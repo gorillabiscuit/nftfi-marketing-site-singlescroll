@@ -1,9 +1,6 @@
 // Main JavaScript file for NFTfi Marketing Site - Single Scroll
 // Three.js scene with glass shader and scroll/mouse interactions
 
-import * as THREE from 'three';
-import { GLTFLoader } from './libs/GLTFLoader.js';
-
 console.log('NFTfi Marketing Site - Single Scroll initialized');
 
 // Scene variables
@@ -234,62 +231,69 @@ function createBackgroundGeometry() {
 function loadModel() {
     console.log('Loading NFTfi logo model...');
     
-    const loader = new GLTFLoader();
-    
-    loader.load('/models/nftfi_logo.glb', (gltf) => {
-        console.log('Model loaded:', gltf);
+    // Import GLTFLoader dynamically
+    import('./libs/GLTFLoader.js').then(({ GLTFLoader }) => {
+        const loader = new GLTFLoader();
         
-        // Calculate bounding box
-        const box = new THREE.Box3().setFromObject(gltf.scene);
-        const center = new THREE.Vector3();
-        const size = new THREE.Vector3();
-        box.getCenter(center);
-        box.getSize(size);
-        
-        // Apply material to all meshes
-        gltf.scene.traverse((child) => {
-            if (child.isMesh) {
-                mesh = child;
-                
-                // Apply smoothing
-                if (child.geometry) {
-                    child.geometry.computeVertexNormals();
+        loader.load('/models/nftfi_logo.glb', (gltf) => {
+            console.log('Model loaded:', gltf);
+            
+            // Calculate bounding box
+            const box = new THREE.Box3().setFromObject(gltf.scene);
+            const center = new THREE.Vector3();
+            const size = new THREE.Vector3();
+            box.getCenter(center);
+            box.getSize(size);
+            
+            // Apply material to all meshes
+            gltf.scene.traverse((child) => {
+                if (child.isMesh) {
+                    mesh = child;
+                    
+                    // Apply smoothing
+                    if (child.geometry) {
+                        child.geometry.computeVertexNormals();
+                    }
+                    
+                    // Create glass shader material
+                    child.material = new THREE.ShaderMaterial({
+                        vertexShader: vertexShader,
+                        fragmentShader: fragmentShader,
+                        uniforms: uniforms,
+                        transparent: true,
+                        side: THREE.DoubleSide
+                    });
                 }
-                
-                // Create glass shader material
-                child.material = new THREE.ShaderMaterial({
-                    vertexShader: vertexShader,
-                    fragmentShader: fragmentShader,
-                    uniforms: uniforms,
-                    transparent: true,
-                    side: THREE.DoubleSide
-                });
-            }
+            });
+            
+            // Create wrapper group
+            wrapper = new THREE.Group();
+            
+            // Center the original mesh
+            gltf.scene.position.set(-center.x, -center.y, -center.z);
+            
+            // Add centered mesh to wrapper
+            wrapper.add(gltf.scene);
+            
+            // Scale the wrapper
+            wrapper.scale.set(3, 3, 3);
+            
+            // Add to scene
+            scene.add(wrapper);
+            
+            isModelReady = true;
+            console.log('NFTfi logo ready for animation');
+            
+        }, (progress) => {
+            console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+        }, (error) => {
+            console.error('Error loading model:', error);
+            // Fallback to icosahedron if model fails to load
+            createFallbackGeometry();
         });
-        
-        // Create wrapper group
-        wrapper = new THREE.Group();
-        
-        // Center the original mesh
-        gltf.scene.position.set(-center.x, -center.y, -center.z);
-        
-        // Add centered mesh to wrapper
-        wrapper.add(gltf.scene);
-        
-        // Scale the wrapper
-        wrapper.scale.set(3, 3, 3);
-        
-        // Add to scene
-        scene.add(wrapper);
-        
-        isModelReady = true;
-        console.log('NFTfi logo ready for animation');
-        
-    }, (progress) => {
-        console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
-    }, (error) => {
-        console.error('Error loading model:', error);
-        // Fallback to icosahedron if model fails to load
+    }).catch(error => {
+        console.error('Error loading GLTFLoader:', error);
+        // Fallback to icosahedron if GLTFLoader fails
         createFallbackGeometry();
     });
 }

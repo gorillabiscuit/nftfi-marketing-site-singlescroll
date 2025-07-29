@@ -12,7 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "task-master-ai": "^0.22.0"
+    "gsap": "^3.13.0",
+    "task-master-ai": "^0.22.0",
+    "three": "^0.178.0"
   },
   "devDependencies": {
     "vite": "^7.0.6"

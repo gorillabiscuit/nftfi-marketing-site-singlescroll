@@ -1,5 +1,4 @@
-// Use global THREE object instead of ES6 imports
-const {
+import {
 	AnimationClip,
 	Bone,
 	Box3,
@@ -65,27 +64,8 @@ const {
 	VectorKeyframeTrack,
 	SRGBColorSpace,
 	InstancedBufferAttribute
-} = THREE;
-
-// Import BufferGeometryUtils function
-function toTrianglesDrawMode(geometry) {
-	const index = geometry.getIndex();
-	const position = geometry.getAttribute('position');
-	const drawRange = geometry.drawRange;
-	const start = drawRange.start;
-	const count = drawRange.count;
-	const maxIndex = geometry.groups.length > 0 ? geometry.groups[geometry.groups.length - 1].start + geometry.groups[geometry.groups.length - 1].count : index ? index.count : position.count;
-	const range = Math.min(maxIndex - start, count);
-	const newIndex = new THREE.BufferAttribute(new Uint16Array(range * 3), 1);
-	let newIndexCount = 0;
-	for (let i = 0; i < range; i += 3) {
-		newIndex.setXYZ(newIndexCount, start + i, start + i + 1, start + i + 2);
-		newIndexCount++;
-	}
-	geometry.setIndex(newIndex);
-	geometry.drawRange.start = 0;
-	geometry.drawRange.count = newIndexCount;
-}
+} from 'three';
+import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
 
 class GLTFLoader extends Loader {
 
