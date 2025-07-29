@@ -8,81 +8,9 @@ let scene, camera, renderer, canvas;
 let model, wrapper, mesh;
 let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
-let uniforms = {};
-let backRenderTarget;
 let isModelReady = false;
 
-// Shader code
-const vertexShader = `
-varying vec3 worldNormal;
-varying vec3 eyeVector;
-
-void main() {
-  vec4 worldPos = modelMatrix * vec4(position, 1.0);
-  vec4 mvPosition = viewMatrix * worldPos;
-
-  gl_Position = projectionMatrix * mvPosition;
-
-  worldNormal = normalize(modelMatrix * vec4(normal, 0.0)).xyz;
-  eyeVector = normalize(worldPos.xyz - cameraPosition);
-}
-`;
-
-const fragmentShader = `
-uniform float uIorR;
-uniform float uIorY;
-uniform float uIorG;
-uniform float uIorC;
-uniform float uIorB;
-uniform float uIorP;
-
-uniform float uSaturation;
-uniform float uChromaticAberration;
-uniform float uRefractPower;
-uniform float uFresnelPower;
-uniform float uShininess;
-uniform float uDiffuseness;
-uniform vec3 uLight;
-
-uniform vec2 winResolution;
-uniform sampler2D uTexture;
-
-varying vec3 worldNormal;
-varying vec3 eyeVector;
-
-// DEBUG: Simplified shader for testing
-void main() {
-  // Calculate UV coordinates
-  vec2 uv = gl_FragCoord.xy / winResolution.xy;
-  
-  // Simple refraction test
-  vec3 normal = normalize(worldNormal);
-  vec3 viewDir = normalize(eyeVector);
-  
-  // Basic refraction calculation
-  float ior = 1.5; // Simple glass IOR
-  vec3 refractDir = refract(viewDir, normal, 1.0 / ior);
-  
-  // Sample texture with refraction offset
-  vec2 refractedUV = uv + refractDir.xy * 0.1; // Simple offset
-  
-  // Sample the background texture
-  vec4 refractedColor = texture2D(uTexture, refractedUV);
-  
-  // Add some basic lighting
-  vec3 lightDir = normalize(uLight);
-  float diffuse = max(0.0, dot(normal, lightDir));
-  
-  // Final color
-  vec3 color = refractedColor.rgb * 0.8 + diffuse * 0.2;
-  
-  // Add fresnel effect
-  float fresnel = pow(1.0 - abs(dot(viewDir, normal)), 3.0);
-  color += fresnel * 0.3;
-  
-  gl_FragColor = vec4(color, 1.0);
-}
-`;
+// No custom shaders needed - using Three.js built-in MeshPhysicalMaterial for refraction
 
 // Initialize Three.js scene
 function init() {
@@ -110,30 +38,9 @@ function init() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     
-    // Create render target for refraction effect
-    backRenderTarget = new THREE.WebGLRenderTarget(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
-    );
+    // No render target needed - MeshPhysicalMaterial handles refraction automatically
     
-    // Initialize uniforms
-    uniforms = {
-        uIorR: { value: 1.15 },
-        uIorY: { value: 1.16 },
-        uIorG: { value: 1.18 },
-        uIorC: { value: 1.22 },
-        uIorB: { value: 1.22 },
-        uIorP: { value: 1.22 },
-        uSaturation: { value: 1.01 },
-        uChromaticAberration: { value: 0.14 },
-        uRefractPower: { value: 0.35 },
-        uFresnelPower: { value: 9.0 },
-        uShininess: { value: 25.0 },
-        uDiffuseness: { value: 0.2 },
-        uLight: { value: new THREE.Vector3(5, 5, 5).normalize() },
-        winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        uTexture: { value: null }
-    };
+    // No uniforms needed - MeshPhysicalMaterial handles all refraction properties
     
     // Add comprehensive lighting setup
     // Ambient light for overall illumination
@@ -166,8 +73,7 @@ function init() {
     // Create background geometry for refraction
     createBackgroundGeometry();
     
-    // Create debug quad to visualize render target content
-    createDebugQuad();
+    // No debug quad needed - MeshPhysicalMaterial handles refraction automatically
     
     // Load GLTF model
     loadModel().catch(error => {
@@ -212,24 +118,7 @@ function createBackgroundGeometry() {
     console.log('Background plane positioned BEHIND mesh (z=-5) for proper refraction');
 }
 
-// Create debug quad to visualize render target content
-function createDebugQuad() {
-    console.log('Creating debug quad to visualize render target...');
-    
-    const geometry = new THREE.PlaneGeometry(10, 10);
-    const material = new THREE.MeshBasicMaterial({
-        map: null, // Will be set to render target texture
-        transparent: true,
-        opacity: 0.8
-    });
-    
-    const debugQuad = new THREE.Mesh(geometry, material);
-    debugQuad.position.set(15, 0, 0); // Position to the right of the scene
-    debugQuad.name = 'debugQuad';
-    
-    scene.add(debugQuad);
-    console.log('Debug quad added at position:', debugQuad.position);
-}
+
 async function loadModel() {
     console.log('Loading NFTfi logo model...');
     
@@ -258,13 +147,18 @@ async function loadModel() {
                         child.geometry.computeVertexNormals();
                     }
                     
-                    // Create glass shader material
-                    child.material = new THREE.ShaderMaterial({
-                        vertexShader: vertexShader,
-                        fragmentShader: fragmentShader,
-                        uniforms: uniforms,
+                    // Create glass material using Three.js built-in refraction
+                    child.material = new THREE.MeshPhysicalMaterial({
+                        transmission: 1.0,        // Full transmission for glass effect
+                        thickness: 0.5,          // Thickness of the glass
+                        ior: 1.5,                // Index of refraction (glass)
                         transparent: true,
-                        side: THREE.DoubleSide
+                        opacity: 1.0,
+                        color: 0xffffff,
+                        metalness: 0.0,
+                        roughness: 0.0,
+                        clearcoat: 1.0,          // Clear coat for extra shine
+                        clearcoatRoughness: 0.0
                     });
                 }
             });
@@ -309,12 +203,17 @@ function createFallbackGeometry() {
     console.log('Creating fallback geometry...');
     
     const geometry = new THREE.IcosahedronGeometry(2, 4);
-    const material = new THREE.ShaderMaterial({
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        uniforms: uniforms,
+    const material = new THREE.MeshPhysicalMaterial({
+        transmission: 1.0,        // Full transmission for glass effect
+        thickness: 0.5,          // Thickness of the glass
+        ior: 1.5,                // Index of refraction (glass)
         transparent: true,
-        side: THREE.DoubleSide
+        opacity: 1.0,
+        color: 0xffffff,
+        metalness: 0.0,
+        roughness: 0.0,
+        clearcoat: 1.0,          // Clear coat for extra shine
+        clearcoatRoughness: 0.0
     });
     
     mesh = new THREE.Mesh(geometry, material);
@@ -363,11 +262,7 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     
-    // Update render target size
-    backRenderTarget.setSize(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
-    );
+    // No render target to resize - MeshPhysicalMaterial handles refraction automatically
     
     // Update uniforms
     uniforms.winResolution.value.set(window.innerWidth, window.innerHeight);
@@ -397,58 +292,11 @@ function animate() {
         wrapper.rotation.z += zRate * 0.02;
     }
     
-    // Glass refraction rendering
+    // MeshPhysicalMaterial handles refraction automatically - no custom render target needed
     if (mesh) {
-        // Update uniforms like in the original
-        mesh.material.uniforms.uDiffuseness.value = 0.2;
-        mesh.material.uniforms.uShininess.value = 25.0;
-        mesh.material.uniforms.uLight.value = new THREE.Vector3(5, 5, 5).normalize();
-        mesh.material.uniforms.uFresnelPower.value = 9.0;
-        mesh.material.uniforms.uIorR.value = 1.15;
-        mesh.material.uniforms.uIorY.value = 1.16;
-        mesh.material.uniforms.uIorG.value = 1.18;
-        mesh.material.uniforms.uIorC.value = 1.22;
-        mesh.material.uniforms.uIorB.value = 1.22;
-        mesh.material.uniforms.uIorP.value = 1.22;
-        mesh.material.uniforms.uSaturation.value = 1.01;
-        mesh.material.uniforms.uChromaticAberration.value = 0.14;
-        mesh.material.uniforms.uRefractPower.value = 0.35;
-        
-        // CRITICAL: Update winResolution uniform for proper UV calculation
-        mesh.material.uniforms.winResolution.value.set(window.innerWidth, window.innerHeight);
-        
-        // STEP 1: Render scene WITHOUT the mesh to back render target
-        mesh.visible = false;
-        renderer.setRenderTarget(backRenderTarget);
-        renderer.render(scene, camera);
-        
-        // STEP 2: Assign the back render target texture to the shader
-        mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
-        console.log('Texture assigned to shader:', backRenderTarget.texture);
-        console.log('Shader uniform uTexture:', mesh.material.uniforms.uTexture.value);
-        
-        // DEBUG: Also assign to debug quad to visualize render target content
-        const debugQuad = scene.getObjectByName('debugQuad');
-        if (debugQuad) {
-            debugQuad.material.map = backRenderTarget.texture;
-            debugQuad.material.needsUpdate = true;
-        }
-        
-        // STEP 3: Show mesh and render to screen with refraction
-        mesh.visible = true;
-        renderer.setRenderTarget(null);
-        
-        // Debug: Log texture updates occasionally
-        if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
-            console.log('Back render target texture assigned:', backRenderTarget.texture);
-            console.log('Texture dimensions:', backRenderTarget.texture.image?.width, 'x', backRenderTarget.texture.image?.height);
-            console.log('winResolution:', mesh.material.uniforms.winResolution.value);
-            console.log('uRefractPower:', mesh.material.uniforms.uRefractPower.value);
-            console.log('uChromaticAberration:', mesh.material.uniforms.uChromaticAberration.value);
-            console.log('Mesh visible:', mesh.visible);
-            console.log('Mesh position:', mesh.position);
-            console.log('Mesh material:', mesh.material);
-        }
+        // Optional: Add some subtle animation to the material properties
+        const time = Date.now() * 0.001;
+        mesh.material.transmission = 0.9 + Math.sin(time * 0.5) * 0.1; // Subtle transmission variation
     }
     
     renderer.render(scene, camera);
