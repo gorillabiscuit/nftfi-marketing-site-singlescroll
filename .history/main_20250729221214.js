@@ -341,12 +341,6 @@ function loadModel() {
         isModelReady = true;
         console.log('NFTfi logo ready for animation');
         
-        // Debug: Log all objects in scene
-        console.log('All objects in scene:');
-        scene.traverse((object) => {
-            console.log('-', object.type, object.name || 'unnamed', 'visible:', object.visible);
-        });
-        
     }, (progress) => {
         console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
     }, (error) => {
@@ -383,12 +377,6 @@ function createFallbackGeometry() {
     
     isModelReady = true;
     console.log('Fallback geometry ready for animation');
-    
-    // Debug: Log all objects in scene
-    console.log('All objects in scene (fallback):');
-    scene.traverse((object) => {
-        console.log('-', object.type, object.name || 'unnamed', 'visible:', object.visible);
-    });
 }
 
 // Add event listeners
@@ -472,6 +460,12 @@ function animate() {
     if (mesh) {
         console.log('Rendering glass refraction...');
         
+        // Temporarily make background geometry visible for render targets
+        const backgroundGroup = scene.children.find(child => child.type === 'Group' && child.visible === false);
+        if (backgroundGroup) {
+            backgroundGroup.visible = true;
+        }
+        
         mesh.visible = false;
         
         // Back side render
@@ -493,6 +487,11 @@ function animate() {
         console.log('Main render target texture:', mainRenderTarget.texture);
         
         renderer.setRenderTarget(null);
+        
+        // Make background geometry invisible again
+        if (backgroundGroup) {
+            backgroundGroup.visible = false;
+        }
     }
     
     renderer.render(scene, camera);

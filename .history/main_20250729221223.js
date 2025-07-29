@@ -341,12 +341,6 @@ function loadModel() {
         isModelReady = true;
         console.log('NFTfi logo ready for animation');
         
-        // Debug: Log all objects in scene
-        console.log('All objects in scene:');
-        scene.traverse((object) => {
-            console.log('-', object.type, object.name || 'unnamed', 'visible:', object.visible);
-        });
-        
     }, (progress) => {
         console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
     }, (error) => {
@@ -383,12 +377,6 @@ function createFallbackGeometry() {
     
     isModelReady = true;
     console.log('Fallback geometry ready for animation');
-    
-    // Debug: Log all objects in scene
-    console.log('All objects in scene (fallback):');
-    scene.traverse((object) => {
-        console.log('-', object.type, object.name || 'unnamed', 'visible:', object.visible);
-    });
 }
 
 // Add event listeners
