@@ -229,35 +229,65 @@ function createBackgroundGeometry() {
 
 // Load GLTF model
 function loadModel() {
-    // For now, create a simple geometry to test the shader
-    console.log('Creating test geometry...');
-    
-    // Create a simple icosahedron as a test object
-    const geometry = new THREE.IcosahedronGeometry(2, 4);
-    
-    // Create shader material
-    const material = new THREE.ShaderMaterial({
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        uniforms: uniforms
+    // Import GLTFLoader dynamically
+    import('./libs/GLTFLoader.js').then(({ GLTFLoader }) => {
+        const loader = new GLTFLoader();
+        
+        loader.load('/models/nftfi_logo.glb', (gltf) => {
+            console.log('Model loaded:', gltf);
+            
+            // Calculate bounding box
+            const box = new THREE.Box3().setFromObject(gltf.scene);
+            const center = new THREE.Vector3();
+            const size = new THREE.Vector3();
+            box.getCenter(center);
+            box.getSize(size);
+            
+            // Apply material to all meshes
+            gltf.scene.traverse((child) => {
+                if (child.isMesh) {
+                    mesh = child;
+                    
+                    // Apply smoothing
+                    if (child.geometry) {
+                        child.geometry.computeVertexNormals();
+                    }
+                    
+                    // Create shader material
+                    child.material = new THREE.ShaderMaterial({
+                        vertexShader: vertexShader,
+                        fragmentShader: fragmentShader,
+                        uniforms: uniforms
+                    });
+                }
+            });
+            
+            // Create wrapper group
+            wrapper = new THREE.Group();
+            
+            // Center the original mesh
+            gltf.scene.position.set(-center.x, -center.y, -center.z);
+            
+            // Add centered mesh to wrapper
+            wrapper.add(gltf.scene);
+            
+            // Scale the wrapper
+            wrapper.scale.set(3, 3, 3);
+            
+            // Add to scene
+            scene.add(wrapper);
+            
+            isModelReady = true;
+            console.log('Model ready for animation');
+            
+        }, (progress) => {
+            console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+        }, (error) => {
+            console.error('Error loading model:', error);
+        });
+    }).catch(error => {
+        console.error('Error loading GLTFLoader:', error);
     });
-    
-    // Create mesh
-    mesh = new THREE.Mesh(geometry, material);
-    
-    // Create wrapper group
-    wrapper = new THREE.Group();
-    wrapper.add(mesh);
-    wrapper.scale.set(3, 3, 3);
-    
-    // Add to scene
-    scene.add(wrapper);
-    
-    isModelReady = true;
-    console.log('Test geometry ready for animation');
-    
-    // TODO: Add GLTF model loading when we resolve the import issues
-    // We can add the model loading back once we have a working GLTFLoader setup
 }
 
 // Add event listeners
