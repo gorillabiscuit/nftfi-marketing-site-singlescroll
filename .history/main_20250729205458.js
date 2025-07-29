@@ -165,14 +165,6 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, 20);
     
-    // Initialize OrbitControls
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.enableZoom = true;
-    controls.enablePan = true;
-    controls.enableRotate = true;
-    
     // Create renderer
     renderer = new THREE.WebGLRenderer({ 
         canvas: canvas,
@@ -405,11 +397,6 @@ function onWindowResize() {
 // Animation loop
 function animate() {
     requestAnimationFrame(animate);
-    
-    // Update OrbitControls
-    if (controls) {
-        controls.update();
-    }
     
     if (wrapper && isModelReady) {
         const time = Date.now() * 0.001; // Convert to seconds
