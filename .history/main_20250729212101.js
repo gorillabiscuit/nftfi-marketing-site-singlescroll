@@ -163,8 +163,8 @@ function init() {
     scene.background = new THREE.Color('#000000');
     
     // Create camera
-    camera = new THREE.PerspectiveCamera(75, size / size, 0.1, 1000); // GitHub Canvas FOV
-    camera.position.set(4, -2, 7); // GitHub Canvas position
+    camera = new THREE.PerspectiveCamera(23, size / size, 0.1, 1000);
+    camera.position.set(4, -2, 7);
     
     // Create renderer
     renderer = new THREE.WebGLRenderer({ 
