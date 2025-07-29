@@ -261,12 +261,12 @@ function createBackgroundGeometry() {
     const material = new THREE.MeshBasicMaterial({ 
         map: texture,
         transparent: true,
-        opacity: 0.8
+        opacity: 1.0  // Make more visible for debugging
     });
     
-    // Create the background plane - positioned closer to the mesh
+    // Create the background plane - positioned for refraction
     const backgroundPlane = new THREE.Mesh(planeGeometry, material);
-    backgroundPlane.position.set(0, 0, -2); // Much closer to the mesh
+    backgroundPlane.position.set(0, 0, -5); // Match original GitHub positioning
     backgroundPlane.rotation.set(0, 0, 0);
     
     scene.add(backgroundPlane);
