@@ -240,24 +240,11 @@ function createBackgroundGeometry() {
     // Create a plane geometry for the background
     const planeGeometry = new THREE.PlaneGeometry(20, 20);
     
-    // Load the original header.png texture
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load('/header.png', 
-        (texture) => {
-            console.log('Background texture loaded successfully');
-            console.log('Texture dimensions:', texture.image.width, 'x', texture.image.height);
-        },
-        undefined,
-        (error) => {
-            console.warn('Could not load background texture:', error);
-        }
-    );
-    
-    // Create material with the original texture
+    // Create a simple blue material for testing refraction
     const material = new THREE.MeshBasicMaterial({ 
-        map: texture,
+        color: 0x0066ff,  // Bright blue color
         transparent: true,
-        opacity: 1.0  // Make more visible for debugging
+        opacity: 1.0
     });
     
     // Create the background plane - positioned for refraction
@@ -266,7 +253,7 @@ function createBackgroundGeometry() {
     backgroundPlane.rotation.set(0, 0, 0);
     
     scene.add(backgroundPlane);
-    console.log('Background plane added at z:', backgroundPlane.position.z);
+    console.log('Blue background plane added at z:', backgroundPlane.position.z);
     console.log('Background plane visible:', backgroundPlane.visible);
     console.log('Background plane material:', backgroundPlane.material);
 }
@@ -466,6 +453,8 @@ function animate() {
         
         // STEP 2: Assign the back render target texture to the shader
         mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
+        console.log('Texture assigned to shader:', backRenderTarget.texture);
+        console.log('Shader uniform uTexture:', mesh.material.uniforms.uTexture.value);
         
         // STEP 3: Show mesh and render to screen with refraction
         mesh.visible = true;
@@ -478,6 +467,9 @@ function animate() {
             console.log('winResolution:', mesh.material.uniforms.winResolution.value);
             console.log('uRefractPower:', mesh.material.uniforms.uRefractPower.value);
             console.log('uChromaticAberration:', mesh.material.uniforms.uChromaticAberration.value);
+            console.log('Mesh visible:', mesh.visible);
+            console.log('Mesh position:', mesh.position);
+            console.log('Mesh material:', mesh.material);
         }
     }
     
