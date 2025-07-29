@@ -204,105 +204,7 @@ body {
     margin-top: 1rem;
 }
 
-/* Controls Panel Styles */
-.controls-panel {
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 20px 0;
-    backdrop-filter: blur(10px);
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.controls-panel h3 {
-    color: #F2F2F2;
-    margin: 0 0 20px 0;
-    font-size: 18px;
-    font-weight: 600;
-    text-align: center;
-}
-
-.control-group {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.control-group:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.control-group label {
-    display: block;
-    color: #F2F2F2;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 10px;
-}
-
-.control-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    gap: 10px;
-}
-
-.control-row label {
-    color: #F2F2F2;
-    font-size: 12px;
-    font-weight: 400;
-    margin: 0;
-    min-width: 120px;
-}
-
-.control-slider {
-    flex: 1;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.control-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #F2F2F2;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.control-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    background: #F2F2F2;
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-}
-
-.vector-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.control-label {
-    color: #F2F2F2;
-    font-size: 11px;
-    font-weight: 400;
-    opacity: 0.8;
-}
-
-/* Responsive adjustments */
+/* Responsive Design */
 @media (max-width: 768px) {
     .content h1 {
         font-size: 2.5rem;
@@ -314,20 +216,5 @@ body {
     
     .content p {
         font-size: 1.2rem;
-    }
-
-    .controls-panel {
-        margin: 10px;
-        padding: 15px;
-    }
-    
-    .control-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 5px;
-    }
-    
-    .control-row label {
-        min-width: auto;
     }
 } 
