@@ -68,7 +68,7 @@ const {
 } = THREE;
 
 // Import BufferGeometryUtils function
-const { toTrianglesDrawMode } = await import('./utils/BufferGeometryUtils.js');
+const { toTrianglesDrawMode } = THREE.BufferGeometryUtils || {};
 
 class GLTFLoader extends Loader {
 

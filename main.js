@@ -153,8 +153,8 @@ function init() {
     scene.background = null; // Make background transparent
     
     // Create camera
-    camera = new THREE.PerspectiveCamera(23, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0.5, 0.0, 20.0);
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 20);
     
     // Create renderer
     renderer = new THREE.WebGLRenderer({ 
@@ -227,9 +227,6 @@ function init() {
     // Create background geometry for refraction
     createBackgroundGeometry();
     
-    // Create background objects for refraction (like in GitHub version)
-    createBackgroundObjects();
-    
     // Load GLTF model
     loadModel().catch(error => {
         console.error('Error in loadModel:', error);
@@ -252,6 +249,7 @@ function createBackgroundGeometry() {
     const texture = textureLoader.load('/header.png', 
         (texture) => {
             console.log('Background texture loaded successfully');
+            console.log('Texture dimensions:', texture.image.width, 'x', texture.image.height);
         },
         undefined,
         (error) => {
@@ -273,34 +271,8 @@ function createBackgroundGeometry() {
     
     scene.add(backgroundPlane);
     console.log('Background plane added at z:', backgroundPlane.position.z);
-}
-
-// Create background objects for refraction (like in GitHub version)
-function createBackgroundObjects() {
-    console.log('Creating background objects for refraction...');
-    
-    // Create background group (initially invisible)
-    const backgroundGroup = new THREE.Group();
-    backgroundGroup.visible = false;
-    
-    // Add multiple icosahedrons at different positions (like GitHub version)
-    const positions = [
-        [-4, -3, -4],
-        [4, -3, -4], 
-        [-5, 3, -4],
-        [5, 3, -4]
-    ];
-    
-    positions.forEach((pos, index) => {
-        const geometry = new THREE.IcosahedronGeometry(2, 16);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(pos[0], pos[1], pos[2]);
-        backgroundGroup.add(mesh);
-    });
-    
-    scene.add(backgroundGroup);
-    console.log('Background objects added for refraction');
+    console.log('Background plane visible:', backgroundPlane.visible);
+    console.log('Background plane material:', backgroundPlane.material);
 }
 
 // Load GLTF model
@@ -477,6 +449,7 @@ function animate() {
     
     // Glass refraction rendering
     if (mesh) {
+        // Hide mesh during render target creation
         mesh.visible = false;
 
         // Update uniforms like in the original
@@ -494,51 +467,33 @@ function animate() {
         mesh.material.uniforms.uChromaticAberration.value = 0.14;
         mesh.material.uniforms.uRefractPower.value = 0.35;
         
-        // Back side render - render background objects to texture
+        // Render scene to back render target (without the mesh)
         renderer.setRenderTarget(backRenderTarget);
-        // Temporarily make background objects visible for rendering
-        scene.children.forEach(child => {
-            if (child.type === 'Group' && !child.visible) {
-                child.visible = true;
-            }
-        });
         renderer.render(scene, camera);
-        // Hide background objects again
-        scene.children.forEach(child => {
-            if (child.type === 'Group') {
-                child.visible = false;
-            }
-        });
         
+        // Assign back render target texture to shader
         mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
         mesh.material.side = THREE.BackSide;
         
+        // Show mesh for front render
         mesh.visible = true;
         
-        // Front side render - render background objects to texture
+        // Render scene to main render target (with the mesh)
         renderer.setRenderTarget(mainRenderTarget);
-        // Temporarily make background objects visible for rendering
-        scene.children.forEach(child => {
-            if (child.type === 'Group' && !child.visible) {
-                child.visible = true;
-            }
-        });
         renderer.render(scene, camera);
-        // Hide background objects again
-        scene.children.forEach(child => {
-            if (child.type === 'Group') {
-                child.visible = false;
-            }
-        });
         
+        // Assign main render target texture to shader
         mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
         mesh.material.side = THREE.FrontSide;
         
+        // Reset render target to screen
         renderer.setRenderTarget(null);
         
-        // Debug: Log texture updates
+        // Debug: Log texture updates occasionally
         if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
             console.log('Render targets updated, texture:', mesh.material.uniforms.uTexture.value);
+            console.log('Back render target:', backRenderTarget.texture);
+            console.log('Main render target:', mainRenderTarget.texture);
         }
     }
     
