@@ -156,6 +156,8 @@ function init() {
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     
     // Create render targets
     mainRenderTarget = new THREE.WebGLRenderTarget(
@@ -181,14 +183,38 @@ function init() {
         uFresnelPower: { value: 9.0 },
         uShininess: { value: 25.0 },
         uDiffuseness: { value: 0.2 },
-        uLight: { value: new THREE.Vector3(-1.0, 1.0, 1.0) },
+        uLight: { value: new THREE.Vector3(5, 5, 5).normalize() },
         winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
         uTexture: { value: null }
     };
     
-    // Add lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+    // Add comprehensive lighting setup
+    // Ambient light for overall illumination
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
     scene.add(ambientLight);
+    
+    // Main directional light
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    directionalLight.position.set(5, 5, 5);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    scene.add(directionalLight);
+    
+    // Secondary directional light for fill
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    fillLight.position.set(-5, 3, 5);
+    scene.add(fillLight);
+    
+    // Rim light for edge highlighting
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    rimLight.position.set(0, -5, 5);
+    scene.add(rimLight);
+    
+    // Point light for dynamic highlights
+    const pointLight = new THREE.PointLight(0xffffff, 0.8, 100);
+    pointLight.position.set(0, 0, 10);
+    scene.add(pointLight);
     
     // Create background geometry for refraction
     createBackgroundGeometry();
