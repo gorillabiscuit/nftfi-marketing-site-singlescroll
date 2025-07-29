@@ -71,8 +71,6 @@ body {
     max-width: 800px;
     text-align: center;
     margin-left: 340px; /* Give space for the controls panel */
-    position: relative;
-    z-index: 3;
 }
 
 .content h1 {

@@ -305,11 +305,9 @@ function init() {
     // Create renderer
     renderer = new THREE.WebGLRenderer({ 
         canvas: canvas,
-        alpha: true, // Enable transparency
-        antialias: true 
+        antialias: true,
+        alpha: true 
     });
-    renderer.setSize(size, size);
-    renderer.setClearColor(0x000000, 0); // Transparent clear color
     
     // Set square aspect ratio like GitHub version
     renderer.setSize(size, size);
@@ -388,7 +386,7 @@ function createBackgroundGeometry() {
     });
     
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.set(0, 0, -3); // Move plane closer to center
+    plane.position.set(0, 0, -5); // GitHub position
     scene.add(plane); // Add directly to scene, not to background group
 }
 
