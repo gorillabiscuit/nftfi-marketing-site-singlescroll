@@ -304,6 +304,11 @@ function loadModel() {
             // Fallback to icosahedron if model fails to load
             createFallbackGeometry();
         });
+    }).catch(error => {
+        console.error('Error loading GLTFLoader:', error);
+        // Fallback to icosahedron if GLTFLoader fails
+        createFallbackGeometry();
+    });
 }
 
 // Fallback geometry if model loading fails

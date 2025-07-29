@@ -239,10 +239,11 @@ function createBackgroundGeometry() {
 function loadModel() {
     console.log('Loading NFTfi logo model...');
     
-    // Use global GLTFLoader
-    const loader = new GLTFLoader();
-    
-    loader.load('/models/nftfi_logo.glb', (gltf) => {
+    // Import GLTFLoader dynamically
+    import('./libs/GLTFLoader-global.js').then(({ GLTFLoader }) => {
+        const loader = new GLTFLoader();
+        
+        loader.load('/models/nftfi_logo.glb', (gltf) => {
             console.log('Model loaded:', gltf);
             
             // Calculate bounding box FIRST (before any geometry modifications) - EXACT from original
@@ -304,6 +305,11 @@ function loadModel() {
             // Fallback to icosahedron if model fails to load
             createFallbackGeometry();
         });
+    }).catch(error => {
+        console.error('Error loading GLTFLoader:', error);
+        // Fallback to icosahedron if GLTFLoader fails
+        createFallbackGeometry();
+    });
 }
 
 // Fallback geometry if model loading fails
