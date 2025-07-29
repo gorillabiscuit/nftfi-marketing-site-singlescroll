@@ -213,7 +213,7 @@ function init() {
         uShininess: { value: 25.0 },
         uDiffuseness: { value: 0.2 },
         uLight: { value: new THREE.Vector3(-1.0, 1.0, 1.0) },
-        winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2)) },
+        winResolution: { value: new THREE.Vector2(size, size) },
         uTexture: { value: null }
     };
     
@@ -436,7 +436,7 @@ function onWindowResize() {
     );
     
     // Update uniforms
-    uniforms.winResolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2));
+    uniforms.winResolution.value.set(size, size);
 }
 
 // Animation loop

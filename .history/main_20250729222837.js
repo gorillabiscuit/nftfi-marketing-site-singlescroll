@@ -188,14 +188,14 @@ function init() {
     controls.enablePan = true;
     controls.enableRotate = true;
     
-    // Create render targets with full window resolution like GitHub version
+    // Create render targets
     mainRenderTarget = new THREE.WebGLRenderTarget(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
+        size * Math.min(window.devicePixelRatio, 2),
+        size * Math.min(window.devicePixelRatio, 2)
     );
     backRenderTarget = new THREE.WebGLRenderTarget(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
+        size * Math.min(window.devicePixelRatio, 2),
+        size * Math.min(window.devicePixelRatio, 2)
     );
     
     // Initialize uniforms
@@ -213,7 +213,7 @@ function init() {
         uShininess: { value: 25.0 },
         uDiffuseness: { value: 0.2 },
         uLight: { value: new THREE.Vector3(-1.0, 1.0, 1.0) },
-        winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2)) },
+        winResolution: { value: new THREE.Vector2(size, size) },
         uTexture: { value: null }
     };
     
@@ -427,16 +427,16 @@ function onWindowResize() {
     
     // Update render targets
     mainRenderTarget.setSize(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
+        size * Math.min(window.devicePixelRatio, 2),
+        size * Math.min(window.devicePixelRatio, 2)
     );
     backRenderTarget.setSize(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
+        size * Math.min(window.devicePixelRatio, 2),
+        size * Math.min(window.devicePixelRatio, 2)
     );
     
     // Update uniforms
-    uniforms.winResolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2));
+    uniforms.winResolution.value.set(size, size);
 }
 
 // Animation loop
