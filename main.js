@@ -129,6 +129,14 @@ void main() {
 
   color /= float(LOOP);
   
+  // Specular
+  float specularLight = specular(uLight, uShininess, uDiffuseness);
+  color += specularLight;
+
+  // Fresnel
+  float f = fresnel(eyeVector, normal, uFresnelPower);
+  color.rgb += f * vec3(1.0);
+
   gl_FragColor = vec4(color, 1.0);
 }
 `;
@@ -229,31 +237,36 @@ function init() {
     addEventListeners();
 }
 
-// Create background geometry for refraction effects
+// Create background plane for refraction effects
 function createBackgroundGeometry() {
-    const backgroundGroup = new THREE.Group();
-    backgroundGroup.visible = false;
+    // Create a plane geometry for the background
+    const planeGeometry = new THREE.PlaneGeometry(20, 20);
     
-    // Add geometric shapes for refraction
-    const geometry1 = new THREE.IcosahedronGeometry(2, 16);
-    const material1 = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const mesh1 = new THREE.Mesh(geometry1, material1);
-    mesh1.position.set(-4, -3, -4);
-    backgroundGroup.add(mesh1);
+    // Try to load the texture, fallback to white if not available
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('/header.png', 
+        (texture) => {
+            console.log('Background texture loaded successfully');
+        },
+        undefined,
+        (error) => {
+            console.warn('Could not load background texture, using fallback:', error);
+        }
+    );
     
-    const mesh2 = new THREE.Mesh(geometry1, material1);
-    mesh2.position.set(4, -3, -4);
-    backgroundGroup.add(mesh2);
+    // Create material with texture or fallback to white
+    const material = new THREE.MeshBasicMaterial({ 
+        map: texture,
+        transparent: true,
+        opacity: 0.8
+    });
     
-    const mesh3 = new THREE.Mesh(geometry1, material1);
-    mesh3.position.set(-5, 3, -4);
-    backgroundGroup.add(mesh3);
+    // Create the background plane
+    const backgroundPlane = new THREE.Mesh(planeGeometry, material);
+    backgroundPlane.position.set(0, 0, -5);
+    backgroundPlane.rotation.set(0, 0, 0);
     
-    const mesh4 = new THREE.Mesh(geometry1, material1);
-    mesh4.position.set(5, 3, -4);
-    backgroundGroup.add(mesh4);
-    
-    scene.add(backgroundGroup);
+    scene.add(backgroundPlane);
 }
 
 // Load GLTF model
