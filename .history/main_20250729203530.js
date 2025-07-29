@@ -161,9 +161,6 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
-    // Set clear color to transparent
-    renderer.setClearColor(0x000000, 0);
-    
     // Create render targets
     mainRenderTarget = new THREE.WebGLRenderTarget(
         window.innerWidth * Math.min(window.devicePixelRatio, 2),
