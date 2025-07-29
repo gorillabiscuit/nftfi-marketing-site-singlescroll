@@ -247,9 +247,9 @@ function createBackgroundGeometry() {
         opacity: 1.0
     });
     
-    // Create the background plane - positioned for refraction with random rotation
+    // Create the background plane - positioned at the same location as the mesh
     const backgroundPlane = new THREE.Mesh(planeGeometry, material);
-    backgroundPlane.position.set(0, 0, -5); // Match original GitHub positioning
+    backgroundPlane.position.set(0, 0, 5); // Same z-position as the mesh (z=5)
     
     // Random rotation for more interesting refraction
     const randomRotationX = (Math.random() - 0.5) * Math.PI * 0.5; // ±45 degrees
@@ -263,6 +263,7 @@ function createBackgroundGeometry() {
     console.log('Background plane material:', backgroundPlane.material);
     console.log('Background plane rotation:', backgroundPlane.rotation);
     console.log('Background plane dimensions: 4 x 20 (narrow rectangle)');
+    console.log('Background plane positioned at same z as mesh (z=5)');
 }
 
 // Load GLTF model
