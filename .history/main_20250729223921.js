@@ -142,8 +142,6 @@ void main() {
   color.rgb += f * vec3(1.0);
 
   gl_FragColor = vec4(color, 1.0);
-  #include <tonemapping_fragment>
-  #include <colorspace_fragment>
 }
 `;
 
@@ -190,7 +188,7 @@ function init() {
         window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     
-    // Initialize uniforms with all parameters from GitHub version
+    // Initialize uniforms
     uniforms = {
         uIorR: { value: 1.15 },
         uIorY: { value: 1.16 },
@@ -198,9 +196,9 @@ function init() {
         uIorC: { value: 1.22 },
         uIorB: { value: 1.22 },
         uIorP: { value: 1.22 },
-        uRefractPower: { value: 0.35 },
-        uChromaticAberration: { value: 0.14 },
         uSaturation: { value: 1.01 },
+        uChromaticAberration: { value: 0.14 },
+        uRefractPower: { value: 0.35 },
         uFresnelPower: { value: 9.0 },
         uShininess: { value: 25.0 },
         uDiffuseness: { value: 0.2 },
@@ -208,7 +206,8 @@ function init() {
         winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2)) },
         uTexture: { value: null }
     };
-    console.log('Uniforms initialized:', uniforms); // Debugging
+    
+    console.log('Uniforms initialized:', uniforms);
     
     // Add lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
