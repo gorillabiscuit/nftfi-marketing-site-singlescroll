@@ -8,12 +8,13 @@ console.log('NFTfi Marketing Site - Single Scroll initialized');
 
 // Scene variables
 let scene, camera, renderer, canvas;
-let mesh, wrapper;
-let isModelReady = false;
-let mainRenderTarget, backRenderTarget;
-let uniforms;
+let model, wrapper, mesh;
 let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
+let uniforms = {};
+let mainRenderTarget, backRenderTarget;
+let isModelReady = false;
+let controls;
 
 // Shader code
 const vertexShader = `
@@ -177,6 +178,14 @@ function init() {
     
     // Set clear color to transparent
     renderer.setClearColor(0x000000, 0);
+    
+    // Initialize OrbitControls (after renderer is created)
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.enableRotate = true;
     
     // Create render targets with full window resolution like GitHub version
     mainRenderTarget = new THREE.WebGLRenderTarget(
@@ -414,6 +423,11 @@ function onWindowResize() {
 // Animation loop
 function animate() {
     requestAnimationFrame(animate);
+    
+    // Update OrbitControls
+    if (controls) {
+        controls.update();
+    }
     
     if (wrapper && isModelReady) {
         const time = Date.now() * 0.001; // Convert to seconds

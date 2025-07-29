@@ -178,6 +178,14 @@ function init() {
     // Set clear color to transparent
     renderer.setClearColor(0x000000, 0);
     
+    // Initialize OrbitControls (after renderer is created)
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.enableRotate = true;
+    
     // Create render targets with full window resolution like GitHub version
     mainRenderTarget = new THREE.WebGLRenderTarget(
         window.innerWidth * Math.min(window.devicePixelRatio, 2),
@@ -414,6 +422,11 @@ function onWindowResize() {
 // Animation loop
 function animate() {
     requestAnimationFrame(animate);
+    
+    // Update OrbitControls
+    if (controls) {
+        controls.update();
+    }
     
     if (wrapper && isModelReady) {
         const time = Date.now() * 0.001; // Convert to seconds

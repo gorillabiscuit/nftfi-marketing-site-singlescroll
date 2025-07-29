@@ -415,6 +415,11 @@ function onWindowResize() {
 function animate() {
     requestAnimationFrame(animate);
     
+    // Update OrbitControls
+    if (controls) {
+        controls.update();
+    }
+    
     if (wrapper && isModelReady) {
         const time = Date.now() * 0.001; // Convert to seconds
         
