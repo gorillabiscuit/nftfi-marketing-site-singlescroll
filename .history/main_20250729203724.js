@@ -210,7 +210,7 @@ function init() {
 // Create background geometry for refraction effects
 function createBackgroundGeometry() {
     const backgroundGroup = new THREE.Group();
-    backgroundGroup.visible = true; // Make visible so plane can be seen
+    backgroundGroup.visible = false;
     
     // Add geometric shapes for refraction
     const geometry1 = new THREE.IcosahedronGeometry(2, 16);
