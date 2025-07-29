@@ -333,6 +333,8 @@ function createFallbackGeometry() {
         vertexShader: vertexShader,
         fragmentShader: fragmentShader,
         uniforms: uniforms,
+        transparent: true,
+        opacity: 0.5,
         side: THREE.DoubleSide
     });
     

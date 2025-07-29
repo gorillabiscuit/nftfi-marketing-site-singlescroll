@@ -201,7 +201,8 @@ function init() {
         uDiffuseness: { value: 0.2 },
         uLight: { value: new THREE.Vector3(-1.0, 1.0, 1.0) },
         winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        uTexture: { value: null }
+        uTexture: { value: null },
+        uOpacity: { value: 0.5 } // Initialize opacity uniform
     };
     
     // Add lights
@@ -292,6 +293,8 @@ function loadModel() {
                     vertexShader: vertexShader,
                     fragmentShader: fragmentShader,
                     uniforms: uniforms,
+                    transparent: true,
+                    opacity: 0.5,
                     side: THREE.DoubleSide
                 });
             }
@@ -333,6 +336,8 @@ function createFallbackGeometry() {
         vertexShader: vertexShader,
         fragmentShader: fragmentShader,
         uniforms: uniforms,
+        transparent: true,
+        opacity: 0.5,
         side: THREE.DoubleSide
     });
     
