@@ -239,34 +239,47 @@ function init() {
 
 // Create background plane for refraction effects
 function createBackgroundGeometry() {
+    console.log('Creating background plane for refraction...');
+    
     // Create a plane geometry for the background
     const planeGeometry = new THREE.PlaneGeometry(20, 20);
     
-    // Try to load the texture, fallback to white if not available
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load('/header.png', 
-        (texture) => {
-            console.log('Background texture loaded successfully');
-        },
-        undefined,
-        (error) => {
-            console.warn('Could not load background texture, using fallback:', error);
-        }
-    );
+    // Create a checkerboard pattern for better refraction visibility
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
     
-    // Create material with texture or fallback to white
+    // Create checkerboard pattern
+    const tileSize = 32;
+    for (let x = 0; x < canvas.width; x += tileSize) {
+        for (let y = 0; y < canvas.height; y += tileSize) {
+            const isEven = ((x / tileSize) + (y / tileSize)) % 2 === 0;
+            ctx.fillStyle = isEven ? '#ffffff' : '#cccccc';
+            ctx.fillRect(x, y, tileSize, tileSize);
+        }
+    }
+    
+    // Create texture from canvas
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(4, 4);
+    
+    // Create material with the pattern
     const material = new THREE.MeshBasicMaterial({ 
         map: texture,
         transparent: true,
-        opacity: 0.8
+        opacity: 1.0
     });
     
-    // Create the background plane
+    // Create the background plane - positioned closer to the mesh
     const backgroundPlane = new THREE.Mesh(planeGeometry, material);
-    backgroundPlane.position.set(0, 0, -5);
+    backgroundPlane.position.set(0, 0, -2); // Much closer to the mesh
     backgroundPlane.rotation.set(0, 0, 0);
     
     scene.add(backgroundPlane);
+    console.log('Background plane added at z:', backgroundPlane.position.z);
 }
 
 // Load GLTF model
@@ -444,6 +457,21 @@ function animate() {
     // Glass refraction rendering
     if (mesh) {
         mesh.visible = false;
+
+        // Update uniforms like in the original
+        mesh.material.uniforms.uDiffuseness.value = 0.2;
+        mesh.material.uniforms.uShininess.value = 25.0;
+        mesh.material.uniforms.uLight.value = new THREE.Vector3(5, 5, 5).normalize();
+        mesh.material.uniforms.uFresnelPower.value = 9.0;
+        mesh.material.uniforms.uIorR.value = 1.15;
+        mesh.material.uniforms.uIorY.value = 1.16;
+        mesh.material.uniforms.uIorG.value = 1.18;
+        mesh.material.uniforms.uIorC.value = 1.22;
+        mesh.material.uniforms.uIorB.value = 1.22;
+        mesh.material.uniforms.uIorP.value = 1.22;
+        mesh.material.uniforms.uSaturation.value = 1.01;
+        mesh.material.uniforms.uChromaticAberration.value = 0.14;
+        mesh.material.uniforms.uRefractPower.value = 0.35;
         
         // Back side render
         renderer.setRenderTarget(backRenderTarget);
@@ -462,6 +490,11 @@ function animate() {
         mesh.material.side = THREE.FrontSide;
         
         renderer.setRenderTarget(null);
+        
+        // Debug: Log texture updates
+        if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
+            console.log('Render targets updated, texture:', mesh.material.uniforms.uTexture.value);
+        }
     }
     
     renderer.render(scene, camera);
