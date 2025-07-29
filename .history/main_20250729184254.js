@@ -229,80 +229,12 @@ function createBackgroundGeometry() {
 
 // Load GLTF model
 function loadModel() {
-    console.log('Loading NFTfi logo model...');
+    console.log('Creating glass shader geometry...');
     
-    // Import GLTFLoader dynamically
-    import('./libs/GLTFLoader.js').then(({ GLTFLoader }) => {
-        const loader = new GLTFLoader();
-        
-        loader.load('/models/nftfi_logo.glb', (gltf) => {
-            console.log('Model loaded:', gltf);
-            
-            // Calculate bounding box
-            const box = new THREE.Box3().setFromObject(gltf.scene);
-            const center = new THREE.Vector3();
-            const size = new THREE.Vector3();
-            box.getCenter(center);
-            box.getSize(size);
-            
-            // Apply material to all meshes
-            gltf.scene.traverse((child) => {
-                if (child.isMesh) {
-                    mesh = child;
-                    
-                    // Apply smoothing
-                    if (child.geometry) {
-                        child.geometry.computeVertexNormals();
-                    }
-                    
-                    // Create glass shader material
-                    child.material = new THREE.ShaderMaterial({
-                        vertexShader: vertexShader,
-                        fragmentShader: fragmentShader,
-                        uniforms: uniforms,
-                        transparent: true,
-                        side: THREE.DoubleSide
-                    });
-                }
-            });
-            
-            // Create wrapper group
-            wrapper = new THREE.Group();
-            
-            // Center the original mesh
-            gltf.scene.position.set(-center.x, -center.y, -center.z);
-            
-            // Add centered mesh to wrapper
-            wrapper.add(gltf.scene);
-            
-            // Scale the wrapper
-            wrapper.scale.set(3, 3, 3);
-            
-            // Add to scene
-            scene.add(wrapper);
-            
-            isModelReady = true;
-            console.log('NFTfi logo ready for animation');
-            
-        }, (progress) => {
-            console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
-        }, (error) => {
-            console.error('Error loading model:', error);
-            // Fallback to icosahedron if model fails to load
-            createFallbackGeometry();
-        });
-    }).catch(error => {
-        console.error('Error loading GLTFLoader:', error);
-        // Fallback to icosahedron if GLTFLoader fails
-        createFallbackGeometry();
-    });
-}
-
-// Fallback geometry if model loading fails
-function createFallbackGeometry() {
-    console.log('Creating fallback geometry...');
-    
+    // Create a simple icosahedron as a test object
     const geometry = new THREE.IcosahedronGeometry(2, 4);
+    
+    // Create glass shader material
     const material = new THREE.ShaderMaterial({
         vertexShader: vertexShader,
         fragmentShader: fragmentShader,
@@ -311,14 +243,19 @@ function createFallbackGeometry() {
         side: THREE.DoubleSide
     });
     
+    // Create mesh
     mesh = new THREE.Mesh(geometry, material);
+    
+    // Create wrapper group
     wrapper = new THREE.Group();
     wrapper.add(mesh);
     wrapper.scale.set(3, 3, 3);
+    
+    // Add to scene
     scene.add(wrapper);
     
     isModelReady = true;
-    console.log('Fallback geometry ready for animation');
+    console.log('Glass shader geometry ready for animation');
 }
 
 // Add event listeners
@@ -391,29 +328,7 @@ function animate() {
         wrapper.rotation.z += zRate * 0.02;
     }
     
-    // Glass refraction rendering
-    if (mesh) {
-        mesh.visible = false;
-        
-        // Back side render
-        renderer.setRenderTarget(backRenderTarget);
-        renderer.render(scene, camera);
-        
-        mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
-        mesh.material.side = THREE.BackSide;
-        
-        mesh.visible = true;
-        
-        // Front side render
-        renderer.setRenderTarget(mainRenderTarget);
-        renderer.render(scene, camera);
-        
-        mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
-        mesh.material.side = THREE.FrontSide;
-        
-        renderer.setRenderTarget(null);
-    }
-    
+    // Simple render for now
     renderer.render(scene, camera);
 }
 
