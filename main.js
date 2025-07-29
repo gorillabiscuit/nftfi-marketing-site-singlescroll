@@ -50,93 +50,36 @@ uniform sampler2D uTexture;
 varying vec3 worldNormal;
 varying vec3 eyeVector;
 
-vec3 sat(vec3 rgb, float adjustment) {
-  const vec3 W = vec3(0.2125, 0.7154, 0.0721);
-  vec3 intensity = vec3(dot(rgb, W));
-  return mix(intensity, rgb, adjustment);
-}
-
-float fresnel(vec3 eyeVector, vec3 worldNormal, float power) {
-  float fresnelFactor = abs(dot(eyeVector, worldNormal));
-  float inversefresnelFactor = 1.0 - fresnelFactor;
-  
-  return pow(inversefresnelFactor, power);
-}
-
-float specular(vec3 light, float shininess, float diffuseness) {
-  vec3 normal = worldNormal;
-  vec3 lightVector = normalize(-light);
-  vec3 halfVector = normalize(eyeVector + lightVector);
-
-  float NdotL = dot(normal, lightVector);
-  float NdotH = dot(normal, halfVector);
-  float kDiffuse = max(0.0, NdotL);
-  float NdotH2 = NdotH * NdotH;
-
-  float kSpecular = pow(NdotH2, shininess);
-  return kSpecular + kDiffuse * diffuseness;
-}
-
-const int LOOP = 16;
-
+// DEBUG: Simplified shader for testing
 void main() {
-  float iorRatioRed = 1.0/uIorR;
-  float iorRatioGreen = 1.0/uIorG;
-  float iorRatioBlue = 1.0/uIorB;
-
+  // Calculate UV coordinates
   vec2 uv = gl_FragCoord.xy / winResolution.xy;
-  vec3 normal = worldNormal;
-  vec3 color = vec3(0.0);
-
-  for (int i = 0; i < LOOP; i++) {
-    float slide = float(i) / float(LOOP) * 0.1;
-
-    vec3 refractVecR = refract(eyeVector, normal, (1.0/uIorR));
-    vec3 refractVecY = refract(eyeVector, normal, (1.0/uIorY));
-    vec3 refractVecG = refract(eyeVector, normal, (1.0/uIorG));
-    vec3 refractVecC = refract(eyeVector, normal, (1.0/uIorC));
-    vec3 refractVecB = refract(eyeVector, normal, (1.0/uIorB));
-    vec3 refractVecP = refract(eyeVector, normal, (1.0/uIorP));
-
-    float r = texture2D(uTexture, uv + refractVecR.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).x * 0.5;
-
-    float y = (texture2D(uTexture, uv + refractVecY.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).x * 2.0 +
-                texture2D(uTexture, uv + refractVecY.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).y * 2.0 -
-                texture2D(uTexture, uv + refractVecY.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).z) / 6.0;
-
-    float g = texture2D(uTexture, uv + refractVecG.xy * (uRefractPower + slide * 2.0) * uChromaticAberration).y * 0.5;
-
-    float c = (texture2D(uTexture, uv + refractVecC.xy * (uRefractPower + slide * 2.5) * uChromaticAberration).y * 2.0 +
-                texture2D(uTexture, uv + refractVecC.xy * (uRefractPower + slide * 2.5) * uChromaticAberration).z * 2.0 -
-                texture2D(uTexture, uv + refractVecC.xy * (uRefractPower + slide * 2.5) * uChromaticAberration).x) / 6.0;
-          
-    float b = texture2D(uTexture, uv + refractVecB.xy * (uRefractPower + slide * 3.0) * uChromaticAberration).z * 0.5;
-
-    float p = (texture2D(uTexture, uv + refractVecP.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).z * 2.0 +
-                texture2D(uTexture, uv + refractVecP.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).x * 2.0 -
-                texture2D(uTexture, uv + refractVecP.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).y) / 6.0;
-
-    float R = r + (2.0*p + 2.0*y - c)/3.0;
-    float G = g + (2.0*y + 2.0*c - p)/3.0;
-    float B = b + (2.0*c + 2.0*p - y)/3.0;
-
-    color.r += R;
-    color.g += G;
-    color.b += B;
-
-    color = sat(color, uSaturation);
-  }
-
-  color /= float(LOOP);
   
-  // Specular
-  float specularLight = specular(uLight, uShininess, uDiffuseness);
-  color += specularLight;
-
-  // Fresnel
-  float f = fresnel(eyeVector, normal, uFresnelPower);
-  color.rgb += f * vec3(1.0);
-
+  // Simple refraction test
+  vec3 normal = normalize(worldNormal);
+  vec3 viewDir = normalize(eyeVector);
+  
+  // Basic refraction calculation
+  float ior = 1.5; // Simple glass IOR
+  vec3 refractDir = refract(viewDir, normal, 1.0 / ior);
+  
+  // Sample texture with refraction offset
+  vec2 refractedUV = uv + refractDir.xy * 0.1; // Simple offset
+  
+  // Sample the background texture
+  vec4 refractedColor = texture2D(uTexture, refractedUV);
+  
+  // Add some basic lighting
+  vec3 lightDir = normalize(uLight);
+  float diffuse = max(0.0, dot(normal, lightDir));
+  
+  // Final color
+  vec3 color = refractedColor.rgb * 0.8 + diffuse * 0.2;
+  
+  // Add fresnel effect
+  float fresnel = pow(1.0 - abs(dot(viewDir, normal)), 3.0);
+  color += fresnel * 0.3;
+  
   gl_FragColor = vec4(color, 1.0);
 }
 `;
@@ -223,6 +166,9 @@ function init() {
     // Create background geometry for refraction
     createBackgroundGeometry();
     
+    // Create debug quad to visualize render target content
+    createDebugQuad();
+    
     // Load GLTF model
     loadModel().catch(error => {
         console.error('Error in loadModel:', error);
@@ -247,9 +193,9 @@ function createBackgroundGeometry() {
         opacity: 1.0
     });
     
-    // Create the background plane - positioned at the same location as the mesh
+    // Create the background plane - positioned BEHIND the mesh for proper refraction
     const backgroundPlane = new THREE.Mesh(planeGeometry, material);
-    backgroundPlane.position.set(0, 0, 5); // Same z-position as the mesh (z=5)
+    backgroundPlane.position.set(0, 0, -5); // BEHIND the mesh (z=-5) for proper refraction
     
     // Random rotation for more interesting refraction
     const randomRotationX = (Math.random() - 0.5) * Math.PI * 0.5; // ±45 degrees
@@ -263,10 +209,27 @@ function createBackgroundGeometry() {
     console.log('Background plane material:', backgroundPlane.material);
     console.log('Background plane rotation:', backgroundPlane.rotation);
     console.log('Background plane dimensions: 4 x 20 (narrow rectangle)');
-    console.log('Background plane positioned at same z as mesh (z=5)');
+    console.log('Background plane positioned BEHIND mesh (z=-5) for proper refraction');
 }
 
-// Load GLTF model
+// Create debug quad to visualize render target content
+function createDebugQuad() {
+    console.log('Creating debug quad to visualize render target...');
+    
+    const geometry = new THREE.PlaneGeometry(10, 10);
+    const material = new THREE.MeshBasicMaterial({
+        map: null, // Will be set to render target texture
+        transparent: true,
+        opacity: 0.8
+    });
+    
+    const debugQuad = new THREE.Mesh(geometry, material);
+    debugQuad.position.set(15, 0, 0); // Position to the right of the scene
+    debugQuad.name = 'debugQuad';
+    
+    scene.add(debugQuad);
+    console.log('Debug quad added at position:', debugQuad.position);
+}
 async function loadModel() {
     console.log('Loading NFTfi logo model...');
     
@@ -463,6 +426,13 @@ function animate() {
         mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
         console.log('Texture assigned to shader:', backRenderTarget.texture);
         console.log('Shader uniform uTexture:', mesh.material.uniforms.uTexture.value);
+        
+        // DEBUG: Also assign to debug quad to visualize render target content
+        const debugQuad = scene.getObjectByName('debugQuad');
+        if (debugQuad) {
+            debugQuad.material.map = backRenderTarget.texture;
+            debugQuad.material.needsUpdate = true;
+        }
         
         // STEP 3: Show mesh and render to screen with refraction
         mesh.visible = true;
