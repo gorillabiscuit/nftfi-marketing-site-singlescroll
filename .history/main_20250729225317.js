@@ -144,25 +144,6 @@ function updatePlane() {
     }
 }
 
-function updateCamera() {
-    const x = parseFloat(document.getElementById('cameraX').value);
-    const y = parseFloat(document.getElementById('cameraY').value);
-    const z = parseFloat(document.getElementById('cameraZ').value);
-    const fov = parseFloat(document.getElementById('cameraFOV').value);
-    
-    document.getElementById('cameraXValue').textContent = x.toFixed(1);
-    document.getElementById('cameraYValue').textContent = y.toFixed(1);
-    document.getElementById('cameraZValue').textContent = z.toFixed(1);
-    document.getElementById('cameraFOVValue').textContent = fov.toFixed(0);
-    
-    // Update camera position and FOV
-    if (camera) {
-        camera.position.set(x, y, z);
-        camera.fov = fov;
-        camera.updateProjectionMatrix();
-    }
-}
-
 // Initialize controls when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Wait a bit for Three.js to initialize
