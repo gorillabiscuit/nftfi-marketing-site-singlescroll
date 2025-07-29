@@ -9,7 +9,7 @@ let model, wrapper, mesh;
 let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
 let uniforms = {};
-let mainRenderTarget, backRenderTarget;
+let backRenderTarget;
 let isModelReady = false;
 
 // Shader code
@@ -80,23 +80,63 @@ float specular(vec3 light, float shininess, float diffuseness) {
 const int LOOP = 16;
 
 void main() {
+  float iorRatioRed = 1.0/uIorR;
+  float iorRatioGreen = 1.0/uIorG;
+  float iorRatioBlue = 1.0/uIorB;
+
   vec2 uv = gl_FragCoord.xy / winResolution.xy;
   vec3 normal = worldNormal;
   vec3 color = vec3(0.0);
 
-  // Simplified refraction for debugging
-  vec3 refractVec = refract(eyeVector, normal, 1.0/uIorR);
-  vec2 refractedUV = uv + refractVec.xy * uRefractPower * uChromaticAberration;
+  for (int i = 0; i < LOOP; i++) {
+    float slide = float(i) / float(LOOP) * 0.1;
+
+    vec3 refractVecR = refract(eyeVector, normal, (1.0/uIorR));
+    vec3 refractVecY = refract(eyeVector, normal, (1.0/uIorY));
+    vec3 refractVecG = refract(eyeVector, normal, (1.0/uIorG));
+    vec3 refractVecC = refract(eyeVector, normal, (1.0/uIorC));
+    vec3 refractVecB = refract(eyeVector, normal, (1.0/uIorB));
+    vec3 refractVecP = refract(eyeVector, normal, (1.0/uIorP));
+
+    float r = texture2D(uTexture, uv + refractVecR.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).x * 0.5;
+
+    float y = (texture2D(uTexture, uv + refractVecY.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).x * 2.0 +
+                texture2D(uTexture, uv + refractVecY.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).y * 2.0 -
+                texture2D(uTexture, uv + refractVecY.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).z) / 6.0;
+
+    float g = texture2D(uTexture, uv + refractVecG.xy * (uRefractPower + slide * 2.0) * uChromaticAberration).y * 0.5;
+
+    float c = (texture2D(uTexture, uv + refractVecC.xy * (uRefractPower + slide * 2.5) * uChromaticAberration).y * 2.0 +
+                texture2D(uTexture, uv + refractVecC.xy * (uRefractPower + slide * 2.5) * uChromaticAberration).z * 2.0 -
+                texture2D(uTexture, uv + refractVecC.xy * (uRefractPower + slide * 2.5) * uChromaticAberration).x) / 6.0;
+          
+    float b = texture2D(uTexture, uv + refractVecB.xy * (uRefractPower + slide * 3.0) * uChromaticAberration).z * 0.5;
+
+    float p = (texture2D(uTexture, uv + refractVecP.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).z * 2.0 +
+                texture2D(uTexture, uv + refractVecP.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).x * 2.0 -
+                texture2D(uTexture, uv + refractVecP.xy * (uRefractPower + slide * 1.0) * uChromaticAberration).y) / 6.0;
+
+    float R = r + (2.0*p + 2.0*y - c)/3.0;
+    float G = g + (2.0*y + 2.0*c - p)/3.0;
+    float B = b + (2.0*c + 2.0*p - y)/3.0;
+
+    color.r += R;
+    color.g += G;
+    color.b += B;
+
+    color = sat(color, uSaturation);
+  }
+
+  color /= float(LOOP);
   
-  // Sample the texture with refraction
-  vec3 refractedColor = texture2D(uTexture, refractedUV).rgb;
-  
-  // Add some basic lighting
+  // Specular
   float specularLight = specular(uLight, uShininess, uDiffuseness);
+  color += specularLight;
+
+  // Fresnel
   float f = fresnel(eyeVector, normal, uFresnelPower);
-  
-  color = refractedColor + specularLight + f * vec3(1.0);
-  
+  color.rgb += f * vec3(1.0);
+
   gl_FragColor = vec4(color, 1.0);
 }
 `;
@@ -127,11 +167,7 @@ function init() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     
-    // Create render targets
-    mainRenderTarget = new THREE.WebGLRenderTarget(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
-    );
+    // Create render target for refraction effect
     backRenderTarget = new THREE.WebGLRenderTarget(
         window.innerWidth * Math.min(window.devicePixelRatio, 2),
         window.innerHeight * Math.min(window.devicePixelRatio, 2)
@@ -369,11 +405,7 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     
-    // Update render targets
-    mainRenderTarget.setSize(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
-    );
+    // Update render target size
     backRenderTarget.setSize(
         window.innerWidth * Math.min(window.devicePixelRatio, 2),
         window.innerHeight * Math.min(window.devicePixelRatio, 2)
@@ -409,54 +441,40 @@ function animate() {
     
     // Glass refraction rendering
     if (mesh) {
-        // Hide mesh during render target creation
-        mesh.visible = false;
-
-            // Update uniforms like in the original
-    mesh.material.uniforms.uDiffuseness.value = 0.2;
-    mesh.material.uniforms.uShininess.value = 25.0;
-    mesh.material.uniforms.uLight.value = new THREE.Vector3(5, 5, 5).normalize();
-    mesh.material.uniforms.uFresnelPower.value = 9.0;
-    mesh.material.uniforms.uIorR.value = 1.15;
-    mesh.material.uniforms.uIorY.value = 1.16;
-    mesh.material.uniforms.uIorG.value = 1.18;
-    mesh.material.uniforms.uIorC.value = 1.22;
-    mesh.material.uniforms.uIorB.value = 1.22;
-    mesh.material.uniforms.uIorP.value = 1.22;
-    mesh.material.uniforms.uSaturation.value = 1.01;
-    mesh.material.uniforms.uChromaticAberration.value = 0.14;
-    mesh.material.uniforms.uRefractPower.value = 0.35;
-    
-    // CRITICAL: Update winResolution uniform for proper UV calculation
-    mesh.material.uniforms.winResolution.value.set(window.innerWidth, window.innerHeight);
+        // Update uniforms like in the original
+        mesh.material.uniforms.uDiffuseness.value = 0.2;
+        mesh.material.uniforms.uShininess.value = 25.0;
+        mesh.material.uniforms.uLight.value = new THREE.Vector3(5, 5, 5).normalize();
+        mesh.material.uniforms.uFresnelPower.value = 9.0;
+        mesh.material.uniforms.uIorR.value = 1.15;
+        mesh.material.uniforms.uIorY.value = 1.16;
+        mesh.material.uniforms.uIorG.value = 1.18;
+        mesh.material.uniforms.uIorC.value = 1.22;
+        mesh.material.uniforms.uIorB.value = 1.22;
+        mesh.material.uniforms.uIorP.value = 1.22;
+        mesh.material.uniforms.uSaturation.value = 1.01;
+        mesh.material.uniforms.uChromaticAberration.value = 0.14;
+        mesh.material.uniforms.uRefractPower.value = 0.35;
         
-        // Render scene to back render target (without the mesh)
+        // CRITICAL: Update winResolution uniform for proper UV calculation
+        mesh.material.uniforms.winResolution.value.set(window.innerWidth, window.innerHeight);
+        
+        // STEP 1: Render scene WITHOUT the mesh to back render target
+        mesh.visible = false;
         renderer.setRenderTarget(backRenderTarget);
         renderer.render(scene, camera);
         
-        // Assign back render target texture to shader
+        // STEP 2: Assign the back render target texture to the shader
         mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
-        mesh.material.side = THREE.BackSide;
         
-        // Show mesh for front render
+        // STEP 3: Show mesh and render to screen with refraction
         mesh.visible = true;
-        
-        // Render scene to main render target (with the mesh)
-        renderer.setRenderTarget(mainRenderTarget);
-        renderer.render(scene, camera);
-        
-        // Assign main render target texture to shader
-        mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
-        mesh.material.side = THREE.FrontSide;
-        
-        // Reset render target to screen
         renderer.setRenderTarget(null);
         
         // Debug: Log texture updates occasionally
         if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
-            console.log('Render targets updated, texture:', mesh.material.uniforms.uTexture.value);
-            console.log('Back render target:', backRenderTarget.texture);
-            console.log('Main render target:', mainRenderTarget.texture);
+            console.log('Back render target texture assigned:', backRenderTarget.texture);
+            console.log('Texture dimensions:', backRenderTarget.texture.image?.width, 'x', backRenderTarget.texture.image?.height);
             console.log('winResolution:', mesh.material.uniforms.winResolution.value);
             console.log('uRefractPower:', mesh.material.uniforms.uRefractPower.value);
             console.log('uChromaticAberration:', mesh.material.uniforms.uChromaticAberration.value);
