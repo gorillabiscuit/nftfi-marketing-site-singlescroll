@@ -1,5 +1,4 @@
-// Use global THREE object instead of ES6 imports
-const {
+import {
 	BufferAttribute,
 	BufferGeometry,
 	Float32BufferAttribute,
@@ -10,7 +9,7 @@ const {
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
 	Vector3,
-} = THREE;
+} from 'three';
 
 function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 

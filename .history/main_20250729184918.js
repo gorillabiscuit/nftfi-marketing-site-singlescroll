@@ -194,10 +194,7 @@ function init() {
     createBackgroundGeometry();
     
     // Load GLTF model
-    loadModel().catch(error => {
-        console.error('Error in loadModel:', error);
-        createFallbackGeometry();
-    });
+    loadModel();
     
     // Add event listeners
     addEventListeners();
@@ -295,11 +292,11 @@ async function loadModel() {
             // Fallback to icosahedron if model fails to load
             createFallbackGeometry();
         });
-    } catch (error) {
+    }).catch(error => {
         console.error('Error loading GLTFLoader:', error);
         // Fallback to icosahedron if GLTFLoader fails
         createFallbackGeometry();
-    }
+    });
 }
 
 // Fallback geometry if model loading fails

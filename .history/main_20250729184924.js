@@ -194,10 +194,7 @@ function init() {
     createBackgroundGeometry();
     
     // Load GLTF model
-    loadModel().catch(error => {
-        console.error('Error in loadModel:', error);
-        createFallbackGeometry();
-    });
+    loadModel();
     
     // Add event listeners
     addEventListeners();
