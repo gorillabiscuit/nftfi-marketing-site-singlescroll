@@ -282,6 +282,9 @@ async function loadModel() {
             // Scale the wrapper
             wrapper.scale.set(3, 3, 3);
             
+            // Move to front of scene
+            wrapper.position.z = 5;
+            
             // Add to scene
             scene.add(wrapper);
             
@@ -319,6 +322,10 @@ function createFallbackGeometry() {
     wrapper = new THREE.Group();
     wrapper.add(mesh);
     wrapper.scale.set(3, 3, 3);
+    
+    // Move to front of scene
+    wrapper.position.z = 5;
+    
     scene.add(wrapper);
     
     isModelReady = true;
