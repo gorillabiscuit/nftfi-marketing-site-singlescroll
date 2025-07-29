@@ -190,12 +190,12 @@ function init() {
     
     // Create render targets
     mainRenderTarget = new THREE.WebGLRenderTarget(
-        size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2)
+        window.innerWidth * Math.min(window.devicePixelRatio, 2),
+        window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     backRenderTarget = new THREE.WebGLRenderTarget(
-        size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2)
+        window.innerWidth * Math.min(window.devicePixelRatio, 2),
+        window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     
     // Initialize uniforms
@@ -213,7 +213,7 @@ function init() {
         uShininess: { value: 25.0 },
         uDiffuseness: { value: 0.2 },
         uLight: { value: new THREE.Vector3(-1.0, 1.0, 1.0) },
-        winResolution: { value: new THREE.Vector2(size, size) },
+        winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
         uTexture: { value: null }
     };
     
@@ -403,24 +403,22 @@ function addEventListeners() {
 
 // Window resize handler
 function onWindowResize() {
-    const size = Math.min(window.innerWidth, window.innerHeight, 800);
-    
-    camera.aspect = size / size; // Square aspect ratio
+    camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(size, size);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     
     // Update render targets
     mainRenderTarget.setSize(
-        size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2)
+        window.innerWidth * Math.min(window.devicePixelRatio, 2),
+        window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     backRenderTarget.setSize(
-        size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2)
+        window.innerWidth * Math.min(window.devicePixelRatio, 2),
+        window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     
     // Update uniforms
-    uniforms.winResolution.value.set(size, size);
+    uniforms.winResolution.value.set(window.innerWidth, window.innerHeight);
 }
 
 // Animation loop

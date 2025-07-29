@@ -154,17 +154,14 @@ function init() {
     // Get canvas
     canvas = document.getElementById('three-canvas');
     
-    // Calculate square size like GitHub version
-    const size = Math.min(window.innerWidth, window.innerHeight, 800);
-    
     // Create scene
     scene = new THREE.Scene();
     // Set black background like GitHub version
     scene.background = new THREE.Color('#000000');
     
     // Create camera
-    camera = new THREE.PerspectiveCamera(23, size / size, 0.1, 1000);
-    camera.position.set(4, -2, 7);
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 20);
     
     // Create renderer
     renderer = new THREE.WebGLRenderer({ 
@@ -172,9 +169,7 @@ function init() {
         antialias: true,
         alpha: true 
     });
-    
-    // Set square aspect ratio like GitHub version
-    renderer.setSize(size, size);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
     // Set clear color to transparent
@@ -190,12 +185,12 @@ function init() {
     
     // Create render targets
     mainRenderTarget = new THREE.WebGLRenderTarget(
-        size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2)
+        window.innerWidth * Math.min(window.devicePixelRatio, 2),
+        window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     backRenderTarget = new THREE.WebGLRenderTarget(
-        size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2)
+        window.innerWidth * Math.min(window.devicePixelRatio, 2),
+        window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     
     // Initialize uniforms
@@ -213,7 +208,7 @@ function init() {
         uShininess: { value: 25.0 },
         uDiffuseness: { value: 0.2 },
         uLight: { value: new THREE.Vector3(-1.0, 1.0, 1.0) },
-        winResolution: { value: new THREE.Vector2(size, size) },
+        winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
         uTexture: { value: null }
     };
     
@@ -264,7 +259,7 @@ function createBackgroundGeometry() {
     const headerTexture = textureLoader.load('/header.png');
     
     // Create plane geometry - adjust dimensions as needed
-    const planeGeometry = new THREE.PlaneGeometry(20, 12); // Width: 10, Height: 6
+    const planeGeometry = new THREE.PlaneGeometry(10, 6); // Width: 10, Height: 6
     const planeMaterial = new THREE.MeshBasicMaterial({ 
         map: headerTexture,
         transparent: true,
@@ -272,7 +267,7 @@ function createBackgroundGeometry() {
     });
     
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.set(0, 0, -4); // Moved closer to camera (was -8)
+    plane.position.set(0, 0, -2.5); // Moved closer to camera (was -8)
     scene.add(plane); // Add directly to scene, not to background group
 }
 
@@ -403,24 +398,22 @@ function addEventListeners() {
 
 // Window resize handler
 function onWindowResize() {
-    const size = Math.min(window.innerWidth, window.innerHeight, 800);
-    
-    camera.aspect = size / size; // Square aspect ratio
+    camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(size, size);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     
     // Update render targets
     mainRenderTarget.setSize(
-        size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2)
+        window.innerWidth * Math.min(window.devicePixelRatio, 2),
+        window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     backRenderTarget.setSize(
-        size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2)
+        window.innerWidth * Math.min(window.devicePixelRatio, 2),
+        window.innerHeight * Math.min(window.devicePixelRatio, 2)
     );
     
     // Update uniforms
-    uniforms.winResolution.value.set(size, size);
+    uniforms.winResolution.value.set(window.innerWidth, window.innerHeight);
 }
 
 // Animation loop
