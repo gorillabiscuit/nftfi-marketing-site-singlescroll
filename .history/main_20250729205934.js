@@ -233,20 +233,20 @@ function createBackgroundGeometry() {
     
     // Add geometric shapes for refraction
     const geometry1 = new THREE.IcosahedronGeometry(2, 16);
-    const material1 = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red
+    const material1 = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const mesh1 = new THREE.Mesh(geometry1, material1);
     mesh1.position.set(-4, -3, -4);
     backgroundGroup.add(mesh1);
     
-    const mesh2 = new THREE.Mesh(geometry1, new THREE.MeshBasicMaterial({ color: 0x00ff00 })); // Green
+    const mesh2 = new THREE.Mesh(geometry1, material1);
     mesh2.position.set(4, -3, -4);
     backgroundGroup.add(mesh2);
     
-    const mesh3 = new THREE.Mesh(geometry1, new THREE.MeshBasicMaterial({ color: 0x0000ff })); // Blue
+    const mesh3 = new THREE.Mesh(geometry1, material1);
     mesh3.position.set(-5, 3, -4);
     backgroundGroup.add(mesh3);
     
-    const mesh4 = new THREE.Mesh(geometry1, new THREE.MeshBasicMaterial({ color: 0xffff00 })); // Yellow
+    const mesh4 = new THREE.Mesh(geometry1, material1);
     mesh4.position.set(5, 3, -4);
     backgroundGroup.add(mesh4);
     
@@ -431,11 +431,23 @@ function animate() {
     
     // Glass refraction rendering
     if (mesh) {
-        // Simple render to texture for refraction
+        mesh.visible = false;
+        
+        // Back side render
+        renderer.setRenderTarget(backRenderTarget);
+        renderer.render(scene, camera);
+        
+        mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
+        mesh.material.side = THREE.BackSide;
+        
+        mesh.visible = true;
+        
+        // Front side render
         renderer.setRenderTarget(mainRenderTarget);
         renderer.render(scene, camera);
         
         mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
+        mesh.material.side = THREE.FrontSide;
         
         renderer.setRenderTarget(null);
     }
