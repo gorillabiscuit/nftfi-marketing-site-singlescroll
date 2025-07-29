@@ -433,23 +433,11 @@ function animate() {
     
     // Glass refraction rendering
     if (mesh) {
-        mesh.visible = false;
-        
-        // Back side render
-        renderer.setRenderTarget(backRenderTarget);
-        renderer.render(scene, camera);
-        
-        mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
-        mesh.material.side = THREE.BackSide;
-        
-        mesh.visible = true;
-        
-        // Front side render
+        // Simple render to texture for refraction
         renderer.setRenderTarget(mainRenderTarget);
         renderer.render(scene, camera);
         
         mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
-        mesh.material.side = THREE.FrontSide;
         
         renderer.setRenderTarget(null);
     }
