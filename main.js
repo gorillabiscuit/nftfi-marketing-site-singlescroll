@@ -244,33 +244,23 @@ function createBackgroundGeometry() {
     // Create a plane geometry for the background
     const planeGeometry = new THREE.PlaneGeometry(20, 20);
     
-    // Create a checkerboard pattern for better refraction visibility
-    const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
-    const ctx = canvas.getContext('2d');
-    
-    // Create checkerboard pattern
-    const tileSize = 32;
-    for (let x = 0; x < canvas.width; x += tileSize) {
-        for (let y = 0; y < canvas.height; y += tileSize) {
-            const isEven = ((x / tileSize) + (y / tileSize)) % 2 === 0;
-            ctx.fillStyle = isEven ? '#ffffff' : '#cccccc';
-            ctx.fillRect(x, y, tileSize, tileSize);
+    // Load the original header.png texture
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('/header.png', 
+        (texture) => {
+            console.log('Background texture loaded successfully');
+        },
+        undefined,
+        (error) => {
+            console.warn('Could not load background texture:', error);
         }
-    }
+    );
     
-    // Create texture from canvas
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(4, 4);
-    
-    // Create material with the pattern
+    // Create material with the original texture
     const material = new THREE.MeshBasicMaterial({ 
         map: texture,
         transparent: true,
-        opacity: 1.0
+        opacity: 0.8
     });
     
     // Create the background plane - positioned closer to the mesh
