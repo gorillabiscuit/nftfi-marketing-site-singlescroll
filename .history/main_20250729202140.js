@@ -240,7 +240,7 @@ function loadModel() {
     console.log('Loading NFTfi logo model...');
     
     // Import GLTFLoader dynamically
-    import('./libs/GLTFLoader-fixed.js').then(({ GLTFLoader }) => {
+    import('./libs/GLTFLoader.js').then(({ GLTFLoader }) => {
         const loader = new GLTFLoader();
         
         loader.load('/models/nftfi_logo.glb', (gltf) => {

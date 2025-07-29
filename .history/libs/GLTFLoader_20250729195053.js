@@ -1,4 +1,5 @@
-import {
+// Use global THREE object instead of ES6 imports
+const {
 	AnimationClip,
 	Bone,
 	Box3,
@@ -64,8 +65,10 @@ import {
 	VectorKeyframeTrack,
 	SRGBColorSpace,
 	InstancedBufferAttribute
-} from 'three';
-import { toTrianglesDrawMode } from './utils/BufferGeometryUtils.js';
+} = THREE;
+
+// Import BufferGeometryUtils function
+const { toTrianglesDrawMode } = THREE.BufferGeometryUtils || {};
 
 class GLTFLoader extends Loader {
 
