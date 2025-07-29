@@ -212,8 +212,6 @@ function init() {
         uTexture: { value: null }
     };
     
-    console.log('Uniforms initialized:', uniforms);
-    
     // Add lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
@@ -304,13 +302,6 @@ function loadModel() {
                     uniforms: uniforms,
                     side: THREE.DoubleSide
                 });
-                
-                // Check for shader compilation errors
-                if (child.material.program && child.material.program.error) {
-                    console.error('Shader compilation error:', child.material.program.error);
-                } else {
-                    console.log('Shader compiled successfully');
-                }
             }
         });
         
@@ -352,13 +343,6 @@ function createFallbackGeometry() {
         uniforms: uniforms,
         side: THREE.DoubleSide
     });
-    
-    // Check for shader compilation errors
-    if (material.program && material.program.error) {
-        console.error('Fallback shader compilation error:', material.program.error);
-    } else {
-        console.log('Fallback shader compiled successfully');
-    }
     
     mesh = new THREE.Mesh(geometry, material);
     wrapper = new THREE.Group();
@@ -447,14 +431,6 @@ function animate() {
     
     // Glass refraction rendering
     if (mesh) {
-        console.log('Rendering glass refraction...');
-        
-        // Temporarily make background geometry visible for render targets
-        const backgroundGroup = scene.children.find(child => child.type === 'Group' && child.visible === false);
-        if (backgroundGroup) {
-            backgroundGroup.visible = true;
-        }
-        
         mesh.visible = false;
         
         // Back side render
@@ -463,7 +439,6 @@ function animate() {
         
         mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
         mesh.material.side = THREE.BackSide;
-        console.log('Back render target texture:', backRenderTarget.texture);
         
         mesh.visible = true;
         
@@ -473,14 +448,8 @@ function animate() {
         
         mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
         mesh.material.side = THREE.FrontSide;
-        console.log('Main render target texture:', mainRenderTarget.texture);
         
         renderer.setRenderTarget(null);
-        
-        // Make background geometry invisible again
-        if (backgroundGroup) {
-            backgroundGroup.visible = false;
-        }
     }
     
     renderer.render(scene, camera);

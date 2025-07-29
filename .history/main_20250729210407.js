@@ -212,8 +212,6 @@ function init() {
         uTexture: { value: null }
     };
     
-    console.log('Uniforms initialized:', uniforms);
-    
     // Add lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);

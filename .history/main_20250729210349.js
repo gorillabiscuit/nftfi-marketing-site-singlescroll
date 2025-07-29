@@ -212,8 +212,6 @@ function init() {
         uTexture: { value: null }
     };
     
-    console.log('Uniforms initialized:', uniforms);
-    
     // Add lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
@@ -304,13 +302,6 @@ function loadModel() {
                     uniforms: uniforms,
                     side: THREE.DoubleSide
                 });
-                
-                // Check for shader compilation errors
-                if (child.material.program && child.material.program.error) {
-                    console.error('Shader compilation error:', child.material.program.error);
-                } else {
-                    console.log('Shader compiled successfully');
-                }
             }
         });
         
@@ -352,13 +343,6 @@ function createFallbackGeometry() {
         uniforms: uniforms,
         side: THREE.DoubleSide
     });
-    
-    // Check for shader compilation errors
-    if (material.program && material.program.error) {
-        console.error('Fallback shader compilation error:', material.program.error);
-    } else {
-        console.log('Fallback shader compiled successfully');
-    }
     
     mesh = new THREE.Mesh(geometry, material);
     wrapper = new THREE.Group();
