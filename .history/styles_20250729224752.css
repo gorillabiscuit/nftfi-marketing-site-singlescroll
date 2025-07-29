@@ -225,15 +225,15 @@ body {
 
 .controls-panel h3 {
     color: #F2F2F2;
-    margin: 0 0 15px 0;
-    font-size: 16px;
+    margin: 0 0 20px 0;
+    font-size: 18px;
     font-weight: 600;
     text-align: center;
 }
 
 .control-group {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -245,25 +245,25 @@ body {
 .control-group label {
     display: block;
     color: #F2F2F2;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .control-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
-    gap: 8px;
+    margin-bottom: 8px;
+    gap: 10px;
 }
 
 .control-row label {
     color: #F2F2F2;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 400;
     margin: 0;
-    min-width: 80px;
+    min-width: 120px;
 }
 
 .control-slider {
@@ -310,20 +310,21 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .controls-panel {
-        position: fixed;
-        left: 10px;
-        right: 10px;
-        top: 10px;
-        transform: none;
-        max-width: none;
-        max-height: 40vh;
-        margin: 0;
+    .content h1 {
+        font-size: 2.5rem;
     }
     
-    .content {
-        margin-left: 0;
-        margin-top: 45vh;
+    .content h2 {
+        font-size: 2rem;
+    }
+    
+    .content p {
+        font-size: 1.2rem;
+    }
+
+    .controls-panel {
+        margin: 10px;
+        padding: 15px;
     }
     
     .control-row {
