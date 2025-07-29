@@ -153,8 +153,8 @@ function init() {
     scene.background = null; // Make background transparent
     
     // Create camera
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 20);
+    camera = new THREE.PerspectiveCamera(23, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0.5, 0.0, 20.0);
     
     // Create renderer
     renderer = new THREE.WebGLRenderer({ 
@@ -227,6 +227,9 @@ function init() {
     // Create background geometry for refraction
     createBackgroundGeometry();
     
+    // Create background objects for refraction (like in GitHub version)
+    createBackgroundObjects();
+    
     // Load GLTF model
     loadModel().catch(error => {
         console.error('Error in loadModel:', error);
@@ -270,6 +273,34 @@ function createBackgroundGeometry() {
     
     scene.add(backgroundPlane);
     console.log('Background plane added at z:', backgroundPlane.position.z);
+}
+
+// Create background objects for refraction (like in GitHub version)
+function createBackgroundObjects() {
+    console.log('Creating background objects for refraction...');
+    
+    // Create background group (initially invisible)
+    const backgroundGroup = new THREE.Group();
+    backgroundGroup.visible = false;
+    
+    // Add multiple icosahedrons at different positions (like GitHub version)
+    const positions = [
+        [-4, -3, -4],
+        [4, -3, -4], 
+        [-5, 3, -4],
+        [5, 3, -4]
+    ];
+    
+    positions.forEach((pos, index) => {
+        const geometry = new THREE.IcosahedronGeometry(2, 16);
+        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(pos[0], pos[1], pos[2]);
+        backgroundGroup.add(mesh);
+    });
+    
+    scene.add(backgroundGroup);
+    console.log('Background objects added for refraction');
 }
 
 // Load GLTF model
@@ -463,18 +494,42 @@ function animate() {
         mesh.material.uniforms.uChromaticAberration.value = 0.14;
         mesh.material.uniforms.uRefractPower.value = 0.35;
         
-        // Back side render
+        // Back side render - render background objects to texture
         renderer.setRenderTarget(backRenderTarget);
+        // Temporarily make background objects visible for rendering
+        scene.children.forEach(child => {
+            if (child.type === 'Group' && !child.visible) {
+                child.visible = true;
+            }
+        });
         renderer.render(scene, camera);
+        // Hide background objects again
+        scene.children.forEach(child => {
+            if (child.type === 'Group') {
+                child.visible = false;
+            }
+        });
         
         mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
         mesh.material.side = THREE.BackSide;
         
         mesh.visible = true;
         
-        // Front side render
+        // Front side render - render background objects to texture
         renderer.setRenderTarget(mainRenderTarget);
+        // Temporarily make background objects visible for rendering
+        scene.children.forEach(child => {
+            if (child.type === 'Group' && !child.visible) {
+                child.visible = true;
+            }
+        });
         renderer.render(scene, camera);
+        // Hide background objects again
+        scene.children.forEach(child => {
+            if (child.type === 'Group') {
+                child.visible = false;
+            }
+        });
         
         mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
         mesh.material.side = THREE.FrontSide;
