@@ -237,8 +237,8 @@ function init() {
 function createBackgroundGeometry() {
     console.log('Creating background plane for refraction...');
     
-    // Create a plane geometry for the background
-    const planeGeometry = new THREE.PlaneGeometry(20, 20);
+    // Create a narrow plane geometry for the background
+    const planeGeometry = new THREE.PlaneGeometry(4, 20); // Much narrower: 4 wide, 20 tall
     
     // Create a simple blue material for testing refraction
     const material = new THREE.MeshBasicMaterial({ 
@@ -247,15 +247,22 @@ function createBackgroundGeometry() {
         opacity: 1.0
     });
     
-    // Create the background plane - positioned for refraction
+    // Create the background plane - positioned for refraction with random rotation
     const backgroundPlane = new THREE.Mesh(planeGeometry, material);
     backgroundPlane.position.set(0, 0, -5); // Match original GitHub positioning
-    backgroundPlane.rotation.set(0, 0, 0);
+    
+    // Random rotation for more interesting refraction
+    const randomRotationX = (Math.random() - 0.5) * Math.PI * 0.5; // ±45 degrees
+    const randomRotationY = (Math.random() - 0.5) * Math.PI * 0.3; // ±27 degrees
+    const randomRotationZ = (Math.random() - 0.5) * Math.PI * 0.2; // ±18 degrees
+    backgroundPlane.rotation.set(randomRotationX, randomRotationY, randomRotationZ);
     
     scene.add(backgroundPlane);
     console.log('Blue background plane added at z:', backgroundPlane.position.z);
     console.log('Background plane visible:', backgroundPlane.visible);
     console.log('Background plane material:', backgroundPlane.material);
+    console.log('Background plane rotation:', backgroundPlane.rotation);
+    console.log('Background plane dimensions: 4 x 20 (narrow rectangle)');
 }
 
 // Load GLTF model
