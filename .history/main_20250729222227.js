@@ -189,28 +189,14 @@ function init() {
     controls.enablePan = true;
     controls.enableRotate = true;
     
-    // Create render targets with proper settings for refraction
+    // Create render targets
     mainRenderTarget = new THREE.WebGLRenderTarget(
         size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2),
-        {
-            type: THREE.HalfFloatType,
-            format: THREE.RGBAFormat,
-            colorSpace: THREE.LinearSRGBColorSpace,
-            depthBuffer: true,
-            stencilBuffer: false
-        }
+        size * Math.min(window.devicePixelRatio, 2)
     );
     backRenderTarget = new THREE.WebGLRenderTarget(
         size * Math.min(window.devicePixelRatio, 2),
-        size * Math.min(window.devicePixelRatio, 2),
-        {
-            type: THREE.HalfFloatType,
-            format: THREE.RGBAFormat,
-            colorSpace: THREE.LinearSRGBColorSpace,
-            depthBuffer: true,
-            stencilBuffer: false
-        }
+        size * Math.min(window.devicePixelRatio, 2)
     );
     
     // Initialize uniforms
