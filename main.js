@@ -495,7 +495,7 @@ void main() {
   // Fresnel
   float f = fresnel(eyeVector, normal, uFresnelPower);
   color.rgb += f * vec3(1.0);
-
+  
   gl_FragColor = vec4(color, 1.0);
 }
 `;
@@ -634,34 +634,34 @@ function createBackgroundGeometry() {
 // Load GLTF model
 function loadModel() {
     
-    const loader = new GLTFLoader();
-    
-    loader.load('/models/nftfi_logo.glb', (gltf) => {
+        const loader = new GLTFLoader();
         
-        // Calculate bounding box
-        const box = new THREE.Box3().setFromObject(gltf.scene);
-        const center = new THREE.Vector3();
-        const size = new THREE.Vector3();
-        box.getCenter(center);
-        box.getSize(size);
-        
-        // Apply material to all meshes
-        gltf.scene.traverse((child) => {
-            if (child.isMesh) {
-                mesh = child;
-                
-                // Apply smoothing
-                if (child.geometry) {
-                    child.geometry.computeVertexNormals();
-                }
-                
-                // Create glass shader material
-                child.material = new THREE.ShaderMaterial({
-                    vertexShader: vertexShader,
-                    fragmentShader: fragmentShader,
-                    uniforms: uniforms,
-                    side: THREE.DoubleSide
-                });
+        loader.load('/models/nftfi_logo.glb', (gltf) => {
+            
+            // Calculate bounding box
+            const box = new THREE.Box3().setFromObject(gltf.scene);
+            const center = new THREE.Vector3();
+            const size = new THREE.Vector3();
+            box.getCenter(center);
+            box.getSize(size);
+            
+            // Apply material to all meshes
+            gltf.scene.traverse((child) => {
+                if (child.isMesh) {
+                    mesh = child;
+                    
+                    // Apply smoothing
+                    if (child.geometry) {
+                        child.geometry.computeVertexNormals();
+                    }
+                    
+                    // Create glass shader material
+                    child.material = new THREE.ShaderMaterial({
+                        vertexShader: vertexShader,
+                        fragmentShader: fragmentShader,
+                        uniforms: uniforms,
+                        side: THREE.DoubleSide
+                    });
                 
                 // Check for shader compilation errors
                 if (child.material.program && child.material.program.error) {
@@ -669,33 +669,33 @@ function loadModel() {
                 } else {
                     console.log('Shader compiled successfully');
                 }
-            }
-        });
-        
-        // Create wrapper group
-        wrapper = new THREE.Group();
-        
-        // Center the original mesh
-        gltf.scene.position.set(-center.x, -center.y, -center.z);
-        
-        // Add centered mesh to wrapper
-        wrapper.add(gltf.scene);
-        
-        // Scale the wrapper
-        wrapper.scale.set(3, 3, 3);
-        
-        // Add to scene
-        scene.add(wrapper);
-        
-        isModelReady = true;
+                }
+            });
+            
+            // Create wrapper group
+            wrapper = new THREE.Group();
+            
+            // Center the original mesh
+            gltf.scene.position.set(-center.x, -center.y, -center.z);
+            
+            // Add centered mesh to wrapper
+            wrapper.add(gltf.scene);
+            
+            // Scale the wrapper
+            wrapper.scale.set(3, 3, 3);
+            
+            // Add to scene
+            scene.add(wrapper);
+            
+            isModelReady = true;
         
        
-        
-    }, (progress) => {
-        console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
-    }, (error) => {
-        console.error('Error loading model:', error);
-        // Fallback to icosahedron if model fails to load
+            
+        }, (progress) => {
+            console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+        }, (error) => {
+            console.error('Error loading model:', error);
+            // Fallback to icosahedron if model fails to load
     });
 }
 
@@ -803,7 +803,7 @@ function animate() {
 document.addEventListener('DOMContentLoaded', () => {
     init();
     animate();
-});
+}); 
 
 
 // Check if DOM is ready, if not wait for it

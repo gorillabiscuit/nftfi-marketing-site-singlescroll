@@ -190,6 +190,42 @@ body {
     max-width: calc(100vw - 98px); /* Full width minus left and right margins */
     position: relative;
     z-index: 4;
+    overflow: hidden; /* Clip the SVG backgrounds */
+}
+
+/* SVG Background - Top Right Copy */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -350px;
+    right: -345px;
+    width: 950px;
+    height: 950px;
+    background-image: url('/images/circles.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 1.0;
+    z-index: 5;
+    pointer-events: none;
+    
+}
+
+/* SVG Background - Bottom Left Copy */
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: -460px;
+    left: 255px;
+    width: 950px;
+    height: 950px;
+    background-image: url('/images/circles.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 1.0;
+    z-index: 5;
+    pointer-events: none;
 }
 
 .hero-heading-wrapper {
