@@ -365,6 +365,7 @@ let backgroundPlane; // Reference to background plane for render target control
 let uniforms;
 let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
+let startTime = Date.now(); // For time-based rotation calculations
 
 // Shader code
 const vertexShader = `
@@ -691,6 +692,39 @@ function loadModel() {
             // Add to scene
             scene.add(wrapper);
             
+            // Expose debug objects to console for debugging (like working example)
+            window.DEBUG = {
+                gltf: gltf.scene,
+                wrapper: wrapper,
+                originalPosition: gltf.scene.position.clone(),
+                center: center.clone(),
+                size: size.clone(),
+                box: box,
+                // Helper functions
+                setWrapperPosition: (x, y, z) => {
+                    wrapper.position.set(x, y, z);
+                    console.log('Wrapper position set to:', [x, y, z]);
+                },
+                setOriginalPosition: (x, y, z) => {
+                    gltf.scene.position.set(x, y, z);
+                    console.log('Original position set to:', [x, y, z]);
+                },
+                resetPositions: () => {
+                    wrapper.position.set(0, 0, 0);
+                    gltf.scene.position.set(-center.x, -center.y, -center.z);
+                    console.log('Positions reset to calculated center');
+                },
+                logPositions: () => {
+                    console.log('Current positions:', {
+                        wrapper: wrapper.position.toArray(),
+                        original: gltf.scene.position.toArray(),
+                        center: center.toArray(),
+                        size: size.toArray()
+                    });
+                }
+            };
+            
+            console.log('Debug objects exposed! Use window.DEBUG to access them.');
             isModelReady = true;
         
        
@@ -706,7 +740,7 @@ function loadModel() {
 
 // Add event listeners
 function addEventListeners() {
-    // Mouse move handler
+    // Mouse move handler with sophisticated tracking
     window.addEventListener('mousemove', (e) => {
         // Initialize lastMousePos if it hasn't been set yet
         if (lastMousePos.x === 0 && lastMousePos.y === 0) {
@@ -719,6 +753,7 @@ function addEventListeners() {
         const deltaY = e.clientY - lastMousePos.y;
         
         // Add mouse movement to influence (normalized to screen size)
+        // Enhanced mouse influence calculation like the working example
         mouseInfluence.x += deltaX / window.innerWidth * 2.0;
         mouseInfluence.y += deltaY / window.innerHeight * 2.0;
         
@@ -752,24 +787,25 @@ function onWindowResize() {
     uniforms.winResolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2));
 }
 
-// Animation loop
+// Animation loop with sophisticated rotation system
 function animate() {
     requestAnimationFrame(animate);
     
     if (wrapper && isModelReady) {
-        const time = Date.now() * 0.001; // Convert to seconds
+        const time = (Date.now() - startTime) * 0.001; // Convert to seconds from start
         
-        // Decay mouse influence over time
-        mouseInfluence.x *= 0.98;
+        // Decay mouse influence over time (slower decay like working example)
+        mouseInfluence.x *= 0.98; // Slower decay
         mouseInfluence.y *= 0.98;
         
+        // Sophisticated rotation rates with varying modulation
         // X-axis: varying rate with sine wave modulation + mouse Y influence
         const xRate = 0.2 + Math.sin(time * 0.1) * 0.15;
-        wrapper.rotation.x += xRate * 0.02 + mouseInfluence.y * 0.05;
+        wrapper.rotation.x += xRate * 0.02 + mouseInfluence.y * 0.05; // Increased mouse influence
         
         // Y-axis: varying rate with cosine wave modulation + mouse X influence
         const yRate = 0.3 + Math.cos(time * 0.08) * 0.2;
-        wrapper.rotation.y += yRate * 0.02 + mouseInfluence.x * 0.05;
+        wrapper.rotation.y += yRate * 0.02 + mouseInfluence.x * 0.05; // Increased mouse influence
         
         // Z-axis: varying rate with sine wave modulation at different frequency
         const zRate = 0.15 + Math.sin(time * 0.12) * 0.1;
