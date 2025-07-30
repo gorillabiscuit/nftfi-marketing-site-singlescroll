@@ -791,5 +791,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, ready to initialize Three.js scene');
     init();
     animate();
-    initializeNavigation();
 }); 

@@ -6,6 +6,9 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
 console.log('NFTfi Marketing Site - Single Scroll initialized');
 
+// Import Floating UI
+import { computePosition, flip, offset, shift } from '@floating-ui/dom';
+
 // Navigation functionality
 function initializeNavigation() {
     const dropdowns = document.querySelectorAll('.dropdown-container');
@@ -72,12 +75,21 @@ function initializeNavigation() {
     });
 }
 
-// Update dropdown position (simplified without Floating UI for now)
+// Update dropdown position using Floating UI
 function updateDropdownPosition(trigger, menu) {
-    // Simple positioning - dropdown will appear below the trigger
-    const rect = trigger.getBoundingClientRect();
-    menu.style.left = '0';
-    menu.style.top = '100%';
+    computePosition(trigger, menu, {
+        placement: 'bottom-start',
+        middleware: [
+            offset(4),
+            flip(),
+            shift()
+        ]
+    }).then(({ x, y }) => {
+        Object.assign(menu.style, {
+            left: `${x}px`,
+            top: `${y}px`
+        });
+    });
 }
 
 // Initialize controls
@@ -791,5 +803,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, ready to initialize Three.js scene');
     init();
     animate();
-    initializeNavigation();
 }); 

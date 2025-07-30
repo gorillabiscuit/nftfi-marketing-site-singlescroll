@@ -148,32 +148,6 @@ body {
     transform: rotate(270deg);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .custom-navbar {
-        width: 90vw;
-        top: 50px;
-    }
-    
-    .nav-container {
-        gap: 24px;
-    }
-    
-    .nav-link {
-        font-size: 14px;
-        line-height: 18px;
-    }
-    
-    .dropdown-menu {
-        min-width: 140px;
-    }
-    
-    .dropdown-item {
-        font-size: 13px;
-        padding: 6px 12px;
-    }
-}
-
 /* Content Container for ScrollSmoother */
 #smooth-content {
     position: relative;
