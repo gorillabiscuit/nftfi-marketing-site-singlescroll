@@ -306,21 +306,16 @@ function updatePlane() {
     document.getElementById('planeZValue').textContent = z.toFixed(1);
     document.getElementById('planeScaleValue').textContent = scale.toFixed(1);
     
-    // Update plane position and scale
-    if (scene) {
-        scene.traverse((object) => {
-            if (object.isMesh && object.material && object.material.map) {
-                // This is our plane with texture
-                object.position.set(x, y, z);
-                object.scale.setScalar(scale);
-                
-                // Update plane geometry dimensions
-                const width = 20 * scale;
-                const height = width * (591 / 1325);
-                object.geometry.dispose();
-                object.geometry = new THREE.PlaneGeometry(width, height);
-            }
-        });
+    // Update plane position and scale using direct reference
+    if (backgroundPlane) {
+        backgroundPlane.position.set(x, y, z);
+        backgroundPlane.scale.setScalar(scale);
+        
+        // Update plane geometry dimensions
+        const width = 20 * scale;
+        const height = width * (591 / 1325);
+        backgroundPlane.geometry.dispose();
+        backgroundPlane.geometry = new THREE.PlaneGeometry(width, height);
     }
 }
 
@@ -366,6 +361,7 @@ let scene, camera, renderer, canvas;
 let mesh, wrapper;
 let isModelReady = false;
 let mainRenderTarget, backRenderTarget;
+let backgroundPlane; // Reference to background plane for render target control
 let uniforms;
 let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
@@ -627,8 +623,16 @@ function createBackgroundGeometry() {
     });
     
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.set(-5.1, 0, -5.0); // Match UI defaults
+    plane.position.set(0, 0, -5); // Position behind camera for invisibility
+    
+    // NEW: Make plane invisible to camera but still available for shader sampling
+    plane.visible = false; // Invisible to camera
+    plane.renderOrder = -1; // Render first (before the main mesh)
+    
     scene.add(plane); // Add directly to scene, not to background group
+    
+    // Store reference for potential future use
+    backgroundPlane = plane;
 }
 
 // Load GLTF model
@@ -772,8 +776,13 @@ function animate() {
         wrapper.rotation.z += zRate * 0.02;
     }
     
-    // Glass refraction rendering
+    // Glass refraction rendering with temporal plane visibility control
     if (mesh) {
+        
+        // Temporarily make background plane visible for render target sampling
+        if (backgroundPlane) {
+            backgroundPlane.visible = true;
+        }
         
         mesh.visible = false;
         
@@ -792,6 +801,11 @@ function animate() {
         
         mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
         mesh.material.side = THREE.FrontSide;
+        
+        // Hide background plane again for final render
+        if (backgroundPlane) {
+            backgroundPlane.visible = false;
+        }
         
         renderer.setRenderTarget(null);
     }
