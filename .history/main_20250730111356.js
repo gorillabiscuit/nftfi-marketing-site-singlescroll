@@ -49,7 +49,7 @@ function initializeControls() {
         document.getElementById('cameraX').value = camera.position.x;
         document.getElementById('cameraY').value = camera.position.y;
         document.getElementById('cameraZ').value = camera.position.z;
-        document.getElementById('cameraFOV').value = camera.fov; // Direct FOV value
+        document.getElementById('cameraFOV').value = 130 - camera.fov; // Invert FOV for slider
         
         // Update display values
         updateCamera();
