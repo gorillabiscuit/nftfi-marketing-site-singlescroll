@@ -20,11 +20,7 @@ function initializeNavigation() {
         console.log(`📦 Dropdown ${index + 1}:`, {
             trigger: trigger ? 'Found' : 'Missing',
             menu: menu ? 'Found' : 'Missing',
-            triggerText: trigger ? trigger.textContent.trim() : 'N/A',
-            triggerVisible: trigger ? trigger.offsetParent !== null : false,
-            menuVisible: menu ? menu.offsetParent !== null : false,
-            menuDisplay: menu ? getComputedStyle(menu).display : 'N/A',
-            menuVisibility: menu ? getComputedStyle(menu).visibility : 'N/A'
+            triggerText: trigger ? trigger.textContent.trim() : 'N/A'
         });
         
         if (!trigger || !menu) {
@@ -57,23 +53,11 @@ function initializeNavigation() {
                 console.log('🔽 Closing dropdown');
                 menu.classList.remove('open');
                 trigger.classList.remove('open');
-                console.log('📊 Classes after close:', {
-                    menuClasses: menu.className,
-                    triggerClasses: trigger.className,
-                    menuVisible: menu.style.visibility,
-                    menuOpacity: menu.style.opacity
-                });
             } else {
                 console.log('🔼 Opening dropdown');
                 menu.classList.add('open');
                 trigger.classList.add('open');
                 updateDropdownPosition(trigger, menu);
-                console.log('📊 Classes after open:', {
-                    menuClasses: menu.className,
-                    triggerClasses: trigger.className,
-                    menuVisible: menu.style.visibility,
-                    menuOpacity: menu.style.opacity
-                });
             }
         });
         
@@ -361,6 +345,11 @@ function updateCamera() {
 document.addEventListener('DOMContentLoaded', function() {
     // Wait a bit for Three.js to initialize
     setTimeout(initializeControls, 1000);
+});
+
+// Initialize navigation when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    initializeNavigation();
 });
 
 // Scene variables
@@ -853,19 +842,5 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, ready to initialize Three.js scene');
     init();
     animate();
-});
-
-// Initialize navigation immediately when script loads
-console.log('🚀 Script loaded, initializing navigation...');
-
-// Check if DOM is ready, if not wait for it
-if (document.readyState === 'loading') {
-    console.log('⏳ DOM still loading, waiting...');
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 DOM ready, initializing navigation...');
-        initializeNavigation();
-    });
-} else {
-    console.log('✅ DOM already ready, initializing navigation...');
     initializeNavigation();
-} 
+}); 

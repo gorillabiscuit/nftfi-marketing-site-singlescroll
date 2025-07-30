@@ -20,11 +20,7 @@ function initializeNavigation() {
         console.log(`📦 Dropdown ${index + 1}:`, {
             trigger: trigger ? 'Found' : 'Missing',
             menu: menu ? 'Found' : 'Missing',
-            triggerText: trigger ? trigger.textContent.trim() : 'N/A',
-            triggerVisible: trigger ? trigger.offsetParent !== null : false,
-            menuVisible: menu ? menu.offsetParent !== null : false,
-            menuDisplay: menu ? getComputedStyle(menu).display : 'N/A',
-            menuVisibility: menu ? getComputedStyle(menu).visibility : 'N/A'
+            triggerText: trigger ? trigger.textContent.trim() : 'N/A'
         });
         
         if (!trigger || !menu) {
