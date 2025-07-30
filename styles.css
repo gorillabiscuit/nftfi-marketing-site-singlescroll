@@ -17,8 +17,8 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
-    z-index: 10; /* Increased from 1 to be above hero content */
-    pointer-events: auto;
+    z-index: 1; /* Lower z-index to be behind UI elements */
+    pointer-events: none; /* Make canvas invisible to mouse events - canonical solution */
     display: flex;
     justify-content: flex-end; /* Changed from center to move scene to right */
     align-items: center;
@@ -38,8 +38,8 @@ body {
     position: fixed;
     top: 50px;
     left: 49px;
-    z-index: 20;
-    pointer-events: none;
+    z-index: 1000; /* High z-index to be above canvas */
+    pointer-events: auto; /* Make logo clickable if needed */
 }
 
 #logo svg {
@@ -55,7 +55,8 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 851px;
-    z-index: 1000;
+    z-index: 1000; /* High z-index to be above canvas */
+    pointer-events: auto; /* Ensure navigation is clickable */
 }
 
 .nav-container {
@@ -175,7 +176,8 @@ body {
 /* Content Container for ScrollSmoother */
 #smooth-content {
     position: relative;
-    z-index: 1;
+    z-index: 1000; /* High z-index to be above canvas */
+    pointer-events: auto; /* Ensure content is clickable */
 }
 
 /* Hero Section */
@@ -382,10 +384,11 @@ body {
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1000;
+    z-index: 1000; /* High z-index to be above canvas */
     max-height: 75vh;
     overflow-y: auto;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    pointer-events: auto; /* Ensure controls are clickable */
 }
 
 .controls-panel h3 {

@@ -748,6 +748,7 @@ function loadModel() {
 // Add event listeners
 function addEventListeners() {
     // Mouse move handler with sophisticated tracking
+    // Use window events since canvas has pointer-events: none
     window.addEventListener('mousemove', (e) => {
         // Initialize lastMousePos if it hasn't been set yet
         if (lastMousePos.x === 0 && lastMousePos.y === 0) {
