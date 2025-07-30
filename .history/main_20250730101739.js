@@ -413,7 +413,7 @@ function createBackgroundGeometry() {
     
     // Add plane with PNG material - separate from background group so it's visible
     const textureLoader = new THREE.TextureLoader();
-    const headerTexture = textureLoader.load('/images/header.png');
+    const headerTexture = textureLoader.load('/header.png');
     
     // Create plane geometry - exact GitHub dimensions
     const planeScale = 1; // GitHub default
