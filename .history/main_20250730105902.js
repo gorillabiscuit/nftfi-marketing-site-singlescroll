@@ -339,6 +339,7 @@ function init() {
     scene.background = null;
     
     // Create camera
+    const size = Math.min(window.innerWidth, window.innerHeight, 800);
     camera = new THREE.PerspectiveCamera(100, size / size, 0.1, 1000); // FOV 100, square aspect
     camera.position.set(0, 0, 21.2); // Match UI defaults
     
@@ -452,7 +453,7 @@ function createBackgroundGeometry() {
     });
     
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.set(-5.1, 0, -5.0); // Match UI defaults
+    plane.position.set(0, 0, -3); // Move plane closer to center
     scene.add(plane); // Add directly to scene, not to background group
 }
 

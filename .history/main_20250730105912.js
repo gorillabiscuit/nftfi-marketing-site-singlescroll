@@ -452,7 +452,7 @@ function createBackgroundGeometry() {
     });
     
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.set(-5.1, 0, -5.0); // Match UI defaults
+    plane.position.set(0, 0, -3); // Move plane closer to center
     scene.add(plane); // Add directly to scene, not to background group
 }
 
