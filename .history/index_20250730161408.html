@@ -325,18 +325,5 @@
 
     <!-- Main Application Script -->
     <script type="module" src="main.js"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-          const title = document.getElementById('hero-title');
-          const subtitle = document.getElementById('hero-subtitle');
-          const heroActions = document.querySelector('.hero-actions');
-      
-          if (title && subtitle && heroActions) {
-            const titleWidth = title.offsetWidth;
-            subtitle.style.width = titleWidth + 'px';
-            heroActions.style.width = titleWidth + 'px';
-          }
-        });
-      </script>
 </body>
 </html> 

@@ -6,6 +6,9 @@
 }
 
 body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: white;
     overflow-x: hidden;
     background-color: #271E23;
 }
@@ -17,12 +20,11 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
-    z-index: 10; /* Increased from 1 to be above hero content */
+    z-index: 1;
     pointer-events: auto;
     display: flex;
-    justify-content: flex-end; /* Changed from center to move scene to right */
+    justify-content: center;
     align-items: center;
-    transform: translate(30px, 20px); /* Move 30px right, 20px down */
 }
 
 /* Three.js Canvas */
@@ -186,23 +188,13 @@ body {
     padding: 97px;
     margin-left: 49px; /* Align with logo left edge */
     margin-right: 49px; /* Equal spacing on the right */
-    margin-bottom: 49px; /* Match left and right margins */
     max-width: calc(100vw - 98px); /* Full width minus left and right margins */
     position: relative;
     z-index: 4;
 }
 
-.hero-heading-wrapper {
-    display: inline-block;
-    width: fit-content;
-  }
-  
-  .hero-heading-wrapper h1,
-  .hero-heading-wrapper .subtitle {
-    width: 100%;
-  }
-
 .hero-content {
+    display: inline-block;
     text-align: left;
     padding: 0px;
     gap: 9px;
@@ -212,9 +204,17 @@ body {
 }
 
 .hero-text {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 24px;
+    margin: 0; /* Remove auto margin to align left */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
     text-align: left;
-    padding-bottom: 110px; /* Add space between subtitle and buttons */
+    width: fit-content; /* Allow container to size to content */
 }
 
 .hero h1 {
@@ -246,22 +246,23 @@ body {
     order: 1;
     flex-grow: 0;
     text-align: left;
-    width: 100%;
+    width: fit-content;
+    
 }
 
 .hero-actions {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start; /* Changed from space-between to align left */
-    align-items: center; /* Changed back from left to center for proper button alignment */
+    justify-content: space-between;
+    align-items: center;
     padding: 0px;
     gap: 22px;
-    margin: 0; /* Remove auto margin to align left */
+    margin: 0 auto;
+    width: 710px;
     height: 48px;
     flex: none;
     order: 1;
     flex-grow: 0;
-    /* Width will be set by JavaScript to match title width */
 }
 
 .action-btn {
@@ -301,7 +302,7 @@ body {
 .section {
     min-height: 100vh;
     display: flex;
-    align-items: flex-end; /* Changed from center to flex-end to position at bottom */
+    align-items: center;
     justify-content: flex-start; /* Changed from center to flex-start for hero alignment */
     padding: 2rem;
     position: relative;
@@ -326,13 +327,139 @@ body {
     width: 100%;
 }
 
+.content h1 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    
+}
 
+.content h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    
+}
 
+.content p {
+    font-size: 1.5rem;
+    
+}
 
+.content .subtitle {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
 
+/* Features */
+.features {
+    display: flex;
+    gap: 2rem;
+    margin-top: 3rem;
+}
 
+.feature {
+    text-align: center;
+    padding: 1rem;
+}
 
+.feature h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #4CAF50;
+}
 
+.feature p {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 3rem;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat .number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 0.5rem;
+}
+
+.stat .label {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Buttons */
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.btn-large {
+    padding: 1.5rem 3rem;
+    font-size: 1.3rem;
+    background: #4CAF50;
+    color: white;
+}
+
+/* Social Proof */
+.social-proof {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.social-proof p {
+    font-style: italic;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.author {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+/* Final CTA */
+.final-cta {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.disclaimer {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-top: 1rem;
+}
 
 /* Controls Panel Styles */
 .controls-panel {

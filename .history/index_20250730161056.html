@@ -81,11 +81,11 @@
                 <div class="hero">
                     <div class="hero-content">
                         <div class="hero-text">
-                            <h1 id="hero-title">The NFT Lending Aggregator<br>Built for Power Users</h1>
-                            <p id="hero-subtitle" class="subtitle">
-                              Borrow, lend, and refinance at scale, across all major protocols, on the most secure NFT lending protocol.
-                            </p>
-                          </div>
+                            <div class="hero-heading-wrapper">
+                                <h1>The NFT Lending Aggregator<br>Built for Power Users</h1>
+                                <p class="subtitle">Borrow, lend, and refinance at scale, across all major protocols, on the most secure NFT lending protocol.</p>
+                        </div>
+                        </div>
                         
                         <div class="hero-actions">
                             <button class="action-btn">Borrow</button>
@@ -325,18 +325,5 @@
 
     <!-- Main Application Script -->
     <script type="module" src="main.js"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-          const title = document.getElementById('hero-title');
-          const subtitle = document.getElementById('hero-subtitle');
-          const heroActions = document.querySelector('.hero-actions');
-      
-          if (title && subtitle && heroActions) {
-            const titleWidth = title.offsetWidth;
-            subtitle.style.width = titleWidth + 'px';
-            heroActions.style.width = titleWidth + 'px';
-          }
-        });
-      </script>
 </body>
 </html> 

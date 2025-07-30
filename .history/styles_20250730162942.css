@@ -22,7 +22,6 @@ body {
     display: flex;
     justify-content: flex-end; /* Changed from center to move scene to right */
     align-items: center;
-    transform: translate(30px, 20px); /* Move 30px right, 20px down */
 }
 
 /* Three.js Canvas */
@@ -186,7 +185,6 @@ body {
     padding: 97px;
     margin-left: 49px; /* Align with logo left edge */
     margin-right: 49px; /* Equal spacing on the right */
-    margin-bottom: 49px; /* Match left and right margins */
     max-width: calc(100vw - 98px); /* Full width minus left and right margins */
     position: relative;
     z-index: 4;
@@ -214,14 +212,13 @@ body {
 .hero-text {
     display: inline-block;
     text-align: left;
-    padding-bottom: 110px; /* Add space between subtitle and buttons */
-}
+  }
 
 .hero h1 {
     font-family: 'Satoshi Variable';
     font-style: normal;
     font-weight: 400;
-    font-size: 48px;
+    font-size: 38px;
     line-height: 70px;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.8);
@@ -253,15 +250,15 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: flex-start; /* Changed from space-between to align left */
-    align-items: center; /* Changed back from left to center for proper button alignment */
+    align-items: left;
     padding: 0px;
     gap: 22px;
     margin: 0; /* Remove auto margin to align left */
+
     height: 48px;
     flex: none;
     order: 1;
     flex-grow: 0;
-    /* Width will be set by JavaScript to match title width */
 }
 
 .action-btn {
@@ -301,7 +298,7 @@ body {
 .section {
     min-height: 100vh;
     display: flex;
-    align-items: flex-end; /* Changed from center to flex-end to position at bottom */
+    align-items: center;
     justify-content: flex-start; /* Changed from center to flex-start for hero alignment */
     padding: 2rem;
     position: relative;

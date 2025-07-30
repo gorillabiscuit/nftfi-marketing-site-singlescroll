@@ -22,7 +22,6 @@ body {
     display: flex;
     justify-content: flex-end; /* Changed from center to move scene to right */
     align-items: center;
-    transform: translate(30px, 20px); /* Move 30px right, 20px down */
 }
 
 /* Three.js Canvas */
@@ -214,7 +213,7 @@ body {
 .hero-text {
     display: inline-block;
     text-align: left;
-    padding-bottom: 110px; /* Add space between subtitle and buttons */
+    padding-bottom: 100px; /* Add space between subtitle and buttons */
 }
 
 .hero h1 {
