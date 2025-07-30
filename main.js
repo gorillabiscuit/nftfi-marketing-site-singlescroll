@@ -643,12 +643,19 @@ function loadModel() {
         
         loader.load('/models/nftfi_logo.glb', (gltf) => {
             
-            // Calculate bounding box
+            // Calculate bounding box FIRST (before any geometry modifications)
             const box = new THREE.Box3().setFromObject(gltf.scene);
             const center = new THREE.Vector3();
             const size = new THREE.Vector3();
             box.getCenter(center);
             box.getSize(size);
+            
+            console.log('Bounding box calculated:', {
+                center: center.toArray(),
+                size: size.toArray(),
+                min: box.min.toArray(),
+                max: box.max.toArray()
+            });
             
             // Apply material to all meshes
             gltf.scene.traverse((child) => {
@@ -677,10 +684,10 @@ function loadModel() {
                 }
             });
             
-            // Create wrapper group
+            // Create wrapper group (parent object for rotation)
             wrapper = new THREE.Group();
             
-            // Center the original mesh
+            // Center the original mesh by moving it
             gltf.scene.position.set(-center.x, -center.y, -center.z);
             
             // Add centered mesh to wrapper
@@ -787,7 +794,7 @@ function onWindowResize() {
     uniforms.winResolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2));
 }
 
-// Animation loop with sophisticated rotation system
+// Animation loop with proper parent-child rotation and mouse-controlled axes
 function animate() {
     requestAnimationFrame(animate);
     
@@ -798,16 +805,16 @@ function animate() {
         mouseInfluence.x *= 0.98; // Slower decay
         mouseInfluence.y *= 0.98;
         
-        // Sophisticated rotation rates with varying modulation
-        // X-axis: varying rate with sine wave modulation + mouse Y influence
+        // Apply rotation to wrapper (parent) with varying rates and mouse influence
+        // X-axis: varying rate with sine wave modulation + mouse Y influence (up/down mouse = tilt)
         const xRate = 0.2 + Math.sin(time * 0.1) * 0.15;
-        wrapper.rotation.x += xRate * 0.02 + mouseInfluence.y * 0.05; // Increased mouse influence
+        wrapper.rotation.x += xRate * 0.02 + mouseInfluence.y * 0.05; // Mouse Y affects X rotation
         
-        // Y-axis: varying rate with cosine wave modulation + mouse X influence
+        // Y-axis: varying rate with cosine wave modulation + mouse X influence (left/right mouse = turn)
         const yRate = 0.3 + Math.cos(time * 0.08) * 0.2;
-        wrapper.rotation.y += yRate * 0.02 + mouseInfluence.x * 0.05; // Increased mouse influence
+        wrapper.rotation.y += yRate * 0.02 + mouseInfluence.x * 0.05; // Mouse X affects Y rotation
         
-        // Z-axis: varying rate with sine wave modulation at different frequency
+        // Z-axis: varying rate with sine wave modulation at different frequency (no mouse control)
         const zRate = 0.15 + Math.sin(time * 0.12) * 0.1;
         wrapper.rotation.z += zRate * 0.02;
     }
