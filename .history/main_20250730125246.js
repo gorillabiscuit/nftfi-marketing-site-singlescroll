@@ -8,9 +8,6 @@ console.log('NFTfi Marketing Site - Single Scroll initialized');
 
 // Initialize controls
 function initializeControls() {
-    // Accordion functionality
-    initializeAccordion();
-    
     // Light controls
     document.getElementById('lightX').addEventListener('input', updateLight);
     document.getElementById('lightY').addEventListener('input', updateLight);
@@ -56,32 +53,6 @@ function initializeControls() {
         
         // Update display values
         updateCamera();
-    }
-}
-
-// Initialize accordion functionality
-function initializeAccordion() {
-    const headers = document.querySelectorAll('.accordion-header');
-    
-    headers.forEach(header => {
-        header.addEventListener('click', toggleAccordionSection);
-    });
-}
-
-// Toggle accordion section
-function toggleAccordionSection(event) {
-    const header = event.currentTarget;
-    const content = header.nextElementSibling;
-    const isExpanded = header.classList.contains('expanded');
-    
-    if (isExpanded) {
-        // Collapse
-        header.classList.remove('expanded');
-        content.classList.remove('expanded');
-    } else {
-        // Expand
-        header.classList.add('expanded');
-        content.classList.add('expanded');
     }
 }
 

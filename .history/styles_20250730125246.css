@@ -234,59 +234,6 @@ body {
     text-align: center;
 }
 
-/* Accordion Styles */
-.accordion-section {
-    margin-bottom: 8px;
-}
-
-.accordion-section:last-child {
-    margin-bottom: 0;
-}
-
-.accordion-header {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    padding: 8px 12px;
-    color: #F2F2F2;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.2s ease;
-}
-
-.accordion-header:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-.accordion-header:active {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.accordion-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.accordion-content.expanded {
-    max-height: 500px; /* Sufficient for largest section */
-}
-
-.chevron {
-    transition: transform 0.3s ease;
-    color: #F2F2F2;
-}
-
-.accordion-header.expanded .chevron {
-    transform: rotate(180deg);
-}
-
 .control-group {
     margin-bottom: 12px;
     padding-bottom: 8px;
