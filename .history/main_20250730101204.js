@@ -160,9 +160,7 @@ function updateCamera() {
         // Update position
         camera.position.set(x, y, z);
         
-        // Update FOV (Three.js uses degrees)
-        // Higher FOV = wider angle (more zoomed out)
-        // Lower FOV = narrower angle (more zoomed in)
+        // Update FOV (Three.js uses degrees, not radians)
         camera.fov = fov;
         
         // Force projection matrix update
