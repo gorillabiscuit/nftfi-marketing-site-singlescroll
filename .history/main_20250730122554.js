@@ -8,113 +8,51 @@ console.log('NFTfi Marketing Site - Single Scroll initialized');
 
 // Initialize controls
 function initializeControls() {
-    console.log('Initializing controls...');
-    
     // Light controls
-    const lightX = document.getElementById('lightX');
-    const lightY = document.getElementById('lightY');
-    const lightZ = document.getElementById('lightZ');
-    
-    if (lightX && lightY && lightZ) {
-        lightX.addEventListener('input', updateLight);
-        lightY.addEventListener('input', updateLight);
-        lightZ.addEventListener('input', updateLight);
-        console.log('Light controls initialized');
-    } else {
-        console.error('Light controls not found');
-    }
+    document.getElementById('lightX').addEventListener('input', updateLight);
+    document.getElementById('lightY').addEventListener('input', updateLight);
+    document.getElementById('lightZ').addEventListener('input', updateLight);
     
     // Material controls
-    const diffuseness = document.getElementById('diffuseness');
-    const shininess = document.getElementById('shininess');
-    const fresnelPower = document.getElementById('fresnelPower');
-    
-    if (diffuseness && shininess && fresnelPower) {
-        diffuseness.addEventListener('input', updateMaterial);
-        shininess.addEventListener('input', updateMaterial);
-        fresnelPower.addEventListener('input', updateMaterial);
-        console.log('Material controls initialized');
-    } else {
-        console.error('Material controls not found');
-    }
+    document.getElementById('diffuseness').addEventListener('input', updateMaterial);
+    document.getElementById('shininess').addEventListener('input', updateMaterial);
+    document.getElementById('fresnelPower').addEventListener('input', updateMaterial);
     
     // IOR controls
-    const iorR = document.getElementById('iorR');
-    const iorY = document.getElementById('iorY');
-    const iorG = document.getElementById('iorG');
-    const iorC = document.getElementById('iorC');
-    const iorB = document.getElementById('iorB');
-    const iorP = document.getElementById('iorP');
-    
-    if (iorR && iorY && iorG && iorC && iorB && iorP) {
-        iorR.addEventListener('input', updateIOR);
-        iorY.addEventListener('input', updateIOR);
-        iorG.addEventListener('input', updateIOR);
-        iorC.addEventListener('input', updateIOR);
-        iorB.addEventListener('input', updateIOR);
-        iorP.addEventListener('input', updateIOR);
-        console.log('IOR controls initialized');
-    } else {
-        console.error('IOR controls not found');
-    }
+    document.getElementById('iorR').addEventListener('input', updateIOR);
+    document.getElementById('iorY').addEventListener('input', updateIOR);
+    document.getElementById('iorG').addEventListener('input', updateIOR);
+    document.getElementById('iorC').addEventListener('input', updateIOR);
+    document.getElementById('iorB').addEventListener('input', updateIOR);
+    document.getElementById('iorP').addEventListener('input', updateIOR);
     
     // Effect controls
-    const saturation = document.getElementById('saturation');
-    const chromaticAberration = document.getElementById('chromaticAberration');
-    const refractPower = document.getElementById('refractPower');
-    
-    if (saturation && chromaticAberration && refractPower) {
-        saturation.addEventListener('input', updateEffects);
-        chromaticAberration.addEventListener('input', updateEffects);
-        refractPower.addEventListener('input', updateEffects);
-        console.log('Effect controls initialized');
-    } else {
-        console.error('Effect controls not found');
-    }
+    document.getElementById('saturation').addEventListener('input', updateEffects);
+    document.getElementById('chromaticAberration').addEventListener('input', updateEffects);
+    document.getElementById('refractPower').addEventListener('input', updateEffects);
     
     // Plane controls
-    const planeX = document.getElementById('planeX');
-    const planeY = document.getElementById('planeY');
-    const planeZ = document.getElementById('planeZ');
-    const planeScale = document.getElementById('planeScale');
-    
-    if (planeX && planeY && planeZ && planeScale) {
-        planeX.addEventListener('input', updatePlane);
-        planeY.addEventListener('input', updatePlane);
-        planeZ.addEventListener('input', updatePlane);
-        planeScale.addEventListener('input', updatePlane);
-        console.log('Plane controls initialized');
-    } else {
-        console.error('Plane controls not found');
-    }
+    document.getElementById('planeX').addEventListener('input', updatePlane);
+    document.getElementById('planeY').addEventListener('input', updatePlane);
+    document.getElementById('planeZ').addEventListener('input', updatePlane);
+    document.getElementById('planeScale').addEventListener('input', updatePlane);
     
     // Camera controls
-    const cameraX = document.getElementById('cameraX');
-    const cameraY = document.getElementById('cameraY');
-    const cameraZ = document.getElementById('cameraZ');
-    const cameraFOV = document.getElementById('cameraFOV');
-    
-    if (cameraX && cameraY && cameraZ && cameraFOV) {
-        cameraX.addEventListener('input', updateCamera);
-        cameraY.addEventListener('input', updateCamera);
-        cameraZ.addEventListener('input', updateCamera);
-        cameraFOV.addEventListener('input', updateCamera);
-        console.log('Camera controls initialized');
-    } else {
-        console.error('Camera controls not found');
-    }
+    document.getElementById('cameraX').addEventListener('input', updateCamera);
+    document.getElementById('cameraY').addEventListener('input', updateCamera);
+    document.getElementById('cameraZ').addEventListener('input', updateCamera);
+    document.getElementById('cameraFOV').addEventListener('input', updateCamera);
     
     // Sync UI with actual camera position
     if (camera) {
         // Set slider values to match camera position
-        if (cameraX) cameraX.value = camera.position.x;
-        if (cameraY) cameraY.value = camera.position.y;
-        if (cameraZ) cameraZ.value = camera.position.z;
-        if (cameraFOV) cameraFOV.value = camera.fov; // Direct FOV value
+        document.getElementById('cameraX').value = camera.position.x;
+        document.getElementById('cameraY').value = camera.position.y;
+        document.getElementById('cameraZ').value = camera.position.z;
+        document.getElementById('cameraFOV').value = camera.fov; // Direct FOV value
         
         // Update display values
         updateCamera();
-        console.log('Camera UI synced');
     }
 }
 
