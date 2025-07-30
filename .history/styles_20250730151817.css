@@ -186,9 +186,8 @@ body {
     border: 1px solid rgba(217, 213, 214, 0.25);
     background: linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
     padding: 3rem 4rem;
-    margin-left: 49px; /* Align with logo left edge */
-    margin-right: 49px; /* Equal spacing on the right */
-    max-width: calc(100vw - 98px); /* Full width minus left and right margins */
+    margin: 0 auto;
+    max-width: 600px;
     text-align: center;
     position: relative;
     z-index: 4;
@@ -214,16 +213,10 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Changed from center to flex-start for hero alignment */
+    justify-content: center;
     padding: 2rem;
     position: relative;
     z-index: 2;
-}
-
-.section:first-child {
-    justify-content: flex-start; /* Ensure first section aligns left */
-    padding-left: 0; /* Remove left padding to allow hero to align with logo */
-    padding-right: 0; /* Remove right padding for consistency */
 }
 
 .content {
@@ -231,11 +224,6 @@ body {
     text-align: center;
     position: relative;
     z-index: 3;
-}
-
-.section:first-child .content {
-    max-width: none; /* Allow hero to take full width */
-    width: 100%;
 }
 
 .content h1 {

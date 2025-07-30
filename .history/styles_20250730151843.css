@@ -214,16 +214,10 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Changed from center to flex-start for hero alignment */
+    justify-content: center;
     padding: 2rem;
     position: relative;
     z-index: 2;
-}
-
-.section:first-child {
-    justify-content: flex-start; /* Ensure first section aligns left */
-    padding-left: 0; /* Remove left padding to allow hero to align with logo */
-    padding-right: 0; /* Remove right padding for consistency */
 }
 
 .content {
@@ -231,11 +225,6 @@ body {
     text-align: center;
     position: relative;
     z-index: 3;
-}
-
-.section:first-child .content {
-    max-width: none; /* Allow hero to take full width */
-    width: 100%;
 }
 
 .content h1 {

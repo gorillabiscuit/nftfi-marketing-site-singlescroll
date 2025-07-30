@@ -233,11 +233,6 @@ body {
     z-index: 3;
 }
 
-.section:first-child .content {
-    max-width: none; /* Allow hero to take full width */
-    width: 100%;
-}
-
 .content h1 {
     font-size: 4rem;
     margin-bottom: 1rem;
