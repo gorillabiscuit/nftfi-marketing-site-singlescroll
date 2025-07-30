@@ -219,7 +219,6 @@ body {
     order: 0;
     flex-grow: 0;
     text-align: left;
-    width: fit-content; /* Allow container to size to content */
 }
 
 .hero h1 {
@@ -235,7 +234,6 @@ body {
     order: 0;
     flex-grow: 0;
     text-align: left;
-    width: fit-content; /* Size to content */
 }
 
 .hero .subtitle {
@@ -251,7 +249,8 @@ body {
     order: 1;
     flex-grow: 0;
     text-align: left;
-    width: 100%; /* Take full width of parent (hero-text) */
+    width: 100%; /* Use full width of parent */
+    max-width: fit-content; /* Allow natural width based on content */
 }
 
 .hero-actions {
