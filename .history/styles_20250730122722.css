@@ -326,8 +326,6 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
     overflow: visible;
     transform-origin: top left;
-    height: auto;
-    min-height: 0;
 }
 
 .accordion-toggle {
@@ -461,7 +459,6 @@ body {
         top: 10px;
         max-width: none;
         width: auto;
-        transform-origin: top left;
     }
     
     .controls-panel {
@@ -469,7 +466,6 @@ body {
         top: 100%;
         left: 0;
         right: 0;
-        z-index: 1000;
     }
     
     .controls-panel.expanded {

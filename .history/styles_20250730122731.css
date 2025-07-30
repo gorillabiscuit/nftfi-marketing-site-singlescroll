@@ -326,8 +326,6 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
     overflow: visible;
     transform-origin: top left;
-    height: auto;
-    min-height: 0;
 }
 
 .accordion-toggle {
