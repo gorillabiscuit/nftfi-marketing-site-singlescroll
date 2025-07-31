@@ -388,18 +388,18 @@ let scrollSpinVelocity = 0;
 let lastScrollDirection = 0;
 let lastScrollTime = 0;
 
-// Viewport-relative positioning configuration
+// Percentage-based positioning configuration (responsive)
 const TARGET_CONFIG = {
-    // Target position in viewport coordinates (pixels from edges)
-    viewportX: 0,  // 0px from left edge (top-left corner)
-    viewportY: 0,  // 0px from top edge (top-left corner)
-    viewportZ: 0,  // Z depth (world coordinates - not viewport-based)
-    scaleRatio: 1, // 30% of original scale
+    // Target position as percentages of screen size
+    targetPercentX: 0.1,    // 10% from left edge
+    targetPercentY: 0.2,    // 20% from top edge
+    targetPercentZ: 0,      // Z depth (world coordinates)
+    scaleRatio: 1.2,        // Scale ratio
     
-    // Starting position in viewport coordinates (pixels from edges)
-    startViewportX: 4,  // 4px from left edge (right side of screen)
-    startViewportY: 0,  // 0px from top edge (center vertically)
-    startViewportZ: 0   // Z depth (world coordinates)
+    // Starting position as percentages of screen size
+    startPercentX: 0.8,     // 80% from left edge (right side)
+    startPercentY: 0.5,     // 50% from top edge (center)
+    startPercentZ: 0        // Z depth (world coordinates)
 };
 
 // Model positioning configuration - EASY TO TWEAK!
@@ -885,8 +885,8 @@ function loadModel() {
                 // Texture debugging
                 updatePlaneTexture,
                 captureHeroAsTexture,
-                // Viewport positioning debugging
-                viewportToWorld,
+                // Percentage positioning debugging
+                percentageToWorld,
                 calculateTargetPosition,
                 TARGET_CONFIG
             };
@@ -1015,14 +1015,18 @@ function updatePlaneTexture() {
     }
 }
 
-// Viewport to world coordinate conversion using canonical Three.js approach
-function viewportToWorld(viewportX, viewportY) {
+// Percentage to world coordinate conversion using canonical Three.js approach
+function percentageToWorld(percentX, percentY) {
     const canvas = document.getElementById('three-canvas');
     const rect = canvas.getBoundingClientRect();
     
+    // Convert percentages to pixel coordinates
+    const pixelX = percentX * window.innerWidth;
+    const pixelY = percentY * window.innerHeight;
+    
     // Convert viewport coordinates to canvas-relative coordinates
-    const canvasX = (viewportX - rect.left) * canvas.width / rect.width;
-    const canvasY = (viewportY - rect.top) * canvas.height / rect.height;
+    const canvasX = (pixelX - rect.left) * canvas.width / rect.width;
+    const canvasY = (pixelY - rect.top) * canvas.height / rect.height;
     
     // Convert to normalized device coordinates (-1 to 1)
     const normalizedX = (canvasX / canvas.width) * 2 - 1;
@@ -1039,9 +1043,9 @@ function viewportToWorld(viewportX, viewportY) {
     return { x: worldX, y: worldY };
 }
 
-// Calculate dynamic target position based on viewport coordinates
+// Calculate dynamic target position based on percentage coordinates
 function calculateTargetPosition() {
-    const worldPos = viewportToWorld(TARGET_CONFIG.viewportX, TARGET_CONFIG.viewportY);
+    const worldPos = percentageToWorld(TARGET_CONFIG.targetPercentX, TARGET_CONFIG.targetPercentY);
     
     // Apply scale factor based on current viewport
     const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
@@ -1050,14 +1054,14 @@ function calculateTargetPosition() {
     return {
         x: worldPos.x * scaleFactor,
         y: worldPos.y * scaleFactor,
-        z: TARGET_CONFIG.viewportZ, // Use Z from TARGET_CONFIG (world coordinates)
+        z: TARGET_CONFIG.targetPercentZ, // Use Z from TARGET_CONFIG (world coordinates)
         scale: MODEL_CONFIG.targetScale * TARGET_CONFIG.scaleRatio * scaleFactor
     };
 }
 
-// Calculate starting position based on viewport coordinates
+// Calculate starting position based on percentage coordinates
 function calculateStartPosition() {
-    const worldPos = viewportToWorld(TARGET_CONFIG.startViewportX, TARGET_CONFIG.startViewportY);
+    const worldPos = percentageToWorld(TARGET_CONFIG.startPercentX, TARGET_CONFIG.startPercentY);
     
     // Apply scale factor based on current viewport
     const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
@@ -1066,7 +1070,7 @@ function calculateStartPosition() {
     return {
         x: worldPos.x * scaleFactor,
         y: worldPos.y * scaleFactor,
-        z: TARGET_CONFIG.startViewportZ // Use Z from TARGET_CONFIG (world coordinates)
+        z: TARGET_CONFIG.startPercentZ // Use Z from TARGET_CONFIG (world coordinates)
     };
 }
 
