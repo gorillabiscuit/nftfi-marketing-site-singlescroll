@@ -662,28 +662,37 @@ function captureHeroAsTexture() {
             return;
         }
         
-        // Capture the hero div using html2canvas
-        html2canvas(heroElement, { 
-            backgroundColor: null, // Transparent background
-            scale: 2, // Higher resolution for better quality
-            useCORS: true, // Allow cross-origin images
-            allowTaint: true, // Allow tainted canvas
-            logging: false // Disable logging for performance
-        }).then(canvas => {
-            // Create Three.js texture from canvas
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.needsUpdate = true;
-            
-            console.log('Hero captured successfully:', {
-                canvasWidth: canvas.width,
-                canvasHeight: canvas.height,
-                texture: texture
+        // Wait for any pending layout calculations
+        requestAnimationFrame(() => {
+            // Capture the hero div using html2canvas
+            html2canvas(heroElement, { 
+                backgroundColor: null, // Transparent background
+                scale: 2, // Higher resolution for better quality
+                useCORS: true, // Allow cross-origin images
+                allowTaint: true, // Allow tainted canvas
+                logging: false, // Disable logging for performance
+                width: heroElement.offsetWidth, // Use actual element width
+                height: heroElement.offsetHeight, // Use actual element height
+                scrollX: window.scrollX, // Account for scroll position
+                scrollY: window.scrollY
+            }).then(canvas => {
+                // Create Three.js texture from canvas
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.needsUpdate = true;
+                
+                console.log('Hero captured successfully:', {
+                    canvasWidth: canvas.width,
+                    canvasHeight: canvas.height,
+                    elementWidth: heroElement.offsetWidth,
+                    elementHeight: heroElement.offsetHeight,
+                    texture: texture
+                });
+                
+                resolve(texture);
+            }).catch(error => {
+                console.error('Error capturing hero:', error);
+                reject(error);
             });
-            
-            resolve(texture);
-        }).catch(error => {
-            console.error('Error capturing hero:', error);
-            reject(error);
         });
     });
 }
@@ -721,19 +730,21 @@ function createBackgroundGeometry() {
     // Store reference for potential future use
     backgroundPlane = plane;
     
-    // Capture hero and apply as texture
-    captureHeroAsTexture().then(texture => {
-        plane.material.map = texture;
-        plane.material.needsUpdate = true;
-        console.log('Dynamic texture applied to plane');
-    }).catch(error => {
-        console.error('Failed to apply dynamic texture, using fallback:', error);
-        // Fallback to static texture if capture fails
-        const textureLoader = new THREE.TextureLoader();
-        const headerTexture = textureLoader.load('/images/header.png');
-        plane.material.map = headerTexture;
-        plane.material.needsUpdate = true;
-    });
+    // Capture hero and apply as texture with delay to ensure DOM is ready
+    setTimeout(() => {
+        captureHeroAsTexture().then(texture => {
+            plane.material.map = texture;
+            plane.material.needsUpdate = true;
+            console.log('Dynamic texture applied to plane');
+        }).catch(error => {
+            console.error('Failed to apply dynamic texture, using fallback:', error);
+            // Fallback to static texture if capture fails
+            const textureLoader = new THREE.TextureLoader();
+            const headerTexture = textureLoader.load('/images/header.png');
+            plane.material.map = headerTexture;
+            plane.material.needsUpdate = true;
+        });
+    }, 100); // Small delay to ensure DOM is fully rendered
     
     // Add white sphere at the same position as the plane
     const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
@@ -1247,6 +1258,14 @@ function resetScrollAnimation() {
 document.addEventListener('DOMContentLoaded', () => {
     init();
     animate();
+    
+    // Force texture update after everything is loaded
+    setTimeout(() => {
+        if (window.DEBUG && window.DEBUG.updatePlaneTexture) {
+            window.DEBUG.updatePlaneTexture();
+            console.log('Forced texture update after DOM load');
+        }
+    }, 500); // Wait for all styles and layouts to be applied
 }); 
 
 
