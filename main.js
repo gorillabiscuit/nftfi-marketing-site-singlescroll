@@ -383,6 +383,11 @@ let scrollTimeline;
 let originalWrapperPosition = { x: 0, y: 0, z: 0 };
 let originalWrapperScale = { x: 3, y: 3, z: 3 };
 
+// Scroll spin tracking variables
+let scrollSpinVelocity = 0;
+let lastScrollDirection = 0;
+let lastScrollTime = 0;
+
 // Model positioning configuration - EASY TO TWEAK!
 const MODEL_CONFIG = {
     // Starting position (right side of screen)
@@ -408,7 +413,11 @@ const MODEL_CONFIG = {
     
     // Floating animation settings
     floatAmplitude: 0.5, // Small amplitude for subtle movement
-    floatSpeed: 0.8 // Slow, gentle speed
+    floatSpeed: 0.8, // Slow, gentle speed
+    
+    // Scroll spin settings
+    spinIntensity: 0.3, // How much spin per scroll unit
+    spinDecay: 0.95 // How quickly spin decays (0.95 = slow decay)
 };
 
 // Shader code
@@ -811,7 +820,10 @@ function loadModel() {
                 originalWrapperPosition: originalWrapperPosition,
                 originalWrapperScale: originalWrapperScale,
                 // Model positioning configuration - EASY TO TWEAK!
-                MODEL_CONFIG: MODEL_CONFIG
+                MODEL_CONFIG: MODEL_CONFIG,
+                // Scroll spin debugging
+                scrollSpinVelocity: () => scrollSpinVelocity,
+                updateScrollSpin: (direction) => updateScrollSpin(direction)
             };
             
             console.log('Debug objects exposed! Use window.DEBUG to access them.');
@@ -970,6 +982,9 @@ function onWindowResize() {
             const zRate = 0.15 + Math.sin(time * 0.12) * 0.1;
             wrapper.rotation.z += zRate * 0.02;
             
+            // Add scroll spin to Y rotation (upward spin)
+            wrapper.rotation.y += scrollSpinVelocity;
+            
             // Floating animation - gentle up and down movement
             // Scale amplitude based on current mesh scale for consistent visual effect
             const currentScale = wrapper.scale.x; // Use X scale as reference
@@ -1045,6 +1060,24 @@ function onWindowResize() {
     renderer.render(scene, camera);
 }
 
+// Track scroll events for spin animation
+function updateScrollSpin(direction) {
+    const currentTime = Date.now();
+    const timeDelta = currentTime - lastScrollTime;
+    
+    // Update spin velocity based on scroll direction
+    if (direction !== 0) {
+        scrollSpinVelocity += direction * MODEL_CONFIG.spinIntensity;
+        lastScrollDirection = direction;
+    }
+    
+    // Apply decay over time
+    if (timeDelta > 16) { // Only decay every ~16ms (60fps)
+        scrollSpinVelocity *= MODEL_CONFIG.spinDecay;
+        lastScrollTime = currentTime;
+    }
+}
+
 // Set up scroll-triggered animation
 function setupScrollAnimation() {
     if (!wrapper) return;
@@ -1061,7 +1094,7 @@ function setupScrollAnimation() {
         z: wrapper.scale.z
     };
     
-    // Create scroll timeline
+        // Create scroll timeline
     scrollTimeline = gsap.timeline({
         scrollTrigger: {
             trigger: ".section[data-section='1']",
@@ -1072,25 +1105,29 @@ function setupScrollAnimation() {
                 // Update Three.js wrapper position and scale based on scroll progress
                 const progress = self.progress;
                 
-                            // Interpolate position using configuration values
-            wrapper.position.x = gsap.utils.interpolate(
-                MODEL_CONFIG.startPosition.x, 
-                MODEL_CONFIG.targetPosition.x, 
-                progress
-            );
-            
-            // Store the target Y position for scroll animation (floating will add offset)
-            wrapper.userData.targetY = gsap.utils.interpolate(
-                MODEL_CONFIG.startPosition.y, 
-                MODEL_CONFIG.targetPosition.y, 
-                progress
-            );
-            
-            wrapper.position.z = gsap.utils.interpolate(
-                MODEL_CONFIG.startPosition.z, 
-                MODEL_CONFIG.targetPosition.z, 
-                progress
-            );
+                // Track scroll direction for spin animation
+                const scrollDirection = self.direction || 0;
+                updateScrollSpin(scrollDirection);
+                
+                // Interpolate position using configuration values
+                wrapper.position.x = gsap.utils.interpolate(
+                    MODEL_CONFIG.startPosition.x, 
+                    MODEL_CONFIG.targetPosition.x, 
+                    progress
+                );
+                
+                // Store the target Y position for scroll animation (floating will add offset)
+                wrapper.userData.targetY = gsap.utils.interpolate(
+                    MODEL_CONFIG.startPosition.y, 
+                    MODEL_CONFIG.targetPosition.y, 
+                    progress
+                );
+                
+                wrapper.position.z = gsap.utils.interpolate(
+                    MODEL_CONFIG.startPosition.z, 
+                    MODEL_CONFIG.targetPosition.z, 
+                    progress
+                );
                 
                 // Interpolate scale using configuration values
                 const currentScale = gsap.utils.interpolate(
@@ -1100,7 +1137,7 @@ function setupScrollAnimation() {
                 );
                 wrapper.scale.setScalar(currentScale);
                 
-                console.log('Scroll animation progress:', progress, 'Scale:', currentScale);
+                console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Spin velocity:', scrollSpinVelocity);
             }
         }
     });
