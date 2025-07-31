@@ -417,7 +417,7 @@ const MODEL_CONFIG = {
     
     // Scroll spin settings
     spinIntensity: 0.3, // How much spin per scroll unit
-    spinDecay: 0.95 // How quickly spin decays (0.95 = slow decay)
+    spinDecay: 0.25 // How quickly spin decays (0.95 = slow decay)
 };
 
 // Shader code
