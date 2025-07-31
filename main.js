@@ -1,10 +1,4 @@
 // Main JavaScript file for NFTfi Marketing Site - Single Scroll
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ScrollSmoother } from 'gsap/ScrollSmoother';
-
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 // Three.js scene with glass shader and scroll/mouse interactions
 
 import * as THREE from 'three';
@@ -366,6 +360,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
 });
 
+// Import GSAP and ScrollTrigger
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
+
 // Scene variables
 let scene, camera, renderer, canvas;
 let mesh, wrapper;
@@ -377,8 +378,10 @@ let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
 let startTime = Date.now(); // For time-based rotation calculations
 
-// GSAP ScrollSmoother instance
-let smoother;
+// Scroll animation variables
+let scrollTimeline;
+let originalWrapperPosition = { x: 0, y: 0, z: 0 };
+let originalWrapperScale = { x: 3, y: 3, z: 3 };
 
 // Shader code
 const vertexShader = `
@@ -741,7 +744,11 @@ function loadModel() {
                         center: center.toArray(),
                         size: size.toArray()
                     });
-                }
+                },
+                // Scroll animation helpers
+                resetScrollAnimation: resetScrollAnimation,
+                originalWrapperPosition: originalWrapperPosition,
+                originalWrapperScale: originalWrapperScale
             };
             
             console.log('Debug objects exposed! Use window.DEBUG to access them.');
@@ -749,6 +756,9 @@ function loadModel() {
             
             // Set initial plane position based on viewport
             updatePlaneForViewport();
+            
+            // Set up scroll-triggered animation after model is ready
+            setupScrollAnimation();
         
        
             
@@ -870,11 +880,6 @@ function onWindowResize() {
     
     // Update plane position for new viewport
     updatePlaneForViewport();
-    
-    // Refresh ScrollTrigger on resize
-    if (smoother) {
-        ScrollTrigger.refresh();
-    }
 }
 
 // Animation loop with proper parent-child rotation and mouse-controlled axes
@@ -939,104 +944,95 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// Initialize ScrollSmoother and scroll animations
-function initializeScrollAnimations() {
-    // Create ScrollSmoother with proper configuration
-    smoother = ScrollSmoother.create({
-        wrapper: "body",
-        content: "#smooth-content",
-        smooth: 1.5,
-        effects: true,
-        normalizeScroll: true,
-        ignoreMobileResize: true,
-        smoothTouch: 0.1,
-        ease: "power2.out",
-    });
+// Set up scroll-triggered animation
+function setupScrollAnimation() {
+    if (!wrapper) return;
     
-    // Create scroll-driven animations for Three.js scene
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: "#smooth-content",
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1,
-            onUpdate: (self) => {
-                // Update Three.js scene based on scroll progress
-                if (wrapper && isModelReady) {
-                    const progress = self.progress;
-                    
-                    // Rotate wrapper based on scroll
-                    wrapper.rotation.y = progress * Math.PI * 2; // Full rotation
-                    
-                    // Move camera based on scroll
-                    if (camera) {
-                        const cameraZ = 33.6 + (progress * 10); // Move camera closer/further
-                        camera.position.z = cameraZ;
-                        camera.updateProjectionMatrix();
-                    }
-                    
-                    // Update plane position based on scroll
-                    if (backgroundPlane) {
-                        const planeX = -12 + (progress * 20); // Move plane across screen
-                        backgroundPlane.position.x = planeX;
-                    }
-                }
-            }
-        }
-    });
+    // Store original position and scale
+    originalWrapperPosition = {
+        x: wrapper.position.x,
+        y: wrapper.position.y,
+        z: wrapper.position.z
+    };
+    originalWrapperScale = {
+        x: wrapper.scale.x,
+        y: wrapper.scale.y,
+        z: wrapper.scale.z
+    };
     
-    // Add specific section animations
-    gsap.timeline({
+    // Create scroll timeline
+    scrollTimeline = gsap.timeline({
         scrollTrigger: {
             trigger: ".section[data-section='1']",
-            start: "top center",
-            end: "bottom center",
-            scrub: 1,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1, // Smooth scrubbing
             onUpdate: (self) => {
-                if (wrapper && isModelReady) {
-                    // Hero section: scale up model
-                    const scale = 3 + (self.progress * 2);
-                    wrapper.scale.setScalar(scale);
-                }
+                // Update Three.js wrapper position and scale based on scroll progress
+                const progress = self.progress;
+                
+                // Calculate target position (top left of screen)
+                const targetX = -5; // Move left
+                const targetY = 3;  // Move up
+                const targetZ = wrapper.position.z; // Keep same Z
+                
+                // Calculate target scale (90% of original)
+                const targetScale = 0.9;
+                
+                // Interpolate position and scale
+                wrapper.position.x = gsap.utils.interpolate(
+                    originalWrapperPosition.x, 
+                    targetX, 
+                    progress
+                );
+                wrapper.position.y = gsap.utils.interpolate(
+                    originalWrapperPosition.y, 
+                    targetY, 
+                    progress
+                );
+                wrapper.position.z = gsap.utils.interpolate(
+                    originalWrapperPosition.z, 
+                    targetZ, 
+                    progress
+                );
+                
+                // Interpolate scale
+                const currentScale = gsap.utils.interpolate(
+                    originalWrapperScale.x, 
+                    originalWrapperScale.x * targetScale, 
+                    progress
+                );
+                wrapper.scale.setScalar(currentScale);
+                
+                console.log('Scroll animation progress:', progress, 'Scale:', currentScale);
             }
         }
     });
     
-    gsap.timeline({
-        scrollTrigger: {
-            trigger: ".section[data-section='2']",
-            start: "top center",
-            end: "bottom center",
-            scrub: 1,
-            onUpdate: (self) => {
-                if (wrapper && isModelReady) {
-                    // Stats section: rotate and change color
-                    wrapper.rotation.x = self.progress * Math.PI;
-                    
-                    // Update shader uniforms for color change
-                    if (uniforms) {
-                        uniforms.uSaturation.value = 1.01 + (self.progress * 0.5);
-                    }
-                }
-            }
-        }
-    });
-    
-    console.log('ScrollSmoother and ScrollTrigger animations initialized');
-    console.log('ScrollSmoother instance:', smoother);
-    console.log('Content height:', document.querySelector('#smooth-content').offsetHeight);
-    console.log('Window height:', window.innerHeight);
+    console.log('Scroll animation setup complete');
+}
+
+// Reset scroll animation to original position
+function resetScrollAnimation() {
+    if (wrapper && scrollTimeline) {
+        wrapper.position.set(
+            originalWrapperPosition.x,
+            originalWrapperPosition.y,
+            originalWrapperPosition.z
+        );
+        wrapper.scale.set(
+            originalWrapperScale.x,
+            originalWrapperScale.y,
+            originalWrapperScale.z
+        );
+        console.log('Scroll animation reset to original position');
+    }
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     init();
     animate();
-    
-    // Initialize scroll animations after Three.js is ready
-    setTimeout(() => {
-        initializeScrollAnimations();
-    }, 1500);
 }); 
 
 
