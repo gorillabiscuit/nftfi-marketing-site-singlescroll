@@ -695,8 +695,11 @@ function createBackgroundGeometry() {
     scene.add(whiteSphere);
     
     // Store reference to sphere for potential future use
-    window.DEBUG = window.DEBUG || {};
+    if (!window.DEBUG) {
+        window.DEBUG = {};
+    }
     window.DEBUG.whiteSphere = whiteSphere;
+    console.log('Sphere added to DEBUG object:', whiteSphere);
 }
 
 // Load GLTF model
@@ -971,8 +974,21 @@ function animate() {
         if (backgroundPlane) {
             backgroundPlane.visible = true;
         }
-        if (window.DEBUG && window.DEBUG.whiteSphere) {
-            window.DEBUG.whiteSphere.visible = true;
+        
+        // Find sphere in scene for render target sampling
+        let whiteSphere = null;
+        scene.traverse((object) => {
+            if (object.isMesh && object.material && object.material.color && 
+                object.material.color.getHexString() === 'ffffff') {
+                whiteSphere = object;
+            }
+        });
+        
+        if (whiteSphere) {
+            whiteSphere.visible = true;
+            console.log('Sphere made visible for render target');
+        } else {
+            console.log('White sphere not found in scene');
         }
         
         mesh.visible = false;
@@ -997,8 +1013,11 @@ function animate() {
         if (backgroundPlane) {
             backgroundPlane.visible = false;
         }
-        if (window.DEBUG && window.DEBUG.whiteSphere) {
-            window.DEBUG.whiteSphere.visible = false;
+        
+        // Hide sphere for final render
+        if (whiteSphere) {
+            whiteSphere.visible = false;
+            console.log('Sphere hidden for final render');
         }
         
         renderer.setRenderTarget(null);
