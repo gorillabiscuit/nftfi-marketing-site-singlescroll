@@ -407,7 +407,7 @@ const MODEL_CONFIG = {
     scrubDuration: 1,    // Smooth transition duration
     
     // Floating animation settings
-    floatAmplitude: 0.1, // Small amplitude for subtle movement
+    floatAmplitude: 0.5, // Small amplitude for subtle movement
     floatSpeed: 0.8 // Slow, gentle speed
 };
 
@@ -973,8 +973,14 @@ function onWindowResize() {
             // Floating animation - gentle up and down movement
             const floatOffset = Math.sin(time * MODEL_CONFIG.floatSpeed) * MODEL_CONFIG.floatAmplitude;
             
-            // Apply floating movement to wrapper position
-            wrapper.position.y = MODEL_CONFIG.startPosition.y + floatOffset;
+            // Apply floating movement - works with both static and scroll animation
+            if (wrapper.userData.targetY !== undefined) {
+                // Scroll animation active - add floating offset to target Y position
+                wrapper.position.y = wrapper.userData.targetY + floatOffset;
+            } else {
+                // No scroll animation - use base position with floating
+                wrapper.position.y = MODEL_CONFIG.startPosition.y + floatOffset;
+            }
         }
     
     // Glass refraction rendering with temporal plane and sphere visibility control
@@ -1063,22 +1069,25 @@ function setupScrollAnimation() {
                 // Update Three.js wrapper position and scale based on scroll progress
                 const progress = self.progress;
                 
-                // Interpolate position using configuration values
-                wrapper.position.x = gsap.utils.interpolate(
-                    MODEL_CONFIG.startPosition.x, 
-                    MODEL_CONFIG.targetPosition.x, 
-                    progress
-                );
-                wrapper.position.y = gsap.utils.interpolate(
-                    MODEL_CONFIG.startPosition.y, 
-                    MODEL_CONFIG.targetPosition.y, 
-                    progress
-                );
-                wrapper.position.z = gsap.utils.interpolate(
-                    MODEL_CONFIG.startPosition.z, 
-                    MODEL_CONFIG.targetPosition.z, 
-                    progress
-                );
+                            // Interpolate position using configuration values
+            wrapper.position.x = gsap.utils.interpolate(
+                MODEL_CONFIG.startPosition.x, 
+                MODEL_CONFIG.targetPosition.x, 
+                progress
+            );
+            
+            // Store the target Y position for scroll animation (floating will add offset)
+            wrapper.userData.targetY = gsap.utils.interpolate(
+                MODEL_CONFIG.startPosition.y, 
+                MODEL_CONFIG.targetPosition.y, 
+                progress
+            );
+            
+            wrapper.position.z = gsap.utils.interpolate(
+                MODEL_CONFIG.startPosition.z, 
+                MODEL_CONFIG.targetPosition.z, 
+                progress
+            );
                 
                 // Interpolate scale using configuration values
                 const currentScale = gsap.utils.interpolate(
@@ -1109,6 +1118,8 @@ function resetScrollAnimation() {
             originalWrapperScale.y,
             originalWrapperScale.z
         );
+        // Clear the target Y data to stop scroll animation influence
+        delete wrapper.userData.targetY;
         console.log('Scroll animation reset to original position');
     }
 }
