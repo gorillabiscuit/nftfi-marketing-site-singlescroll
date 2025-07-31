@@ -178,8 +178,6 @@ body {
     position: relative;
     z-index: 50; /* Lower z-index to be behind canvas but above background */
     pointer-events: auto; /* Ensure content is clickable */
-    height: auto; /* Allow content to determine height */
-    min-height: 100vh; /* Ensure minimum height for scrolling */
 }
 
 /* Hero Section */
