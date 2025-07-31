@@ -9,6 +9,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 function initializeNavigation() {
     
     const dropdowns = document.querySelectorAll('.dropdown-container');
+    console.log('📋 Found dropdowns:', dropdowns.length);
     
     dropdowns.forEach((dropdown, index) => {
         const trigger = dropdown.querySelector('.dropdown-trigger');
@@ -121,10 +122,12 @@ function initializeNavigation() {
         });
     });
     
+    console.log('✅ Navigation initialization complete');
 }
 
 // Update dropdown position (improved positioning)
 function updateDropdownPosition(trigger, menu) {
+    console.log('📍 Updating dropdown position');
     
     // Get the trigger's position relative to its parent
     const triggerRect = trigger.getBoundingClientRect();
@@ -385,9 +388,13 @@ let scrollSpinVelocity = 0;
 let lastScrollDirection = 0;
 let lastScrollTime = 0;
 
-// Responsive positioning cache
-let cachedTargetPosition = null;
-let lastViewportSize = { width: 0, height: 0 };
+// Viewport-relative positioning configuration
+const TARGET_CONFIG = {
+    // Target position in viewport coordinates (pixels from edges)
+    viewportX: 50,    // 50px from left edge
+    viewportY: 50,    // 50px from top edge
+    scaleRatio: 0.3   // 30% of original scale
+};
 
 // Model positioning configuration - EASY TO TWEAK!
 const MODEL_CONFIG = {
@@ -398,8 +405,16 @@ const MODEL_CONFIG = {
         z: 0     // Keep same depth
     },
     
+    // Target position (top-left corner)
+    targetPosition: {
+        x: -9.725,   // Move left (negative = left)
+        y: 4.7,    // Move up (positive = up)
+        z: 0     // Keep same depth
+    },
+    
     // Scale configuration
     startScale: 3.0,    // Starting scale
+    targetScale: 0.265,   // Target scale (much smaller)
     
     // Animation timing
     scrubDuration: 1,    // Smooth transition duration
@@ -410,67 +425,7 @@ const MODEL_CONFIG = {
     
     // Scroll spin settings
     spinIntensity: 0.1, // How much spin per scroll unit
-    spinDecay: 0.15, // How quickly spin decays (0.95 = slow decay)
-    
-    // BREAKPOINT CONFIGURATIONS - Different settings for different screen sizes
-    breakpoints: {
-        // Mobile (320px - 767px)
-        mobile: {
-            viewportTarget: {
-                xPercent: 0.05,  // 5% from left edge
-                yPercent: 0.05,  // 5% from top edge
-                zDepth: 0
-            },
-            fallbackTarget: {
-                x: -8,   // Move left
-                y: 3,    // Move up
-                z: 0
-            },
-            responsiveScale: {
-                minScale: 0.05,   // Very small for mobile
-                maxScale: 0.15,   // Small max for mobile
-                viewportThreshold: 320
-            }
-        },
-        
-        // Tablet (768px - 1199px)
-        tablet: {
-            viewportTarget: {
-                xPercent: 0.08,  // 8% from left edge
-                yPercent: 0.08,  // 8% from top edge
-                zDepth: 0
-            },
-            fallbackTarget: {
-                x: -9,   // Move left
-                y: 4,    // Move up
-                z: 0
-            },
-            responsiveScale: {
-                minScale: 0.08,   // Medium small for tablet
-                maxScale: 0.2,    // Medium max for tablet
-                viewportThreshold: 768
-            }
-        },
-        
-        // Desktop (1200px+)
-        desktop: {
-            viewportTarget: {
-                xPercent: 0.1,   // 10% from left edge
-                yPercent: 0.1,   // 10% from top edge
-                zDepth: 0
-            },
-            fallbackTarget: {
-                x: -9.725,   // Move left
-                y: 4.7,      // Move up
-                z: 0
-            },
-            responsiveScale: {
-                minScale: 0.1,   // Larger min for desktop
-                maxScale: 0.3,   // Larger max for desktop
-                viewportThreshold: 1200
-            }
-        }
-    }
+    spinDecay: 0.15 // How quickly spin decays (0.95 = slow decay)
 };
 
 // Shader code
@@ -937,55 +892,10 @@ function loadModel() {
                 // Texture debugging
                 updatePlaneTexture,
                 captureHeroAsTexture,
-                // Responsive positioning debugging
-                calculateResponsiveTargetPosition,
-                calculateResponsiveScale,
-                screenToWorldPosition,
-                isPositionVisible,
-                // Expose all configurable parameters for real-time tweaking
-                viewportTarget: getCurrentBreakpoint().viewportTarget,
-                responsiveScale: getCurrentBreakpoint().responsiveScale,
-                fallbackTarget: getCurrentBreakpoint().fallbackTarget,
-                startPosition: MODEL_CONFIG.startPosition,
-                startScale: MODEL_CONFIG.startScale,
-                // Helper functions for parameter tweaking
-                updateViewportTarget: (xPercent, yPercent) => {
-                    const currentBreakpoint = getCurrentBreakpoint();
-                    currentBreakpoint.viewportTarget.xPercent = xPercent;
-                    currentBreakpoint.viewportTarget.yPercent = yPercent;
-                    cachedTargetPosition = null; // Invalidate cache
-                    console.log('Updated viewport target for current breakpoint:', currentBreakpoint.viewportTarget);
-                },
-                updateResponsiveScale: (minScale, maxScale, threshold) => {
-                    const currentBreakpoint = getCurrentBreakpoint();
-                    currentBreakpoint.responsiveScale.minScale = minScale;
-                    currentBreakpoint.responsiveScale.maxScale = maxScale;
-                    currentBreakpoint.responsiveScale.viewportThreshold = threshold;
-                    console.log('Updated responsive scale for current breakpoint:', currentBreakpoint.responsiveScale);
-                },
-                updateFallbackTarget: (x, y, z) => {
-                    const currentBreakpoint = getCurrentBreakpoint();
-                    currentBreakpoint.fallbackTarget.x = x;
-                    currentBreakpoint.fallbackTarget.y = y;
-                    currentBreakpoint.fallbackTarget.z = z;
-                    cachedTargetPosition = null; // Invalidate cache
-                    console.log('Updated fallback target for current breakpoint:', currentBreakpoint.fallbackTarget);
-                },
-                updateStartPosition: (x, y, z) => {
-                    MODEL_CONFIG.startPosition.x = x;
-                    MODEL_CONFIG.startPosition.y = y;
-                    MODEL_CONFIG.startPosition.z = z;
-                    console.log('Updated start position:', MODEL_CONFIG.startPosition);
-                },
-                updateStartScale: (scale) => {
-                    MODEL_CONFIG.startScale = scale;
-                    console.log('Updated start scale:', MODEL_CONFIG.startScale);
-                },
-                // Force recalculation
-                forceRecalculate: () => {
-                    cachedTargetPosition = null;
-                    console.log('Forced position recalculation');
-                }
+                // Viewport positioning debugging
+                viewportToWorld,
+                calculateTargetPosition,
+                TARGET_CONFIG
             };
             
             console.log('Debug objects exposed! Use window.DEBUG to access them.');
@@ -1112,6 +1022,34 @@ function updatePlaneTexture() {
     }
 }
 
+// Viewport to world coordinate conversion
+function viewportToWorld(viewportX, viewportY) {
+    const aspect = window.innerWidth / window.innerHeight;
+    const fov = camera.fov * Math.PI / 180;
+    const distance = Math.abs(camera.position.z);
+    
+    // Calculate world coordinates based on viewport position
+    const worldX = (viewportX / window.innerWidth - 0.5) * 2 * distance * Math.tan(fov/2) * aspect;
+    const worldY = (0.5 - viewportY / window.innerHeight) * 2 * distance * Math.tan(fov/2);
+    
+    return { x: worldX, y: worldY };
+}
+
+// Calculate dynamic target position based on viewport coordinates
+function calculateTargetPosition() {
+    const worldPos = viewportToWorld(TARGET_CONFIG.viewportX, TARGET_CONFIG.viewportY);
+    
+    // Apply scale factor based on current viewport
+    const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
+    const scaleFactor = Math.max(0.5, Math.min(1.5, viewportScale)); // Clamp between 0.5 and 1.5
+    
+    return {
+        x: worldPos.x * scaleFactor,
+        y: worldPos.y * scaleFactor,
+        scale: MODEL_CONFIG.targetScale * TARGET_CONFIG.scaleRatio * scaleFactor
+    };
+}
+
 // Debounced texture update function
 let textureUpdateTimeout;
 function debouncedTextureUpdate() {
@@ -1145,9 +1083,6 @@ function onWindowResize() {
     
     // Update plane position for new viewport
     updatePlaneForViewport();
-    
-    // Invalidate cached responsive position
-    cachedTargetPosition = null;
     
     // Debounced texture update
     debouncedTextureUpdate();
@@ -1212,7 +1147,13 @@ function onWindowResize() {
                 whiteSphere = object;
             }
         });
-
+        
+        if (whiteSphere) {
+            whiteSphere.visible = true;
+            console.log('Sphere made visible for render target');
+        } else {
+            console.log('White sphere not found in scene');
+        }
         
         mesh.visible = false;
         
@@ -1240,119 +1181,13 @@ function onWindowResize() {
         // Hide sphere for final render
         if (whiteSphere) {
             whiteSphere.visible = false;
+            console.log('Sphere hidden for final render');
         }
         
         renderer.setRenderTarget(null);
     }
     
     renderer.render(scene, camera);
-}
-
-// Viewport to world coordinate conversion
-function screenToWorldPosition(screenX, screenY, depth = 0) {
-    const vector = new THREE.Vector3();
-    vector.set(
-        (screenX / window.innerWidth) * 2 - 1,
-        -(screenY / window.innerHeight) * 2 + 1,
-        depth
-    );
-    vector.unproject(camera);
-    return vector;
-}
-
-// Check if position is within camera frustum
-function isPositionVisible(position) {
-    const frustum = new THREE.Frustum();
-    const matrix = new THREE.Matrix4();
-    
-    matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    frustum.setFromProjectionMatrix(matrix);
-    
-    return frustum.containsPoint(position);
-}
-
-// Calculate responsive target position
-function getCurrentBreakpoint() {
-    const viewportWidth = window.innerWidth;
-    
-    if (viewportWidth < 768) {
-        return MODEL_CONFIG.breakpoints.mobile;
-    } else if (viewportWidth < 1200) {
-        return MODEL_CONFIG.breakpoints.tablet;
-    } else {
-        return MODEL_CONFIG.breakpoints.desktop;
-    }
-}
-
-function calculateResponsiveTargetPosition() {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    // Check if viewport size has changed
-    const viewportChanged = 
-        viewportWidth !== lastViewportSize.width || 
-        viewportHeight !== lastViewportSize.height;
-    
-    // Return cached position if viewport hasn't changed
-    if (!viewportChanged && cachedTargetPosition) {
-        return cachedTargetPosition;
-    }
-    
-    // Calculate viewport-relative position
-    const currentBreakpoint = getCurrentBreakpoint();
-    const screenX = viewportWidth * currentBreakpoint.viewportTarget.xPercent;
-    const screenY = viewportHeight * currentBreakpoint.viewportTarget.yPercent;
-    
-    // Convert to world coordinates
-    const worldPos = screenToWorldPosition(screenX, screenY, currentBreakpoint.viewportTarget.zDepth);
-    
-    // Validate position is within camera frustum
-    if (isPositionVisible(worldPos)) {
-        cachedTargetPosition = worldPos;
-        lastViewportSize = { width: viewportWidth, height: viewportHeight };
-        console.log('Responsive target position calculated:', worldPos);
-        return worldPos;
-    } else {
-        // Fallback to percentage-based calculation
-        console.log('Position not visible, using fallback');
-        return calculateFallbackPosition();
-    }
-}
-
-// Calculate fallback position using viewport percentages
-function calculateFallbackPosition() {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    // Use smaller percentages for fallback
-    const fallbackXPercent = 0.05; // 5% from left
-    const fallbackYPercent = 0.05; // 5% from top
-    
-    const screenX = viewportWidth * fallbackXPercent;
-    const screenY = viewportHeight * fallbackYPercent;
-    
-    const worldPos = screenToWorldPosition(screenX, screenY, MODEL_CONFIG.viewportTarget.zDepth);
-    
-    cachedTargetPosition = worldPos;
-    lastViewportSize = { width: viewportWidth, height: viewportHeight };
-    
-    return worldPos;
-}
-
-// Calculate responsive scale based on viewport
-function calculateResponsiveScale() {
-    const viewportWidth = window.innerWidth;
-    const currentBreakpoint = getCurrentBreakpoint();
-    const { minScale, maxScale, viewportThreshold } = currentBreakpoint.responsiveScale;
-    
-    if (viewportWidth <= viewportThreshold) {
-        // Small viewport - use minimum scale
-        return minScale;
-    } else {
-        // Large viewport - interpolate between min and max
-        const ratio = Math.min((viewportWidth - viewportThreshold) / 800, 1);
-        return minScale + (maxScale - minScale) * ratio;
-    }
 }
 
 // Track scroll events for spin animation
@@ -1389,7 +1224,7 @@ function setupScrollAnimation() {
         z: wrapper.scale.z
     };
     
-        // Create scroll timeline with responsive positioning
+        // Create scroll timeline
     scrollTimeline = gsap.timeline({
         scrollTrigger: {
             trigger: ".section[data-section='1']",
@@ -1404,49 +1239,43 @@ function setupScrollAnimation() {
                 const scrollDirection = self.direction || 0;
                 updateScrollSpin(scrollDirection);
                 
-                // Get current responsive target position
-                const currentTarget = calculateResponsiveTargetPosition();
-                const responsiveTargetScale = calculateResponsiveScale();
+                // Calculate dynamic target position based on current viewport
+                const dynamicTarget = calculateTargetPosition();
                 
-                // Interpolate position using responsive target
+                // Interpolate position using dynamic target values
                 wrapper.position.x = gsap.utils.interpolate(
                     MODEL_CONFIG.startPosition.x, 
-                    currentTarget.x, 
+                    dynamicTarget.x, 
                     progress
                 );
                 
                 // Store the target Y position for scroll animation (floating will add offset)
                 wrapper.userData.targetY = gsap.utils.interpolate(
                     MODEL_CONFIG.startPosition.y, 
-                    currentTarget.y, 
+                    dynamicTarget.y, 
                     progress
                 );
                 
                 wrapper.position.z = gsap.utils.interpolate(
                     MODEL_CONFIG.startPosition.z, 
-                    currentTarget.z, 
+                    MODEL_CONFIG.targetPosition.z, // Keep Z the same
                     progress
                 );
                 
-                // Interpolate scale using responsive target scale
+                // Interpolate scale using dynamic target scale
                 const currentScale = gsap.utils.interpolate(
                     MODEL_CONFIG.startScale, 
-                    responsiveTargetScale, 
+                    dynamicTarget.scale, 
                     progress
                 );
                 wrapper.scale.setScalar(currentScale);
                 
-                console.log('Responsive scroll animation:', {
-                    progress: progress,
-                    targetPosition: currentTarget,
-                    targetScale: responsiveTargetScale,
-                    currentScale: currentScale,
-                    spinVelocity: scrollSpinVelocity
-                });
+                console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
             }
         }
     });
     
+    console.log('Scroll animation setup complete');
 }
 
 // Reset scroll animation to original position
@@ -1477,6 +1306,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         if (window.DEBUG && window.DEBUG.updatePlaneTexture) {
             window.DEBUG.updatePlaneTexture();
+            console.log('Forced texture update after DOM load');
         }
     }, 500); // Wait for all styles and layouts to be applied
 }); 
