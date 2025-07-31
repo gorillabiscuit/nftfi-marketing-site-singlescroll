@@ -9,7 +9,6 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 function initializeNavigation() {
     
     const dropdowns = document.querySelectorAll('.dropdown-container');
-    console.log('📋 Found dropdowns:', dropdowns.length);
     
     dropdowns.forEach((dropdown, index) => {
         const trigger = dropdown.querySelector('.dropdown-trigger');
@@ -122,12 +121,10 @@ function initializeNavigation() {
         });
     });
     
-    console.log('✅ Navigation initialization complete');
 }
 
 // Update dropdown position (improved positioning)
 function updateDropdownPosition(trigger, menu) {
-    console.log('📍 Updating dropdown position');
     
     // Get the trigger's position relative to its parent
     const triggerRect = trigger.getBoundingClientRect();
@@ -401,30 +398,8 @@ const MODEL_CONFIG = {
         z: 0     // Keep same depth
     },
     
-    // Responsive target positioning
-    viewportTarget: {
-        xPercent: 0.1,  // 10% from left edge of viewport
-        yPercent: 0.1,  // 10% from top edge of viewport
-        zDepth: 0       // Depth in world space
-    },
-    
-    // Fallback world coordinates (for edge cases)
-    fallbackTarget: {
-        x: -9.725,   // Move left (negative = left)
-        y: 4.7,    // Move up (positive = up)
-        z: 0     // Keep same depth
-    },
-    
     // Scale configuration
     startScale: 3.0,    // Starting scale
-    targetScale: 0.265,   // Target scale (much smaller)
-    
-    // Responsive scaling
-    responsiveScale: {
-        minScale: 0.1,   // Minimum scale at small viewports
-        maxScale: 0.3,   // Maximum scale at large viewports
-        viewportThreshold: 1200 // Breakpoint for scale adjustment
-    },
     
     // Animation timing
     scrubDuration: 1,    // Smooth transition duration
@@ -435,7 +410,67 @@ const MODEL_CONFIG = {
     
     // Scroll spin settings
     spinIntensity: 0.1, // How much spin per scroll unit
-    spinDecay: 0.15 // How quickly spin decays (0.95 = slow decay)
+    spinDecay: 0.15, // How quickly spin decays (0.95 = slow decay)
+    
+    // BREAKPOINT CONFIGURATIONS - Different settings for different screen sizes
+    breakpoints: {
+        // Mobile (320px - 767px)
+        mobile: {
+            viewportTarget: {
+                xPercent: 0.05,  // 5% from left edge
+                yPercent: 0.05,  // 5% from top edge
+                zDepth: 0
+            },
+            fallbackTarget: {
+                x: -8,   // Move left
+                y: 3,    // Move up
+                z: 0
+            },
+            responsiveScale: {
+                minScale: 0.05,   // Very small for mobile
+                maxScale: 0.15,   // Small max for mobile
+                viewportThreshold: 320
+            }
+        },
+        
+        // Tablet (768px - 1199px)
+        tablet: {
+            viewportTarget: {
+                xPercent: 0.08,  // 8% from left edge
+                yPercent: 0.08,  // 8% from top edge
+                zDepth: 0
+            },
+            fallbackTarget: {
+                x: -9,   // Move left
+                y: 4,    // Move up
+                z: 0
+            },
+            responsiveScale: {
+                minScale: 0.08,   // Medium small for tablet
+                maxScale: 0.2,    // Medium max for tablet
+                viewportThreshold: 768
+            }
+        },
+        
+        // Desktop (1200px+)
+        desktop: {
+            viewportTarget: {
+                xPercent: 0.1,   // 10% from left edge
+                yPercent: 0.1,   // 10% from top edge
+                zDepth: 0
+            },
+            fallbackTarget: {
+                x: -9.725,   // Move left
+                y: 4.7,      // Move up
+                z: 0
+            },
+            responsiveScale: {
+                minScale: 0.1,   // Larger min for desktop
+                maxScale: 0.3,   // Larger max for desktop
+                viewportThreshold: 1200
+            }
+        }
+    }
 };
 
 // Shader code
@@ -908,30 +943,33 @@ function loadModel() {
                 screenToWorldPosition,
                 isPositionVisible,
                 // Expose all configurable parameters for real-time tweaking
-                viewportTarget: MODEL_CONFIG.viewportTarget,
-                responsiveScale: MODEL_CONFIG.responsiveScale,
-                fallbackTarget: MODEL_CONFIG.fallbackTarget,
+                viewportTarget: getCurrentBreakpoint().viewportTarget,
+                responsiveScale: getCurrentBreakpoint().responsiveScale,
+                fallbackTarget: getCurrentBreakpoint().fallbackTarget,
                 startPosition: MODEL_CONFIG.startPosition,
                 startScale: MODEL_CONFIG.startScale,
                 // Helper functions for parameter tweaking
                 updateViewportTarget: (xPercent, yPercent) => {
-                    MODEL_CONFIG.viewportTarget.xPercent = xPercent;
-                    MODEL_CONFIG.viewportTarget.yPercent = yPercent;
+                    const currentBreakpoint = getCurrentBreakpoint();
+                    currentBreakpoint.viewportTarget.xPercent = xPercent;
+                    currentBreakpoint.viewportTarget.yPercent = yPercent;
                     cachedTargetPosition = null; // Invalidate cache
-                    console.log('Updated viewport target:', MODEL_CONFIG.viewportTarget);
+                    console.log('Updated viewport target for current breakpoint:', currentBreakpoint.viewportTarget);
                 },
                 updateResponsiveScale: (minScale, maxScale, threshold) => {
-                    MODEL_CONFIG.responsiveScale.minScale = minScale;
-                    MODEL_CONFIG.responsiveScale.maxScale = maxScale;
-                    MODEL_CONFIG.responsiveScale.viewportThreshold = threshold;
-                    console.log('Updated responsive scale:', MODEL_CONFIG.responsiveScale);
+                    const currentBreakpoint = getCurrentBreakpoint();
+                    currentBreakpoint.responsiveScale.minScale = minScale;
+                    currentBreakpoint.responsiveScale.maxScale = maxScale;
+                    currentBreakpoint.responsiveScale.viewportThreshold = threshold;
+                    console.log('Updated responsive scale for current breakpoint:', currentBreakpoint.responsiveScale);
                 },
                 updateFallbackTarget: (x, y, z) => {
-                    MODEL_CONFIG.fallbackTarget.x = x;
-                    MODEL_CONFIG.fallbackTarget.y = y;
-                    MODEL_CONFIG.fallbackTarget.z = z;
+                    const currentBreakpoint = getCurrentBreakpoint();
+                    currentBreakpoint.fallbackTarget.x = x;
+                    currentBreakpoint.fallbackTarget.y = y;
+                    currentBreakpoint.fallbackTarget.z = z;
                     cachedTargetPosition = null; // Invalidate cache
-                    console.log('Updated fallback target:', MODEL_CONFIG.fallbackTarget);
+                    console.log('Updated fallback target for current breakpoint:', currentBreakpoint.fallbackTarget);
                 },
                 updateStartPosition: (x, y, z) => {
                     MODEL_CONFIG.startPosition.x = x;
@@ -1174,13 +1212,7 @@ function onWindowResize() {
                 whiteSphere = object;
             }
         });
-        
-        if (whiteSphere) {
-            whiteSphere.visible = true;
-            console.log('Sphere made visible for render target');
-        } else {
-            console.log('White sphere not found in scene');
-        }
+
         
         mesh.visible = false;
         
@@ -1208,7 +1240,6 @@ function onWindowResize() {
         // Hide sphere for final render
         if (whiteSphere) {
             whiteSphere.visible = false;
-            console.log('Sphere hidden for final render');
         }
         
         renderer.setRenderTarget(null);
@@ -1241,6 +1272,18 @@ function isPositionVisible(position) {
 }
 
 // Calculate responsive target position
+function getCurrentBreakpoint() {
+    const viewportWidth = window.innerWidth;
+    
+    if (viewportWidth < 768) {
+        return MODEL_CONFIG.breakpoints.mobile;
+    } else if (viewportWidth < 1200) {
+        return MODEL_CONFIG.breakpoints.tablet;
+    } else {
+        return MODEL_CONFIG.breakpoints.desktop;
+    }
+}
+
 function calculateResponsiveTargetPosition() {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -1402,7 +1445,6 @@ function setupScrollAnimation() {
         }
     });
     
-    console.log('Scroll animation setup complete');
 }
 
 // Reset scroll animation to original position
@@ -1433,7 +1475,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         if (window.DEBUG && window.DEBUG.updatePlaneTexture) {
             window.DEBUG.updatePlaneTexture();
-            console.log('Forced texture update after DOM load');
         }
     }, 500); // Wait for all styles and layouts to be applied
 }); 
