@@ -388,6 +388,10 @@ let scrollSpinVelocity = 0;
 let lastScrollDirection = 0;
 let lastScrollTime = 0;
 
+// Responsive positioning cache
+let cachedTargetPosition = null;
+let lastViewportSize = { width: 0, height: 0 };
+
 // Model positioning configuration - EASY TO TWEAK!
 const MODEL_CONFIG = {
     // Starting position (right side of screen)
@@ -397,8 +401,15 @@ const MODEL_CONFIG = {
         z: 0     // Keep same depth
     },
     
-    // Target position (top-left corner)
-    targetPosition: {
+    // Responsive target positioning
+    viewportTarget: {
+        xPercent: 0.1,  // 10% from left edge of viewport
+        yPercent: 0.1,  // 10% from top edge of viewport
+        zDepth: 0       // Depth in world space
+    },
+    
+    // Fallback world coordinates (for edge cases)
+    fallbackTarget: {
         x: -9.725,   // Move left (negative = left)
         y: 4.7,    // Move up (positive = up)
         z: 0     // Keep same depth
@@ -407,6 +418,13 @@ const MODEL_CONFIG = {
     // Scale configuration
     startScale: 3.0,    // Starting scale
     targetScale: 0.265,   // Target scale (much smaller)
+    
+    // Responsive scaling
+    responsiveScale: {
+        minScale: 0.1,   // Minimum scale at small viewports
+        maxScale: 0.3,   // Maximum scale at large viewports
+        viewportThreshold: 1200 // Breakpoint for scale adjustment
+    },
     
     // Animation timing
     scrubDuration: 1,    // Smooth transition duration
@@ -883,7 +901,12 @@ function loadModel() {
                 updateScrollSpin: (direction) => updateScrollSpin(direction),
                 // Texture debugging
                 updatePlaneTexture,
-                captureHeroAsTexture
+                captureHeroAsTexture,
+                // Responsive positioning debugging
+                calculateResponsiveTargetPosition,
+                calculateResponsiveScale,
+                screenToWorldPosition,
+                isPositionVisible
             };
             
             console.log('Debug objects exposed! Use window.DEBUG to access them.');
@@ -1044,6 +1067,9 @@ function onWindowResize() {
     // Update plane position for new viewport
     updatePlaneForViewport();
     
+    // Invalidate cached responsive position
+    cachedTargetPosition = null;
+    
     // Debounced texture update
     debouncedTextureUpdate();
 }
@@ -1150,6 +1176,99 @@ function onWindowResize() {
     renderer.render(scene, camera);
 }
 
+// Viewport to world coordinate conversion
+function screenToWorldPosition(screenX, screenY, depth = 0) {
+    const vector = new THREE.Vector3();
+    vector.set(
+        (screenX / window.innerWidth) * 2 - 1,
+        -(screenY / window.innerHeight) * 2 + 1,
+        depth
+    );
+    vector.unproject(camera);
+    return vector;
+}
+
+// Check if position is within camera frustum
+function isPositionVisible(position) {
+    const frustum = new THREE.Frustum();
+    const matrix = new THREE.Matrix4();
+    
+    matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    frustum.setFromProjectionMatrix(matrix);
+    
+    return frustum.containsPoint(position);
+}
+
+// Calculate responsive target position
+function calculateResponsiveTargetPosition() {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Check if viewport size has changed
+    const viewportChanged = 
+        viewportWidth !== lastViewportSize.width || 
+        viewportHeight !== lastViewportSize.height;
+    
+    // Return cached position if viewport hasn't changed
+    if (!viewportChanged && cachedTargetPosition) {
+        return cachedTargetPosition;
+    }
+    
+    // Calculate viewport-relative position
+    const screenX = viewportWidth * MODEL_CONFIG.viewportTarget.xPercent;
+    const screenY = viewportHeight * MODEL_CONFIG.viewportTarget.yPercent;
+    
+    // Convert to world coordinates
+    const worldPos = screenToWorldPosition(screenX, screenY, MODEL_CONFIG.viewportTarget.zDepth);
+    
+    // Validate position is within camera frustum
+    if (isPositionVisible(worldPos)) {
+        cachedTargetPosition = worldPos;
+        lastViewportSize = { width: viewportWidth, height: viewportHeight };
+        console.log('Responsive target position calculated:', worldPos);
+        return worldPos;
+    } else {
+        // Fallback to percentage-based calculation
+        console.log('Position not visible, using fallback');
+        return calculateFallbackPosition();
+    }
+}
+
+// Calculate fallback position using viewport percentages
+function calculateFallbackPosition() {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Use smaller percentages for fallback
+    const fallbackXPercent = 0.05; // 5% from left
+    const fallbackYPercent = 0.05; // 5% from top
+    
+    const screenX = viewportWidth * fallbackXPercent;
+    const screenY = viewportHeight * fallbackYPercent;
+    
+    const worldPos = screenToWorldPosition(screenX, screenY, MODEL_CONFIG.viewportTarget.zDepth);
+    
+    cachedTargetPosition = worldPos;
+    lastViewportSize = { width: viewportWidth, height: viewportHeight };
+    
+    return worldPos;
+}
+
+// Calculate responsive scale based on viewport
+function calculateResponsiveScale() {
+    const viewportWidth = window.innerWidth;
+    const { minScale, maxScale, viewportThreshold } = MODEL_CONFIG.responsiveScale;
+    
+    if (viewportWidth <= viewportThreshold) {
+        // Small viewport - use minimum scale
+        return minScale;
+    } else {
+        // Large viewport - interpolate between min and max
+        const ratio = Math.min((viewportWidth - viewportThreshold) / 800, 1);
+        return minScale + (maxScale - minScale) * ratio;
+    }
+}
+
 // Track scroll events for spin animation
 function updateScrollSpin(direction) {
     const currentTime = Date.now();
@@ -1184,7 +1303,7 @@ function setupScrollAnimation() {
         z: wrapper.scale.z
     };
     
-        // Create scroll timeline
+        // Create scroll timeline with responsive positioning
     scrollTimeline = gsap.timeline({
         scrollTrigger: {
             trigger: ".section[data-section='1']",
@@ -1199,35 +1318,45 @@ function setupScrollAnimation() {
                 const scrollDirection = self.direction || 0;
                 updateScrollSpin(scrollDirection);
                 
-                // Interpolate position using configuration values
+                // Get current responsive target position
+                const currentTarget = calculateResponsiveTargetPosition();
+                const responsiveTargetScale = calculateResponsiveScale();
+                
+                // Interpolate position using responsive target
                 wrapper.position.x = gsap.utils.interpolate(
                     MODEL_CONFIG.startPosition.x, 
-                    MODEL_CONFIG.targetPosition.x, 
+                    currentTarget.x, 
                     progress
                 );
                 
                 // Store the target Y position for scroll animation (floating will add offset)
                 wrapper.userData.targetY = gsap.utils.interpolate(
                     MODEL_CONFIG.startPosition.y, 
-                    MODEL_CONFIG.targetPosition.y, 
+                    currentTarget.y, 
                     progress
                 );
                 
                 wrapper.position.z = gsap.utils.interpolate(
                     MODEL_CONFIG.startPosition.z, 
-                    MODEL_CONFIG.targetPosition.z, 
+                    currentTarget.z, 
                     progress
                 );
                 
-                // Interpolate scale using configuration values
+                // Interpolate scale using responsive target scale
                 const currentScale = gsap.utils.interpolate(
                     MODEL_CONFIG.startScale, 
-                    MODEL_CONFIG.targetScale, 
+                    responsiveTargetScale, 
                     progress
                 );
                 wrapper.scale.setScalar(currentScale);
                 
-                console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Spin velocity:', scrollSpinVelocity);
+                console.log('Responsive scroll animation:', {
+                    progress: progress,
+                    targetPosition: currentTarget,
+                    targetScale: responsiveTargetScale,
+                    currentScale: currentScale,
+                    spinVelocity: scrollSpinVelocity
+                });
             }
         }
     });
