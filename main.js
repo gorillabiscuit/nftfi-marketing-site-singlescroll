@@ -387,21 +387,21 @@ let originalWrapperScale = { x: 3, y: 3, z: 3 };
 const MODEL_CONFIG = {
     // Starting position (right side of screen)
     startPosition: {
-        x: 8,    // Move right (positive = right)
+        x: 4,    // Move right (positive = right)
         y: 0,    // Center vertically
         z: 0     // Keep same depth
     },
     
     // Target position (top-left corner)
     targetPosition: {
-        x: -8,   // Move left (negative = left)
-        y: 4,    // Move up (positive = up)
+        x: -9.725,   // Move left (negative = left)
+        y: 4.7,    // Move up (positive = up)
         z: 0     // Keep same depth
     },
     
     // Scale configuration
     startScale: 3.0,    // Starting scale
-    targetScale: 0.5,   // Target scale (much smaller)
+    targetScale: 0.265,   // Target scale (much smaller)
     
     // Animation timing
     scrubDuration: 1    // Smooth transition duration
@@ -665,7 +665,7 @@ function createBackgroundGeometry() {
     });
     
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.set(0, 0, -5); // Position behind camera for invisibility
+    plane.position.set(0, 0, -10); // Position behind camera for invisibility
     
     // NEW: Make plane invisible to camera but still available for shader sampling
     plane.visible = false; // Invisible to camera
@@ -675,6 +675,24 @@ function createBackgroundGeometry() {
     
     // Store reference for potential future use
     backgroundPlane = plane;
+    
+    // Add white sphere at the same position as the plane
+    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0xffffff, 
+        transparent: true,
+        opacity: 0.3
+    });
+    
+    const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    whiteSphere.position.set(0, 0, -10); // Same position as plane
+    whiteSphere.scale.setScalar(2); // Make it visible
+    
+    scene.add(whiteSphere);
+    
+    // Store reference to sphere for potential future use
+    window.DEBUG = window.DEBUG || {};
+    window.DEBUG.whiteSphere = whiteSphere;
 }
 
 // Load GLTF model
@@ -839,7 +857,7 @@ function calculatePlanePosition() {
     const viewportHeight = window.innerHeight;
     
     // X offset constant for easy tweaking
-    const X_OFFSET = -12; // Adjust this value to move plane left/right
+    const X_OFFSET = -4; // Adjust this value to move plane left/right
     
     // Calculate the center of the viewport in normalized coordinates (-1 to 1)
     const centerX = 0; // Center of viewport
