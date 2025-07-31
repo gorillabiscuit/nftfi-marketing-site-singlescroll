@@ -785,6 +785,9 @@ function calculatePlanePosition() {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
+    // X offset constant for easy tweaking
+    const X_OFFSET = -8.9; // Adjust this value to move plane left/right
+    
     // Calculate the center of the viewport in normalized coordinates (-1 to 1)
     const centerX = 0; // Center of viewport
     const centerY = 0; // Center of viewport
@@ -795,14 +798,17 @@ function calculatePlanePosition() {
     let worldY = centerY * 10;
     const worldZ = -5; // Keep behind the camera
     
+    // Apply X offset
+    worldX += X_OFFSET;
+    
     // Adjust based on viewport aspect ratio
     const aspectRatio = viewportWidth / viewportHeight;
     if (aspectRatio > 1) {
         // Wide screen - adjust X position
-        worldX = (aspectRatio - 1) * 5; // Move plane right for wide screens
+        worldX += (aspectRatio - 1) * 5; // Move plane right for wide screens
     } else {
         // Tall screen - adjust Y position
-        worldY = (1 - aspectRatio) * 5; // Move plane up for tall screens
+        worldY += (1 - aspectRatio) * 5; // Move plane up for tall screens
     }
     
     return { x: worldX, y: worldY, z: worldZ };
