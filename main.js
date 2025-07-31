@@ -383,6 +383,30 @@ let scrollTimeline;
 let originalWrapperPosition = { x: 0, y: 0, z: 0 };
 let originalWrapperScale = { x: 3, y: 3, z: 3 };
 
+// Model positioning configuration - EASY TO TWEAK!
+const MODEL_CONFIG = {
+    // Starting position (right side of screen)
+    startPosition: {
+        x: 8,    // Move right (positive = right)
+        y: 0,    // Center vertically
+        z: 0     // Keep same depth
+    },
+    
+    // Target position (top-left corner)
+    targetPosition: {
+        x: -8,   // Move left (negative = left)
+        y: 4,    // Move up (positive = up)
+        z: 0     // Keep same depth
+    },
+    
+    // Scale configuration
+    startScale: 3.0,    // Starting scale
+    targetScale: 0.5,   // Target scale (much smaller)
+    
+    // Animation timing
+    scrubDuration: 1    // Smooth transition duration
+};
+
 // Shader code
 const vertexShader = `
 varying vec3 worldNormal;
@@ -710,8 +734,15 @@ function loadModel() {
             // Add centered mesh to wrapper
             wrapper.add(gltf.scene);
             
+            // Set starting position (right side of screen)
+            wrapper.position.set(
+                MODEL_CONFIG.startPosition.x,
+                MODEL_CONFIG.startPosition.y,
+                MODEL_CONFIG.startPosition.z
+            );
+            
             // Scale the wrapper
-            wrapper.scale.set(3, 3, 3);
+            wrapper.scale.setScalar(MODEL_CONFIG.startScale);
             
             // Add to scene
             scene.add(wrapper);
@@ -749,7 +780,9 @@ function loadModel() {
                 // Scroll animation helpers
                 resetScrollAnimation: resetScrollAnimation,
                 originalWrapperPosition: originalWrapperPosition,
-                originalWrapperScale: originalWrapperScale
+                originalWrapperScale: originalWrapperScale,
+                // Model positioning configuration - EASY TO TWEAK!
+                MODEL_CONFIG: MODEL_CONFIG
             };
             
             console.log('Debug objects exposed! Use window.DEBUG to access them.');
@@ -968,40 +1001,32 @@ function setupScrollAnimation() {
             trigger: ".section[data-section='1']",
             start: "top top",
             end: "bottom top",
-            scrub: 1, // Smooth scrubbing
+            scrub: MODEL_CONFIG.scrubDuration, // Smooth scrubbing
             onUpdate: (self) => {
                 // Update Three.js wrapper position and scale based on scroll progress
                 const progress = self.progress;
                 
-                // Calculate target position (top left of screen)
-                const targetX = -5; // Move left
-                const targetY = 3;  // Move up
-                const targetZ = wrapper.position.z; // Keep same Z
-                
-                // Calculate target scale (90% of original)
-                const targetScale = 0.9;
-                
-                // Interpolate position and scale
+                // Interpolate position using configuration values
                 wrapper.position.x = gsap.utils.interpolate(
-                    originalWrapperPosition.x, 
-                    targetX, 
+                    MODEL_CONFIG.startPosition.x, 
+                    MODEL_CONFIG.targetPosition.x, 
                     progress
                 );
                 wrapper.position.y = gsap.utils.interpolate(
-                    originalWrapperPosition.y, 
-                    targetY, 
+                    MODEL_CONFIG.startPosition.y, 
+                    MODEL_CONFIG.targetPosition.y, 
                     progress
                 );
                 wrapper.position.z = gsap.utils.interpolate(
-                    originalWrapperPosition.z, 
-                    targetZ, 
+                    MODEL_CONFIG.startPosition.z, 
+                    MODEL_CONFIG.targetPosition.z, 
                     progress
                 );
                 
-                // Interpolate scale
+                // Interpolate scale using configuration values
                 const currentScale = gsap.utils.interpolate(
-                    originalWrapperScale.x, 
-                    originalWrapperScale.x * targetScale, 
+                    MODEL_CONFIG.startScale, 
+                    MODEL_CONFIG.targetScale, 
                     progress
                 );
                 wrapper.scale.setScalar(currentScale);
