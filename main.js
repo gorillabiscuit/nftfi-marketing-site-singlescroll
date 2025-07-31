@@ -1,4 +1,10 @@
 // Main JavaScript file for NFTfi Marketing Site - Single Scroll
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollSmoother } from 'gsap/ScrollSmoother';
+
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 // Three.js scene with glass shader and scroll/mouse interactions
 
 import * as THREE from 'three';
@@ -370,6 +376,9 @@ let uniforms;
 let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
 let startTime = Date.now(); // For time-based rotation calculations
+
+// GSAP ScrollSmoother instance
+let smoother;
 
 // Shader code
 const vertexShader = `
@@ -786,7 +795,7 @@ function calculatePlanePosition() {
     const viewportHeight = window.innerHeight;
     
     // X offset constant for easy tweaking
-    const X_OFFSET = -8.9; // Adjust this value to move plane left/right
+    const X_OFFSET = -12; // Adjust this value to move plane left/right
     
     // Calculate the center of the viewport in normalized coordinates (-1 to 1)
     const centerX = 0; // Center of viewport
@@ -861,6 +870,11 @@ function onWindowResize() {
     
     // Update plane position for new viewport
     updatePlaneForViewport();
+    
+    // Refresh ScrollTrigger on resize
+    if (smoother) {
+        ScrollTrigger.refresh();
+    }
 }
 
 // Animation loop with proper parent-child rotation and mouse-controlled axes
@@ -925,10 +939,99 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+// Initialize ScrollSmoother and scroll animations
+function initializeScrollAnimations() {
+    // Create ScrollSmoother
+    smoother = ScrollSmoother.create({
+        wrapper: "#smooth-content",
+        content: "#smooth-content",
+        smooth: 1.5,
+        effects: true,
+        normalizeScroll: true,
+        ignoreMobileResize: true,
+    });
+    
+    // Create scroll-driven animations for Three.js scene
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: "#smooth-content",
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1,
+            onUpdate: (self) => {
+                // Update Three.js scene based on scroll progress
+                if (wrapper && isModelReady) {
+                    const progress = self.progress;
+                    
+                    // Rotate wrapper based on scroll
+                    wrapper.rotation.y = progress * Math.PI * 2; // Full rotation
+                    
+                    // Move camera based on scroll
+                    if (camera) {
+                        const cameraZ = 33.6 + (progress * 10); // Move camera closer/further
+                        camera.position.z = cameraZ;
+                        camera.updateProjectionMatrix();
+                    }
+                    
+                    // Update plane position based on scroll
+                    if (backgroundPlane) {
+                        const planeX = -12 + (progress * 20); // Move plane across screen
+                        backgroundPlane.position.x = planeX;
+                    }
+                }
+            }
+        }
+    });
+    
+    // Add specific section animations
+    gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section[data-section='1']",
+            start: "top center",
+            end: "bottom center",
+            scrub: 1,
+            onUpdate: (self) => {
+                if (wrapper && isModelReady) {
+                    // Hero section: scale up model
+                    const scale = 3 + (self.progress * 2);
+                    wrapper.scale.setScalar(scale);
+                }
+            }
+        }
+    });
+    
+    gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section[data-section='2']",
+            start: "top center",
+            end: "bottom center",
+            scrub: 1,
+            onUpdate: (self) => {
+                if (wrapper && isModelReady) {
+                    // Stats section: rotate and change color
+                    wrapper.rotation.x = self.progress * Math.PI;
+                    
+                    // Update shader uniforms for color change
+                    if (uniforms) {
+                        uniforms.uSaturation.value = 1.01 + (self.progress * 0.5);
+                    }
+                }
+            }
+        }
+    });
+    
+    console.log('ScrollSmoother and ScrollTrigger animations initialized');
+}
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     init();
     animate();
+    
+    // Initialize scroll animations after Three.js is ready
+    setTimeout(() => {
+        initializeScrollAnimations();
+    }, 1500);
 }); 
 
 
