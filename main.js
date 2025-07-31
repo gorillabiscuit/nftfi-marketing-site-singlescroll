@@ -891,20 +891,20 @@ function loadModel() {
                 TARGET_CONFIG,
                 // Sphere positioning helpers
                 toggleSphere: () => {
-                    if (whiteSphere) {
-                        whiteSphere.visible = !whiteSphere.visible;
-                        console.log('Sphere visibility:', whiteSphere.visible);
+                    if (window.DEBUG.whiteSphere) {
+                        window.DEBUG.whiteSphere.visible = !window.DEBUG.whiteSphere.visible;
+                        console.log('Sphere visibility:', window.DEBUG.whiteSphere.visible);
                     }
                 },
                 setSpherePosition: (x, y, z) => {
-                    if (whiteSphere) {
-                        whiteSphere.position.set(x, y, z);
+                    if (window.DEBUG.whiteSphere) {
+                        window.DEBUG.whiteSphere.position.set(x, y, z);
                         console.log('Sphere position set to:', [x, y, z]);
                     }
                 },
                 getSpherePosition: () => {
-                    if (whiteSphere) {
-                        return whiteSphere.position.toArray();
+                    if (window.DEBUG.whiteSphere) {
+                        return window.DEBUG.whiteSphere.position.toArray();
                     }
                     return null;
                 }
