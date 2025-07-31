@@ -9,21 +9,21 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 function initializeNavigation() {
     
     const dropdowns = document.querySelectorAll('.dropdown-container');
-    console.log('📋 Found dropdowns:', dropdowns.length);
+    // console.log('📋 Found dropdowns:', dropdowns.length);
     
     dropdowns.forEach((dropdown, index) => {
         const trigger = dropdown.querySelector('.dropdown-trigger');
         const menu = dropdown.querySelector('.dropdown-menu');
         
-        console.log(`📦 Dropdown ${index + 1}:`, {
-            trigger: trigger ? 'Found' : 'Missing',
-            menu: menu ? 'Found' : 'Missing',
-            triggerText: trigger ? trigger.textContent.trim() : 'N/A',
-            triggerVisible: trigger ? trigger.offsetParent !== null : false,
-            menuVisible: menu ? menu.offsetParent !== null : false,
-            menuDisplay: menu ? getComputedStyle(menu).display : 'N/A',
-            menuVisibility: menu ? getComputedStyle(menu).visibility : 'N/A'
-        });
+        // console.log(`📦 Dropdown ${index + 1}:`, {
+        //     trigger: trigger ? 'Found' : 'Missing',
+        //     menu: menu ? 'Found' : 'Missing',
+        //     triggerText: trigger ? trigger.textContent.trim() : 'N/A',
+        //     triggerVisible: trigger ? trigger.offsetParent !== null : false,
+        //     menuVisible: menu ? menu.offsetParent !== null : false,
+        //     menuDisplay: menu ? getComputedStyle(menu).display : 'N/A',
+        //     menuVisibility: menu ? getComputedStyle(menu).visibility : 'N/A'
+        // });
         
         if (!trigger || !menu) {
             console.error('❌ Missing trigger or menu element');
@@ -32,12 +32,12 @@ function initializeNavigation() {
         
         // Toggle dropdown on click
         trigger.addEventListener('click', (e) => {
-            console.log('🖱️ Dropdown clicked:', trigger.textContent.trim());
+            // console.log('🖱️ Dropdown clicked:', trigger.textContent.trim());
             e.preventDefault();
             e.stopPropagation();
             
             const isOpen = menu.classList.contains('open');
-            console.log('📊 Current state:', isOpen ? 'Open' : 'Closed');
+            // console.log('📊 Current state:', isOpen ? 'Open' : 'Closed');
             
             // Close all other dropdowns
             document.querySelectorAll('.dropdown-menu').forEach(otherMenu => {
@@ -52,30 +52,30 @@ function initializeNavigation() {
             
             // Toggle current dropdown
             if (isOpen) {
-                console.log('🔽 Closing dropdown');
+                // console.log('🔽 Closing dropdown');
                 menu.classList.remove('open');
                 trigger.classList.remove('open');
-                console.log('📊 Classes after close:', {
-                    menuClasses: menu.className,
-                    triggerClasses: trigger.className,
-                    menuVisible: menu.style.visibility,
-                    menuOpacity: menu.style.opacity
-                });
+                // console.log('📊 Classes after close:', {
+                //     menuClasses: menu.className,
+                //     triggerClasses: trigger.className,
+                //     menuVisible: menu.style.visibility,
+                //     menuOpacity: menu.style.opacity
+                // });
             } else {
-                console.log('🔼 Opening dropdown');
+                // console.log('🔼 Opening dropdown');
                 menu.classList.add('open');
                 trigger.classList.add('open');
                 updateDropdownPosition(trigger, menu);
-                console.log('📊 Classes after open:', {
-                    menuClasses: menu.className,
-                    triggerClasses: trigger.className,
-                    menuVisible: menu.style.visibility,
-                    menuOpacity: menu.style.opacity
-                });
+                // console.log('📊 Classes after open:', {
+                //     menuClasses: menu.className,
+                //     triggerClasses: trigger.className,
+                //     menuVisible: menu.style.visibility,
+                //     menuOpacity: menu.style.opacity
+                // });
             }
         });
         
-        console.log('✅ Event listener attached to dropdown', index + 1);
+        // console.log('✅ Event listener attached to dropdown', index + 1);
     });
     
     // Close dropdowns on outside click
@@ -83,7 +83,7 @@ function initializeNavigation() {
         if (!e.target.closest('.dropdown-container')) {
             const openMenus = document.querySelectorAll('.dropdown-menu.open');
             if (openMenus.length > 0) {
-                console.log('🔄 Closing dropdowns (outside click)');
+                // console.log('🔄 Closing dropdowns (outside click)');
                 openMenus.forEach(menu => {
                     menu.classList.remove('open');
                     const trigger = menu.parentElement.querySelector('.dropdown-trigger');
@@ -100,7 +100,7 @@ function initializeNavigation() {
         if (e.key === 'Escape') {
             const openMenus = document.querySelectorAll('.dropdown-menu.open');
             if (openMenus.length > 0) {
-                console.log('🔽 Closing dropdowns (escape key)');
+                // console.log('🔽 Closing dropdowns (escape key)');
                 openMenus.forEach(menu => {
                     menu.classList.remove('open');
                     const trigger = menu.parentElement.querySelector('.dropdown-trigger');
@@ -122,12 +122,12 @@ function initializeNavigation() {
         });
     });
     
-    console.log('✅ Navigation initialization complete');
+    // console.log('✅ Navigation initialization complete');
 }
 
 // Update dropdown position (improved positioning)
 function updateDropdownPosition(trigger, menu) {
-    console.log('📍 Updating dropdown position');
+    // console.log('📍 Updating dropdown position');
     
     // Get the trigger's position relative to its parent
     const triggerRect = trigger.getBoundingClientRect();
@@ -137,12 +137,12 @@ function updateDropdownPosition(trigger, menu) {
     menu.style.left = '0';
     menu.style.top = '100%';
     
-    console.log('📍 Position set:', {
-        left: menu.style.left,
-        top: menu.style.top,
-        triggerWidth: triggerRect.width,
-        menuWidth: menu.offsetWidth
-    });
+    // console.log('📍 Position set:', {
+    //     left: menu.style.left,
+    //     top: menu.style.top,
+    //     triggerWidth: triggerRect.width,
+    //     menuWidth: menu.offsetWidth
+    // });
 }
 
 // Initialize controls
@@ -341,12 +341,12 @@ function updateCamera() {
         // Force projection matrix update
         camera.updateProjectionMatrix();
         
-        console.log('Camera updated:', {
-            position: camera.position,
-            fov: camera.fov,
-            sliderValue: fovSlider,
-            aspect: camera.aspect
-        });
+        // console.log('Camera updated:', {
+        //     position: camera.position,
+        //     fov: camera.fov,
+        //     sliderValue: fovSlider,
+        //     aspect: camera.aspect
+        // });
     }
 }
 
@@ -393,6 +393,7 @@ const TARGET_CONFIG = {
     // Target position in viewport coordinates (pixels from edges)
     viewportX: 200,  // 200px from left edge
     viewportY: 2000, // 2000px from top edge
+    viewportZ: 0,    // Z depth (world coordinates - not viewport-based)
     scaleRatio: 1   // 30% of original scale
 };
 
@@ -407,10 +408,11 @@ const MODEL_CONFIG = {
     
     // Target position is now handled by TARGET_CONFIG viewport coordinates
     // This is converted to world coordinates by calculateTargetPosition()
+    // DEPRECATED: Use TARGET_CONFIG instead
     targetPosition: {
-        x: 0,   // Ignored - uses TARGET_CONFIG.viewportX instead
-        y: 0,   // Ignored - uses TARGET_CONFIG.viewportY instead
-        z: 0    // Keep same depth (this is still used)
+        x: 0,   // DEPRECATED - uses TARGET_CONFIG.viewportX instead
+        y: 0,   // DEPRECATED - uses TARGET_CONFIG.viewportY instead
+        z: 0    // DEPRECATED - uses TARGET_CONFIG.viewportZ instead
     },
     
     // Scale configuration
@@ -689,13 +691,13 @@ function captureHeroAsTexture() {
                 const texture = new THREE.CanvasTexture(canvas);
                 texture.needsUpdate = true;
                 
-                console.log('Hero captured successfully:', {
-                    canvasWidth: canvas.width,
-                    canvasHeight: canvas.height,
-                    elementWidth: heroElement.offsetWidth,
-                    elementHeight: heroElement.offsetHeight,
-                    texture: texture
-                });
+                // console.log('Hero captured successfully:', {
+                //     canvasWidth: canvas.width,
+                //     canvasHeight: canvas.height,
+                //     elementWidth: heroElement.offsetWidth,
+                //     elementHeight: heroElement.offsetHeight,
+                //     texture: texture
+                // });
                 
                 resolve(texture);
             }).catch(error => {
@@ -744,7 +746,7 @@ function createBackgroundGeometry() {
         captureHeroAsTexture().then(texture => {
             plane.material.map = texture;
             plane.material.needsUpdate = true;
-            console.log('Dynamic texture applied to plane');
+                            // console.log('Dynamic texture applied to plane');
         }).catch(error => {
             console.error('Failed to apply dynamic texture, using fallback:', error);
             // Fallback to static texture if capture fails
@@ -778,7 +780,7 @@ function createBackgroundGeometry() {
         window.DEBUG = {};
     }
     window.DEBUG.whiteSphere = whiteSphere;
-    console.log('Sphere added to DEBUG object:', whiteSphere);
+    // console.log('Sphere added to DEBUG object:', whiteSphere);
 }
 
 // Load GLTF model
@@ -795,12 +797,12 @@ function loadModel() {
             box.getCenter(center);
             box.getSize(size);
             
-            console.log('Bounding box calculated:', {
-                center: center.toArray(),
-                size: size.toArray(),
-                min: box.min.toArray(),
-                max: box.max.toArray()
-            });
+            // console.log('Bounding box calculated:', {
+            //     center: center.toArray(),
+            //     size: size.toArray(),
+            //     min: box.min.toArray(),
+            //     max: box.max.toArray()
+            // });
             
             // Apply material to all meshes
             gltf.scene.traverse((child) => {
@@ -824,7 +826,7 @@ function loadModel() {
                 if (child.material.program && child.material.program.error) {
                     console.error('Shader compilation error:', child.material.program.error);
                 } else {
-                    console.log('Shader compiled successfully');
+                    // console.log('Shader compiled successfully');
                 }
                 }
             });
@@ -862,24 +864,24 @@ function loadModel() {
                 // Helper functions
                 setWrapperPosition: (x, y, z) => {
                     wrapper.position.set(x, y, z);
-                    console.log('Wrapper position set to:', [x, y, z]);
+                    // console.log('Wrapper position set to:', [x, y, z]);
                 },
                 setOriginalPosition: (x, y, z) => {
                     gltf.scene.position.set(x, y, z);
-                    console.log('Original position set to:', [x, y, z]);
+                    // console.log('Original position set to:', [x, y, z]);
                 },
                 resetPositions: () => {
                     wrapper.position.set(0, 0, 0);
                     gltf.scene.position.set(-center.x, -center.y, -center.z);
-                    console.log('Positions reset to calculated center');
+                    // console.log('Positions reset to calculated center');
                 },
                 logPositions: () => {
-                    console.log('Current positions:', {
-                        wrapper: wrapper.position.toArray(),
-                        original: gltf.scene.position.toArray(),
-                        center: center.toArray(),
-                        size: size.toArray()
-                    });
+                    // console.log('Current positions:', {
+                    //     wrapper: wrapper.position.toArray(),
+                    //     original: gltf.scene.position.toArray(),
+                    //     center: center.toArray(),
+                    //     size: size.toArray()
+                    // });
                 },
                 // Scroll animation helpers
                 resetScrollAnimation: resetScrollAnimation,
@@ -899,7 +901,7 @@ function loadModel() {
                 TARGET_CONFIG
             };
             
-            console.log('Debug objects exposed! Use window.DEBUG to access them.');
+            // console.log('Debug objects exposed! Use window.DEBUG to access them.');
             isModelReady = true;
             
             // Set initial plane position based on viewport
@@ -911,7 +913,7 @@ function loadModel() {
        
             
         }, (progress) => {
-            console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+            // console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
         }, (error) => {
             console.error('Error loading model:', error);
             // Fallback to icosahedron if model fails to load
@@ -1001,7 +1003,7 @@ function updatePlaneForViewport() {
             document.getElementById('planeZValue').textContent = position.z.toFixed(1);
         }
         
-        console.log('Plane position updated for viewport:', position);
+        // console.log('Plane position updated for viewport:', position);
     }
 }
 
@@ -1016,7 +1018,7 @@ function updatePlaneTexture() {
             
             backgroundPlane.material.map = texture;
             backgroundPlane.material.needsUpdate = true;
-            console.log('Plane texture updated with fresh hero capture');
+            // console.log('Plane texture updated with fresh hero capture');
         }).catch(error => {
             console.error('Failed to update plane texture:', error);
         });
@@ -1058,6 +1060,7 @@ function calculateTargetPosition() {
     return {
         x: worldPos.x * scaleFactor,
         y: worldPos.y * scaleFactor,
+        z: TARGET_CONFIG.viewportZ, // Use Z from TARGET_CONFIG (world coordinates)
         scale: MODEL_CONFIG.targetScale * TARGET_CONFIG.scaleRatio * scaleFactor
     };
 }
@@ -1162,9 +1165,9 @@ function onWindowResize() {
         
         if (whiteSphere) {
             whiteSphere.visible = true;
-            console.log('Sphere made visible for render target');
+            // console.log('Sphere made visible for render target');
         } else {
-            console.log('White sphere not found in scene');
+            // console.log('White sphere not found in scene');
         }
         
         mesh.visible = false;
@@ -1193,7 +1196,7 @@ function onWindowResize() {
         // Hide sphere for final render
         if (whiteSphere) {
             whiteSphere.visible = false;
-            console.log('Sphere hidden for final render');
+            // console.log('Sphere hidden for final render');
         }
         
         renderer.setRenderTarget(null);
@@ -1270,7 +1273,7 @@ function setupScrollAnimation() {
                 
                 wrapper.position.z = gsap.utils.interpolate(
                     MODEL_CONFIG.startPosition.z, 
-                    MODEL_CONFIG.targetPosition.z, // Keep Z the same
+                    dynamicTarget.z, // Use Z from calculateTargetPosition()
                     progress
                 );
                 
@@ -1282,12 +1285,12 @@ function setupScrollAnimation() {
                 );
                 wrapper.scale.setScalar(currentScale);
                 
-                console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
+                // console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
             }
         }
     });
     
-    console.log('Scroll animation setup complete');
+    // console.log('Scroll animation setup complete');
 }
 
 // Reset scroll animation to original position
@@ -1305,7 +1308,7 @@ function resetScrollAnimation() {
         );
         // Clear the target Y data to stop scroll animation influence
         delete wrapper.userData.targetY;
-        console.log('Scroll animation reset to original position');
+        // console.log('Scroll animation reset to original position');
     }
 }
 
@@ -1318,7 +1321,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         if (window.DEBUG && window.DEBUG.updatePlaneTexture) {
             window.DEBUG.updatePlaneTexture();
-            console.log('Forced texture update after DOM load');
+            // console.log('Forced texture update after DOM load');
         }
     }, 500); // Wait for all styles and layouts to be applied
 }); 
