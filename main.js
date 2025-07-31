@@ -906,7 +906,48 @@ function loadModel() {
                 calculateResponsiveTargetPosition,
                 calculateResponsiveScale,
                 screenToWorldPosition,
-                isPositionVisible
+                isPositionVisible,
+                // Expose all configurable parameters for real-time tweaking
+                viewportTarget: MODEL_CONFIG.viewportTarget,
+                responsiveScale: MODEL_CONFIG.responsiveScale,
+                fallbackTarget: MODEL_CONFIG.fallbackTarget,
+                startPosition: MODEL_CONFIG.startPosition,
+                startScale: MODEL_CONFIG.startScale,
+                // Helper functions for parameter tweaking
+                updateViewportTarget: (xPercent, yPercent) => {
+                    MODEL_CONFIG.viewportTarget.xPercent = xPercent;
+                    MODEL_CONFIG.viewportTarget.yPercent = yPercent;
+                    cachedTargetPosition = null; // Invalidate cache
+                    console.log('Updated viewport target:', MODEL_CONFIG.viewportTarget);
+                },
+                updateResponsiveScale: (minScale, maxScale, threshold) => {
+                    MODEL_CONFIG.responsiveScale.minScale = minScale;
+                    MODEL_CONFIG.responsiveScale.maxScale = maxScale;
+                    MODEL_CONFIG.responsiveScale.viewportThreshold = threshold;
+                    console.log('Updated responsive scale:', MODEL_CONFIG.responsiveScale);
+                },
+                updateFallbackTarget: (x, y, z) => {
+                    MODEL_CONFIG.fallbackTarget.x = x;
+                    MODEL_CONFIG.fallbackTarget.y = y;
+                    MODEL_CONFIG.fallbackTarget.z = z;
+                    cachedTargetPosition = null; // Invalidate cache
+                    console.log('Updated fallback target:', MODEL_CONFIG.fallbackTarget);
+                },
+                updateStartPosition: (x, y, z) => {
+                    MODEL_CONFIG.startPosition.x = x;
+                    MODEL_CONFIG.startPosition.y = y;
+                    MODEL_CONFIG.startPosition.z = z;
+                    console.log('Updated start position:', MODEL_CONFIG.startPosition);
+                },
+                updateStartScale: (scale) => {
+                    MODEL_CONFIG.startScale = scale;
+                    console.log('Updated start scale:', MODEL_CONFIG.startScale);
+                },
+                // Force recalculation
+                forceRecalculate: () => {
+                    cachedTargetPosition = null;
+                    console.log('Forced position recalculation');
+                }
             };
             
             console.log('Debug objects exposed! Use window.DEBUG to access them.');
