@@ -353,7 +353,11 @@ function updateCamera() {
 // Initialize controls when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Wait a bit for Three.js to initialize
-    setTimeout(initializeControls, 1000);
+    setTimeout(() => {
+        initializeControls();
+        // Set initial plane position to -8.9
+        updatePlane();
+    }, 1000);
 });
 
 // Scene variables
