@@ -519,16 +519,17 @@ function init() {
     // Get canvas
     canvas = document.getElementById('three-canvas');
     
-    // Calculate square size like GitHub version
-    const size = Math.min(window.innerWidth, window.innerHeight, 800);
+    // Use full viewport dimensions instead of square constraint
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     
     // Create scene
     scene = new THREE.Scene();
     // Set transparent background instead of black
     scene.background = null;
     
-    // Create camera
-    camera = new THREE.PerspectiveCamera(18, size / size, 0.1, 1000); // FOV 18, square aspect
+    // Create camera with full viewport aspect ratio
+    camera = new THREE.PerspectiveCamera(18, width / height, 0.1, 1000); // FOV 18, full viewport aspect
     camera.position.set(0, 0, 33.6); // Match UI defaults
     
     // Create renderer
@@ -537,11 +538,11 @@ function init() {
         alpha: true, // Enable transparency
         antialias: true 
     });
-    renderer.setSize(size, size);
+    renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0); // Transparent clear color
     
-    // Set square aspect ratio like GitHub version
-    renderer.setSize(size, size);
+    // Set full viewport dimensions
+    renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
     // Set clear color to transparent
@@ -859,11 +860,12 @@ function updatePlaneForViewport() {
 
 // Window resize handler
 function onWindowResize() {
-    const size = Math.min(window.innerWidth, window.innerHeight, 800);
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     
-    camera.aspect = size / size; // Square aspect ratio
+    camera.aspect = width / height; // Full viewport aspect ratio
     camera.updateProjectionMatrix();
-    renderer.setSize(size, size);
+    renderer.setSize(width, height);
     
     // Update render targets
     mainRenderTarget.setSize(
