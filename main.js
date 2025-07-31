@@ -685,11 +685,11 @@ function createBackgroundGeometry() {
     });
     
     const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    whiteSphere.position.set(0, 0, -10); // Same position as plane
-    whiteSphere.scale.setScalar(2); // Make it visible
+    whiteSphere.position.set(-11.75, 5.75, -7); // Same position as plane
+    whiteSphere.scale.setScalar(.3); // Make it visible
     
-    // Make sphere visible to glass shader for refraction effects
-    whiteSphere.visible = true;
+    // Make sphere invisible to camera but available for shader sampling (like plane)
+    whiteSphere.visible = false; // Invisible to camera
     whiteSphere.renderOrder = -2; // Render before plane
     
     scene.add(whiteSphere);
