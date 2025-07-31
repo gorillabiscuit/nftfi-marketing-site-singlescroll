@@ -416,8 +416,8 @@ const MODEL_CONFIG = {
     floatSpeed: 0.8, // Slow, gentle speed
     
     // Scroll spin settings
-    spinIntensity: 0.3, // How much spin per scroll unit
-    spinDecay: 0.25 // How quickly spin decays (0.95 = slow decay)
+    spinIntensity: 0.1, // How much spin per scroll unit
+    spinDecay: 0.15 // How quickly spin decays (0.95 = slow decay)
 };
 
 // Shader code
@@ -653,6 +653,41 @@ function init() {
     addEventListeners();
 }
 
+// Capture hero div and create dynamic texture
+function captureHeroAsTexture() {
+    return new Promise((resolve, reject) => {
+        const heroElement = document.querySelector('.hero');
+        if (!heroElement) {
+            reject(new Error('Hero element not found'));
+            return;
+        }
+        
+        // Capture the hero div using html2canvas
+        html2canvas(heroElement, { 
+            backgroundColor: null, // Transparent background
+            scale: 2, // Higher resolution for better quality
+            useCORS: true, // Allow cross-origin images
+            allowTaint: true, // Allow tainted canvas
+            logging: false // Disable logging for performance
+        }).then(canvas => {
+            // Create Three.js texture from canvas
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            
+            console.log('Hero captured successfully:', {
+                canvasWidth: canvas.width,
+                canvasHeight: canvas.height,
+                texture: texture
+            });
+            
+            resolve(texture);
+        }).catch(error => {
+            console.error('Error capturing hero:', error);
+            reject(error);
+        });
+    });
+}
+
 // Create background geometry for refraction effects
 function createBackgroundGeometry() {
     const backgroundGroup = new THREE.Group();
@@ -661,17 +696,14 @@ function createBackgroundGeometry() {
     // Background group is now empty - removed the four white icosahedrons
     scene.add(backgroundGroup);
     
-    // Add plane with PNG material - separate from background group so it's visible
-    const textureLoader = new THREE.TextureLoader();
-    const headerTexture = textureLoader.load('/images/header.png');
-    
     // Create plane geometry - exact GitHub dimensions
     const planeScale = 1; // GitHub default
     const width = 20 * planeScale; // 20 units
     const height = width * (591 / 1325); // 8.92 units based on 1325:591 ratio
     const planeGeometry = new THREE.PlaneGeometry(width, height);
+    
+    // Create material with dynamic texture (will be updated)
     const planeMaterial = new THREE.MeshBasicMaterial({ 
-        map: headerTexture,
         transparent: true,
         opacity: 0.8, // GitHub opacity
         side: THREE.DoubleSide
@@ -688,6 +720,20 @@ function createBackgroundGeometry() {
     
     // Store reference for potential future use
     backgroundPlane = plane;
+    
+    // Capture hero and apply as texture
+    captureHeroAsTexture().then(texture => {
+        plane.material.map = texture;
+        plane.material.needsUpdate = true;
+        console.log('Dynamic texture applied to plane');
+    }).catch(error => {
+        console.error('Failed to apply dynamic texture, using fallback:', error);
+        // Fallback to static texture if capture fails
+        const textureLoader = new THREE.TextureLoader();
+        const headerTexture = textureLoader.load('/images/header.png');
+        plane.material.map = headerTexture;
+        plane.material.needsUpdate = true;
+    });
     
     // Add white sphere at the same position as the plane
     const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
@@ -823,7 +869,10 @@ function loadModel() {
                 MODEL_CONFIG: MODEL_CONFIG,
                 // Scroll spin debugging
                 scrollSpinVelocity: () => scrollSpinVelocity,
-                updateScrollSpin: (direction) => updateScrollSpin(direction)
+                updateScrollSpin: (direction) => updateScrollSpin(direction),
+                // Texture debugging
+                updatePlaneTexture,
+                captureHeroAsTexture
             };
             
             console.log('Debug objects exposed! Use window.DEBUG to access them.');
@@ -932,6 +981,33 @@ function updatePlaneForViewport() {
     }
 }
 
+// Update plane texture with fresh hero capture
+function updatePlaneTexture() {
+    if (backgroundPlane) {
+        captureHeroAsTexture().then(texture => {
+            // Dispose old texture to prevent memory leaks
+            if (backgroundPlane.material.map) {
+                backgroundPlane.material.map.dispose();
+            }
+            
+            backgroundPlane.material.map = texture;
+            backgroundPlane.material.needsUpdate = true;
+            console.log('Plane texture updated with fresh hero capture');
+        }).catch(error => {
+            console.error('Failed to update plane texture:', error);
+        });
+    }
+}
+
+// Debounced texture update function
+let textureUpdateTimeout;
+function debouncedTextureUpdate() {
+    clearTimeout(textureUpdateTimeout);
+    textureUpdateTimeout = setTimeout(() => {
+        updatePlaneTexture();
+    }, 250); // Wait 250ms after resize stops
+}
+
 // Window resize handler
 function onWindowResize() {
     const width = window.innerWidth;
@@ -956,6 +1032,9 @@ function onWindowResize() {
     
     // Update plane position for new viewport
     updatePlaneForViewport();
+    
+    // Debounced texture update
+    debouncedTextureUpdate();
 }
 
     // Animation loop with proper parent-child rotation, mouse-controlled axes, and floating animation
