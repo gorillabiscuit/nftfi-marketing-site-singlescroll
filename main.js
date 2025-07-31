@@ -388,18 +388,18 @@ let scrollSpinVelocity = 0;
 let lastScrollDirection = 0;
 let lastScrollTime = 0;
 
-// Percentage-based positioning configuration (responsive)
+// Direct world space positioning configuration
 const TARGET_CONFIG = {
-    // Target position as percentages of screen size
-    targetPercentX: 0.1,    // 10% from left edge
-    targetPercentY: 0.2,    // 20% from top edge
-    targetPercentZ: 0,      // Z depth (world coordinates)
-    scaleRatio: 1.2,        // Scale ratio
+    // Target position in world coordinates (-1 to 1 range)
+    targetWorldX: -0.8,    // 80% left in world space
+    targetWorldY: 0.5,     // 50% up in world space
+    targetWorldZ: 0,       // Z depth
+    scaleRatio: 1.2,       // Scale ratio
     
-    // Starting position as percentages of screen size
-    startPercentX: 0.8,     // 80% from left edge (right side)
-    startPercentY: 0.5,     // 50% from top edge (center)
-    startPercentZ: 0        // Z depth (world coordinates)
+    // Starting position in world coordinates (-1 to 1 range)
+    startWorldX: 0.8,      // 80% right in world space
+    startWorldY: 0,        // Center vertically
+    startWorldZ: 0         // Z depth
 };
 
 // Model positioning configuration - EASY TO TWEAK!
@@ -885,8 +885,8 @@ function loadModel() {
                 // Texture debugging
                 updatePlaneTexture,
                 captureHeroAsTexture,
-                // Percentage positioning debugging
-                percentageToWorld,
+                // World space positioning debugging
+                worldToPosition,
                 calculateTargetPosition,
                 TARGET_CONFIG
             };
@@ -1015,62 +1015,47 @@ function updatePlaneTexture() {
     }
 }
 
-// Percentage to world coordinate conversion using canonical Three.js approach
-function percentageToWorld(percentX, percentY) {
-    const canvas = document.getElementById('three-canvas');
-    const rect = canvas.getBoundingClientRect();
-    
-    // Convert percentages to pixel coordinates
-    const pixelX = percentX * window.innerWidth;
-    const pixelY = percentY * window.innerHeight;
-    
-    // Convert viewport coordinates to canvas-relative coordinates
-    const canvasX = (pixelX - rect.left) * canvas.width / rect.width;
-    const canvasY = (pixelY - rect.top) * canvas.height / rect.height;
-    
-    // Convert to normalized device coordinates (-1 to 1)
-    const normalizedX = (canvasX / canvas.width) * 2 - 1;
-    const normalizedY = -(canvasY / canvas.height) * 2 + 1; // Flip Y axis
-    
-    // Convert to world coordinates
+// Convert world space coordinates to actual world positions
+function worldToPosition(worldX, worldY) {
+    // Convert from -1 to 1 range to actual world coordinates
     const aspect = window.innerWidth / window.innerHeight;
     const fov = camera.fov * Math.PI / 180;
     const distance = Math.abs(camera.position.z);
     
-    const worldX = normalizedX * distance * Math.tan(fov/2) * aspect;
-    const worldY = normalizedY * distance * Math.tan(fov/2);
+    const actualWorldX = worldX * distance * Math.tan(fov/2) * aspect;
+    const actualWorldY = worldY * distance * Math.tan(fov/2);
     
-    return { x: worldX, y: worldY };
+    return { x: actualWorldX, y: actualWorldY };
 }
 
-// Calculate dynamic target position based on percentage coordinates
+// Calculate target position using direct world coordinates
 function calculateTargetPosition() {
-    const worldPos = percentageToWorld(TARGET_CONFIG.targetPercentX, TARGET_CONFIG.targetPercentY);
+    const worldPos = worldToPosition(TARGET_CONFIG.targetWorldX, TARGET_CONFIG.targetWorldY);
     
     // Apply scale factor based on current viewport
     const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
     const scaleFactor = Math.max(0.5, Math.min(1.5, viewportScale)); // Clamp between 0.5 and 1.5
     
     return {
-        x: worldPos.x * scaleFactor,
-        y: worldPos.y * scaleFactor,
-        z: TARGET_CONFIG.targetPercentZ, // Use Z from TARGET_CONFIG (world coordinates)
+        x: worldPos.x,
+        y: worldPos.y,
+        z: TARGET_CONFIG.targetWorldZ, // Use Z from TARGET_CONFIG
         scale: MODEL_CONFIG.targetScale * TARGET_CONFIG.scaleRatio * scaleFactor
     };
 }
 
-// Calculate starting position based on percentage coordinates
+// Calculate starting position using direct world coordinates
 function calculateStartPosition() {
-    const worldPos = percentageToWorld(TARGET_CONFIG.startPercentX, TARGET_CONFIG.startPercentY);
+    const worldPos = worldToPosition(TARGET_CONFIG.startWorldX, TARGET_CONFIG.startWorldY);
     
     // Apply scale factor based on current viewport
     const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
     const scaleFactor = Math.max(0.5, Math.min(1.5, viewportScale)); // Clamp between 0.5 and 1.5
     
     return {
-        x: worldPos.x * scaleFactor,
-        y: worldPos.y * scaleFactor,
-        z: TARGET_CONFIG.startPercentZ // Use Z from TARGET_CONFIG (world coordinates)
+        x: worldPos.x,
+        y: worldPos.y,
+        z: TARGET_CONFIG.startWorldZ // Use Z from TARGET_CONFIG
     };
 }
 
