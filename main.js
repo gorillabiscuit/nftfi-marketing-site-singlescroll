@@ -971,7 +971,10 @@ function onWindowResize() {
             wrapper.rotation.z += zRate * 0.02;
             
             // Floating animation - gentle up and down movement
-            const floatOffset = Math.sin(time * MODEL_CONFIG.floatSpeed) * MODEL_CONFIG.floatAmplitude;
+            // Scale amplitude based on current mesh scale for consistent visual effect
+            const currentScale = wrapper.scale.x; // Use X scale as reference
+            const scaledAmplitude = MODEL_CONFIG.floatAmplitude * currentScale;
+            const floatOffset = Math.sin(time * MODEL_CONFIG.floatSpeed) * scaledAmplitude;
             
             // Apply floating movement - works with both static and scroll animation
             if (wrapper.userData.targetY !== undefined) {
