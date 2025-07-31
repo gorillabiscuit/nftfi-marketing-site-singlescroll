@@ -941,14 +941,16 @@ function animate() {
 
 // Initialize ScrollSmoother and scroll animations
 function initializeScrollAnimations() {
-    // Create ScrollSmoother
+    // Create ScrollSmoother with proper configuration
     smoother = ScrollSmoother.create({
-        wrapper: "#smooth-content",
+        wrapper: "body",
         content: "#smooth-content",
         smooth: 1.5,
         effects: true,
         normalizeScroll: true,
         ignoreMobileResize: true,
+        smoothTouch: 0.1,
+        ease: "power2.out",
     });
     
     // Create scroll-driven animations for Three.js scene
@@ -1021,6 +1023,9 @@ function initializeScrollAnimations() {
     });
     
     console.log('ScrollSmoother and ScrollTrigger animations initialized');
+    console.log('ScrollSmoother instance:', smoother);
+    console.log('Content height:', document.querySelector('#smooth-content').offsetHeight);
+    console.log('Window height:', window.innerHeight);
 }
 
 // Initialize when DOM is loaded
