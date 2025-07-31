@@ -391,14 +391,14 @@ let lastScrollTime = 0;
 // Direct world space positioning configuration
 const TARGET_CONFIG = {
     // Target position in world coordinates (-1 to 1 range)
-    targetWorldX: -0.8,    // 80% left in world space
-    targetWorldY: 0.5,     // 50% up in world space
+    targetWorldX: -0.92,    // 80% left in world space
+    targetWorldY: 0.84,     // 50% up in world space
     targetWorldZ: 0,       // Z depth
     scaleRatio: 1.2,       // Scale ratio
     
     // Starting position in world coordinates (-1 to 1 range)
-    startWorldX: 0.8,      // 80% right in world space
-    startWorldY: 0,        // Center vertically
+    startWorldX: 0.55,      // 80% right in world space
+    startWorldY: -0.15,        // Center vertically
     startWorldZ: 0         // Z depth
 };
 
@@ -759,7 +759,7 @@ function createBackgroundGeometry() {
     whiteSphere.scale.setScalar(.3); // Make it visible
     
     // Make sphere invisible to camera but available for shader sampling (like plane)
-    whiteSphere.visible = false; // Invisible to camera
+    whiteSphere.visible = true; // Visible for positioning reference
     whiteSphere.renderOrder = -2; // Render before plane
     
     scene.add(whiteSphere);
@@ -888,7 +888,26 @@ function loadModel() {
                 // World space positioning debugging
                 worldToPosition,
                 calculateTargetPosition,
-                TARGET_CONFIG
+                TARGET_CONFIG,
+                // Sphere positioning helpers
+                toggleSphere: () => {
+                    if (whiteSphere) {
+                        whiteSphere.visible = !whiteSphere.visible;
+                        console.log('Sphere visibility:', whiteSphere.visible);
+                    }
+                },
+                setSpherePosition: (x, y, z) => {
+                    if (whiteSphere) {
+                        whiteSphere.position.set(x, y, z);
+                        console.log('Sphere position set to:', [x, y, z]);
+                    }
+                },
+                getSpherePosition: () => {
+                    if (whiteSphere) {
+                        return whiteSphere.position.toArray();
+                    }
+                    return null;
+                }
             };
             
             // console.log('Debug objects exposed! Use window.DEBUG to access them.');
