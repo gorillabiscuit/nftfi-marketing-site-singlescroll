@@ -391,29 +391,28 @@ let lastScrollTime = 0;
 // Viewport-relative positioning configuration
 const TARGET_CONFIG = {
     // Target position in viewport coordinates (pixels from edges)
-    viewportX: 200,  // 200px from left edge
-    viewportY: 2000, // 2000px from top edge
-    viewportZ: 0,    // Z depth (world coordinates - not viewport-based)
-    scaleRatio: 1   // 30% of original scale
+    viewportX: 0,  // 0px from left edge (top-left corner)
+    viewportY: 0,  // 0px from top edge (top-left corner)
+    viewportZ: 0,  // Z depth (world coordinates - not viewport-based)
+    scaleRatio: 1, // 30% of original scale
+    
+    // Starting position in viewport coordinates (pixels from edges)
+    startViewportX: 4,  // 4px from left edge (right side of screen)
+    startViewportY: 0,  // 0px from top edge (center vertically)
+    startViewportZ: 0   // Z depth (world coordinates)
 };
 
 // Model positioning configuration - EASY TO TWEAK!
 const MODEL_CONFIG = {
-    // Starting position (right side of screen)
+    // Starting position now handled by TARGET_CONFIG.startViewportX/Y/Z
+    // DEPRECATED: Use TARGET_CONFIG instead
     startPosition: {
-        x: 4,    // Move right (positive = right)
-        y: 0,    // Center vertically
-        z: 0     // Keep same depth
+        x: 4,    // DEPRECATED - uses TARGET_CONFIG.startViewportX instead
+        y: 0,    // DEPRECATED - uses TARGET_CONFIG.startViewportY instead
+        z: 0     // DEPRECATED - uses TARGET_CONFIG.startViewportZ instead
     },
     
-    // Target position is now handled by TARGET_CONFIG viewport coordinates
-    // This is converted to world coordinates by calculateTargetPosition()
-    // DEPRECATED: Use TARGET_CONFIG instead
-    targetPosition: {
-        x: 0,   // DEPRECATED - uses TARGET_CONFIG.viewportX instead
-        y: 0,   // DEPRECATED - uses TARGET_CONFIG.viewportY instead
-        z: 0    // DEPRECATED - uses TARGET_CONFIG.viewportZ instead
-    },
+
     
     // Scale configuration
     startScale: 3.0,    // Starting scale
@@ -840,11 +839,12 @@ function loadModel() {
             // Add centered mesh to wrapper
             wrapper.add(gltf.scene);
             
-            // Set starting position (right side of screen)
+            // Set starting position using viewport coordinates
+            const startPos = calculateStartPosition();
             wrapper.position.set(
-                MODEL_CONFIG.startPosition.x,
-                MODEL_CONFIG.startPosition.y,
-                MODEL_CONFIG.startPosition.z
+                startPos.x,
+                startPos.y,
+                startPos.z
             );
             
             // Scale the wrapper
@@ -1065,6 +1065,21 @@ function calculateTargetPosition() {
     };
 }
 
+// Calculate starting position based on viewport coordinates
+function calculateStartPosition() {
+    const worldPos = viewportToWorld(TARGET_CONFIG.startViewportX, TARGET_CONFIG.startViewportY);
+    
+    // Apply scale factor based on current viewport
+    const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
+    const scaleFactor = Math.max(0.5, Math.min(1.5, viewportScale)); // Clamp between 0.5 and 1.5
+    
+    return {
+        x: worldPos.x * scaleFactor,
+        y: worldPos.y * scaleFactor,
+        z: TARGET_CONFIG.startViewportZ // Use Z from TARGET_CONFIG (world coordinates)
+    };
+}
+
 // Debounced texture update function
 let textureUpdateTimeout;
 function debouncedTextureUpdate() {
@@ -1142,7 +1157,8 @@ function onWindowResize() {
                 wrapper.position.y = wrapper.userData.targetY + floatOffset;
             } else {
                 // No scroll animation - use base position with floating
-                wrapper.position.y = MODEL_CONFIG.startPosition.y + floatOffset;
+                const startPos = calculateStartPosition();
+                wrapper.position.y = startPos.y + floatOffset;
             }
         }
     
@@ -1257,22 +1273,25 @@ function setupScrollAnimation() {
                 // Calculate dynamic target position based on current viewport
                 const dynamicTarget = calculateTargetPosition();
                 
+                // Calculate starting position for interpolation
+                const startPos = calculateStartPosition();
+                
                 // Interpolate position using dynamic target values
                 wrapper.position.x = gsap.utils.interpolate(
-                    MODEL_CONFIG.startPosition.x, 
+                    startPos.x, 
                     dynamicTarget.x, 
                     progress
                 );
                 
                 // Store the target Y position for scroll animation (floating will add offset)
                 wrapper.userData.targetY = gsap.utils.interpolate(
-                    MODEL_CONFIG.startPosition.y, 
+                    startPos.y, 
                     dynamicTarget.y, 
                     progress
                 );
                 
                 wrapper.position.z = gsap.utils.interpolate(
-                    MODEL_CONFIG.startPosition.z, 
+                    startPos.z, 
                     dynamicTarget.z, // Use Z from calculateTargetPosition()
                     progress
                 );
