@@ -404,7 +404,11 @@ const MODEL_CONFIG = {
     targetScale: 0.265,   // Target scale (much smaller)
     
     // Animation timing
-    scrubDuration: 1    // Smooth transition duration
+    scrubDuration: 1,    // Smooth transition duration
+    
+    // Floating animation settings
+    floatAmplitude: 0.1, // Small amplitude for subtle movement
+    floatSpeed: 0.8 // Slow, gentle speed
 };
 
 // Shader code
@@ -591,8 +595,8 @@ function init() {
         uIorB: { value: 1.22 },
         uIorP: { value: 1.22 },
         uSaturation: { value: 1.01 },
-        uChromaticAberration: { value: 0.14 },
-        uRefractPower: { value: 0.35 },
+        uChromaticAberration: { value: 0.06 },
+        uRefractPower: { value: 0.13 },
         uFresnelPower: { value: 9.0 },
         uShininess: { value: 25.0 },
         uDiffuseness: { value: 0.2 },
@@ -677,7 +681,7 @@ function createBackgroundGeometry() {
     backgroundPlane = plane;
     
     // Add white sphere at the same position as the plane
-    const sphereGeometry = new THREE.SphereGeometry(1, 16, 16);
+    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
     const sphereMaterial = new THREE.MeshBasicMaterial({ 
         color: 0xffffff, 
         transparent: true,
@@ -942,30 +946,36 @@ function onWindowResize() {
     updatePlaneForViewport();
 }
 
-// Animation loop with proper parent-child rotation and mouse-controlled axes
-function animate() {
-    requestAnimationFrame(animate);
-    
-    if (wrapper && isModelReady) {
-        const time = (Date.now() - startTime) * 0.001; // Convert to seconds from start
+    // Animation loop with proper parent-child rotation, mouse-controlled axes, and floating animation
+    function animate() {
+        requestAnimationFrame(animate);
         
-        // Decay mouse influence over time (slower decay like working example)
-        mouseInfluence.x *= 0.98; // Slower decay
-        mouseInfluence.y *= 0.98;
-        
-        // Apply rotation to wrapper (parent) with varying rates and mouse influence
-        // X-axis: varying rate with sine wave modulation + mouse Y influence (up/down mouse = tilt)
-        const xRate = 0.2 + Math.sin(time * 0.1) * 0.15;
-        wrapper.rotation.x += xRate * 0.02 + mouseInfluence.y * 0.05; // Mouse Y affects X rotation
-        
-        // Y-axis: varying rate with cosine wave modulation + mouse X influence (left/right mouse = turn)
-        const yRate = 0.3 + Math.cos(time * 0.08) * 0.2;
-        wrapper.rotation.y += yRate * 0.02 + mouseInfluence.x * 0.05; // Mouse X affects Y rotation
-        
-        // Z-axis: varying rate with sine wave modulation at different frequency (no mouse control)
-        const zRate = 0.15 + Math.sin(time * 0.12) * 0.1;
-        wrapper.rotation.z += zRate * 0.02;
-    }
+        if (wrapper && isModelReady) {
+            const time = (Date.now() - startTime) * 0.001; // Convert to seconds from start
+            
+            // Decay mouse influence over time (slower decay like working example)
+            mouseInfluence.x *= 0.98; // Slower decay
+            mouseInfluence.y *= 0.98;
+            
+            // Apply rotation to wrapper (parent) with varying rates and mouse influence
+            // X-axis: varying rate with sine wave modulation + mouse Y influence (up/down mouse = tilt)
+            const xRate = 0.2 + Math.sin(time * 0.1) * 0.15;
+            wrapper.rotation.x += xRate * 0.02 + mouseInfluence.y * 0.05; // Mouse Y affects X rotation
+            
+            // Y-axis: varying rate with cosine wave modulation + mouse X influence (left/right mouse = turn)
+            const yRate = 0.3 + Math.cos(time * 0.08) * 0.2;
+            wrapper.rotation.y += yRate * 0.02 + mouseInfluence.x * 0.05; // Mouse X affects Y rotation
+            
+            // Z-axis: varying rate with sine wave modulation at different frequency (no mouse control)
+            const zRate = 0.15 + Math.sin(time * 0.12) * 0.1;
+            wrapper.rotation.z += zRate * 0.02;
+            
+            // Floating animation - gentle up and down movement
+            const floatOffset = Math.sin(time * MODEL_CONFIG.floatSpeed) * MODEL_CONFIG.floatAmplitude;
+            
+            // Apply floating movement to wrapper position
+            wrapper.position.y = MODEL_CONFIG.startPosition.y + floatOffset;
+        }
     
     // Glass refraction rendering with temporal plane and sphere visibility control
     if (mesh) {
