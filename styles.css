@@ -19,10 +19,6 @@ body {
     height: 100vh;
     z-index: 100; /* Higher z-index to be visible but behind UI controls */
     pointer-events: none; /* Make canvas invisible to mouse events - canonical solution */
-    display: flex;
-    justify-content: flex-end; /* Changed from center to move scene to right */
-    align-items: center;
-    transform: translate(30px, 20px); /* Move 30px right, 20px down */
 }
 
 /* Three.js Canvas */

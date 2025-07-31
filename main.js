@@ -391,9 +391,9 @@ let lastScrollTime = 0;
 // Viewport-relative positioning configuration
 const TARGET_CONFIG = {
     // Target position in viewport coordinates (pixels from edges)
-    viewportX: 50,    // 50px from left edge
-    viewportY: 50,    // 50px from top edge
-    scaleRatio: 0.3   // 30% of original scale
+    viewportX: 200,  // 200px from left edge
+    viewportY: 2000, // 2000px from top edge
+    scaleRatio: 1   // 30% of original scale
 };
 
 // Model positioning configuration - EASY TO TWEAK!
@@ -405,11 +405,12 @@ const MODEL_CONFIG = {
         z: 0     // Keep same depth
     },
     
-    // Target position (top-left corner)
+    // Target position is now handled by TARGET_CONFIG viewport coordinates
+    // This is converted to world coordinates by calculateTargetPosition()
     targetPosition: {
-        x: -9.725,   // Move left (negative = left)
-        y: 4.7,    // Move up (positive = up)
-        z: 0     // Keep same depth
+        x: 0,   // Ignored - uses TARGET_CONFIG.viewportX instead
+        y: 0,   // Ignored - uses TARGET_CONFIG.viewportY instead
+        z: 0    // Keep same depth (this is still used)
     },
     
     // Scale configuration
@@ -420,7 +421,7 @@ const MODEL_CONFIG = {
     scrubDuration: 1,    // Smooth transition duration
     
     // Floating animation settings
-    floatAmplitude: 0.5, // Small amplitude for subtle movement
+    floatAmplitude: 0.4, // Small amplitude for subtle movement
     floatSpeed: 0.8, // Slow, gentle speed
     
     // Scroll spin settings
@@ -1022,15 +1023,26 @@ function updatePlaneTexture() {
     }
 }
 
-// Viewport to world coordinate conversion
+// Viewport to world coordinate conversion using canonical Three.js approach
 function viewportToWorld(viewportX, viewportY) {
+    const canvas = document.getElementById('three-canvas');
+    const rect = canvas.getBoundingClientRect();
+    
+    // Convert viewport coordinates to canvas-relative coordinates
+    const canvasX = (viewportX - rect.left) * canvas.width / rect.width;
+    const canvasY = (viewportY - rect.top) * canvas.height / rect.height;
+    
+    // Convert to normalized device coordinates (-1 to 1)
+    const normalizedX = (canvasX / canvas.width) * 2 - 1;
+    const normalizedY = -(canvasY / canvas.height) * 2 + 1; // Flip Y axis
+    
+    // Convert to world coordinates
     const aspect = window.innerWidth / window.innerHeight;
     const fov = camera.fov * Math.PI / 180;
     const distance = Math.abs(camera.position.z);
     
-    // Calculate world coordinates based on viewport position
-    const worldX = (viewportX / window.innerWidth - 0.5) * 2 * distance * Math.tan(fov/2) * aspect;
-    const worldY = (0.5 - viewportY / window.innerHeight) * 2 * distance * Math.tan(fov/2);
+    const worldX = normalizedX * distance * Math.tan(fov/2) * aspect;
+    const worldY = normalizedY * distance * Math.tan(fov/2);
     
     return { x: worldX, y: worldY };
 }
