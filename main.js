@@ -404,16 +404,6 @@ const TARGET_CONFIG = {
 
 // Model positioning configuration - EASY TO TWEAK!
 const MODEL_CONFIG = {
-    // Starting position now handled by TARGET_CONFIG.startViewportX/Y/Z
-    // DEPRECATED: Use TARGET_CONFIG instead
-    startPosition: {
-        x: 4,    // DEPRECATED - uses TARGET_CONFIG.startViewportX instead
-        y: 0,    // DEPRECATED - uses TARGET_CONFIG.startViewportY instead
-        z: 0     // DEPRECATED - uses TARGET_CONFIG.startViewportZ instead
-    },
-    
-
-    
     // Scale configuration
     startScale: 3.0,    // Starting scale
     targetScale: 0.265,   // Target scale (much smaller)
