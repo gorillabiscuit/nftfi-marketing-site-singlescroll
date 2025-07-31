@@ -350,59 +350,13 @@ function updateCamera() {
     }
 }
 
-// Tween function for smooth plane positioning
-function tweenPlane() {
-    if (!backgroundPlane) return;
-    
-    const currentTime = Date.now();
-    const elapsed = currentTime - planeTween.startTime;
-    const progress = Math.min(elapsed / planeTween.duration, 1);
-    
-    // Easing function (ease-out-cubic)
-    const easedProgress = 1 - Math.pow(1 - progress, 3);
-    
-    // Interpolate position
-    const x = planeTween.startPosition.x + (planeTween.targetPosition.x - planeTween.startPosition.x) * easedProgress;
-    const y = planeTween.startPosition.y + (planeTween.targetPosition.y - planeTween.startPosition.y) * easedProgress;
-    const z = planeTween.startPosition.z + (planeTween.targetPosition.z - planeTween.startPosition.z) * easedProgress;
-    const scale = planeTween.startPosition.scale + (planeTween.targetPosition.scale - planeTween.startPosition.scale) * easedProgress;
-    
-    // Update plane position
-    backgroundPlane.position.set(x, y, z);
-    backgroundPlane.scale.setScalar(scale);
-    
-    // Update UI controls to reflect current position
-    document.getElementById('planeX').value = x;
-    document.getElementById('planeY').value = y;
-    document.getElementById('planeZ').value = z;
-    document.getElementById('planeScale').value = scale;
-    document.getElementById('planeXValue').textContent = x.toFixed(1);
-    document.getElementById('planeYValue').textContent = y.toFixed(1);
-    document.getElementById('planeZValue').textContent = z.toFixed(1);
-    document.getElementById('planeScaleValue').textContent = scale.toFixed(1);
-    
-    // Update plane geometry dimensions
-    const width = 20 * scale;
-    const height = width * (591 / 1325);
-    backgroundPlane.geometry.dispose();
-    backgroundPlane.geometry = new THREE.PlaneGeometry(width, height);
-    
-    // Stop tween when complete
-    if (progress >= 1) {
-        planeTween.active = false;
-    }
-}
-
 // Initialize controls when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Wait a bit for Three.js to initialize
     setTimeout(() => {
         initializeControls();
-        // Start plane tween animation
-        if (backgroundPlane) {
-            planeTween.active = true;
-            planeTween.startTime = Date.now();
-        }
+        // Set initial plane position to -8.9
+        updatePlane();
     }, 1000);
 });
 
@@ -416,15 +370,6 @@ let uniforms;
 let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
 let startTime = Date.now(); // For time-based rotation calculations
-
-// Tween variables for smooth plane positioning
-let planeTween = {
-    active: false,
-    startTime: 0,
-    duration: 1000, // 1 second
-    startPosition: { x: 0, y: 0, z: -5, scale: 1 },
-    targetPosition: { x: -8.9, y: 0, z: -5, scale: 1 }
-};
 
 // Shader code
 const vertexShader = `
@@ -792,6 +737,9 @@ function loadModel() {
             
             console.log('Debug objects exposed! Use window.DEBUG to access them.');
             isModelReady = true;
+            
+            // Set initial plane position based on viewport
+            updatePlaneForViewport();
         
        
             
@@ -832,6 +780,58 @@ function addEventListeners() {
     window.addEventListener('resize', onWindowResize);
 }
 
+// Calculate optimal plane position based on viewport
+function calculatePlanePosition() {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Calculate the center of the viewport in normalized coordinates (-1 to 1)
+    const centerX = 0; // Center of viewport
+    const centerY = 0; // Center of viewport
+    
+    // Convert viewport center to world coordinates
+    // The plane should be positioned to match the visible content area
+    let worldX = centerX * 10; // Scale factor for world coordinates
+    let worldY = centerY * 10;
+    const worldZ = -5; // Keep behind the camera
+    
+    // Adjust based on viewport aspect ratio
+    const aspectRatio = viewportWidth / viewportHeight;
+    if (aspectRatio > 1) {
+        // Wide screen - adjust X position
+        worldX = (aspectRatio - 1) * 5; // Move plane right for wide screens
+    } else {
+        // Tall screen - adjust Y position
+        worldY = (1 - aspectRatio) * 5; // Move plane up for tall screens
+    }
+    
+    return { x: worldX, y: worldY, z: worldZ };
+}
+
+// Update plane position based on viewport
+function updatePlaneForViewport() {
+    if (backgroundPlane) {
+        const position = calculatePlanePosition();
+        backgroundPlane.position.set(position.x, position.y, position.z);
+        
+        // Update the UI controls to reflect the new position
+        if (document.getElementById('planeX')) {
+            document.getElementById('planeX').value = position.x;
+            document.getElementById('planeXValue').textContent = position.x.toFixed(1);
+        }
+        if (document.getElementById('planeY')) {
+            document.getElementById('planeY').value = position.y;
+            document.getElementById('planeYValue').textContent = position.y.toFixed(1);
+        }
+        if (document.getElementById('planeZ')) {
+            document.getElementById('planeZ').value = position.z;
+            document.getElementById('planeZValue').textContent = position.z.toFixed(1);
+        }
+        
+        console.log('Plane position updated for viewport:', position);
+    }
+}
+
 // Window resize handler
 function onWindowResize() {
     const size = Math.min(window.innerWidth, window.innerHeight, 800);
@@ -852,16 +852,14 @@ function onWindowResize() {
     
     // Update uniforms
     uniforms.winResolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2));
+    
+    // Update plane position for new viewport
+    updatePlaneForViewport();
 }
 
 // Animation loop with proper parent-child rotation and mouse-controlled axes
 function animate() {
     requestAnimationFrame(animate);
-    
-    // Update plane tween if active
-    if (planeTween.active) {
-        tweenPlane();
-    }
     
     if (wrapper && isModelReady) {
         const time = (Date.now() - startTime) * 0.001; // Convert to seconds from start
