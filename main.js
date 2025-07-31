@@ -1299,11 +1299,12 @@ function calculateResponsiveTargetPosition() {
     }
     
     // Calculate viewport-relative position
-    const screenX = viewportWidth * MODEL_CONFIG.viewportTarget.xPercent;
-    const screenY = viewportHeight * MODEL_CONFIG.viewportTarget.yPercent;
+    const currentBreakpoint = getCurrentBreakpoint();
+    const screenX = viewportWidth * currentBreakpoint.viewportTarget.xPercent;
+    const screenY = viewportHeight * currentBreakpoint.viewportTarget.yPercent;
     
     // Convert to world coordinates
-    const worldPos = screenToWorldPosition(screenX, screenY, MODEL_CONFIG.viewportTarget.zDepth);
+    const worldPos = screenToWorldPosition(screenX, screenY, currentBreakpoint.viewportTarget.zDepth);
     
     // Validate position is within camera frustum
     if (isPositionVisible(worldPos)) {
@@ -1341,7 +1342,8 @@ function calculateFallbackPosition() {
 // Calculate responsive scale based on viewport
 function calculateResponsiveScale() {
     const viewportWidth = window.innerWidth;
-    const { minScale, maxScale, viewportThreshold } = MODEL_CONFIG.responsiveScale;
+    const currentBreakpoint = getCurrentBreakpoint();
+    const { minScale, maxScale, viewportThreshold } = currentBreakpoint.responsiveScale;
     
     if (viewportWidth <= viewportThreshold) {
         // Small viewport - use minimum scale
