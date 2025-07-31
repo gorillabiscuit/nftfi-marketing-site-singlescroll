@@ -596,7 +596,7 @@ function init() {
         uFresnelPower: { value: 9.0 },
         uShininess: { value: 25.0 },
         uDiffuseness: { value: 0.2 },
-        uLight: { value: new THREE.Vector3(-1.0, 1.0, 1.0) },
+        uLight: { value: new THREE.Vector3(-1.3, 1.5, -0.6) },
         winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2)) },
         uTexture: { value: null }
     };
@@ -677,16 +677,20 @@ function createBackgroundGeometry() {
     backgroundPlane = plane;
     
     // Add white sphere at the same position as the plane
-    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const sphereGeometry = new THREE.SphereGeometry(1, 16, 16);
     const sphereMaterial = new THREE.MeshBasicMaterial({ 
         color: 0xffffff, 
         transparent: true,
-        opacity: 0.3
+        opacity: 1
     });
     
     const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     whiteSphere.position.set(0, 0, -10); // Same position as plane
     whiteSphere.scale.setScalar(2); // Make it visible
+    
+    // Make sphere visible to glass shader for refraction effects
+    whiteSphere.visible = true;
+    whiteSphere.renderOrder = -2; // Render before plane
     
     scene.add(whiteSphere);
     
@@ -960,12 +964,15 @@ function animate() {
         wrapper.rotation.z += zRate * 0.02;
     }
     
-    // Glass refraction rendering with temporal plane visibility control
+    // Glass refraction rendering with temporal plane and sphere visibility control
     if (mesh) {
         
-        // Temporarily make background plane visible for render target sampling
+        // Temporarily make background plane and sphere visible for render target sampling
         if (backgroundPlane) {
             backgroundPlane.visible = true;
+        }
+        if (window.DEBUG && window.DEBUG.whiteSphere) {
+            window.DEBUG.whiteSphere.visible = true;
         }
         
         mesh.visible = false;
@@ -986,9 +993,12 @@ function animate() {
         mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
         mesh.material.side = THREE.FrontSide;
         
-        // Hide background plane again for final render
+        // Hide background plane and sphere again for final render
         if (backgroundPlane) {
             backgroundPlane.visible = false;
+        }
+        if (window.DEBUG && window.DEBUG.whiteSphere) {
+            window.DEBUG.whiteSphere.visible = false;
         }
         
         renderer.setRenderTarget(null);
