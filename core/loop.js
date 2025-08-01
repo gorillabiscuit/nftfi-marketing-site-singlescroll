@@ -6,19 +6,17 @@ import { scene, camera, renderer, mainRenderTarget, backRenderTarget } from './i
 import { showBackgroundPlane, hideBackgroundPlane } from '../objects/backgroundPlane.js';
 import { getScrollSpinVelocity } from '../controls/scrollTrigger.js';
 import { calculateStartPosition } from '../utils/viewport.js';
-import { ANIMATION_CONFIG } from '../config.js';
+import { ANIMATION_CONFIG, MODEL_CONFIG } from '../config.js';
 
 // Global references (will be set by main.js)
 let mesh, wrapper, isModelReady;
-let MODEL_CONFIG;
 let startTime;
 
 // Initialize animation loop
-export function initializeAnimationLoop(meshInstance, wrapperInstance, isModelReadyFlag, modelConfig) {
+export function initializeAnimationLoop(meshInstance, wrapperInstance, isModelReadyFlag) {
     mesh = meshInstance;
     wrapper = wrapperInstance;
     isModelReady = isModelReadyFlag;
-    MODEL_CONFIG = modelConfig;
     startTime = Date.now();
 }
 

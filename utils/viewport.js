@@ -1,18 +1,14 @@
 // Viewport Utility Module for NFTfi Marketing Site
 // Handles world space coordinate calculations and viewport positioning
 
+import { TARGET_CONFIG, MODEL_CONFIG } from '../config.js';
+
 // Global reference to camera (will be set by main.js)
 let camera;
 
-// Configuration objects (will be passed from main.js)
-let TARGET_CONFIG;
-let MODEL_CONFIG;
-
 // Initialize viewport utilities
-export function initializeViewport(threeCamera, targetConfig, modelConfig) {
+export function initializeViewport(threeCamera) {
     camera = threeCamera;
-    TARGET_CONFIG = targetConfig;
-    MODEL_CONFIG = modelConfig;
 }
 
 // Convert world space coordinates to actual world positions

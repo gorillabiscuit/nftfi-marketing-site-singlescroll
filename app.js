@@ -24,7 +24,7 @@ function init() {
     createBackgroundPlane(scene, uniforms);
     
     // Load GLTF model
-    loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, MODEL_CONFIG, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition, TARGET_CONFIG);
+    loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
     
     // Create window resize handler
     const onWindowResize = createWindowResizeHandler(onThreeJSResize, updatePlaneForViewport, updatePlaneTexture);
@@ -37,7 +37,7 @@ function init() {
     window.lastMousePos = { x: 0, y: 0 };
     
     // Initialize viewport utilities
-    initializeViewport(camera, TARGET_CONFIG, MODEL_CONFIG);
+    initializeViewport(camera);
     
     // Initialize controls after Three.js setup is complete
     initializeControls(camera, uniforms, updatePlane);
@@ -45,7 +45,7 @@ function init() {
     // Initialize animation loop when model is ready
     const checkModelReady = () => {
         if (isModelReady && mesh && wrapper) {
-            initializeAnimationLoop(mesh, wrapper, isModelReady, MODEL_CONFIG);
+            initializeAnimationLoop(mesh, wrapper, isModelReady);
         } else {
             setTimeout(checkModelReady, 100);
         }

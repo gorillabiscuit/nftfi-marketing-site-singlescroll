@@ -3,6 +3,7 @@
 
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MODEL_CONFIG, TARGET_CONFIG } from '../config.js';
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -17,9 +18,7 @@ let scrollSpinVelocity = 0;
 let lastScrollDirection = 0;
 let lastScrollTime = 0;
 
-// Configuration objects (will be passed from main.js)
-let MODEL_CONFIG;
-let TARGET_CONFIG;
+// Wrapper reference
 let wrapper;
 
 // Position calculation functions (will be passed from main.js)
@@ -27,11 +26,9 @@ let calculateStartPosition;
 let calculateTargetPosition;
 
 // Set up scroll-triggered animation
-export function setupScrollAnimation(wrapperInstance, modelConfig, targetConfig, startPositionFn, targetPositionFn) {
+export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPositionFn) {
     // Store references
     wrapper = wrapperInstance;
-    MODEL_CONFIG = modelConfig;
-    TARGET_CONFIG = targetConfig;
     calculateStartPosition = startPositionFn;
     calculateTargetPosition = targetPositionFn;
     
