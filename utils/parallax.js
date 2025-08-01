@@ -109,16 +109,8 @@ class ParallaxSystem {
             const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
             layer.element.style.transform = `${layer.originalTransform} ${parallaxTransform}`.trim();
             
-            // Special handling for buttons within the layer to preserve hover effects
-            const buttons = layer.element.querySelectorAll('.card');
-            buttons.forEach(button => {
-                // Preserve any existing button transforms (like hover effects)
-                const buttonTransform = button.style.transform || '';
-                if (buttonTransform && buttonTransform.includes('translateY')) {
-                    // Keep the hover effect and add parallax
-                    button.style.transform = `${buttonTransform} ${parallaxTransform}`.trim();
-                }
-            });
+            // Don't apply parallax transforms directly to buttons to preserve backdrop-filter
+            // The buttons will move with their parent container (hero-content)
         });
     }
     

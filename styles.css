@@ -985,6 +985,7 @@ body {
     border: none;
     filter: drop-shadow(-8px -10px 46px #0000005f);
     backdrop-filter: blur(2px) url(#displacementFilter);
+    -webkit-backdrop-filter: blur(2px) url(#displacementFilter);
     
     /* Positioning */
     position: relative;
