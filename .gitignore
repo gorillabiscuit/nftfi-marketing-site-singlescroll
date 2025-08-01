@@ -25,3 +25,4 @@ node_modules/
 # OS specific
 .DS_Store
 temp-original/
+temp-liquid-glass/
