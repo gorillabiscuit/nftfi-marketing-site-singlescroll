@@ -2,11 +2,12 @@
 // Three.js scene with glass shader and scroll/mouse interactions
 
 import * as THREE from 'three';
-import { GLTFLoader } from './libs/GLTFLoader.js';
 import { init as initThreeJS, onWindowResize as onThreeJSResize } from './core/init.js';
 import vertexShader from './shaders/glass.vert.js';
 import fragmentShader from './shaders/glass.frag.js';
 import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.js';
+import { createBackgroundPlane, captureHeroAsTexture, backgroundPlane, updatePlane, updatePlaneForViewport, updatePlaneTexture, showBackgroundPlane, hideBackgroundPlane, calculatePlanePosition } from './objects/backgroundPlane.js';
+import { initializeControls } from './controls/controlPanel.js';
 
 // Navigation functionality - Simple and effective
 function initializeNavigation() {
@@ -142,218 +143,18 @@ function initializeNavigation() {
     }
 }
 
-// Initialize controls
-function initializeControls() {
-    // Accordion functionality
-    initializeAccordion();
-    
-    // Light controls
-    document.getElementById('lightX').addEventListener('input', updateLight);
-    document.getElementById('lightY').addEventListener('input', updateLight);
-    document.getElementById('lightZ').addEventListener('input', updateLight);
-    
-    // Material controls
-    document.getElementById('diffuseness').addEventListener('input', updateMaterial);
-    document.getElementById('shininess').addEventListener('input', updateMaterial);
-    document.getElementById('fresnelPower').addEventListener('input', updateMaterial);
-    
-    // IOR controls
-    document.getElementById('iorR').addEventListener('input', updateIOR);
-    document.getElementById('iorY').addEventListener('input', updateIOR);
-    document.getElementById('iorG').addEventListener('input', updateIOR);
-    document.getElementById('iorC').addEventListener('input', updateIOR);
-    document.getElementById('iorB').addEventListener('input', updateIOR);
-    document.getElementById('iorP').addEventListener('input', updateIOR);
-    
-    // Effect controls
-    document.getElementById('saturation').addEventListener('input', updateEffects);
-    document.getElementById('chromaticAberration').addEventListener('input', updateEffects);
-    document.getElementById('refraction').addEventListener('input', updateEffects);
-    
-    // Plane controls
-    document.getElementById('planeX').addEventListener('input', updatePlane);
-    document.getElementById('planeY').addEventListener('input', updatePlane);
-    document.getElementById('planeZ').addEventListener('input', updatePlane);
-    document.getElementById('planeScale').addEventListener('input', updatePlane);
-    
-    // Camera controls
-    document.getElementById('cameraX').addEventListener('input', updateCamera);
-    document.getElementById('cameraY').addEventListener('input', updateCamera);
-    document.getElementById('cameraZ').addEventListener('input', updateCamera);
-    document.getElementById('cameraFOV').addEventListener('input', updateCamera);
-    
-    // Sync UI with actual camera position
-    if (camera) {
-        // Set slider values to match camera position
-        document.getElementById('cameraX').value = camera.position.x;
-        document.getElementById('cameraY').value = camera.position.y;
-        document.getElementById('cameraZ').value = camera.position.z;
-        document.getElementById('cameraFOV').value = camera.fov; // Direct FOV value
-        
-        // Update display values
-        updateCamera();
-    }
-}
-
-// Initialize accordion functionality
-function initializeAccordion() {
-    const headers = document.querySelectorAll('.accordion-header');
-    
-    headers.forEach(header => {
-        header.addEventListener('click', toggleAccordionSection);
-    });
-}
-
-// Toggle accordion section
-function toggleAccordionSection(event) {
-    const header = event.currentTarget;
-    const content = header.nextElementSibling;
-    const isExpanded = header.classList.contains('expanded');
-    
-    if (isExpanded) {
-        // Collapse
-        header.classList.remove('expanded');
-        content.classList.remove('expanded');
-    } else {
-        // Expand
-        header.classList.add('expanded');
-        content.classList.add('expanded');
-    }
-}
-
-function updateLight() {
-    const x = parseFloat(document.getElementById('lightX').value);
-    const y = parseFloat(document.getElementById('lightY').value);
-    const z = parseFloat(document.getElementById('lightZ').value);
-    
-    document.getElementById('lightXValue').textContent = x.toFixed(1);
-    document.getElementById('lightYValue').textContent = y.toFixed(1);
-    document.getElementById('lightZValue').textContent = z.toFixed(1);
-    
-    if (uniforms && uniforms.uLight) {
-        uniforms.uLight.value.set(x, y, z);
-    }
-}
-
-function updateMaterial() {
-    const diffuseness = parseFloat(document.getElementById('diffuseness').value);
-    const shininess = parseFloat(document.getElementById('shininess').value);
-    const fresnelPower = parseFloat(document.getElementById('fresnelPower').value);
-    
-    document.getElementById('diffusenessValue').textContent = diffuseness.toFixed(2);
-    document.getElementById('shininessValue').textContent = shininess.toFixed(1);
-    document.getElementById('fresnelPowerValue').textContent = fresnelPower.toFixed(1);
-    
-    if (uniforms) {
-        if (uniforms.uDiffuseness) uniforms.uDiffuseness.value = diffuseness;
-        if (uniforms.uShininess) uniforms.uShininess.value = shininess;
-        if (uniforms.uFresnelPower) uniforms.uFresnelPower.value = fresnelPower;
-    }
-}
-
-function updateIOR() {
-    const iorR = parseFloat(document.getElementById('iorR').value);
-    const iorY = parseFloat(document.getElementById('iorY').value);
-    const iorG = parseFloat(document.getElementById('iorG').value);
-    const iorC = parseFloat(document.getElementById('iorC').value);
-    const iorB = parseFloat(document.getElementById('iorB').value);
-    const iorP = parseFloat(document.getElementById('iorP').value);
-    
-    document.getElementById('iorRValue').textContent = iorR.toFixed(3);
-    document.getElementById('iorYValue').textContent = iorY.toFixed(3);
-    document.getElementById('iorGValue').textContent = iorG.toFixed(3);
-    document.getElementById('iorCValue').textContent = iorC.toFixed(3);
-    document.getElementById('iorBValue').textContent = iorB.toFixed(3);
-    document.getElementById('iorPValue').textContent = iorP.toFixed(3);
-    
-    if (uniforms) {
-        if (uniforms.uIorR) uniforms.uIorR.value = iorR;
-        if (uniforms.uIorY) uniforms.uIorY.value = iorY;
-        if (uniforms.uIorG) uniforms.uIorG.value = iorG;
-        if (uniforms.uIorC) uniforms.uIorC.value = iorC;
-        if (uniforms.uIorB) uniforms.uIorB.value = iorB;
-        if (uniforms.uIorP) uniforms.uIorP.value = iorP;
-    }
-}
-
-function updateEffects() {
-    const saturation = parseFloat(document.getElementById('saturation').value);
-    const chromaticAberration = parseFloat(document.getElementById('chromaticAberration').value);
-    const refraction = parseFloat(document.getElementById('refraction').value);
-    
-    document.getElementById('saturationValue').textContent = saturation.toFixed(2);
-    document.getElementById('chromaticAberrationValue').textContent = chromaticAberration.toFixed(2);
-    document.getElementById('refractionValue').textContent = refraction.toFixed(2);
-    
-    if (uniforms) {
-        if (uniforms.uSaturation) uniforms.uSaturation.value = saturation;
-        if (uniforms.uChromaticAberration) uniforms.uChromaticAberration.value = chromaticAberration;
-        if (uniforms.uRefractPower) uniforms.uRefractPower.value = refraction;
-    }
-}
-
-function updatePlane() {
-    const x = parseFloat(document.getElementById('planeX').value);
-    const y = parseFloat(document.getElementById('planeY').value);
-    const z = parseFloat(document.getElementById('planeZ').value);
-    const scale = parseFloat(document.getElementById('planeScale').value);
-    
-    document.getElementById('planeXValue').textContent = x.toFixed(1);
-    document.getElementById('planeYValue').textContent = y.toFixed(1);
-    document.getElementById('planeZValue').textContent = z.toFixed(1);
-    document.getElementById('planeScaleValue').textContent = scale.toFixed(1);
-    
-    // Update plane position and scale using direct reference
-    if (backgroundPlane) {
-        backgroundPlane.position.set(x, y, z);
-        backgroundPlane.scale.setScalar(scale);
-        
-        // Update plane geometry dimensions
-        const width = 20 * scale;
-        const height = width * (591 / 1325);
-        backgroundPlane.geometry.dispose();
-        backgroundPlane.geometry = new THREE.PlaneGeometry(width, height);
-    }
-}
-
-function updateCamera() {
-    const x = parseFloat(document.getElementById('cameraX').value);
-    const y = parseFloat(document.getElementById('cameraY').value);
-    const z = parseFloat(document.getElementById('cameraZ').value);
-    const fovSlider = parseFloat(document.getElementById('cameraFOV').value);
-    
-    document.getElementById('cameraXValue').textContent = x.toFixed(1);
-    document.getElementById('cameraYValue').textContent = y.toFixed(1);
-    document.getElementById('cameraZValue').textContent = z.toFixed(1);
-    document.getElementById('cameraFOVValue').textContent = fovSlider.toFixed(0);
-    
-    // Update camera position and FOV
-    if (camera) {
-        // Update position
-        camera.position.set(x, y, z);
-        
-        // FOV logic: slider value directly sets the FOV
-        camera.fov = fovSlider;
-        
-        // Force projection matrix update
-        camera.updateProjectionMatrix();
-        
-        // console.log('Camera updated:', {
-        //     position: camera.position,
-        //     fov: camera.fov,
-        //     sliderValue: fovSlider,
-        //     aspect: camera.aspect
-        // });
-    }
-}
+// Control initialization is now handled by the controlPanel.js module
 
 // Initialize controls when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Wait a bit for Three.js to initialize
     setTimeout(() => {
-        initializeControls();
+        // Initialize controls with camera and uniforms from the init function
+        if (camera && uniforms) {
+            initializeControls(camera, uniforms, updatePlane);
+        }
         // Set initial plane position to -8.9
-        updatePlane();
+        // Note: updatePlane is now handled by the control panel module
     }, 1000);
 });
 
@@ -368,7 +169,7 @@ gsap.registerPlugin(ScrollTrigger);
 let scene, camera, renderer, canvas;
 // Model variables imported from objects/logoModel.js
 let mainRenderTarget, backRenderTarget;
-let backgroundPlane; // Reference to background plane for render target control
+// backgroundPlane imported from objects/backgroundPlane.js
 let uniforms;
 let mouseInfluence = { x: 0, y: 0 };
 let lastMousePos = { x: 0, y: 0 };
@@ -434,178 +235,22 @@ function init() {
     // Get canvas reference
     canvas = document.getElementById('three-canvas');
     
-    // Create background geometry for refraction
-    createBackgroundGeometry();
+    // Create background plane for refraction
+    createBackgroundPlane(scene, uniforms, MODEL_CONFIG);
     
     // Load GLTF model
     loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, originalWrapperPosition, originalWrapperScale, MODEL_CONFIG, scrollSpinVelocity, updateScrollSpin, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition, TARGET_CONFIG);
     
     // Add event listeners
     addEventListeners();
+    
+    // Initialize controls after Three.js setup is complete
+    initializeControls(camera, uniforms, updatePlane);
 }
 
-// Capture hero div and create dynamic texture
-function captureHeroAsTexture() {
-    return new Promise((resolve, reject) => {
-        const heroElement = document.querySelector('.hero');
-        if (!heroElement) {
-            reject(new Error('Hero element not found'));
-            return;
-        }
-        
-        // Wait for any pending layout calculations
-        requestAnimationFrame(() => {
-            // Capture the hero div using html2canvas
-            html2canvas(heroElement, { 
-                backgroundColor: null, // Transparent background
-                scale: 2, // Higher resolution for better quality
-                useCORS: true, // Allow cross-origin images
-                allowTaint: true, // Allow tainted canvas
-                logging: false, // Disable logging for performance
-                width: heroElement.offsetWidth, // Use actual element width
-                height: heroElement.offsetHeight, // Use actual element height
-                scrollX: window.scrollX, // Account for scroll position
-                scrollY: window.scrollY
-            }).then(canvas => {
-                // Create Three.js texture from canvas
-                const texture = new THREE.CanvasTexture(canvas);
-                texture.needsUpdate = true;
-                
-                // console.log('Hero captured successfully:', {
-                //     canvasWidth: canvas.width,
-                //     canvasHeight: canvas.height,
-                //     elementWidth: heroElement.offsetWidth,
-                //     elementHeight: heroElement.offsetHeight,
-                //     texture: texture
-                // });
-                
-                // Mark texture as ready and trigger mesh scale animation
-                window.textureReady = true;
-                if (window.wrapper) {
-                    // Animate mesh scale from tiny to target scale
-                    gsap.to(window.wrapper.scale, {
-                        x: MODEL_CONFIG.startScale,
-                        y: MODEL_CONFIG.startScale,
-                        z: MODEL_CONFIG.startScale,
-                        duration: 1.5,
-                        ease: "power2.out",
-                        onUpdate: () => {
-                            // Ensure scale is applied
-                            window.wrapper.scale.needsUpdate = true;
-                        }
-                    });
-                }
-                
-                resolve(texture);
-                    }).catch(error => {
-            console.error('Error capturing hero:', error);
-            
-            // Even if texture fails, still scale up the mesh
-            window.textureReady = true;
-            if (window.wrapper) {
-                gsap.to(window.wrapper.scale, {
-                    x: MODEL_CONFIG.startScale,
-                    y: MODEL_CONFIG.startScale,
-                    z: MODEL_CONFIG.startScale,
-                    duration: 1.5,
-                    ease: "power2.out"
-                });
-            }
-            
-            reject(error);
-        });
-        });
-    });
-}
+// Hero capture logic moved to objects/backgroundPlane.js
 
-// Create background geometry for refraction effects
-function createBackgroundGeometry() {
-    const backgroundGroup = new THREE.Group();
-    backgroundGroup.visible = true; // Make visible to see all objects
-    
-    // Background group is now empty - removed the four white icosahedrons
-    scene.add(backgroundGroup);
-    
-    // Create plane geometry - exact GitHub dimensions
-    const planeScale = 1; // GitHub default
-    const width = 20 * planeScale; // 20 units
-    const height = width * (591 / 1325); // 8.92 units based on 1325:591 ratio
-    const planeGeometry = new THREE.PlaneGeometry(width, height);
-    
-    // Create material with dynamic texture (will be updated)
-    const planeMaterial = new THREE.MeshBasicMaterial({ 
-        transparent: true,
-        opacity: 0.8, // GitHub opacity
-        side: THREE.DoubleSide
-    });
-    
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.set(0, 0, -10); // Position behind camera for invisibility
-    
-    // NEW: Make plane invisible to camera but still available for shader sampling
-    plane.visible = false; // Invisible to camera
-    plane.renderOrder = -1; // Render first (before the main mesh)
-    
-    scene.add(plane); // Add directly to scene, not to background group
-    
-    // Store reference for potential future use
-    backgroundPlane = plane;
-    
-    // Capture hero and apply as texture with delay to ensure DOM is ready
-    setTimeout(() => {
-        captureHeroAsTexture().then(texture => {
-            plane.material.map = texture;
-            plane.material.needsUpdate = true;
-                            // console.log('Dynamic texture applied to plane');
-        }).catch(error => {
-            console.error('Failed to apply dynamic texture, using fallback:', error);
-            // Fallback to static texture if capture fails
-            const textureLoader = new THREE.TextureLoader();
-            const headerTexture = textureLoader.load('/images/header.png');
-            plane.material.map = headerTexture;
-            plane.material.needsUpdate = true;
-        });
-    }, 100); // Small delay to ensure DOM is fully rendered
-    
-    // Safety timeout to ensure mesh scales up even if html2canvas takes too long
-    setTimeout(() => {
-        if (!window.textureReady && window.wrapper) {
-            window.textureReady = true;
-            gsap.to(window.wrapper.scale, {
-                x: MODEL_CONFIG.startScale,
-                y: MODEL_CONFIG.startScale,
-                z: MODEL_CONFIG.startScale,
-                duration: 1.5,
-                ease: "power2.out"
-            });
-        }
-    }, 3000); // 3 second safety timeout
-    
-    // Add white sphere at the same position as the plane
-    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-    const sphereMaterial = new THREE.MeshBasicMaterial({ 
-        color: 0xffffff, 
-        transparent: true,
-        opacity: 1
-    });
-    
-    const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    whiteSphere.position.set(-11.15, 5.35, -7); // Same position as plane
-    whiteSphere.scale.setScalar(1.25); // Make it visiblepro
-    
-    // Make sphere invisible to camera but available for shader sampling (like plane)
-    whiteSphere.visible = false; // Visible for positioning reference
-    whiteSphere.renderOrder = -2; // Render before plane
-    
-    scene.add(whiteSphere);
-    
-    // Store reference to sphere for potential future use
-    if (!window.DEBUG) {
-        window.DEBUG = {};
-    }
-    window.DEBUG.whiteSphere = whiteSphere;
-    // console.log('Sphere added to DEBUG object:', whiteSphere);
-}
+// Background plane logic moved to objects/backgroundPlane.js
 
 // Load GLTF model
 // Model loading logic moved to objects/logoModel.js
@@ -640,81 +285,7 @@ function addEventListeners() {
 }
 
 // Calculate optimal plane position based on viewport
-function calculatePlanePosition() {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    // X offset constant for easy tweaking
-    const X_OFFSET = -4; // Adjust this value to move plane left/right
-    
-    // Calculate the center of the viewport in normalized coordinates (-1 to 1)
-    const centerX = 0; // Center of viewport
-    const centerY = 0; // Center of viewport
-    
-    // Convert viewport center to world coordinates
-    // The plane should be positioned to match the visible content area
-    let worldX = centerX * 10; // Scale factor for world coordinates
-    let worldY = centerY * 10;
-    const worldZ = -5; // Keep behind the camera
-    
-    // Apply X offset
-    worldX += X_OFFSET;
-    
-    // Adjust based on viewport aspect ratio
-    const aspectRatio = viewportWidth / viewportHeight;
-    if (aspectRatio > 1) {
-        // Wide screen - adjust X position
-        worldX += (aspectRatio - 1) * 5; // Move plane right for wide screens
-    } else {
-        // Tall screen - adjust Y position
-        worldY += (1 - aspectRatio) * 5; // Move plane up for tall screens
-    }
-    
-    return { x: worldX, y: worldY, z: worldZ };
-}
-
-// Update plane position based on viewport
-function updatePlaneForViewport() {
-    if (backgroundPlane) {
-        const position = calculatePlanePosition();
-        backgroundPlane.position.set(position.x, position.y, position.z);
-        
-        // Update the UI controls to reflect the new position
-        if (document.getElementById('planeX')) {
-            document.getElementById('planeX').value = position.x;
-            document.getElementById('planeXValue').textContent = position.x.toFixed(1);
-        }
-        if (document.getElementById('planeY')) {
-            document.getElementById('planeY').value = position.y;
-            document.getElementById('planeYValue').textContent = position.y.toFixed(1);
-        }
-        if (document.getElementById('planeZ')) {
-            document.getElementById('planeZ').value = position.z;
-            document.getElementById('planeZValue').textContent = position.z.toFixed(1);
-        }
-        
-        // console.log('Plane position updated for viewport:', position);
-    }
-}
-
 // Update plane texture with fresh hero capture
-function updatePlaneTexture() {
-    if (backgroundPlane) {
-        captureHeroAsTexture().then(texture => {
-            // Dispose old texture to prevent memory leaks
-            if (backgroundPlane.material.map) {
-                backgroundPlane.material.map.dispose();
-            }
-            
-            backgroundPlane.material.map = texture;
-            backgroundPlane.material.needsUpdate = true;
-            // console.log('Plane texture updated with fresh hero capture');
-        }).catch(error => {
-            console.error('Failed to update plane texture:', error);
-        });
-    }
-}
-
 // Convert world space coordinates to actual world positions
 function worldToPosition(worldX, worldY) {
     // Convert from -1 to 1 range to actual world coordinates
@@ -764,7 +335,7 @@ let textureUpdateTimeout;
 function debouncedTextureUpdate() {
     clearTimeout(textureUpdateTimeout);
     textureUpdateTimeout = setTimeout(() => {
-        updatePlaneTexture();
+        updatePlaneTexture(MODEL_CONFIG);
     }, 250); // Wait 250ms after resize stops
 }
 
@@ -828,9 +399,7 @@ function onWindowResize() {
     if (mesh) {
         
         // Temporarily make background plane and sphere visible for render target sampling
-        if (backgroundPlane) {
-            backgroundPlane.visible = true;
-        }
+        showBackgroundPlane();
         
         // Find sphere in scene for render target sampling
         let whiteSphere = null;
@@ -867,9 +436,7 @@ function onWindowResize() {
         mesh.material.side = THREE.FrontSide;
         
         // Hide background plane and sphere again for final render
-        if (backgroundPlane) {
-            backgroundPlane.visible = false;
-        }
+        hideBackgroundPlane();
         
         // Hide sphere for final render
         if (whiteSphere) {

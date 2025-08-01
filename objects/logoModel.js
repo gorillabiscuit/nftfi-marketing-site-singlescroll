@@ -127,7 +127,7 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
             scrollSpinVelocity: () => scrollSpinVelocity,
             updateScrollSpin: (direction) => updateScrollSpin(direction),
             // Texture debugging
-            updatePlaneTexture,
+            updatePlaneTexture: () => updatePlaneTexture(MODEL_CONFIG),
             captureHeroAsTexture,
             // World space positioning debugging
             worldToPosition,
