@@ -79,7 +79,8 @@ class ParallaxSystem {
             currentX: 0,
             currentY: 0,
             targetX: 0,
-            targetY: 0
+            targetY: 0,
+            originalTransform: element.style.transform || ''
         });
     }
     
@@ -99,8 +100,14 @@ class ParallaxSystem {
             layer.currentX = this.lerp(layer.currentX, targetX, 0.1);
             layer.currentY = this.lerp(layer.currentY, targetY, 0.1);
             
-            // Apply transform with hardware acceleration
-            layer.element.style.transform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
+            // Store original transform if not already stored
+            if (!layer.originalTransform) {
+                layer.originalTransform = layer.element.style.transform || '';
+            }
+            
+            // Combine original transform with parallax transform
+            const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
+            layer.element.style.transform = `${layer.originalTransform} ${parallaxTransform}`.trim();
         });
     }
     
