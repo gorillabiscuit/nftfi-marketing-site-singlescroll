@@ -11,6 +11,7 @@ import { setupScrollAnimation, resetScrollAnimation } from './controls/scrollTri
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
 import { createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
 import { TARGET_CONFIG, MODEL_CONFIG } from './config.js';
+import ParallaxSystem from './utils/parallax.js';
 
 // Main initialization function
 function init() {
@@ -38,6 +39,21 @@ function init() {
     
     // Initialize viewport utilities
     initializeViewport(camera);
+    
+    // Initialize parallax system
+    const parallaxSystem = new ParallaxSystem();
+    
+    // Register parallax layers
+    const gradientsBg = document.querySelector('.gradients-bg');
+    const heroSection = document.querySelector('.hero');
+    const heroContent = document.querySelector('.hero-content');
+    
+    if (gradientsBg) parallaxSystem.registerLayer('background', gradientsBg);
+    if (heroSection) parallaxSystem.registerLayer('hero', heroSection);
+    if (heroContent) parallaxSystem.registerLayer('text', heroContent);
+    
+    // Store parallax system globally for cleanup if needed
+    window.parallaxSystem = parallaxSystem;
     
     // Initialize controls after Three.js setup is complete
     initializeControls(camera, uniforms, updatePlane);

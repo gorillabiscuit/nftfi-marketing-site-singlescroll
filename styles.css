@@ -20,6 +20,9 @@ body {
     height: 100vh;
     z-index: -1;
     overflow: hidden;
+    /* Hardware acceleration for parallax */
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
 }
 
 .gradients-bg::before {
@@ -574,6 +577,9 @@ body {
     /* Create new stacking context for backdrop-filter to work properly */
     isolation: isolate;
     box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
+    /* Hardware acceleration for parallax */
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
 }
 
 /* SVG Background - Top Right Copy */
@@ -628,6 +634,9 @@ body {
     margin: 0; /* Remove auto margin to align left */
     /* Ensure content is below glass card for proper distortion */
     z-index: 1;
+    /* Hardware acceleration for parallax */
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
 }
 
 .hero-text {
@@ -1028,4 +1037,28 @@ body {
     width: 0;
     height: 0;
     overflow: hidden;
+}
+
+/* Subtle CSS-only parallax for mobile devices */
+@media (hover: none) and (pointer: coarse) {
+    .gradients-bg {
+        animation: subtle-float 20s ease-in-out infinite;
+    }
+    
+    .hero {
+        animation: subtle-float 15s ease-in-out infinite reverse;
+    }
+    
+    .hero-content {
+        animation: subtle-float 10s ease-in-out infinite;
+    }
+    
+    @keyframes subtle-float {
+        0%, 100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(2px, 2px, 0);
+        }
+    }
 }
