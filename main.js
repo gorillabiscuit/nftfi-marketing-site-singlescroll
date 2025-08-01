@@ -604,11 +604,11 @@ function init() {
         uIorB: { value: 1.22 },
         uIorP: { value: 1.22 },
         uSaturation: { value: 1.01 },
-        uChromaticAberration: { value: 0.06 },
-        uRefractPower: { value: 0.13 },
-        uFresnelPower: { value: 9.0 },
-        uShininess: { value: 25.0 },
-        uDiffuseness: { value: 0.2 },
+        uChromaticAberration: { value: 0.28 },
+        uRefractPower: { value: 0.5 },
+        uFresnelPower: { value: 12.7 },
+        uShininess: { value: 28.2 },
+        uDiffuseness: { value: 0.07 },
         uLight: { value: new THREE.Vector3(-1.3, 1.5, -0.6) },
         winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2)) },
         uTexture: { value: null }
@@ -756,7 +756,7 @@ function createBackgroundGeometry() {
     
     const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     whiteSphere.position.set(-11.15, 5.35, -7); // Same position as plane
-    whiteSphere.scale.setScalar(.3); // Make it visible
+    whiteSphere.scale.setScalar(1); // Make it visible
     
     // Make sphere invisible to camera but available for shader sampling (like plane)
     whiteSphere.visible = true; // Visible for positioning reference
