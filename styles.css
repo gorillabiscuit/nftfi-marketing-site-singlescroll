@@ -92,9 +92,7 @@ body {
 }
 
 .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
+    position: fixed; /* Changed to fixed for Floating UI */
     background: rgba(39, 30, 35, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -106,6 +104,7 @@ body {
     transform: translateY(-8px);
     transition: all 0.2s ease;
     z-index: 1001;
+    /* Floating UI will handle positioning */
 }
 
 .dropdown-menu.open {
@@ -161,11 +160,25 @@ body {
     
     .dropdown-menu {
         min-width: 140px;
+        /* Mobile-specific improvements */
+        max-width: calc(100vw - 20px); /* Prevent overflow */
+        border-radius: 12px; /* Larger touch targets */
     }
     
     .dropdown-item {
         font-size: 13px;
-        padding: 6px 12px;
+        padding: 8px 16px; /* Larger touch targets */
+        min-height: 44px; /* iOS touch target minimum */
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Better touch interaction */
+    .dropdown-trigger {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 

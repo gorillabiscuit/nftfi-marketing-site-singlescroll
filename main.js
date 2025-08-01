@@ -3,44 +3,79 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from './libs/GLTFLoader.js';
+import { computePosition, flip, offset, shift, size } from '@floating-ui/dom';
 
-
-// Navigation functionality
+// Navigation functionality with Floating UI
 function initializeNavigation() {
-    
     const dropdowns = document.querySelectorAll('.dropdown-container');
-    // console.log('📋 Found dropdowns:', dropdowns.length);
     
-    dropdowns.forEach((dropdown, index) => {
+    dropdowns.forEach((dropdown) => {
         const trigger = dropdown.querySelector('.dropdown-trigger');
         const menu = dropdown.querySelector('.dropdown-menu');
         
-        // console.log(`📦 Dropdown ${index + 1}:`, {
-        //     trigger: trigger ? 'Found' : 'Missing',
-        //     menu: menu ? 'Found' : 'Missing',
-        //     triggerText: trigger ? trigger.textContent.trim() : 'N/A',
-        //     triggerVisible: trigger ? trigger.offsetParent !== null : false,
-        //     menuVisible: menu ? menu.offsetParent !== null : false,
-        //     menuDisplay: menu ? getComputedStyle(menu).display : 'N/A',
-        //     menuVisibility: menu ? getComputedStyle(menu).visibility : 'N/A'
-        // });
-        
         if (!trigger || !menu) {
-            console.error('❌ Missing trigger or menu element');
+            console.error('Missing trigger or menu element');
             return;
+        }
+        
+        let cleanup = null;
+        
+        function updatePosition() {
+            if (cleanup) cleanup();
+            
+            const { x, y, strategy } = computePosition(trigger, menu, {
+                placement: 'bottom-start',
+                middleware: [
+                    offset(4), // 4px gap
+                    flip(), // Flip to top if no space below
+                    shift(), // Shift if no space on sides
+                    size({
+                        apply({ availableHeight, availableWidth, elements }) {
+                            // Ensure menu doesn't exceed viewport
+                            Object.assign(elements.floating.style, {
+                                maxHeight: `${availableHeight}px`,
+                                maxWidth: `${availableWidth}px`,
+                            });
+                        },
+                    }),
+                ],
+            });
+            
+            Object.assign(menu.style, {
+                position: strategy,
+                left: `${x}px`,
+                top: `${y}px`,
+            });
+        }
+        
+        function show() {
+            menu.classList.add('open');
+            trigger.classList.add('open');
+            updatePosition();
+            
+            // Add event listeners for cleanup
+            cleanup = () => {
+                menu.classList.remove('open');
+                trigger.classList.remove('open');
+            };
+        }
+        
+        function hide() {
+            if (cleanup) {
+                cleanup();
+                cleanup = null;
+            }
         }
         
         // Toggle dropdown on click
         trigger.addEventListener('click', (e) => {
-            // console.log('🖱️ Dropdown clicked:', trigger.textContent.trim());
             e.preventDefault();
             e.stopPropagation();
             
             const isOpen = menu.classList.contains('open');
-            // console.log('📊 Current state:', isOpen ? 'Open' : 'Closed');
             
             // Close all other dropdowns
-            document.querySelectorAll('.dropdown-menu').forEach(otherMenu => {
+            document.querySelectorAll('.dropdown-menu.open').forEach(otherMenu => {
                 if (otherMenu !== menu) {
                     otherMenu.classList.remove('open');
                     const otherTrigger = otherMenu.parentElement.querySelector('.dropdown-trigger');
@@ -50,99 +85,34 @@ function initializeNavigation() {
                 }
             });
             
-            // Toggle current dropdown
             if (isOpen) {
-                // console.log('🔽 Closing dropdown');
-                menu.classList.remove('open');
-                trigger.classList.remove('open');
-                // console.log('📊 Classes after close:', {
-                //     menuClasses: menu.className,
-                //     triggerClasses: trigger.className,
-                //     menuVisible: menu.style.visibility,
-                //     menuOpacity: menu.style.opacity
-                // });
+                hide();
             } else {
-                // console.log('🔼 Opening dropdown');
-                menu.classList.add('open');
-                trigger.classList.add('open');
-                updateDropdownPosition(trigger, menu);
-                // console.log('📊 Classes after open:', {
-                //     menuClasses: menu.className,
-                //     triggerClasses: trigger.className,
-                //     menuVisible: menu.style.visibility,
-                //     menuOpacity: menu.style.opacity
-                // });
+                show();
             }
         });
         
-        // console.log('✅ Event listener attached to dropdown', index + 1);
-    });
-    
-    // Close dropdowns on outside click
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.dropdown-container')) {
-            const openMenus = document.querySelectorAll('.dropdown-menu.open');
-            if (openMenus.length > 0) {
-                // console.log('🔄 Closing dropdowns (outside click)');
-                openMenus.forEach(menu => {
-                    menu.classList.remove('open');
-                    const trigger = menu.parentElement.querySelector('.dropdown-trigger');
-                    if (trigger) {
-                        trigger.classList.remove('open');
-                    }
-                });
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown-container')) {
+                hide();
             }
-        }
-    });
-    
-    // Close dropdowns on escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const openMenus = document.querySelectorAll('.dropdown-menu.open');
-            if (openMenus.length > 0) {
-                // console.log('🔽 Closing dropdowns (escape key)');
-                openMenus.forEach(menu => {
-                    menu.classList.remove('open');
-                    const trigger = menu.parentElement.querySelector('.dropdown-trigger');
-                    if (trigger) {
-                        trigger.classList.remove('open');
-                    }
-                });
+        });
+        
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hide();
             }
-        }
-    });
-    
-    // Update dropdown positions on window resize
-    window.addEventListener('resize', () => {
-        document.querySelectorAll('.dropdown-menu.open').forEach(menu => {
-            const trigger = menu.parentElement.querySelector('.dropdown-trigger');
-            if (trigger) {
-                updateDropdownPosition(trigger, menu);
+        });
+        
+        // Update position on window resize
+        window.addEventListener('resize', () => {
+            if (menu.classList.contains('open')) {
+                updatePosition();
             }
         });
     });
-    
-    // console.log('✅ Navigation initialization complete');
-}
-
-// Update dropdown position (improved positioning)
-function updateDropdownPosition(trigger, menu) {
-    // console.log('📍 Updating dropdown position');
-    
-    // Get the trigger's position relative to its parent
-    const triggerRect = trigger.getBoundingClientRect();
-    const parentRect = trigger.parentElement.getBoundingClientRect();
-    
-    // Position the dropdown below the trigger
-    menu.style.left = '0';
-    menu.style.top = '100%';
-    
-    // console.log('📍 Position set:', {
-    //     left: menu.style.left,
-    //     top: menu.style.top,
-    //     triggerWidth: triggerRect.width,
-    //     menuWidth: menu.offsetWidth
-    // });
 }
 
 // Initialize controls
@@ -800,10 +770,10 @@ function createBackgroundGeometry() {
     
     const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     whiteSphere.position.set(-11.15, 5.35, -7); // Same position as plane
-    whiteSphere.scale.setScalar(1); // Make it visible
+    whiteSphere.scale.setScalar(1.25); // Make it visiblepro
     
     // Make sphere invisible to camera but available for shader sampling (like plane)
-    whiteSphere.visible = true; // Visible for positioning reference
+    whiteSphere.visible = false; // Visible for positioning reference
     whiteSphere.renderOrder = -2; // Render before plane
     
     scene.add(whiteSphere);
