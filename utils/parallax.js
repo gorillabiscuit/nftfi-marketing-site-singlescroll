@@ -14,7 +14,8 @@ class ParallaxSystem {
         this.layerSpeeds = {
             background: 0.1,  // Subtle background movement
             hero: 0.3,        // Medium hero movement
-            text: 0.5         // Most responsive text/buttons
+            text: 0.5,        // Responsive text
+            buttons: 0.6      // Most responsive buttons
         };
         
         this.init();
@@ -100,14 +101,19 @@ class ParallaxSystem {
             layer.currentX = this.lerp(layer.currentX, targetX, 0.1);
             layer.currentY = this.lerp(layer.currentY, targetY, 0.1);
             
-            // Store original transform if not already stored
-            if (!layer.originalTransform) {
-                layer.originalTransform = layer.element.style.transform || '';
+            // Get current computed style to preserve any dynamic transforms (like hover effects)
+            const computedStyle = window.getComputedStyle(layer.element);
+            const currentTransform = computedStyle.transform;
+            
+            // If the transform is the identity matrix, use original transform
+            let baseTransform = layer.originalTransform;
+            if (currentTransform && currentTransform !== 'none' && currentTransform !== 'matrix(1, 0, 0, 1, 0, 0)') {
+                baseTransform = currentTransform;
             }
             
-            // Combine original transform with parallax transform
+            // Combine base transform with parallax transform
             const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
-            layer.element.style.transform = `${layer.originalTransform} ${parallaxTransform}`.trim();
+            layer.element.style.transform = `${baseTransform} ${parallaxTransform}`.trim();
         });
     }
     

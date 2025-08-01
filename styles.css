@@ -685,6 +685,9 @@ body {
     flex: none;
     order: 1;
     flex-grow: 0;
+    /* Hardware acceleration for parallax */
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
 }
 
 

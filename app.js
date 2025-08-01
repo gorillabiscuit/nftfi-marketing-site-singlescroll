@@ -43,14 +43,16 @@ function init() {
     // Initialize parallax system
     const parallaxSystem = new ParallaxSystem();
     
-    // Register parallax layers (exclude Three.js container and buttons)
+    // Register parallax layers (include buttons with proper transform handling)
     const gradientsBg = document.querySelector('.gradients-bg');
     const heroSection = document.querySelector('.hero');
-    const heroText = document.querySelector('.hero-text'); // Only the text, not the buttons
+    const heroText = document.querySelector('.hero-text');
+    const heroActions = document.querySelector('.hero-actions'); // Include buttons
     
     if (gradientsBg) parallaxSystem.registerLayer('background', gradientsBg);
     if (heroSection) parallaxSystem.registerLayer('hero', heroSection);
     if (heroText) parallaxSystem.registerLayer('text', heroText);
+    if (heroActions) parallaxSystem.registerLayer('buttons', heroActions);
     
     // Store parallax system globally for cleanup if needed
     window.parallaxSystem = parallaxSystem;
