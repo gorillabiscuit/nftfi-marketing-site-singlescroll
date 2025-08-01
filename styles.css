@@ -106,6 +106,7 @@ body {
     transform: translateY(-8px);
     transition: all 0.2s ease;
     z-index: 1001;
+    pointer-events: auto; /* Ensure dropdown menu is interactive */
 }
 
 .dropdown-menu.open {
@@ -512,6 +513,18 @@ body {
     /* Width will be set by JavaScript to match title width */
 }
 
+/* Glass Distortion Effect Variables */
+:root {
+    --glass-shadow-offset: 0;
+    --glass-shadow-blur: 20px;
+    --glass-shadow-spread: -5px;
+    --glass-shadow-color: rgba(255, 255, 255, 0.7);
+    --glass-tint-color: 255, 255, 255;
+    --glass-tint-opacity: 0.4;
+    --glass-frost-blur: 2px;
+    --glass-outer-shadow-blur: 24px;
+}
+
 .action-btn {
     display: flex;
     flex-direction: row;
@@ -539,10 +552,98 @@ body {
     order: 0;
     flex-grow: 0;
     transition: all 0.2s ease;
+    
+    /* Glass Effect Properties */
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    filter: drop-shadow(-8px -10px 46px #0000005f);
+    backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
+    -webkit-backdrop-filter: brightness(1.1) blur(2px);
+    will-change: transform, backdrop-filter;
+    transform: translateZ(0);
+    z-index: 1;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 500px;
+    -webkit-box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7), 
+                        inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+    box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.7), 
+                inset 0 0 8px 1px rgba(255, 255, 255, 0.7);
+    background-color: rgba(var(--glass-tint-color), var(--glass-tint-opacity));
+    pointer-events: none;
+}
+
+.action-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: 500px;
+    backdrop-filter: blur(var(--glass-frost-blur));
+    -webkit-backdrop-filter: blur(var(--glass-frost-blur));
+    filter: url(#displacementFilter);
+    -webkit-filter: url(#displacementFilter);
+    isolation: isolate;
+    pointer-events: none;
 }
 
 .action-btn:hover {
     background: rgba(226, 220, 218, 0.2);
+    transform: translateZ(0) scale(1.02);
+    filter: drop-shadow(-8px -10px 46px #0000005f) brightness(1.05);
+}
+
+.action-btn:active {
+    transform: translateZ(0) scale(0.98);
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(2px)) {
+    .action-btn {
+        background: rgba(226, 220, 218, 0.15);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+    
+    .action-btn::before {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .action-btn::after {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        filter: none;
+        -webkit-filter: none;
+    }
+}
+
+/* Performance optimizations for mobile devices */
+@media (max-width: 768px) {
+    .action-btn {
+        backdrop-filter: brightness(1.05) blur(1px);
+        -webkit-backdrop-filter: brightness(1.05) blur(1px);
+        filter: drop-shadow(-4px -5px 23px #0000005f);
+    }
+    
+    .action-btn::after {
+        backdrop-filter: blur(1px);
+        -webkit-backdrop-filter: blur(1px);
+    }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .action-btn {
+        transform: translateZ(0) scale(0.999);
+    }
 }
 
 /* Content Sections */
@@ -745,6 +846,33 @@ body {
     opacity: 0.8;
 }
 
+.glass {
+    position: relative;
+    background: rgba(255, 255, 255, 0.15); /* subtle transparency */
+    backdrop-filter: blur(2px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 2rem;
+    box-shadow:
+      0 8px 32px rgba(31, 38, 135, 0.2),
+      inset 0 4px 20px rgba(255, 255, 255, 0.3);
+  }
+  
+  .glass::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2rem;
+    backdrop-filter: blur(1px);
+    box-shadow:
+      inset -10px -8px 0px -11px rgba(255,255,255,1),
+      inset 0px -9px 0px -8px rgba(255,255,255,1);
+    opacity: 0.6;
+    z-index: -1;
+    filter: blur(1px) drop-shadow(10px 4px 6px black) brightness(115%);
+  }
+  
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .controls-panel {
@@ -772,51 +900,4 @@ body {
     .control-row label {
         min-width: auto;
     }
-}
-
-/* Liquid Glass Effect - Based on GitHub Repository */
-.liquid-glass {
-  position: relative;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 28px;
-  backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
-  -webkit-backdrop-filter: brightness(1.1) blur(2px);
-  filter: drop-shadow(-8px -10px 46px #0000005f);
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.liquid-glass::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  border-radius: 28px;
-  box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.7), 
-              inset 0 0 8px 1px rgba(255, 255, 255, 0.7);
-}
-
-.liquid-glass:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.7);
-  transform: translateY(-2px);
-  filter: drop-shadow(-12px -15px 60px #0000007f);
-}
-
-.liquid-glass:hover::before {
-  box-shadow: inset 8px 8px 0px -8px rgba(255, 255, 255, 0.8), 
-              inset 0 0 12px 2px rgba(255, 255, 255, 0.8);
-}
-
-/* Ensure button content is above the glass effect */
-.action-btn.liquid-glass {
-  position: relative;
-  z-index: 1;
-}
-
-.action-btn.liquid-glass > * {
-  position: relative;
-  z-index: 2;
 } 
