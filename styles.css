@@ -5,6 +5,37 @@
     box-sizing: border-box;
 }
 
+/* Responsive Design System */
+:root {
+    /* Breakpoints */
+    --mobile: 480px;
+    --tablet: 768px;
+    --desktop: 1024px;
+    --large: 1200px;
+    
+    /* Spacing */
+    --spacing-xs: clamp(8px, 2vw, 12px);
+    --spacing-sm: clamp(16px, 3vw, 24px);
+    --spacing-md: clamp(24px, 4vw, 48px);
+    --spacing-lg: clamp(32px, 6vw, 64px);
+    --spacing-xl: clamp(48px, 8vw, 97px);
+    
+    /* Typography */
+    --font-size-xs: clamp(12px, 1.5vw, 14px);
+    --font-size-sm: clamp(14px, 2vw, 16px);
+    --font-size-base: clamp(16px, 2.5vw, 18px);
+    --font-size-lg: clamp(18px, 3vw, 24px);
+    --font-size-xl: clamp(24px, 4vw, 32px);
+    --font-size-2xl: clamp(32px, 6vw, 48px);
+    --font-size-3xl: clamp(48px, 8vw, 64px);
+    
+    /* Layout */
+    --container-padding: clamp(16px, 4vw, 32px);
+    --hero-padding: clamp(40px, 8vw, 97px);
+    --logo-size: clamp(60px, 12vw, 102px);
+    --logo-height: clamp(15px, 3vw, 26px);
+}
+
 body {
     overflow-x: hidden;
     background-color: #271E23;
@@ -199,15 +230,15 @@ body {
 /* Logo */
 #logo {
     position: fixed;
-    top: 50px;
-    left: 49px;
+    top: var(--spacing-lg);
+    left: var(--container-padding);
     z-index: 200; /* Higher z-index to be above canvas */
     pointer-events: auto; /* Make logo clickable if needed */
 }
 
 #logo svg {
-    width: 102px;
-    height: 26px;
+    width: var(--logo-size);
+    height: var(--logo-height);
     display: block;
 }
 
@@ -349,6 +380,9 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 200; /* Ensure it's above the canvas */
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--container-padding);
 }
 
 .hamburger-line {
@@ -563,11 +597,11 @@ body {
     border-radius: 27px;
     border: 1px solid rgba(217, 213, 214, 0.25);
     background: linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
-    padding: 97px;
-    margin-left: 49px; /* Align with logo left edge */
-    margin-right: 49px; /* Equal spacing on the right */
-    margin-bottom: 49px; /* Match left and right margins */
-    max-width: calc(100vw - 98px); /* Full width minus left and right margins */
+    padding: var(--hero-padding);
+    margin-left: var(--container-padding);
+    margin-right: var(--container-padding);
+    margin-bottom: var(--spacing-lg);
+    max-width: calc(100vw - (var(--container-padding) * 2));
     position: relative;
     z-index: 4;
     overflow: hidden; /* Clip the SVG backgrounds */
@@ -640,8 +674,8 @@ body {
     font-family: 'Satoshi Variable';
     font-style: normal;
     font-weight: 400;
-    font-size: 48px;
-    line-height: 70px;
+    font-size: var(--font-size-3xl);
+    line-height: 1.2;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.8);
     margin: 0;
@@ -656,8 +690,8 @@ body {
     font-family: 'Satoshi Variable';
     font-style: normal;
     font-weight: 400;
-    font-size: 24px;
-    line-height: 32px;
+    font-size: var(--font-size-lg);
+    line-height: 1.3;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.5);
     margin: 0;
@@ -1028,4 +1062,152 @@ body {
     width: 0;
     height: 0;
     overflow: hidden;
+}
+
+/* Comprehensive Mobile Responsive Design */
+@media (max-width: 768px) {
+    /* Mobile Navigation */
+    .nav-items-desktop {
+        display: none;
+    }
+    
+    .nav-items-mobile {
+        display: block;
+    }
+    
+    .custom-navbar {
+        width: 100%;
+        left: 0;
+        transform: none;
+        padding: 0 var(--container-padding);
+    }
+    
+    .nav-container {
+        justify-content: space-between;
+        gap: 0;
+    }
+    
+    /* Mobile Typography */
+    .hero h1 {
+        font-size: var(--font-size-2xl);
+        line-height: 1.1;
+    }
+    
+    .hero .subtitle {
+        font-size: var(--font-size-base);
+        line-height: 1.4;
+    }
+    
+    /* Mobile Layout */
+    .hero {
+        padding: var(--spacing-lg);
+        margin-left: var(--spacing-sm);
+        margin-right: var(--spacing-sm);
+        border-radius: 20px;
+    }
+    
+    .hero-text {
+        padding-bottom: var(--spacing-lg);
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: stretch;
+    }
+    
+    /* Mobile Buttons */
+    .card {
+        min-width: 100%;
+        height: 48px;
+        padding: 12px 24px;
+        font-size: var(--font-size-sm);
+    }
+    
+    /* Mobile Controls Panel */
+    .controls-panel {
+        left: var(--spacing-sm);
+        right: var(--spacing-sm);
+        max-width: none;
+        width: calc(100vw - (var(--spacing-sm) * 2));
+        max-height: 60vh;
+    }
+    
+    /* Mobile Content */
+    .content {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .control-row {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+    
+    .control-row label {
+        min-width: auto;
+        text-align: left;
+    }
+    
+    /* Mobile Gradient Optimization */
+    .gradients-bg::before,
+    .gradients-bg::after,
+    .gradient-layer-3,
+    .gradient-layer-4,
+    .gradient-layer-5 {
+        filter: blur(20px); /* Reduce blur for mobile performance */
+    }
+}
+
+/* Tablet Responsive Design */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .hero {
+        padding: var(--spacing-xl);
+    }
+    
+    .hero h1 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .hero .subtitle {
+        font-size: var(--font-size-lg);
+    }
+    
+    .card {
+        min-width: 140px;
+        height: 50px;
+    }
+}
+
+/* Large Screen Optimization */
+@media (min-width: 1025px) {
+    .hero {
+        padding: var(--spacing-xl);
+    }
+    
+    .hero h1 {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .hero .subtitle {
+        font-size: var(--font-size-xl);
+    }
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .gradients-bg::before,
+    .gradients-bg::after,
+    .gradient-layer-3,
+    .gradient-layer-4,
+    .gradient-layer-5 {
+        animation: none;
+    }
+    
+    .card:hover {
+        transform: none;
+    }
+    
+    .card:active {
+        transform: none;
+    }
 }
