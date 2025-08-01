@@ -34,7 +34,7 @@ body {
     position: fixed;
     top: 50px;
     left: 49px;
-    z-index: 50; /* Lower z-index to be behind canvas */
+    z-index: 200; /* Higher z-index to be above canvas */
     pointer-events: auto; /* Make logo clickable if needed */
 }
 
@@ -51,7 +51,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 851px;
-    z-index: 50; /* Lower z-index to be behind canvas */
+    z-index: 200; /* Higher z-index to be above canvas */
     pointer-events: auto; /* Ensure navigation is clickable */
 }
 
@@ -178,6 +178,7 @@ body {
     gap: 4px;
     align-items: center;
     justify-content: center;
+    z-index: 200; /* Ensure it's above the canvas */
 }
 
 .hamburger-line {
