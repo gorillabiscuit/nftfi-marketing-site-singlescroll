@@ -46,13 +46,11 @@ function init() {
     // Register parallax layers
     const gradientsBg = document.querySelector('.gradients-bg');
     const heroSection = document.querySelector('.hero');
-    const heroText = document.querySelector('.hero-text');
-    const heroActions = document.querySelector('.hero-actions'); // Include buttons
+    const heroContent = document.querySelector('.hero-content'); // Include both text and buttons
     
     if (gradientsBg) parallaxSystem.registerLayer('background', gradientsBg);
     if (heroSection) parallaxSystem.registerLayer('hero', heroSection);
-    if (heroText) parallaxSystem.registerLayer('text', heroText);
-    if (heroActions) parallaxSystem.registerLayer('buttons', heroActions);
+    if (heroContent) parallaxSystem.registerLayer('text', heroContent);
     
     // Store parallax system globally for cleanup if needed
     window.parallaxSystem = parallaxSystem;

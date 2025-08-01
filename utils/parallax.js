@@ -100,30 +100,25 @@ class ParallaxSystem {
             layer.currentX = this.lerp(layer.currentX, targetX, 0.1);
             layer.currentY = this.lerp(layer.currentY, targetY, 0.1);
             
-            // Special handling for buttons to preserve hover effects
-            if (name === 'buttons') {
-                // For buttons, we need to preserve any existing hover transforms
-                const currentTransform = layer.element.style.transform;
-                const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
-                
-                // If there's already a transform (from hover), combine it with parallax
-                if (currentTransform && currentTransform.includes('translateY')) {
-                    // Extract the hover transform and combine with parallax
-                    const hoverMatch = currentTransform.match(/translateY\([^)]+\)/);
-                    const hoverTransform = hoverMatch ? hoverMatch[0] : '';
-                    layer.element.style.transform = `${hoverTransform} ${parallaxTransform}`.trim();
-                } else {
-                    // No hover effect, just apply parallax
-                    layer.element.style.transform = parallaxTransform;
-                }
-            } else {
-                // For other layers, use the original approach
-                if (!layer.originalTransform) {
-                    layer.originalTransform = layer.element.style.transform || '';
-                }
-                const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
-                layer.element.style.transform = `${layer.originalTransform} ${parallaxTransform}`.trim();
+            // Store original transform if not already stored
+            if (!layer.originalTransform) {
+                layer.originalTransform = layer.element.style.transform || '';
             }
+            
+            // Combine original transform with parallax transform
+            const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
+            layer.element.style.transform = `${layer.originalTransform} ${parallaxTransform}`.trim();
+            
+            // Special handling for buttons within the layer to preserve hover effects
+            const buttons = layer.element.querySelectorAll('.card');
+            buttons.forEach(button => {
+                // Preserve any existing button transforms (like hover effects)
+                const buttonTransform = button.style.transform || '';
+                if (buttonTransform && buttonTransform.includes('translateY')) {
+                    // Keep the hover effect and add parallax
+                    button.style.transform = `${buttonTransform} ${parallaxTransform}`.trim();
+                }
+            });
         });
     }
     
