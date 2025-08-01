@@ -20,11 +20,7 @@
         <div class="nav-container">
             <!-- Desktop Navigation -->
             <div class="nav-items-desktop">
-               
-                <div class="card" id="glassCard" >
-                                
-                    <img class="dock-icon" width="50px" src="https://cdn-icons-png.flaticon.com/512/3670/3670157.png" alt="Discord">
-                </div>
+
 
                 <div class="nav-item">
                     <a href="#" class="nav-link">Borrow</a>
@@ -341,16 +337,23 @@
                             </p>
                           </div>
 
-                          <div class="card" id="glassCard" >
-                                
-                            <img class="dock-icon" width="50px" src="https://cdn-icons-png.flaticon.com/512/3670/3670157.png" alt="Discord">
-                        </div>
+                  
                         
                         <div class="hero-actions">
-                            <button class="action-btn">Borrow</button>
-                            <button class="action-btn">Lend</button>
-                            <button class="action-btn">Refinance</button>
 
+                            <div class="card" id="glassCard" >
+                                Borrow
+                                <img class="dock-icon" width="50px" src="https://cdn-icons-png.flaticon.com/512/3670/3670157.png" alt="Discord">
+                            </div>
+                            <div class="card" id="glassCard" >
+                                Lend
+                                <img class="dock-icon" width="50px" src="https://cdn-icons-png.flaticon.com/512/3670/3670157.png" alt="Discord">
+                            </div>
+                            <div class="card" id="glassCard" >
+                                Refinance
+                                <img class="dock-icon" width="50px" src="https://cdn-icons-png.flaticon.com/512/3670/3670157.png" alt="Discord">
+                            </div>
+                            
                             
                         </div>
 
@@ -441,55 +444,6 @@
           }
         });
       </script>
-       <script>
-        // Draggable functionality
-        const card = document.getElementById('glassCard');
-        const position = { x: 0, y: 0 };
-        let isDragging = false;
-        let startX, startY;
-
-        // Mouse events for dragging
-        card.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startX = e.clientX - position.x;
-            startY = e.clientY - position.y;
-            card.style.cursor = 'grabbing';
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            
-            position.x = e.clientX - startX;
-            position.y = e.clientY - startY;
-            card.style.transform = `translate(${position.x}px, ${position.y}px)`;
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            card.style.cursor = 'grab';
-        });
-
-        // Touch events for mobile
-        card.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            const touch = e.touches[0];
-            startX = touch.clientX - position.x;
-            startY = touch.clientY - position.y;
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            e.preventDefault();
-            
-            const touch = e.touches[0];
-            position.x = touch.clientX - startX;
-            position.y = touch.clientY - startY;
-            card.style.transform = `translate(${position.x}px, ${position.y}px)`;
-        });
-
-        document.addEventListener('touchend', () => {
-            isDragging = false;
-        });
-    </script>
+     
 </body>
 </html> 

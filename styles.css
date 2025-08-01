@@ -503,74 +503,16 @@ body {
 .hero-actions {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start; /* Changed from space-between to align left */
-    align-items: center; /* Changed back from left to center for proper button alignment */
+    justify-content: flex-start;
+    align-items: center;
     padding: 0px;
-    gap: 22px;
-    margin: 0; /* Remove auto margin to align left */
-    height: 48px;
+    gap: 24px;
+    margin: 0;
     flex: none;
     order: 1;
     flex-grow: 0;
-    /* Width will be set by JavaScript to match title width */
 }
 
-.action-btn {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 17px 36px;
-    gap: 10px;
-    margin: 0 auto;
-    width: 180px;
-    min-width: 180px;
-    height: 48px;
-    background: rgba(226, 220, 218, 0.1);
-    border-radius: 500px;
-    border: none;
-    cursor: pointer;
-    font-family: 'General Sans Variable';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 14px;
-    text-align: center;
-    letter-spacing: 0.02em;
-    color: #E2DCDA;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-    transition: all 0.2s ease;
-    
-    /* EXACT Glass Effect from Reference */
-    position: relative;
-    overflow: hidden;
-    filter: drop-shadow(-8px -10px 46px #0000005f);
-    backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
-    cursor: grab;
-}
-
-.action-btn:active {
-    cursor: grabbing;
-}
-
-.action-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    border-radius: 500px;
-    -webkit-box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7), 
-                        inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
-    box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.7), 
-                inset 0 0 8px 1px rgba(255, 255, 255, 0.7);
-}
-
-.action-btn:hover {
-    background: rgba(226, 220, 218, 0.2);
-}
 
 /* Content Sections */
 .section {
@@ -840,56 +782,82 @@ body {
 
 
 
-        .card {
-    width: 400px;
-    flex-wrap: wrap;
+.card {
+    /* Button Layout */
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
-    overflow: hidden;
-    border-radius: inherit;
-    transition: opacity 0.26s ease-out;
-    border-radius: 28px;
+    gap: 12px;
+    padding: 16px 32px;
+    min-width: 160px;
+    height: 56px;
+    
+    /* Typography */
+    font-family: 'General Sans Variable';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.2;
+    text-align: center;
+    letter-spacing: 0.02em;
+    color: #E2DCDA;
+    
+    /* Glass Effect */
+    background: rgba(226, 220, 218, 0.1);
+    border-radius: 500px;
+    border: none;
     filter: drop-shadow(-8px -10px 46px #0000005f);
     backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
+    
+    /* Positioning */
     position: relative;
-    cursor: grab;
-    /* Ensure glass card is above content it should distort */
+    cursor: pointer;
     z-index: 10;
+    
+    /* Transitions */
+    transition: all 0.2s ease;
 }
 
 
-        .card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            border-radius: 28px;
-            -webkit-box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7), 
-                                inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
-            box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.7), 
-                        inset 0 0 8px 1px rgba(255, 255, 255, 0.7);
-        }
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 500px;
+    -webkit-box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7), 
+                        inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+    box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.7), 
+                inset 0 0 8px 1px rgba(255, 255, 255, 0.7);
+}
 
-        .dock-icon {
-            width: 20px;
-            scale: 1;
-            transition: all .2s ease-in-out;
-            cursor: pointer;
-            z-index: 99;
-            margin: 0 10px;
-        }
+.dock-icon {
+    width: 24px;
+    height: 24px;
+    transition: all 0.2s ease-in-out;
+    pointer-events: none; /* Prevent icon from interfering with button clicks */
+}
 
-        .dock-icon:hover {
-            scale: 1.2;
-        }
+.card:hover .dock-icon {
+    transform: scale(1.1);
+}
 
-        /* SVG Filter for Distortion Effect */
-        .svg-filters {
-            position: absolute;
-            width: 0;
-            height: 0;
-            overflow: hidden;
-        }
+.card:hover {
+    background: rgba(226, 220, 218, 0.2);
+    transform: translateY(-2px);
+    filter: drop-shadow(-8px -10px 46px #0000005f) brightness(1.05);
+}
+
+.card:active {
+    transform: translateY(0px);
+    background: rgba(226, 220, 218, 0.3);
+}
+
+/* SVG Filter for Distortion Effect */
+.svg-filters {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
