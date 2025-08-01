@@ -14,8 +14,7 @@ class ParallaxSystem {
         this.layerSpeeds = {
             background: 0.1,  // Subtle background movement
             hero: 0.3,        // Medium hero movement
-            text: 0.5,        // Responsive text
-            buttons: 0.6      // Most responsive buttons
+            text: 0.5         // Most responsive text/buttons
         };
         
         this.init();
@@ -101,19 +100,30 @@ class ParallaxSystem {
             layer.currentX = this.lerp(layer.currentX, targetX, 0.1);
             layer.currentY = this.lerp(layer.currentY, targetY, 0.1);
             
-            // Get current computed style to preserve any dynamic transforms (like hover effects)
-            const computedStyle = window.getComputedStyle(layer.element);
-            const currentTransform = computedStyle.transform;
-            
-            // If the transform is the identity matrix, use original transform
-            let baseTransform = layer.originalTransform;
-            if (currentTransform && currentTransform !== 'none' && currentTransform !== 'matrix(1, 0, 0, 1, 0, 0)') {
-                baseTransform = currentTransform;
+            // Special handling for buttons to preserve hover effects
+            if (name === 'buttons') {
+                // For buttons, we need to preserve any existing hover transforms
+                const currentTransform = layer.element.style.transform;
+                const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
+                
+                // If there's already a transform (from hover), combine it with parallax
+                if (currentTransform && currentTransform.includes('translateY')) {
+                    // Extract the hover transform and combine with parallax
+                    const hoverMatch = currentTransform.match(/translateY\([^)]+\)/);
+                    const hoverTransform = hoverMatch ? hoverMatch[0] : '';
+                    layer.element.style.transform = `${hoverTransform} ${parallaxTransform}`.trim();
+                } else {
+                    // No hover effect, just apply parallax
+                    layer.element.style.transform = parallaxTransform;
+                }
+            } else {
+                // For other layers, use the original approach
+                if (!layer.originalTransform) {
+                    layer.originalTransform = layer.element.style.transform || '';
+                }
+                const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
+                layer.element.style.transform = `${layer.originalTransform} ${parallaxTransform}`.trim();
             }
-            
-            // Combine base transform with parallax transform
-            const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
-            layer.element.style.transform = `${baseTransform} ${parallaxTransform}`.trim();
         });
     }
     

@@ -43,7 +43,7 @@ function init() {
     // Initialize parallax system
     const parallaxSystem = new ParallaxSystem();
     
-    // Register parallax layers (include buttons with proper transform handling)
+    // Register parallax layers
     const gradientsBg = document.querySelector('.gradients-bg');
     const heroSection = document.querySelector('.hero');
     const heroText = document.querySelector('.hero-text');
