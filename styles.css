@@ -513,20 +513,6 @@ body {
     /* Width will be set by JavaScript to match title width */
 }
 
-/* Glass Distortion Effect Variables */
-:root {
-    --glass-shadow-offset: 0;
-    --glass-shadow-blur: 20px;
-    --glass-shadow-spread: -5px;
-    --glass-shadow-color: rgba(255, 255, 255, 0.7);
-    --glass-tint-color: 255, 255, 255;
-    --glass-tint-opacity: 0.4;
-    --glass-frost-blur: 2px;
-    --glass-outer-shadow-blur: 24px;
-    --glass-border-color: rgba(255, 255, 255, 0.3);
-    --glass-border-width: 1px;
-}
-
 .action-btn {
     display: flex;
     flex-direction: row;
@@ -555,16 +541,16 @@ body {
     flex-grow: 0;
     transition: all 0.2s ease;
     
-    /* Glass Effect Properties */
+    /* EXACT Glass Effect from Reference */
     position: relative;
-    isolation: isolate;
     overflow: hidden;
     filter: drop-shadow(-8px -10px 46px #0000005f);
     backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
-    -webkit-backdrop-filter: brightness(1.1) blur(2px);
-    will-change: transform, backdrop-filter;
-    transform: translateZ(0);
-    z-index: 1;
+    cursor: grab;
+}
+
+.action-btn:active {
+    cursor: grabbing;
 }
 
 .action-btn::before {
@@ -578,90 +564,10 @@ body {
                         inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
     box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.7), 
                 inset 0 0 8px 1px rgba(255, 255, 255, 0.7);
-    background-color: rgba(var(--glass-tint-color), var(--glass-tint-opacity));
-    border: var(--glass-border-width) solid var(--glass-border-color);
-    pointer-events: none;
-    animation: glass-shimmer 3s ease-in-out infinite;
-}
-
-.action-btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    border-radius: 500px;
-    backdrop-filter: blur(var(--glass-frost-blur));
-    -webkit-backdrop-filter: blur(var(--glass-frost-blur));
-    filter: url(#displacementFilter);
-    -webkit-filter: url(#displacementFilter);
-    isolation: isolate;
-    pointer-events: none;
 }
 
 .action-btn:hover {
     background: rgba(226, 220, 218, 0.2);
-    transform: translateZ(0) scale(1.02);
-    filter: drop-shadow(-8px -10px 46px #0000005f) brightness(1.05);
-    --glass-tint-opacity: 0.6;
-    --glass-frost-blur: 3px;
-}
-
-.action-btn:active {
-    transform: translateZ(0) scale(0.98);
-    --glass-tint-opacity: 0.8;
-    --glass-frost-blur: 4px;
-}
-
-/* Subtle animation for glass effect */
-@keyframes glass-shimmer {
-    0%, 100% {
-        opacity: 0.7;
-    }
-    50% {
-        opacity: 1;
-    }
-}
-
-/* Fallback for browsers without backdrop-filter support */
-@supports not (backdrop-filter: blur(2px)) {
-    .action-btn {
-        background: rgba(226, 220, 218, 0.15);
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-    }
-    
-    .action-btn::before {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .action-btn::after {
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        filter: none;
-        -webkit-filter: none;
-    }
-}
-
-/* Performance optimizations for mobile devices */
-@media (max-width: 768px) {
-    .action-btn {
-        backdrop-filter: brightness(1.05) blur(1px);
-        -webkit-backdrop-filter: brightness(1.05) blur(1px);
-        filter: drop-shadow(-4px -5px 23px #0000005f);
-    }
-    
-    .action-btn::after {
-        backdrop-filter: blur(1px);
-        -webkit-backdrop-filter: blur(1px);
-    }
-}
-
-/* High DPI display optimizations */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .action-btn {
-        transform: translateZ(0) scale(0.999);
-    }
 }
 
 /* Content Sections */
