@@ -2,6 +2,7 @@
   "name": "nftfi-marketing-site-singlescroll",
   "version": "1.0.0",
   "description": "A single page scroller using Three.js elements and scroll capture libraries, managed with Taskmaster.",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "vite",

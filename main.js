@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from './libs/GLTFLoader.js';
+import { init as initThreeJS, onWindowResize as onThreeJSResize } from './core/init.js';
 
 // Navigation functionality - Simple and effective
 function initializeNavigation() {
@@ -545,96 +546,19 @@ void main() {
 
 // Initialize Three.js scene
 function init() {
+    // Initialize Three.js components using modular structure
+    const { scene: threeScene, camera: threeCamera, renderer: threeRenderer, mainRenderTarget: threeMainTarget, backRenderTarget: threeBackTarget, uniforms: threeUniforms } = initThreeJS();
     
-    // Get canvas
+    // Assign to global variables for compatibility
+    scene = threeScene;
+    camera = threeCamera;
+    renderer = threeRenderer;
+    mainRenderTarget = threeMainTarget;
+    backRenderTarget = threeBackTarget;
+    uniforms = threeUniforms;
+    
+    // Get canvas reference
     canvas = document.getElementById('three-canvas');
-    
-    // Use full viewport dimensions instead of square constraint
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    // Create scene
-    scene = new THREE.Scene();
-    // Set transparent background instead of black
-    scene.background = null;
-    
-    // Create camera with full viewport aspect ratio
-    camera = new THREE.PerspectiveCamera(18, width / height, 0.1, 1000); // FOV 18, full viewport aspect
-    camera.position.set(0, 0, 33.6); // Match UI defaults
-    
-    // Create renderer
-    renderer = new THREE.WebGLRenderer({ 
-        canvas: canvas,
-        alpha: true, // Enable transparency
-        antialias: true 
-    });
-    renderer.setSize(width, height);
-    renderer.setClearColor(0x000000, 0); // Transparent clear color
-    
-    // Set full viewport dimensions
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    
-    // Set clear color to transparent
-    renderer.setClearColor(0x000000, 0);
-    
-    // Create render targets with full window resolution like GitHub version
-    mainRenderTarget = new THREE.WebGLRenderTarget(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
-    );
-    backRenderTarget = new THREE.WebGLRenderTarget(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
-    );
-    
-    // Initialize uniforms
-    uniforms = {
-        uIorR: { value: 1.15 },
-        uIorY: { value: 1.16 },
-        uIorG: { value: 1.18 },
-        uIorC: { value: 1.22 },
-        uIorB: { value: 1.22 },
-        uIorP: { value: 1.22 },
-        uSaturation: { value: 1.01 },
-        uChromaticAberration: { value: 0.28 },
-        uRefractPower: { value: 0.5 },
-        uFresnelPower: { value: 12.7 },
-        uShininess: { value: 28.2 },
-        uDiffuseness: { value: 0.07 },
-        uLight: { value: new THREE.Vector3(-1.3, 1.5, -0.6) },
-        winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2)) },
-        uTexture: { value: null }
-    };
-    
-    
-    // Add comprehensive lighting setup
-    // Ambient light for overall illumination
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-    scene.add(ambientLight);
-    
-    // Main directional light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    directionalLight.position.set(5, 5, 5);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    scene.add(directionalLight);
-    
-    // Secondary directional light for fill
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    fillLight.position.set(-5, 3, 5);
-    scene.add(fillLight);
-    
-    // Rim light for edge highlighting
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    rimLight.position.set(0, -5, 5);
-    scene.add(rimLight);
-    
-    // Point light for dynamic highlights
-    const pointLight = new THREE.PointLight(0xffffff, 0.8, 100);
-    pointLight.position.set(0, 0, 10);
-    scene.add(pointLight);
     
     // Create background geometry for refraction
     createBackgroundGeometry();
@@ -1113,25 +1037,8 @@ function debouncedTextureUpdate() {
 
 // Window resize handler
 function onWindowResize() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    camera.aspect = width / height; // Full viewport aspect ratio
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
-    
-    // Update render targets
-    mainRenderTarget.setSize(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
-    );
-    backRenderTarget.setSize(
-        window.innerWidth * Math.min(window.devicePixelRatio, 2),
-        window.innerHeight * Math.min(window.devicePixelRatio, 2)
-    );
-    
-    // Update uniforms
-    uniforms.winResolution.value.set(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2));
+    // Use modular resize handler
+    onThreeJSResize();
     
     // Update plane position for new viewport
     updatePlaneForViewport();
