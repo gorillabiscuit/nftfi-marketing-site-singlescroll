@@ -803,7 +803,7 @@ body {
     color: #E2DCDA;
     
     /* Glass Effect */
-    background: rgba(226, 220, 218, 0.05);
+    background: rgba(226, 220, 218, 0.15);
     border-radius: 500px;
     border: none;
     filter: drop-shadow(-8px -10px 46px #0000005f);
@@ -826,10 +826,10 @@ body {
     z-index: 0;
     overflow: hidden;
     border-radius: 500px;
-    -webkit-box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.3), 
-                        inset 0 0 3px 1px rgba(255, 255, 255, 0.3);
-    box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.3), 
-                inset 0 0 8px 1px rgba(255, 255, 255, 0.3);
+    -webkit-box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.5), 
+                        inset 0 0 3px 1px rgba(255, 255, 255, 0.5);
+    box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.5), 
+                inset 0 0 8px 1px rgba(255, 255, 255, 0.5);
 }
 
 .dock-icon {
@@ -844,14 +844,14 @@ body {
 }
 
 .card:hover {
-    background: rgba(226, 220, 218, 0.1);
+    background: rgba(226, 220, 218, 0.25);
     transform: translateY(-2px);
     filter: drop-shadow(-8px -10px 46px #0000005f);
 }
 
 .card:active {
     transform: translateY(0px);
-    background: rgba(226, 220, 218, 0.15);
+    background: rgba(226, 220, 218, 0.3);
 }
 
 /* SVG Filter for Distortion Effect */
