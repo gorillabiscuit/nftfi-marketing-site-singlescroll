@@ -70,13 +70,4 @@ document.addEventListener('DOMContentLoaded', () => {
             window.DEBUG.updatePlaneTexture();
         }
     }, 500);
-});
-
-// Check if DOM is ready, if not wait for it
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        initializeNavigation();
-    });
-} else {
-    initializeNavigation();
-} 
+}); 

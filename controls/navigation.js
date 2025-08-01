@@ -3,12 +3,17 @@
 
 // Navigation functionality - Simple and effective
 export function initializeNavigation() {
+    console.log('Initializing navigation...');
+    
     // Desktop dropdowns - Simple and working
     const dropdowns = document.querySelectorAll('.dropdown-container');
+    console.log('Found dropdown containers:', dropdowns.length);
     
-    dropdowns.forEach((dropdown) => {
+    dropdowns.forEach((dropdown, index) => {
         const trigger = dropdown.querySelector('.dropdown-trigger');
         const menu = dropdown.querySelector('.dropdown-menu');
+        
+        console.log(`Dropdown ${index}:`, { trigger: !!trigger, menu: !!menu });
         
         if (!trigger || !menu) {
             console.error('Missing trigger or menu element');
@@ -40,6 +45,21 @@ export function initializeNavigation() {
                 menu.classList.add('open');
                 trigger.classList.add('open');
             }
+        });
+        
+        // Add click handlers to dropdown items
+        const dropdownItems = menu.querySelectorAll('.dropdown-item');
+        console.log(`Dropdown ${index} items:`, dropdownItems.length);
+        
+        dropdownItems.forEach((item, itemIndex) => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log(`Clicked dropdown item ${itemIndex}:`, item.textContent);
+                // Close the dropdown after item click
+                menu.classList.remove('open');
+                trigger.classList.remove('open');
+            });
         });
         
         // Close on outside click
