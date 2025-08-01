@@ -412,12 +412,12 @@ const MODEL_CONFIG = {
     scrubDuration: 1,    // Smooth transition duration
     
     // Floating animation settings
-    floatAmplitude: 0.4, // Small amplitude for subtle movement
+    floatAmplitude: 0.3, // Small amplitude for subtle movement
     floatSpeed: 0.8, // Slow, gentle speed
     
     // Scroll spin settings
-    spinIntensity: 0.1, // How much spin per scroll unit
-    spinDecay: 0.15 // How quickly spin decays (0.95 = slow decay)
+    spinIntensity: 0.05, // How much spin per scroll unit
+    spinDecay: 0.1 // How quickly spin decays (0.95 = slow decay)
 };
 
 // Shader code
@@ -755,7 +755,7 @@ function createBackgroundGeometry() {
     });
     
     const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    whiteSphere.position.set(-11.75, 5.75, -7); // Same position as plane
+    whiteSphere.position.set(-11.15, 5.35, -7); // Same position as plane
     whiteSphere.scale.setScalar(.3); // Make it visible
     
     // Make sphere invisible to camera but available for shader sampling (like plane)
@@ -888,26 +888,7 @@ function loadModel() {
                 // World space positioning debugging
                 worldToPosition,
                 calculateTargetPosition,
-                TARGET_CONFIG,
-                // Sphere positioning helpers
-                toggleSphere: () => {
-                    if (window.DEBUG.whiteSphere) {
-                        window.DEBUG.whiteSphere.visible = !window.DEBUG.whiteSphere.visible;
-                        console.log('Sphere visibility:', window.DEBUG.whiteSphere.visible);
-                    }
-                },
-                setSpherePosition: (x, y, z) => {
-                    if (window.DEBUG.whiteSphere) {
-                        window.DEBUG.whiteSphere.position.set(x, y, z);
-                        console.log('Sphere position set to:', [x, y, z]);
-                    }
-                },
-                getSpherePosition: () => {
-                    if (window.DEBUG.whiteSphere) {
-                        return window.DEBUG.whiteSphere.position.toArray();
-                    }
-                    return null;
-                }
+                TARGET_CONFIG
             };
             
             // console.log('Debug objects exposed! Use window.DEBUG to access them.');
@@ -1209,7 +1190,7 @@ function onWindowResize() {
         
         // Hide sphere for final render
         if (whiteSphere) {
-            whiteSphere.visible = false;
+            whiteSphere.visible = false; // Hide sphere but keep it for refraction
             // console.log('Sphere hidden for final render');
         }
         
