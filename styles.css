@@ -25,8 +25,8 @@ body {
 .gradients-bg::before {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 30%;
+    left: 25%;
     width: 600px;
     height: 600px;
     border-radius: 50%;
@@ -38,8 +38,8 @@ body {
 .gradients-bg::after {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 70%;
+    left: 75%;
     width: 500px;
     height: 500px;
     border-radius: 50%;
@@ -51,13 +51,41 @@ body {
 /* Third gradient layer */
 .gradient-layer-3 {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 20%;
+    left: 70%;
     width: 700px;
     height: 700px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0.1) 50%, transparent 70%);
     animation: morph3 35s ease-in-out infinite;
+    filter: blur(40px);
+    transform: translate(-50%, -50%);
+}
+
+/* Fourth gradient layer */
+.gradient-layer-4 {
+    position: absolute;
+    top: 80%;
+    left: 20%;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.3) 0%, rgba(251, 146, 60, 0.1) 50%, transparent 70%);
+    animation: morph4 28s ease-in-out infinite;
+    filter: blur(40px);
+    transform: translate(-50%, -50%);
+}
+
+/* Fifth gradient layer */
+.gradient-layer-5 {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    width: 550px;
+    height: 550px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0.1) 50%, transparent 70%);
+    animation: morph5 32s ease-in-out infinite;
     filter: blur(40px);
     transform: translate(-50%, -50%);
 }
@@ -108,6 +136,44 @@ body {
     75% {
         transform: translate(-20%, -20%) scale(1.1) rotate(270deg);
         opacity: 0.7;
+    }
+}
+
+@keyframes morph4 {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.3;
+    }
+    33% {
+        transform: translate(-30%, -60%) scale(1.3) rotate(120deg);
+        opacity: 0.5;
+    }
+    66% {
+        transform: translate(-60%, -30%) scale(0.7) rotate(240deg);
+        opacity: 0.2;
+    }
+}
+
+@keyframes morph5 {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.4;
+    }
+    20% {
+        transform: translate(-40%, -70%) scale(1.2) rotate(72deg);
+        opacity: 0.6;
+    }
+    40% {
+        transform: translate(-70%, -40%) scale(0.8) rotate(144deg);
+        opacity: 0.3;
+    }
+    60% {
+        transform: translate(-40%, -40%) scale(1.1) rotate(216deg);
+        opacity: 0.5;
+    }
+    80% {
+        transform: translate(-70%, -70%) scale(0.9) rotate(288deg);
+        opacity: 0.4;
     }
 }
 
@@ -532,7 +598,7 @@ body {
     content: '';
     position: absolute;
     bottom: -460px;
-    left: 255px;
+    left: 55px;
     width: 950px;
     height: 950px;
     background-image: url('/images/circles.svg');
