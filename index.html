@@ -16,45 +16,109 @@
     <!-- Top Navigation -->
     <nav class="custom-navbar">
         <div class="nav-container">
-            <div class="nav-item">
-                <a href="#" class="nav-link">Borrow</a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">Lend</a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">Refinance</a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">Blog</a>
-            </div>
-            <div class="nav-item dropdown-container">
-                <button class="nav-link dropdown-trigger">
-                    Resources
-                    <svg class="chevron" width="20" height="20" viewBox="0 0 20 20">
-                        <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/>
-                    </svg>
-                </button>
-                <div class="dropdown-menu">
-                    <a href="#" class="dropdown-item">Documentation</a>
-                    <a href="#" class="dropdown-item">API Reference</a>
-                    <a href="#" class="dropdown-item">Tutorials</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">Support</a>
+            <!-- Desktop Navigation -->
+            <div class="nav-items-desktop">
+                <div class="nav-item">
+                    <a href="#" class="nav-link">Borrow</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">Lend</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">Refinance</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">Blog</a>
+                </div>
+                <div class="nav-item dropdown-container">
+                    <button class="nav-link dropdown-trigger">
+                        Resources
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 20 20">
+                            <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item">Documentation</a>
+                        <a href="#" class="dropdown-item">API Reference</a>
+                        <a href="#" class="dropdown-item">Tutorials</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">Support</a>
+                    </div>
+                </div>
+                <div class="nav-item dropdown-container">
+                    <button class="nav-link dropdown-trigger">
+                        Socials
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 20 20">
+                            <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item">Twitter</a>
+                        <a href="#" class="dropdown-item">Discord</a>
+                        <a href="#" class="dropdown-item">Telegram</a>
+                        <a href="#" class="dropdown-item">GitHub</a>
+                    </div>
                 </div>
             </div>
-            <div class="nav-item dropdown-container">
-                <button class="nav-link dropdown-trigger">
-                    Socials
-                    <svg class="chevron" width="20" height="20" viewBox="0 0 20 20">
-                        <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/>
-                    </svg>
+            
+            <!-- Mobile Hamburger Menu -->
+            <div class="nav-items-mobile">
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
                 </button>
-                <div class="dropdown-menu">
-                    <a href="#" class="dropdown-item">Twitter</a>
-                    <a href="#" class="dropdown-item">Discord</a>
-                    <a href="#" class="dropdown-item">Telegram</a>
-                    <a href="#" class="dropdown-item">GitHub</a>
+                
+                <!-- Mobile Menu Overlay -->
+                <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+                    <div class="mobile-menu-content">
+                        <div class="mobile-menu-header">
+                            <button class="mobile-menu-close" id="mobile-menu-close">
+                                <svg width="24" height="24" viewBox="0 0 24 24">
+                                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="mobile-menu-items">
+                            <a href="#" class="mobile-nav-link">Borrow</a>
+                            <a href="#" class="mobile-nav-link">Lend</a>
+                            <a href="#" class="mobile-nav-link">Refinance</a>
+                            <a href="#" class="mobile-nav-link">Blog</a>
+                            
+                            <!-- Mobile Dropdowns -->
+                            <div class="mobile-dropdown">
+                                <button class="mobile-dropdown-trigger">
+                                    Resources
+                                    <svg class="chevron" width="16" height="16" viewBox="0 0 16 16">
+                                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    </svg>
+                                </button>
+                                <div class="mobile-dropdown-menu">
+                                    <a href="#" class="mobile-dropdown-item">Documentation</a>
+                                    <a href="#" class="mobile-dropdown-item">API Reference</a>
+                                    <a href="#" class="mobile-dropdown-item">Tutorials</a>
+                                    <div class="mobile-dropdown-divider"></div>
+                                    <a href="#" class="mobile-dropdown-item">Support</a>
+                                </div>
+                            </div>
+                            
+                            <div class="mobile-dropdown">
+                                <button class="mobile-dropdown-trigger">
+                                    Socials
+                                    <svg class="chevron" width="16" height="16" viewBox="0 0 16 16">
+                                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    </svg>
+                                </button>
+                                <div class="mobile-dropdown-menu">
+                                    <a href="#" class="mobile-dropdown-item">Twitter</a>
+                                    <a href="#" class="mobile-dropdown-item">Discord</a>
+                                    <a href="#" class="mobile-dropdown-item">Telegram</a>
+                                    <a href="#" class="mobile-dropdown-item">GitHub</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
