@@ -3,11 +3,10 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from './libs/GLTFLoader.js';
-import { computePosition, flip, offset, shift, size } from '@floating-ui/dom';
 
-// Navigation functionality with Floating UI
+// Navigation functionality - Simple and effective
 function initializeNavigation() {
-    // Desktop dropdowns with Floating UI
+    // Desktop dropdowns - Simple and working
     const dropdowns = document.querySelectorAll('.dropdown-container');
     
     dropdowns.forEach((dropdown) => {
@@ -17,55 +16,6 @@ function initializeNavigation() {
         if (!trigger || !menu) {
             console.error('Missing trigger or menu element');
             return;
-        }
-        
-        let cleanup = null;
-        
-        function updatePosition() {
-            if (cleanup) cleanup();
-            
-            const { x, y, strategy } = computePosition(trigger, menu, {
-                placement: 'bottom-start',
-                middleware: [
-                    offset(4), // 4px gap
-                    flip(), // Flip to top if no space below
-                    shift(), // Shift if no space on sides
-                    size({
-                        apply({ availableHeight, availableWidth, elements }) {
-                            // Ensure menu doesn't exceed viewport
-                            Object.assign(elements.floating.style, {
-                                maxHeight: `${availableHeight}px`,
-                                maxWidth: `${availableWidth}px`,
-                            });
-                        },
-                    }),
-                ],
-            });
-            
-            Object.assign(menu.style, {
-                position: strategy,
-                left: `${x}px`,
-                top: `${y}px`,
-            });
-        }
-        
-        function show() {
-            menu.classList.add('open');
-            trigger.classList.add('open');
-            updatePosition();
-            
-            // Add event listeners for cleanup
-            cleanup = () => {
-                menu.classList.remove('open');
-                trigger.classList.remove('open');
-            };
-        }
-        
-        function hide() {
-            if (cleanup) {
-                cleanup();
-                cleanup = null;
-            }
         }
         
         // Toggle dropdown on click
@@ -87,30 +37,27 @@ function initializeNavigation() {
             });
             
             if (isOpen) {
-                hide();
+                menu.classList.remove('open');
+                trigger.classList.remove('open');
             } else {
-                show();
+                menu.classList.add('open');
+                trigger.classList.add('open');
             }
         });
         
         // Close on outside click
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.dropdown-container')) {
-                hide();
+                menu.classList.remove('open');
+                trigger.classList.remove('open');
             }
         });
         
         // Close on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                hide();
-            }
-        });
-        
-        // Update position on window resize
-        window.addEventListener('resize', () => {
-            if (menu.classList.contains('open')) {
-                updatePosition();
+                menu.classList.remove('open');
+                trigger.classList.remove('open');
             }
         });
     });

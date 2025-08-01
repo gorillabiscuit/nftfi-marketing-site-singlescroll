@@ -92,7 +92,9 @@ body {
 }
 
 .dropdown-menu {
-    position: fixed; /* Changed to fixed for Floating UI */
+    position: absolute;
+    top: 100%;
+    left: 0;
     background: rgba(39, 30, 35, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -104,7 +106,6 @@ body {
     transform: translateY(-8px);
     transition: all 0.2s ease;
     z-index: 1001;
-    /* Floating UI will handle positioning */
 }
 
 .dropdown-menu.open {
@@ -126,6 +127,19 @@ body {
 
 .dropdown-item:hover {
     background: rgba(255, 255, 255, 0.1);
+    color: #F2F2F2;
+}
+
+.dropdown-item:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.dropdown-trigger:hover {
+    color: rgba(242, 242, 242, 0.8);
+}
+
+.dropdown-trigger:active {
+    color: rgba(242, 242, 242, 0.6);
 }
 
 .dropdown-divider {
@@ -250,6 +264,10 @@ body {
     color: rgba(242, 242, 242, 0.8);
 }
 
+.mobile-nav-link:active {
+    color: rgba(242, 242, 242, 0.6);
+}
+
 /* Mobile Dropdowns */
 .mobile-dropdown {
     text-align: center;
@@ -300,6 +318,10 @@ body {
 
 .mobile-dropdown-item:hover {
     color: #F2F2F2;
+}
+
+.mobile-dropdown-item:active {
+    color: rgba(242, 242, 242, 0.8);
 }
 
 .mobile-dropdown-divider {
