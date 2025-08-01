@@ -523,6 +523,8 @@ body {
     --glass-tint-opacity: 0.4;
     --glass-frost-blur: 2px;
     --glass-outer-shadow-blur: 24px;
+    --glass-border-color: rgba(255, 255, 255, 0.3);
+    --glass-border-width: 1px;
 }
 
 .action-btn {
@@ -577,7 +579,9 @@ body {
     box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.7), 
                 inset 0 0 8px 1px rgba(255, 255, 255, 0.7);
     background-color: rgba(var(--glass-tint-color), var(--glass-tint-opacity));
+    border: var(--glass-border-width) solid var(--glass-border-color);
     pointer-events: none;
+    animation: glass-shimmer 3s ease-in-out infinite;
 }
 
 .action-btn::after {
@@ -599,10 +603,24 @@ body {
     background: rgba(226, 220, 218, 0.2);
     transform: translateZ(0) scale(1.02);
     filter: drop-shadow(-8px -10px 46px #0000005f) brightness(1.05);
+    --glass-tint-opacity: 0.6;
+    --glass-frost-blur: 3px;
 }
 
 .action-btn:active {
     transform: translateZ(0) scale(0.98);
+    --glass-tint-opacity: 0.8;
+    --glass-frost-blur: 4px;
+}
+
+/* Subtle animation for glass effect */
+@keyframes glass-shimmer {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
 }
 
 /* Fallback for browsers without backdrop-filter support */
