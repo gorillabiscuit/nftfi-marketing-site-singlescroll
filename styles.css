@@ -20,9 +20,6 @@ body {
     height: 100vh;
     z-index: -1;
     overflow: hidden;
-    /* Parallax transform using CSS custom properties */
-    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
-    will-change: transform;
 }
 
 .gradients-bg::before {
@@ -577,9 +574,6 @@ body {
     /* Create new stacking context for backdrop-filter to work properly */
     isolation: isolate;
     box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
-    /* Parallax transform using CSS custom properties */
-    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
-    will-change: transform;
 }
 
 /* SVG Background - Top Right Copy */
@@ -634,9 +628,6 @@ body {
     margin: 0; /* Remove auto margin to align left */
     /* Ensure content is below glass card for proper distortion */
     z-index: 1;
-    /* Parallax transform using CSS custom properties */
-    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
-    will-change: transform;
 }
 
 .hero-text {
@@ -993,10 +984,6 @@ body {
     
     /* Transitions */
     transition: all 0.2s ease;
-    
-    /* Parallax transform using CSS custom properties */
-    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
-    will-change: transform;
 }
 
 
@@ -1026,12 +1013,12 @@ body {
 
 .card:hover {
     background: rgba(226, 220, 218, 0.25);
-    transform: translate3d(var(--parallax-x, 0), calc(var(--parallax-y, 0) - 2px), 0);
+    transform: translateY(-2px);
     filter: drop-shadow(-8px -10px 46px #0000005f);
 }
 
 .card:active {
-    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
+    transform: translateY(0px);
     background: rgba(226, 220, 218, 0.05);
 }
 

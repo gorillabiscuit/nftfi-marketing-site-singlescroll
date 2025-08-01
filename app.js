@@ -11,7 +11,6 @@ import { setupScrollAnimation, resetScrollAnimation } from './controls/scrollTri
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
 import { createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
 import { TARGET_CONFIG, MODEL_CONFIG } from './config.js';
-import './utils/parallax.js';
 
 // Main initialization function
 function init() {
