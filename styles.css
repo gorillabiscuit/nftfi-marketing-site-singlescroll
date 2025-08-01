@@ -984,13 +984,14 @@ body {
     border-radius: 500px;
     border: none;
     filter: drop-shadow(-8px -10px 46px #0000005f);
-    backdrop-filter: blur(2px) url(#displacementFilter);
-    -webkit-backdrop-filter: blur(2px) url(#displacementFilter);
+    backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
+    -webkit-backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
     
     /* Positioning */
     position: relative;
     cursor: pointer;
     z-index: 10;
+    isolation: isolate;
     
     /* Transitions */
     transition: all 0.2s ease;
@@ -1008,6 +1009,21 @@ body {
                         inset 0 0 3px 1px rgba(255, 255, 255, 0.125);
     box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.125), 
                 inset 0 0 3px 1px rgba(255, 255, 255, 0.125);
+}
+
+.card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: 500px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    filter: url(#displacementFilter);
+    -webkit-filter: url(#displacementFilter);
+    isolation: isolate;
+    pointer-events: none;
 }
 
 .dock-icon {
