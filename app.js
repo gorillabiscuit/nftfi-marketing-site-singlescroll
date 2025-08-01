@@ -10,37 +10,7 @@ import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, capt
 import { setupScrollAnimation, resetScrollAnimation } from './controls/scrollTrigger.js';
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
 import { createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
-
-// Configuration objects
-const TARGET_CONFIG = {
-    // Target position in world coordinates (-1 to 1 range)
-    targetWorldX: -0.92,    // 80% left in world space
-    targetWorldY: 0.84,     // 50% up in world space
-    targetWorldZ: 0,       // Z depth
-    scaleRatio: 1.2,       // Scale ratio
-    
-    // Starting position in world coordinates (-1 to 1 range)
-    startWorldX: 0.55,      // 80% right in world space
-    startWorldY: -0.15,        // Center vertically
-    startWorldZ: 0         // Z depth
-};
-
-const MODEL_CONFIG = {
-    // Scale configuration
-    startScale: 3.0,    // Starting scale
-    targetScale: 0.265,   // Target scale (much smaller)
-    
-    // Animation timing
-    scrubDuration: 1,    // Smooth transition duration
-    
-    // Floating animation settings
-    floatAmplitude: 0.3, // Small amplitude for subtle movement
-    floatSpeed: 0.8, // Slow, gentle speed
-    
-    // Scroll spin settings
-    spinIntensity: 0.05, // How much spin per scroll unit
-    spinDecay: 0.1 // How quickly spin decays (0.95 = slow decay)
-};
+import { TARGET_CONFIG, MODEL_CONFIG } from './config.js';
 
 // Main initialization function
 function init() {
@@ -51,13 +21,13 @@ function init() {
     const canvas = document.getElementById('three-canvas');
     
     // Create background plane for refraction
-    createBackgroundPlane(scene, uniforms, MODEL_CONFIG);
+    createBackgroundPlane(scene, uniforms);
     
     // Load GLTF model
     loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, MODEL_CONFIG, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition, TARGET_CONFIG);
     
     // Create window resize handler
-    const onWindowResize = createWindowResizeHandler(onThreeJSResize, updatePlaneForViewport, updatePlaneTexture, MODEL_CONFIG);
+    const onWindowResize = createWindowResizeHandler(onThreeJSResize, updatePlaneForViewport, updatePlaneTexture);
     
     // Add event listeners
     addEventListeners(onWindowResize);

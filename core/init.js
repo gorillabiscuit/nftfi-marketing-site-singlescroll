@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createScene } from './scene.js';
 import { createCamera } from './camera.js';
 import { createRenderer, createRenderTargets } from './renderer.js';
+import { SHADER_DEFAULTS } from '../config.js';
 
 // Global references
 export let scene = null;
@@ -34,23 +35,23 @@ export function init() {
     mainRenderTarget = renderTargets.mainRenderTarget;
     backRenderTarget = renderTargets.backRenderTarget;
     
-    // Initialize uniforms
+    // Initialize uniforms using defaults from config
     uniforms = {
-        uIorR: { value: 1.15 },
-        uIorY: { value: 1.16 },
-        uIorG: { value: 1.18 },
-        uIorC: { value: 1.22 },
-        uIorB: { value: 1.22 },
-        uIorP: { value: 1.22 },
-        uSaturation: { value: 1.01 },
-        uChromaticAberration: { value: 0.28 },
-        uRefractPower: { value: 0.5 },
-        uFresnelPower: { value: 12.7 },
-        uShininess: { value: 28.2 },
-        uDiffuseness: { value: 0.07 },
-        uLight: { value: new THREE.Vector3(-1.3, 1.5, -0.6) },
-        winResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight).multiplyScalar(Math.min(window.devicePixelRatio, 2)) },
-        uTexture: { value: null }
+        uIorR: { value: SHADER_DEFAULTS.uIorR },
+        uIorY: { value: SHADER_DEFAULTS.uIorY },
+        uIorG: { value: SHADER_DEFAULTS.uIorG },
+        uIorC: { value: SHADER_DEFAULTS.uIorC },
+        uIorB: { value: SHADER_DEFAULTS.uIorB },
+        uIorP: { value: SHADER_DEFAULTS.uIorP },
+        uSaturation: { value: SHADER_DEFAULTS.uSaturation },
+        uChromaticAberration: { value: SHADER_DEFAULTS.uChromaticAberration },
+        uRefractPower: { value: SHADER_DEFAULTS.uRefractPower },
+        uFresnelPower: { value: SHADER_DEFAULTS.uFresnelPower },
+        uShininess: { value: SHADER_DEFAULTS.uShininess },
+        uDiffuseness: { value: SHADER_DEFAULTS.uDiffuseness },
+        uLight: { value: SHADER_DEFAULTS.uLight.clone() },
+        winResolution: { value: SHADER_DEFAULTS.winResolution.clone() },
+        uTexture: { value: SHADER_DEFAULTS.uTexture }
     };
     
     return {

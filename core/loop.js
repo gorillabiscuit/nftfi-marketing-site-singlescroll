@@ -6,6 +6,7 @@ import { scene, camera, renderer, mainRenderTarget, backRenderTarget } from './i
 import { showBackgroundPlane, hideBackgroundPlane } from '../objects/backgroundPlane.js';
 import { getScrollSpinVelocity } from '../controls/scrollTrigger.js';
 import { calculateStartPosition } from '../utils/viewport.js';
+import { ANIMATION_CONFIG } from '../config.js';
 
 // Global references (will be set by main.js)
 let mesh, wrapper, isModelReady;
@@ -30,23 +31,23 @@ export function animate() {
         
         // Decay mouse influence over time (slower decay like working example)
         if (window.mouseInfluence) {
-            window.mouseInfluence.x *= 0.98; // Slower decay
-            window.mouseInfluence.y *= 0.98;
+            window.mouseInfluence.x *= ANIMATION_CONFIG.mouseDecayRate;
+            window.mouseInfluence.y *= ANIMATION_CONFIG.mouseDecayRate;
         }
         
         // Apply rotation to wrapper (parent) with varying rates and mouse influence
         // X-axis: varying rate with sine wave modulation + mouse Y influence (up/down mouse = tilt)
-        const xRate = 0.2 + Math.sin(time * 0.1) * 0.15;
+        const xRate = ANIMATION_CONFIG.xRotationRate.base + Math.sin(time * ANIMATION_CONFIG.xRotationRate.frequency) * ANIMATION_CONFIG.xRotationRate.modulation;
         const mouseY = window.mouseInfluence ? window.mouseInfluence.y : 0;
-        wrapper.rotation.x += xRate * 0.02 + mouseY * 0.05; // Mouse Y affects X rotation
+        wrapper.rotation.x += xRate * 0.02 + mouseY * ANIMATION_CONFIG.xRotationRate.mouseInfluence;
         
         // Y-axis: varying rate with cosine wave modulation + mouse X influence (left/right mouse = turn)
-        const yRate = 0.3 + Math.cos(time * 0.08) * 0.2;
+        const yRate = ANIMATION_CONFIG.yRotationRate.base + Math.cos(time * ANIMATION_CONFIG.yRotationRate.frequency) * ANIMATION_CONFIG.yRotationRate.modulation;
         const mouseX = window.mouseInfluence ? window.mouseInfluence.x : 0;
-        wrapper.rotation.y += yRate * 0.02 + mouseX * 0.05; // Mouse X affects Y rotation
+        wrapper.rotation.y += yRate * 0.02 + mouseX * ANIMATION_CONFIG.yRotationRate.mouseInfluence;
         
         // Z-axis: varying rate with sine wave modulation at different frequency (no mouse control)
-        const zRate = 0.15 + Math.sin(time * 0.12) * 0.1;
+        const zRate = ANIMATION_CONFIG.zRotationRate.base + Math.sin(time * ANIMATION_CONFIG.zRotationRate.frequency) * ANIMATION_CONFIG.zRotationRate.modulation;
         wrapper.rotation.z += zRate * 0.02;
         
         // Add scroll spin to Y rotation (upward spin)

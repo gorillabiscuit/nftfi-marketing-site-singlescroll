@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { gsap } from 'gsap';
+import { MODEL_CONFIG } from '../config.js';
 
 // Global reference
 export let backgroundPlane = null;
@@ -7,7 +8,7 @@ export let backgroundPlane = null;
 /**
  * Capture hero div and create dynamic texture
  */
-export function captureHeroAsTexture(MODEL_CONFIG) {
+export function captureHeroAsTexture() {
     return new Promise((resolve, reject) => {
         const heroElement = document.querySelector('.hero');
         if (!heroElement) {
@@ -83,7 +84,7 @@ export function captureHeroAsTexture(MODEL_CONFIG) {
 /**
  * Create background plane and white sphere for refraction effects
  */
-export function createBackgroundPlane(scene, uniforms, MODEL_CONFIG) {
+export function createBackgroundPlane(scene, uniforms) {
     const backgroundGroup = new THREE.Group();
     backgroundGroup.visible = true; // Make visible to see all objects
     
@@ -120,7 +121,7 @@ export function createBackgroundPlane(scene, uniforms, MODEL_CONFIG) {
     
     // Capture hero and apply as texture with delay to ensure DOM is ready
     setTimeout(() => {
-        captureHeroAsTexture(MODEL_CONFIG).then(texture => {
+        captureHeroAsTexture().then(texture => {
             plane.material.map = texture;
             plane.material.needsUpdate = true;
             // console.log('Dynamic texture applied to plane');
@@ -224,9 +225,9 @@ export function updatePlaneForViewport() {
 /**
  * Update plane texture with fresh hero capture
  */
-export function updatePlaneTexture(MODEL_CONFIG) {
+export function updatePlaneTexture() {
     if (backgroundPlane) {
-        captureHeroAsTexture(MODEL_CONFIG).then(texture => {
+        captureHeroAsTexture().then(texture => {
             // Dispose old texture to prevent memory leaks
             if (backgroundPlane.material.map) {
                 backgroundPlane.material.map.dispose();

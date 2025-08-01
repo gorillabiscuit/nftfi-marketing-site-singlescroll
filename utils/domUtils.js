@@ -4,15 +4,15 @@
 // Debounced texture update function
 let textureUpdateTimeout;
 
-export function debouncedTextureUpdate(updatePlaneTexture, MODEL_CONFIG) {
+export function debouncedTextureUpdate(updatePlaneTexture) {
     clearTimeout(textureUpdateTimeout);
     textureUpdateTimeout = setTimeout(() => {
-        updatePlaneTexture(MODEL_CONFIG);
+        updatePlaneTexture();
     }, 250); // Wait 250ms after resize stops
 }
 
 // Window resize handler
-export function createWindowResizeHandler(onThreeJSResize, updatePlaneForViewport, updatePlaneTexture, MODEL_CONFIG) {
+export function createWindowResizeHandler(onThreeJSResize, updatePlaneForViewport, updatePlaneTexture) {
     return function onWindowResize() {
         // Use modular resize handler
         onThreeJSResize();
@@ -21,7 +21,7 @@ export function createWindowResizeHandler(onThreeJSResize, updatePlaneForViewpor
         updatePlaneForViewport();
         
         // Debounced texture update
-        debouncedTextureUpdate(updatePlaneTexture, MODEL_CONFIG);
+        debouncedTextureUpdate(updatePlaneTexture);
     };
 }
 
