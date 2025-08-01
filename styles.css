@@ -30,7 +30,7 @@ body {
     width: 600px;
     height: 600px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(139, 92, 246, 0.1) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 123, 202, 0.4) 0%, rgba(255, 197, 111, 0.1) 50%, transparent 70%);
     animation: morph1 25s ease-in-out infinite;
     filter: blur(40px);
 }
@@ -43,7 +43,7 @@ body {
     width: 500px;
     height: 500px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, rgba(236, 72, 153, 0.1) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 123, 202, 0.4) 0%, rgba(255, 197, 111, 0.1) 50%, transparent 70%);
     animation: morph2 30s ease-in-out infinite;
     filter: blur(40px);
 }
@@ -56,7 +56,7 @@ body {
     width: 700px;
     height: 700px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0.1) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(224, 29, 146, 0.15) 0%, rgba(255, 197, 111, 0.2) 50%, transparent 70%);
     animation: morph3 35s ease-in-out infinite;
     filter: blur(40px);
     transform: translate(-50%, -50%);
@@ -84,7 +84,7 @@ body {
     width: 550px;
     height: 550px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0.1) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.2) 0%, rgba(255, 197, 111, 0.2) 50%, transparent 70%);
     animation: morph5 32s ease-in-out infinite;
     filter: blur(40px);
     transform: translate(-50%, -50%);
@@ -573,6 +573,7 @@ body {
     overflow: hidden; /* Clip the SVG backgrounds */
     /* Create new stacking context for backdrop-filter to work properly */
     isolation: isolate;
+    box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
 }
 
 /* SVG Background - Top Right Copy */
@@ -598,7 +599,7 @@ body {
     content: '';
     position: absolute;
     bottom: -460px;
-    left: 55px;
+    left: 5px;
     width: 950px;
     height: 950px;
     background-image: url('/images/circles.svg');
