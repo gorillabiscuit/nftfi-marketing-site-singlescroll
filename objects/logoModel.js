@@ -11,7 +11,7 @@ export let isModelReady = false;
 /**
  * Load and setup the GLTF logo model with glass shader material
  */
-export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, originalWrapperPosition, originalWrapperScale, MODEL_CONFIG, scrollSpinVelocity, updateScrollSpin, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition, TARGET_CONFIG) {
+export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, MODEL_CONFIG, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition, TARGET_CONFIG) {
     
     const loader = new GLTFLoader();
     
@@ -119,13 +119,8 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
             },
             // Scroll animation helpers
             resetScrollAnimation: resetScrollAnimation,
-            originalWrapperPosition: originalWrapperPosition,
-            originalWrapperScale: originalWrapperScale,
             // Model positioning configuration - EASY TO TWEAK!
             MODEL_CONFIG: MODEL_CONFIG,
-            // Scroll spin debugging
-            scrollSpinVelocity: () => scrollSpinVelocity,
-            updateScrollSpin: (direction) => updateScrollSpin(direction),
             // Texture debugging
             updatePlaneTexture: () => updatePlaneTexture(MODEL_CONFIG),
             captureHeroAsTexture,
@@ -142,7 +137,7 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
         updatePlaneForViewport();
         
         // Set up scroll-triggered animation after model is ready
-        setupScrollAnimation();
+        setupScrollAnimation(wrapper, MODEL_CONFIG, TARGET_CONFIG, calculateStartPosition, calculateTargetPosition);
     
    
         
