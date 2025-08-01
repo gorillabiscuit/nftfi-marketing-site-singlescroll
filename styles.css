@@ -404,6 +404,8 @@ body {
     position: relative;
     z-index: 4;
     overflow: hidden; /* Clip the SVG backgrounds */
+    /* Create new stacking context for backdrop-filter to work properly */
+    isolation: isolate;
 }
 
 /* SVG Background - Top Right Copy */
@@ -419,7 +421,7 @@ body {
     background-repeat: no-repeat;
     background-position: center;
     opacity: 1.0;
-    z-index: 5;
+    z-index: 1; /* Lower z-index so it gets distorted by glass card */
     pointer-events: none;
     
 }
@@ -437,7 +439,7 @@ body {
     background-repeat: no-repeat;
     background-position: center;
     opacity: 1.0;
-    z-index: 5;
+    z-index: 1; /* Lower z-index so it gets distorted by glass card */
     pointer-events: none;
 }
 
@@ -456,8 +458,8 @@ body {
     padding: 0px;
     gap: 9px;
     margin: 0; /* Remove auto margin to align left */
-
-    z-index: 2;
+    /* Ensure content is below glass card for proper distortion */
+    z-index: 1;
 }
 
 .hero-text {
@@ -825,3 +827,69 @@ body {
         min-width: auto;
     }
 } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+        .card {
+    width: 400px;
+    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    overflow: hidden;
+    border-radius: inherit;
+    transition: opacity 0.26s ease-out;
+    border-radius: 28px;
+    filter: drop-shadow(-8px -10px 46px #0000005f);
+    backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
+    position: relative;
+    cursor: grab;
+    /* Ensure glass card is above content it should distort */
+    z-index: 10;
+}
+
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            border-radius: 28px;
+            -webkit-box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7), 
+                                inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+            box-shadow: inset 6px 6px 0px -6px rgba(255, 255, 255, 0.7), 
+                        inset 0 0 8px 1px rgba(255, 255, 255, 0.7);
+        }
+
+        .dock-icon {
+            width: 20px;
+            scale: 1;
+            transition: all .2s ease-in-out;
+            cursor: pointer;
+            z-index: 99;
+            margin: 0 10px;
+        }
+
+        .dock-icon:hover {
+            scale: 1.2;
+        }
+
+        /* SVG Filter for Distortion Effect */
+        .svg-filters {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
