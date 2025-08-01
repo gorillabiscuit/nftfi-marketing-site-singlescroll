@@ -9,6 +9,8 @@ import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.
 import { createBackgroundPlane, captureHeroAsTexture, backgroundPlane, updatePlane, updatePlaneForViewport, updatePlaneTexture, showBackgroundPlane, hideBackgroundPlane, calculatePlanePosition } from './objects/backgroundPlane.js';
 import { initializeControls } from './controls/controlPanel.js';
 import { setupScrollAnimation, resetScrollAnimation, updateScrollSpin, getScrollSpinVelocity } from './controls/scrollTrigger.js';
+import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
+import { debouncedTextureUpdate, createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
 
 // Navigation functionality - Simple and effective
 function initializeNavigation() {
@@ -167,8 +169,6 @@ let scene, camera, renderer, canvas;
 let mainRenderTarget, backRenderTarget;
 // backgroundPlane imported from objects/backgroundPlane.js
 let uniforms;
-let mouseInfluence = { x: 0, y: 0 };
-let lastMousePos = { x: 0, y: 0 };
 let startTime = Date.now(); // For time-based rotation calculations
 
 // Scroll animation variables are now handled by controls/scrollTrigger.js
@@ -229,8 +229,18 @@ function init() {
     // Load GLTF model
     loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, MODEL_CONFIG, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition, TARGET_CONFIG);
     
+    // Create window resize handler
+    const onWindowResize = createWindowResizeHandler(onThreeJSResize, updatePlaneForViewport, updatePlaneTexture, MODEL_CONFIG);
+    
     // Add event listeners
-    addEventListeners();
+    addEventListeners(onWindowResize);
+    
+    // Initialize global mouse influence variables
+    window.mouseInfluence = { x: 0, y: 0 };
+    window.lastMousePos = { x: 0, y: 0 };
+    
+    // Initialize viewport utilities
+    initializeViewport(camera, TARGET_CONFIG, MODEL_CONFIG);
     
     // Initialize controls after Three.js setup is complete
     initializeControls(camera, uniforms, updatePlane);
@@ -244,100 +254,12 @@ function init() {
 // Model loading logic moved to objects/logoModel.js
 
 
-// Add event listeners
-function addEventListeners() {
-    // Mouse move handler with sophisticated tracking
-    // Use window events since canvas has pointer-events: none
-    window.addEventListener('mousemove', (e) => {
-        // Initialize lastMousePos if it hasn't been set yet
-        if (lastMousePos.x === 0 && lastMousePos.y === 0) {
-            lastMousePos.x = e.clientX;
-            lastMousePos.y = e.clientY;
-            return;
-        }
-        
-        const deltaX = e.clientX - lastMousePos.x;
-        const deltaY = e.clientY - lastMousePos.y;
-        
-        // Add mouse movement to influence (normalized to screen size)
-        // Enhanced mouse influence calculation like the working example
-        mouseInfluence.x += deltaX / window.innerWidth * 2.0;
-        mouseInfluence.y += deltaY / window.innerHeight * 2.0;
-        
-        lastMousePos.x = e.clientX;
-        lastMousePos.y = e.clientY;
-    });
-    
-    // Window resize handler
-    window.addEventListener('resize', onWindowResize);
-}
+// Event listeners are now handled by utils/domUtils.js
 
 // Calculate optimal plane position based on viewport
 // Update plane texture with fresh hero capture
-// Convert world space coordinates to actual world positions
-function worldToPosition(worldX, worldY) {
-    // Convert from -1 to 1 range to actual world coordinates
-    const aspect = window.innerWidth / window.innerHeight;
-    const fov = camera.fov * Math.PI / 180;
-    const distance = Math.abs(camera.position.z);
-    
-    const actualWorldX = worldX * distance * Math.tan(fov/2) * aspect;
-    const actualWorldY = worldY * distance * Math.tan(fov/2);
-    
-    return { x: actualWorldX, y: actualWorldY };
-}
-
-// Calculate target position using direct world coordinates
-function calculateTargetPosition() {
-    const worldPos = worldToPosition(TARGET_CONFIG.targetWorldX, TARGET_CONFIG.targetWorldY);
-    
-    // Apply scale factor based on current viewport
-    const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
-    const scaleFactor = Math.max(0.5, Math.min(1.5, viewportScale)); // Clamp between 0.5 and 1.5
-    
-    return {
-        x: worldPos.x,
-        y: worldPos.y,
-        z: TARGET_CONFIG.targetWorldZ, // Use Z from TARGET_CONFIG
-        scale: MODEL_CONFIG.targetScale * TARGET_CONFIG.scaleRatio * scaleFactor
-    };
-}
-
-// Calculate starting position using direct world coordinates
-function calculateStartPosition() {
-    const worldPos = worldToPosition(TARGET_CONFIG.startWorldX, TARGET_CONFIG.startWorldY);
-    
-    // Apply scale factor based on current viewport
-    const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
-    const scaleFactor = Math.max(0.5, Math.min(1.5, viewportScale)); // Clamp between 0.5 and 1.5
-    
-    return {
-        x: worldPos.x,
-        y: worldPos.y,
-        z: TARGET_CONFIG.startWorldZ // Use Z from TARGET_CONFIG
-    };
-}
-
-// Debounced texture update function
-let textureUpdateTimeout;
-function debouncedTextureUpdate() {
-    clearTimeout(textureUpdateTimeout);
-    textureUpdateTimeout = setTimeout(() => {
-        updatePlaneTexture(MODEL_CONFIG);
-    }, 250); // Wait 250ms after resize stops
-}
-
-// Window resize handler
-function onWindowResize() {
-    // Use modular resize handler
-    onThreeJSResize();
-    
-    // Update plane position for new viewport
-    updatePlaneForViewport();
-    
-    // Debounced texture update
-    debouncedTextureUpdate();
-}
+// Viewport and texture utilities are now handled by utils/viewport.js and utils/textureCapture.js
+// DOM utilities are now handled by utils/domUtils.js
 
     // Animation loop with proper parent-child rotation, mouse-controlled axes, and floating animation
     function animate() {
@@ -347,17 +269,21 @@ function onWindowResize() {
             const time = (Date.now() - startTime) * 0.001; // Convert to seconds from start
             
             // Decay mouse influence over time (slower decay like working example)
-            mouseInfluence.x *= 0.98; // Slower decay
-            mouseInfluence.y *= 0.98;
+            if (window.mouseInfluence) {
+                window.mouseInfluence.x *= 0.98; // Slower decay
+                window.mouseInfluence.y *= 0.98;
+            }
             
             // Apply rotation to wrapper (parent) with varying rates and mouse influence
             // X-axis: varying rate with sine wave modulation + mouse Y influence (up/down mouse = tilt)
             const xRate = 0.2 + Math.sin(time * 0.1) * 0.15;
-            wrapper.rotation.x += xRate * 0.02 + mouseInfluence.y * 0.05; // Mouse Y affects X rotation
+            const mouseY = window.mouseInfluence ? window.mouseInfluence.y : 0;
+            wrapper.rotation.x += xRate * 0.02 + mouseY * 0.05; // Mouse Y affects X rotation
             
             // Y-axis: varying rate with cosine wave modulation + mouse X influence (left/right mouse = turn)
             const yRate = 0.3 + Math.cos(time * 0.08) * 0.2;
-            wrapper.rotation.y += yRate * 0.02 + mouseInfluence.x * 0.05; // Mouse X affects Y rotation
+            const mouseX = window.mouseInfluence ? window.mouseInfluence.x : 0;
+            wrapper.rotation.y += yRate * 0.02 + mouseX * 0.05; // Mouse X affects Y rotation
             
             // Z-axis: varying rate with sine wave modulation at different frequency (no mouse control)
             const zRate = 0.15 + Math.sin(time * 0.12) * 0.1;
