@@ -1,5 +1,5 @@
 // Parallax Mouse Movement System
-// Handles smooth, performant parallax effects for multiple layers
+// Uses matrix3d transforms and CSS custom properties to avoid conflicts
 
 class ParallaxSystem {
     constructor() {
@@ -7,128 +7,120 @@ class ParallaxSystem {
         this.mouseY = 0;
         this.centerX = window.innerWidth / 2;
         this.centerY = window.innerHeight / 2;
-        this.isActive = false;
+        this.ticking = false;
         this.layers = new Map();
-        
-        // Layer speed multipliers (inverse movement)
-        this.layerSpeeds = {
-            background: 0.1,  // Subtle background movement
-            hero: 0.3,        // Medium hero movement
-            text: 0.5         // Most responsive text/buttons
-        };
         
         this.init();
     }
     
     init() {
-        // Check if device supports touch (mobile/tablet)
-        this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        
-        // Only initialize on non-touch devices for better performance
-        if (this.isTouchDevice) {
-            console.log('Parallax disabled on touch device for performance');
-            return;
-        }
-        
-        // Throttled mouse event handler
-        this.handleMouseMove = this.throttle(this.updateMousePosition.bind(this), 16); // 60fps
-        this.handleResize = this.throttle(this.updateViewportCenter.bind(this), 100);
+        // Define parallax layers with different speeds
+        this.addLayer('gradients-bg', 0.05, 0.05); // Background - very subtle
+        this.addLayer('.hero', 0.15, 0.15);         // Hero container - medium
+        this.addLayer('.hero-content', 0.25, 0.25);  // Text/buttons - most responsive
         
         // Add event listeners
-        document.addEventListener('mousemove', this.handleMouseMove);
-        window.addEventListener('resize', this.handleResize);
+        this.addEventListeners();
         
-        // Start animation loop
-        this.animate();
+        // Initial update
+        this.updateParallax();
     }
     
-    // Throttle function for performance
-    throttle(func, limit) {
-        let inThrottle;
-        return function() {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                func.apply(context, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
+    addLayer(selector, speedX = 0.1, speedY = 0.1) {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+            this.layers.set(selector, {
+                elements: Array.from(elements),
+                speedX,
+                speedY
+            });
+        }
     }
     
-    // Update mouse position relative to viewport center
-    updateMousePosition(e) {
-        this.mouseX = (e.clientX - this.centerX) / this.centerX; // -1 to 1
-        this.mouseY = (e.clientY - this.centerY) / this.centerY; // -1 to 1
-        this.isActive = true;
+    addEventListeners() {
+        // Mouse movement
+        document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        
+        // Window resize
+        window.addEventListener('resize', this.handleResize.bind(this));
+        
+        // Touch events for mobile
+        document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: true });
     }
     
-    // Update viewport center on resize
-    updateViewportCenter() {
+    handleMouseMove(e) {
+        this.updateMousePosition(e.clientX, e.clientY);
+    }
+    
+    handleTouchMove(e) {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            this.updateMousePosition(touch.clientX, touch.clientY);
+        }
+    }
+    
+    handleResize() {
         this.centerX = window.innerWidth / 2;
         this.centerY = window.innerHeight / 2;
     }
     
-    // Register a layer for parallax movement
-    registerLayer(name, element, speed = null) {
-        const layerSpeed = speed || this.layerSpeeds[name] || 0.3;
+    updateMousePosition(clientX, clientY) {
+        // Normalize mouse position to -1 to 1 range
+        this.mouseX = (clientX - this.centerX) / this.centerX;
+        this.mouseY = (clientY - this.centerY) / this.centerY;
         
-        this.layers.set(name, {
-            element,
-            speed: layerSpeed,
-            currentX: 0,
-            currentY: 0,
-            targetX: 0,
-            targetY: 0,
-            originalTransform: element.style.transform || ''
-        });
-    }
-    
-    // Smooth interpolation for fluid movement
-    lerp(start, end, factor) {
-        return start + (end - start) * factor;
-    }
-    
-    // Update layer transforms
-    updateLayers() {
-        this.layers.forEach((layer, name) => {
-            // Calculate target position (inverse to mouse movement)
-            const targetX = -this.mouseX * layer.speed * 50; // Max 50px movement
-            const targetY = -this.mouseY * layer.speed * 50;
-            
-            // Smooth interpolation
-            layer.currentX = this.lerp(layer.currentX, targetX, 0.1);
-            layer.currentY = this.lerp(layer.currentY, targetY, 0.1);
-            
-            // Store original transform if not already stored
-            if (!layer.originalTransform) {
-                layer.originalTransform = layer.element.style.transform || '';
-            }
-            
-            // Combine original transform with parallax transform
-            const parallaxTransform = `translate3d(${layer.currentX}px, ${layer.currentY}px, 0)`;
-            layer.element.style.transform = `${layer.originalTransform} ${parallaxTransform}`.trim();
-            
-            // Don't apply parallax transforms directly to buttons to preserve backdrop-filter
-            // The buttons will move with their parent container (hero-content)
-        });
-    }
-    
-    // Main animation loop
-    animate() {
-        if (this.isActive) {
-            this.updateLayers();
+        // Throttle updates to 60fps
+        if (!this.ticking) {
+            requestAnimationFrame(this.updateParallax.bind(this));
+            this.ticking = true;
         }
-        requestAnimationFrame(() => this.animate());
     }
     
-    // Cleanup
-    destroy() {
-        document.removeEventListener('mousemove', this.handleMouseMove);
-        window.removeEventListener('resize', this.handleResize);
-        this.layers.clear();
+    updateParallax() {
+        this.layers.forEach((layer, selector) => {
+            const { elements, speedX, speedY } = layer;
+            
+            // Calculate parallax offset
+            const offsetX = this.mouseX * speedX * 50; // Scale factor for visual effect
+            const offsetY = this.mouseY * speedY * 50;
+            
+            // Update each element in the layer
+            elements.forEach(element => {
+                // Use CSS custom properties to avoid transform conflicts
+                element.style.setProperty('--parallax-x', `${offsetX}px`);
+                element.style.setProperty('--parallax-y', `${offsetY}px`);
+            });
+        });
+        
+        this.ticking = false;
+    }
+    
+    // Method to enable/disable parallax
+    setEnabled(enabled) {
+        if (enabled) {
+            this.addEventListeners();
+        } else {
+            // Remove event listeners and reset transforms
+            document.removeEventListener('mousemove', this.handleMouseMove.bind(this));
+            document.removeEventListener('touchmove', this.handleTouchMove.bind(this));
+            
+            // Reset all parallax transforms
+            this.layers.forEach((layer) => {
+                layer.elements.forEach(element => {
+                    element.style.setProperty('--parallax-x', '0px');
+                    element.style.setProperty('--parallax-y', '0px');
+                });
+            });
+        }
     }
 }
 
-// Export for use in other modules
-export default ParallaxSystem; 
+// Initialize parallax system when DOM is ready
+let parallaxSystem;
+
+document.addEventListener('DOMContentLoaded', () => {
+    parallaxSystem = new ParallaxSystem();
+});
+
+// Export for potential external control
+window.ParallaxSystem = ParallaxSystem; 

@@ -20,9 +20,9 @@ body {
     height: 100vh;
     z-index: -1;
     overflow: hidden;
-    /* Hardware acceleration for parallax */
+    /* Parallax transform using CSS custom properties */
+    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
     will-change: transform;
-    transform: translate3d(0, 0, 0);
 }
 
 .gradients-bg::before {
@@ -577,9 +577,9 @@ body {
     /* Create new stacking context for backdrop-filter to work properly */
     isolation: isolate;
     box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
-    /* Hardware acceleration for parallax */
+    /* Parallax transform using CSS custom properties */
+    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
     will-change: transform;
-    transform: translate3d(0, 0, 0);
 }
 
 /* SVG Background - Top Right Copy */
@@ -634,9 +634,9 @@ body {
     margin: 0; /* Remove auto margin to align left */
     /* Ensure content is below glass card for proper distortion */
     z-index: 1;
-    /* Hardware acceleration for parallax */
+    /* Parallax transform using CSS custom properties */
+    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
     will-change: transform;
-    transform: translate3d(0, 0, 0);
 }
 
 .hero-text {
@@ -984,17 +984,19 @@ body {
     border-radius: 500px;
     border: none;
     filter: drop-shadow(-8px -10px 46px #0000005f);
-    backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
-    -webkit-backdrop-filter: brightness(1.1) blur(2px) url(#displacementFilter);
+    backdrop-filter: blur(2px) url(#displacementFilter);
     
     /* Positioning */
     position: relative;
     cursor: pointer;
     z-index: 10;
-    isolation: isolate;
     
     /* Transitions */
     transition: all 0.2s ease;
+    
+    /* Parallax transform using CSS custom properties */
+    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
+    will-change: transform;
 }
 
 
@@ -1011,21 +1013,6 @@ body {
                 inset 0 0 3px 1px rgba(255, 255, 255, 0.125);
 }
 
-.card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    border-radius: 500px;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    filter: url(#displacementFilter);
-    -webkit-filter: url(#displacementFilter);
-    isolation: isolate;
-    pointer-events: none;
-}
-
 .dock-icon {
     width: 24px;
     height: 24px;
@@ -1039,12 +1026,12 @@ body {
 
 .card:hover {
     background: rgba(226, 220, 218, 0.25);
-    transform: translateY(-2px);
+    transform: translate3d(var(--parallax-x, 0), calc(var(--parallax-y, 0) - 2px), 0);
     filter: drop-shadow(-8px -10px 46px #0000005f);
 }
 
 .card:active {
-    transform: translateY(0px);
+    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
     background: rgba(226, 220, 218, 0.05);
 }
 
@@ -1054,28 +1041,4 @@ body {
     width: 0;
     height: 0;
     overflow: hidden;
-}
-
-/* Subtle CSS-only parallax for mobile devices */
-@media (hover: none) and (pointer: coarse) {
-    .gradients-bg {
-        animation: subtle-float 20s ease-in-out infinite;
-    }
-    
-    .hero {
-        animation: subtle-float 15s ease-in-out infinite reverse;
-    }
-    
-    .hero-content {
-        animation: subtle-float 10s ease-in-out infinite;
-    }
-    
-    @keyframes subtle-float {
-        0%, 100% {
-            transform: translate3d(0, 0, 0);
-        }
-        50% {
-            transform: translate3d(2px, 2px, 0);
-        }
-    }
 }
