@@ -688,11 +688,41 @@ function captureHeroAsTexture() {
                 //     texture: texture
                 // });
                 
+                // Mark texture as ready and trigger mesh scale animation
+                window.textureReady = true;
+                if (window.wrapper) {
+                    // Animate mesh scale from tiny to target scale
+                    gsap.to(window.wrapper.scale, {
+                        x: MODEL_CONFIG.startScale,
+                        y: MODEL_CONFIG.startScale,
+                        z: MODEL_CONFIG.startScale,
+                        duration: 1.5,
+                        ease: "power2.out",
+                        onUpdate: () => {
+                            // Ensure scale is applied
+                            window.wrapper.scale.needsUpdate = true;
+                        }
+                    });
+                }
+                
                 resolve(texture);
-            }).catch(error => {
-                console.error('Error capturing hero:', error);
-                reject(error);
-            });
+                    }).catch(error => {
+            console.error('Error capturing hero:', error);
+            
+            // Even if texture fails, still scale up the mesh
+            window.textureReady = true;
+            if (window.wrapper) {
+                gsap.to(window.wrapper.scale, {
+                    x: MODEL_CONFIG.startScale,
+                    y: MODEL_CONFIG.startScale,
+                    z: MODEL_CONFIG.startScale,
+                    duration: 1.5,
+                    ease: "power2.out"
+                });
+            }
+            
+            reject(error);
+        });
         });
     });
 }
@@ -745,6 +775,20 @@ function createBackgroundGeometry() {
             plane.material.needsUpdate = true;
         });
     }, 100); // Small delay to ensure DOM is fully rendered
+    
+    // Safety timeout to ensure mesh scales up even if html2canvas takes too long
+    setTimeout(() => {
+        if (!window.textureReady && window.wrapper) {
+            window.textureReady = true;
+            gsap.to(window.wrapper.scale, {
+                x: MODEL_CONFIG.startScale,
+                y: MODEL_CONFIG.startScale,
+                z: MODEL_CONFIG.startScale,
+                duration: 1.5,
+                ease: "power2.out"
+            });
+        }
+    }, 3000); // 3 second safety timeout
     
     // Add white sphere at the same position as the plane
     const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
@@ -837,11 +881,17 @@ function loadModel() {
                 startPos.z
             );
             
-            // Scale the wrapper
-            wrapper.scale.setScalar(MODEL_CONFIG.startScale);
+            // Start with very small scale to prevent white flash during loading
+            wrapper.scale.setScalar(0.001); // Nearly invisible scale
+            
+            // Flag to track if texture is ready
+            window.textureReady = false;
             
             // Add to scene
             scene.add(wrapper);
+            
+            // Expose wrapper globally for texture ready callback
+            window.wrapper = wrapper;
             
             // Expose debug objects to console for debugging (like working example)
             window.DEBUG = {
