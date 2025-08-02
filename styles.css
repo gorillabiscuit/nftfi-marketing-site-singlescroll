@@ -88,13 +88,13 @@
        - --font-size-2xl: Page titles, hero text
        - --font-size-3xl: Main headlines, hero titles
        ========================================================================== */
-    --font-size-xs: clamp(12px, 1.5vw, 14px);   /* Captions, metadata */
-    --font-size-sm: clamp(14px, 2vw, 16px);      /* Small text, mobile body */
-    --font-size-base: clamp(16px, 2.5vw, 18px);  /* Primary body text */
-    --font-size-lg: clamp(18px, 3vw, 24px);      /* Subheadings, emphasized */
-    --font-size-xl: clamp(24px, 4vw, 32px);      /* Section headings */
-    --font-size-2xl: clamp(32px, 6vw, 48px);     /* Page titles, hero text */
-    --font-size-3xl: clamp(48px, 8vw, 64px);     /* Main headlines */
+    --font-size-xs: clamp(10px, 1.25vw, 12px);   /* Captions, metadata */
+    --font-size-sm: clamp(12px, 1.5vw, 14px);    /* Small text, mobile body */
+    --font-size-base: clamp(14px, 2vw, 16px);     /* Primary body text */
+    --font-size-lg: clamp(16px, 2.25vw, 18px);   /* Subheadings, emphasized */
+    --font-size-xl: clamp(16px, 2.75vw, 20px);   /* Section headings */
+    --font-size-2xl: clamp(24px, 4vw, 32px);     /* Page titles, hero text */
+    --font-size-3xl: clamp(39px, 6vw, 48px);     /* Main headlines */     /* Main headlines */
     
     /* ==========================================================================
        LAYOUT & COMPONENT VARIABLES
@@ -472,6 +472,10 @@ body {
     height: 2px;
     background: #F2F2F2;
     transition: all 0.3s ease;
+}
+
+#hero-title{
+    padding-bottom: 2vw;
 }
 
 .mobile-menu-toggle.active .hamburger-line:nth-child(1) {
