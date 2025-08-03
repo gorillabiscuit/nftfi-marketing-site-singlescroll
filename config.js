@@ -17,6 +17,23 @@ export const TARGET_CONFIG = {
     startWorldZ: 0          // Z depth
 };
 
+// Animation states for different breakpoints
+// Each breakpoint can have different start and target positions/scales
+export const ANIMATION_STATES = {
+    mobile: {
+        start: { x: 0.8, y: -0.2, z: 0, scale: 100.5 },
+        target: { x: -0.8, y: 0.6, z: 0, scale: 0.4 }
+    },
+    tablet: {
+        start: { x: 0.6, y: -0.1, z: 0, scale: 2.8 },
+        target: { x: -0.7, y: 0.7, z: 0, scale: 0.3 }
+    },
+    desktop: {
+        start: { x: 0.55, y: -0.15, z: 0, scale: 3.0 },
+        target: { x: -0.92, y: 0.84, z: 0, scale: 0.265 }
+    }
+};
+
 // Model animation and behavior configuration
 export const MODEL_CONFIG = {
     // Scale configuration

@@ -23,7 +23,8 @@ export function initializeAnimationLoop(meshInstance, wrapperInstance, isModelRe
 // Main animation loop
 export function animate() {
     requestAnimationFrame(animate);
-    
+
+    // ANIMATION LOOP RE-ENABLED
     if (wrapper && isModelReady) {
         const time = (Date.now() - startTime) * 0.001; // Convert to seconds from start
         
@@ -63,11 +64,12 @@ export function animate() {
             wrapper.position.y = wrapper.userData.targetY + floatOffset;
         } else {
             // No scroll animation - use base position with floating
+            // Use dynamic start position that adapts to current breakpoint
             const startPos = calculateStartPosition();
             wrapper.position.y = startPos.y + floatOffset;
         }
     }
-
+    
     // Glass refraction rendering with temporal plane and sphere visibility control
     if (mesh) {
         
@@ -120,5 +122,6 @@ export function animate() {
         renderer.setRenderTarget(null);
     }
     
+    // Render the scene
     renderer.render(scene, camera);
 } 

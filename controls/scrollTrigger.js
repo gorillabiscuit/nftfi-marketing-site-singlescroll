@@ -4,6 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MODEL_CONFIG, TARGET_CONFIG } from '../config.js';
+import { onStateChange } from '../utils/breakpointManager.js';
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -47,6 +48,25 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
     };
     
     // Create scroll timeline
+    createScrollTimeline();
+    
+    // Listen for state changes and recreate animation
+    onStateChange((newState, oldState) => {
+        console.log('ScrollTrigger: State changed, recreating animation', { from: oldState, to: newState });
+        recreateScrollAnimation();
+    });
+    
+    console.log('Scroll animation setup complete');
+}
+
+// Create or recreate the scroll timeline
+function createScrollTimeline() {
+    // Kill existing timeline if it exists
+    if (scrollTimeline) {
+        scrollTimeline.kill();
+    }
+    
+    // Create new scroll timeline
     scrollTimeline = gsap.timeline({
         scrollTrigger: {
             trigger: ".section[data-section='1']",
@@ -61,7 +81,7 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
                 const scrollDirection = self.direction || 0;
                 updateScrollSpin(scrollDirection);
                 
-                // Calculate dynamic target position based on current viewport
+                // Calculate dynamic target position based on current viewport and state
                 const dynamicTarget = calculateTargetPosition();
                 
                 // Calculate starting position for interpolation
@@ -89,18 +109,31 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
                 
                 // Interpolate scale using dynamic target scale
                 const currentScale = gsap.utils.interpolate(
-                    MODEL_CONFIG.startScale, 
+                    startPos.scale || MODEL_CONFIG.startScale, 
                     dynamicTarget.scale, 
                     progress
                 );
                 wrapper.scale.setScalar(currentScale);
                 
-                // console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
+                console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
             }
         }
     });
-    
-    // console.log('Scroll animation setup complete');
+}
+
+// Recreate scroll animation when state changes
+function recreateScrollAnimation() {
+    if (wrapper && calculateStartPosition && calculateTargetPosition) {
+        // Kill existing timeline
+        if (scrollTimeline) {
+            scrollTimeline.kill();
+        }
+        
+        // Create new timeline with updated state
+        createScrollTimeline();
+        
+        console.log('Scroll animation recreated for new state');
+    }
 }
 
 // Reset scroll animation to original position
@@ -118,7 +151,7 @@ export function resetScrollAnimation() {
         );
         // Clear the target Y data to stop scroll animation influence
         delete wrapper.userData.targetY;
-        // console.log('Scroll animation reset to original position');
+        console.log('Scroll animation reset to original position');
     }
 }
 

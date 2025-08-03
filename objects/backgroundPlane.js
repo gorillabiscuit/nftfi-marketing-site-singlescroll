@@ -45,17 +45,23 @@ export function captureHeroAsTexture() {
                 // Mark texture as ready and trigger mesh scale animation
                 window.textureReady = true;
                 if (window.wrapper) {
-                    // Animate mesh scale from tiny to target scale
-                    gsap.to(window.wrapper.scale, {
-                        x: MODEL_CONFIG.startScale,
-                        y: MODEL_CONFIG.startScale,
-                        z: MODEL_CONFIG.startScale,
-                        duration: 1.5,
-                        ease: "power2.out",
-                        onUpdate: () => {
-                            // Ensure scale is applied
-                            window.wrapper.scale.needsUpdate = true;
-                        }
+                    // Get correct scale from animation state
+                    import('../utils/viewport.js').then(({ calculateStartPosition }) => {
+                        const startPos = calculateStartPosition();
+                        const targetScale = startPos.scale || MODEL_CONFIG.startScale;
+                        
+                        // Animate mesh scale from tiny to target scale
+                        gsap.to(window.wrapper.scale, {
+                            x: targetScale,
+                            y: targetScale,
+                            z: targetScale,
+                            duration: 1.5,
+                            ease: "power2.out",
+                            onUpdate: () => {
+                                // Ensure scale is applied
+                                window.wrapper.scale.needsUpdate = true;
+                            }
+                        });
                     });
                 }
                 
@@ -66,12 +72,18 @@ export function captureHeroAsTexture() {
                 // Even if texture fails, still scale up the mesh
                 window.textureReady = true;
                 if (window.wrapper) {
-                    gsap.to(window.wrapper.scale, {
-                        x: MODEL_CONFIG.startScale,
-                        y: MODEL_CONFIG.startScale,
-                        z: MODEL_CONFIG.startScale,
-                        duration: 1.5,
-                        ease: "power2.out"
+                    // Get correct scale from animation state
+                    import('../utils/viewport.js').then(({ calculateStartPosition }) => {
+                        const startPos = calculateStartPosition();
+                        const targetScale = startPos.scale || MODEL_CONFIG.startScale;
+                        
+                        gsap.to(window.wrapper.scale, {
+                            x: targetScale,
+                            y: targetScale,
+                            z: targetScale,
+                            duration: 1.5,
+                            ease: "power2.out"
+                        });
                     });
                 }
                 
@@ -139,12 +151,17 @@ export function createBackgroundPlane(scene, uniforms) {
     setTimeout(() => {
         if (!window.textureReady && window.wrapper) {
             window.textureReady = true;
-            gsap.to(window.wrapper.scale, {
-                x: MODEL_CONFIG.startScale,
-                y: MODEL_CONFIG.startScale,
-                z: MODEL_CONFIG.startScale,
-                duration: 1.5,
-                ease: "power2.out"
+            import('../utils/viewport.js').then(({ calculateStartPosition }) => {
+                const startPos = calculateStartPosition();
+                const targetScale = startPos.scale || MODEL_CONFIG.startScale;
+                
+                gsap.to(window.wrapper.scale, {
+                    x: targetScale,
+                    y: targetScale,
+                    z: targetScale,
+                    duration: 1.5,
+                    ease: "power2.out"
+                });
             });
         }
     }, 3000); // 3 second safety timeout

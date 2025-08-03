@@ -2,6 +2,7 @@
 // Handles world space coordinate calculations and viewport positioning
 
 import { TARGET_CONFIG, MODEL_CONFIG } from '../config.js';
+import { getCurrentAnimationState, getAnimationState } from './breakpointManager.js';
 
 // Global reference to camera (will be set by main.js)
 let camera;
@@ -24,33 +25,34 @@ export function worldToPosition(worldX, worldY) {
     return { x: actualWorldX, y: actualWorldY };
 }
 
-// Calculate target position using direct world coordinates
+// Calculate target position using current animation state
 export function calculateTargetPosition() {
-    const worldPos = worldToPosition(TARGET_CONFIG.targetWorldX, TARGET_CONFIG.targetWorldY);
+    const currentState = getCurrentAnimationState();
+    const animationState = getAnimationState(currentState);
     
-    // Apply scale factor based on current viewport
-    const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
-    const scaleFactor = Math.max(0.5, Math.min(1.5, viewportScale)); // Clamp between 0.5 and 1.5
+    // Use animation state target values instead of hardcoded TARGET_CONFIG
+    const worldPos = worldToPosition(animationState.target.x, animationState.target.y);
     
     return {
         x: worldPos.x,
         y: worldPos.y,
-        z: TARGET_CONFIG.targetWorldZ, // Use Z from TARGET_CONFIG
-        scale: MODEL_CONFIG.targetScale * TARGET_CONFIG.scaleRatio * scaleFactor
+        z: animationState.target.z, // Use Z from animation state
+        scale: animationState.target.scale // Use scale directly without scaleFactor
     };
 }
 
-// Calculate starting position using direct world coordinates
+// Calculate starting position using current animation state
 export function calculateStartPosition() {
-    const worldPos = worldToPosition(TARGET_CONFIG.startWorldX, TARGET_CONFIG.startWorldY);
+    const currentState = getCurrentAnimationState();
+    const animationState = getAnimationState(currentState);
     
-    // Apply scale factor based on current viewport
-    const viewportScale = Math.min(window.innerWidth, window.innerHeight) / 1000; // Normalize to 1000px baseline
-    const scaleFactor = Math.max(0.5, Math.min(1.5, viewportScale)); // Clamp between 0.5 and 1.5
+    // Use animation state start values instead of hardcoded TARGET_CONFIG
+    const worldPos = worldToPosition(animationState.start.x, animationState.start.y);
     
     return {
         x: worldPos.x,
         y: worldPos.y,
-        z: TARGET_CONFIG.startWorldZ // Use Z from TARGET_CONFIG
+        z: animationState.start.z, // Use Z from animation state
+        scale: animationState.start.scale // Use scale directly without scaleFactor
     };
 } 

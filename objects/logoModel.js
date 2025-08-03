@@ -75,8 +75,8 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
             startPos.z
         );
         
-        // Start with very small scale to prevent white flash during loading
-        wrapper.scale.setScalar(0.001); // Nearly invisible scale
+        // Set initial scale using animation state instead of hardcoded value
+        wrapper.scale.setScalar(startPos.scale || 0.001); // Use correct scale from animation state
         
         // Flag to track if texture is ready
         window.textureReady = false;

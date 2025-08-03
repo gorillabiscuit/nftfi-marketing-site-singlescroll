@@ -11,9 +11,13 @@ import { setupScrollAnimation, resetScrollAnimation } from './controls/scrollTri
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
 import { createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
 import { TARGET_CONFIG, MODEL_CONFIG } from './config.js';
+import { initializeBreakpointDetection, getCurrentAnimationState, onStateChange, debugSetState, getAnimationState } from './utils/breakpointManager.js';
 
 // Main initialization function
 function init() {
+    // Initialize breakpoint detection first
+    initializeBreakpointDetection();
+    
     // Initialize Three.js components using modular structure
     const { scene, camera, renderer, mainRenderTarget, backRenderTarget, uniforms } = initThreeJS();
     
@@ -51,6 +55,45 @@ function init() {
         }
     };
     checkModelReady();
+    
+    // Log current animation state for debugging
+    console.log('Current animation state:', getCurrentAnimationState());
+    
+    // Expose debug functions globally
+    window.debugSetState = debugSetState;
+    window.getCurrentAnimationState = getCurrentAnimationState;
+    
+    // Add debug functions for testing animation states
+    window.debugAnimationStates = {
+        // Test different states
+        testMobile: () => debugSetState('mobile'),
+        testTablet: () => debugSetState('tablet'),
+        testDesktop: () => debugSetState('desktop'),
+        
+        // Get current positions
+        getCurrentPositions: () => {
+            const startPos = calculateStartPosition();
+            const targetPos = calculateTargetPosition();
+            console.log('Current positions:', {
+                state: getCurrentAnimationState(),
+                start: startPos,
+                target: targetPos
+            });
+            return { start: startPos, target: targetPos };
+        },
+        
+        // Test all states
+        testAllStates: () => {
+            console.log('Testing all animation states...');
+            ['mobile', 'tablet', 'desktop'].forEach(state => {
+                debugSetState(state);
+                setTimeout(() => {
+                    const positions = window.debugAnimationStates.getCurrentPositions();
+                    console.log(`${state} state:`, positions);
+                }, 100);
+            });
+        }
+    };
 }
 
 // Initialize when DOM is loaded
