@@ -1044,7 +1044,6 @@ body {
     
     .content {
         margin-left: 0;
-        margin-top: 45vh;
     }
     
     .control-row {
@@ -1190,6 +1189,8 @@ body {
         margin-left: var(--spacing-sm);
         margin-right: var(--spacing-sm);
         border-radius: 20px;
+        height: 80vh;
+        padding-top: 30vh;
     }
     
     .hero-text {

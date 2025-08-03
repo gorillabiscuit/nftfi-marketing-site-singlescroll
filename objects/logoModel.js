@@ -75,8 +75,8 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
             startPos.z
         );
         
-        // Set initial scale using animation state instead of hardcoded value
-        wrapper.scale.setScalar(startPos.scale || 0.001); // Use correct scale from animation state
+        // Set initial scale - nearly invisible to start (will be animated by GSAP)
+        wrapper.scale.setScalar(0.0001); // Start tiny, GSAP will animate to correct scale
         
         // Flag to track if texture is ready
         window.textureReady = false;

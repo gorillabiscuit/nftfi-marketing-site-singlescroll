@@ -21,7 +21,7 @@ export const TARGET_CONFIG = {
 // Each breakpoint can have different start and target positions/scales
 export const ANIMATION_STATES = {
     mobile: {
-        start: { x: 0.8, y: -0.2, z: 0, scale: 100.5 },
+        start: { x: 0, y: 0.3, z: 0, scale: 2 },
         target: { x: -0.8, y: 0.6, z: 0, scale: 0.4 }
     },
     tablet: {
