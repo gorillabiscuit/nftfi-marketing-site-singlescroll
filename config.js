@@ -21,8 +21,8 @@ export const TARGET_CONFIG = {
 // Each breakpoint can have different start and target positions/scales
 export const ANIMATION_STATES = {
     mobile: {
-        start: { x: 0, y: 0.3, z: 0, scale: 2 },
-        target: { x: -0.8, y: 0.6, z: 0, scale: 0.4 }
+        start: { x: 0.4, y: .5, z: 0, scale: 1.5 },
+        target: { x: -0.89, y: 0.9, z: 0, scale: 0.135 }
     },
     tablet: {
         start: { x: 0.6, y: -0.1, z: 0, scale: 2.8 },
@@ -30,8 +30,14 @@ export const ANIMATION_STATES = {
     },
     desktop: {
         start: { x: 0.55, y: -0.15, z: 0, scale: 3.0 },
-        target: { x: -0.92, y: 0.84, z: 0, scale: 0.265 }
+        target: { x: -0.94, y: 0.81, z: 0, scale: 0.235 }
     }
+};
+
+export const WHITE_SPHERE_POSITIONS = {
+    mobile: { x: -3.5, y: 5.6, z: -6 },
+    tablet: { x: -10.0, y: 4.8, z: -6.5 },
+    desktop: { x: -11.15, y: 5.35, z: -7 }
 };
 
 // Model animation and behavior configuration

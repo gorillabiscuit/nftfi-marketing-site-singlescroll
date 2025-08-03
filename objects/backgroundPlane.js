@@ -175,7 +175,17 @@ export function createBackgroundPlane(scene, uniforms) {
     });
     
     const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    whiteSphere.position.set(-11.15, 5.35, -7); // Same position as plane
+    
+    // Set position based on breakpoint
+    import('../utils/breakpointManager.js').then(({ getCurrentBreakpoint }) => {
+        import('../config.js').then(({ WHITE_SPHERE_POSITIONS }) => {
+            const breakpoint = getCurrentBreakpoint();
+            const position = WHITE_SPHERE_POSITIONS[breakpoint] || WHITE_SPHERE_POSITIONS.desktop;
+            
+            whiteSphere.position.set(position.x, position.y, position.z);
+        });
+    });
+    
     whiteSphere.scale.setScalar(1.25); // Make it visible
     
     // Make sphere invisible to camera but available for shader sampling (like plane)

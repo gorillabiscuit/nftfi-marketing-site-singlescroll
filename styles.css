@@ -90,10 +90,10 @@
        ========================================================================== */
     --font-size-xs: clamp(10px, 1.25vw, 12px);   /* Captions, metadata */
     --font-size-sm: clamp(12px, 1.5vw, 14px);    /* Small text, mobile body */
-    --font-size-base: clamp(14px, 2vw, 16px);     /* Primary body text */
+    --font-size-base: clamp(18px, 2vw, 16px);     /* Primary body text */
     --font-size-lg: clamp(16px, 2.25vw, 18px);   /* Subheadings, emphasized */
     --font-size-xl: clamp(16px, 2.75vw, 20px);   /* Section headings */
-    --font-size-2xl: clamp(24px, 4vw, 32px);     /* Page titles, hero text */
+    --font-size-2xl: clamp(28px, 4vw, 32px);     /* Page titles, hero text */
     --font-size-3xl: clamp(39px, 6vw, 48px);     /* Main headlines */     /* Main headlines */
     
     /* ==========================================================================
@@ -1175,12 +1175,15 @@ body {
     /* Mobile Typography */
     .hero h1 {
         font-size: var(--font-size-2xl);
-        line-height: 1.1;
+        line-height: 1.4;
+        text-align: center;
+        width: 100%;
     }
     
     .hero .subtitle {
         font-size: var(--font-size-base);
         line-height: 1.4;
+        text-align: center;
     }
     
     /* Mobile Layout */
@@ -1189,8 +1192,9 @@ body {
         margin-left: var(--spacing-sm);
         margin-right: var(--spacing-sm);
         border-radius: 20px;
-        height: 80vh;
+        height: 82vh;
         padding-top: 30vh;
+        align-content: end;
     }
     
     .hero-text {
