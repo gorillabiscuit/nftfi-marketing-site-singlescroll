@@ -15,6 +15,25 @@ import { initializeBreakpointDetection, getCurrentAnimationState, onStateChange,
 
 // Main initialization function
 function init() {
+    // Reset scroll position to top to prevent animation conflicts
+    window.scrollTo(0, 0);
+    // Also reset on next tick to ensure it takes effect
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+    }, 0);
+    
+    // Disable scrolling initially until animation completes
+    document.body.style.overflow = 'hidden';
+    console.log('App initialized - scrolling disabled until animation completes');
+    
+    // Fallback timer to enable scrolling after 3 seconds in case animation fails
+    setTimeout(() => {
+        if (!window.isAnimationComplete || !window.isAnimationComplete()) {
+            console.log('Fallback: Enabling scrolling after timeout');
+            document.body.style.overflow = 'auto';
+        }
+    }, 3000);
+    
     // Initialize breakpoint detection first
     initializeBreakpointDetection();
     

@@ -2,6 +2,84 @@ import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { MODEL_CONFIG } from '../config.js';
 
+// Add scroll prevention at the top of the file
+let isInitialAnimationComplete = false;
+
+// Function to enable scrolling
+function enableScrolling() {
+    isInitialAnimationComplete = true;
+    document.body.style.overflow = 'auto';
+    console.log('Initial animation complete - scrolling enabled');
+}
+
+// Function to disable scrolling
+function disableScrolling() {
+    isInitialAnimationComplete = false;
+    document.body.style.overflow = 'hidden';
+    console.log('Initial animation started - scrolling disabled');
+}
+
+// Export the completion status for other modules to check
+export function isAnimationComplete() {
+    return isInitialAnimationComplete;
+}
+
+// Expose globally for fallback timer
+window.isAnimationComplete = isAnimationComplete;
+
+// Function to calculate correct scale based on current scroll position
+function calculateCorrectScaleForScroll() {
+    // Import the viewport functions dynamically
+    return import('../utils/viewport.js').then(({ calculateStartPosition, calculateTargetPosition }) => {
+        const startPos = calculateStartPosition();
+        const targetPos = calculateTargetPosition();
+        
+        // Get the ScrollTrigger element (section 1)
+        const triggerElement = document.querySelector(".section[data-section='1']");
+        if (!triggerElement) {
+            console.log('Trigger element not found, using start scale');
+            return startPos.scale || MODEL_CONFIG.startScale;
+        }
+        
+        // Calculate progress based on ScrollTrigger's bounds (section 1 only)
+        const triggerRect = triggerElement.getBoundingClientRect();
+        const triggerHeight = triggerRect.height;
+        const triggerTop = triggerRect.top;
+        
+        // Progress is 0 when section 1 is at top, 1 when section 1 is at bottom
+        let progress = 0;
+        
+        if (triggerTop <= 0) {
+            // Section 1 is above or at top of viewport
+            progress = Math.min(Math.abs(triggerTop) / triggerHeight, 1);
+        } else {
+            // Section 1 is below top of viewport (not started yet)
+            progress = 0;
+        }
+        
+        // Clamp progress between 0 and 1
+        progress = Math.max(0, Math.min(1, progress));
+        
+        // Interpolate scale based on ScrollTrigger progress
+        const currentScale = gsap.utils.interpolate(
+            startPos.scale || MODEL_CONFIG.startScale,
+            targetPos.scale,
+            progress
+        );
+        
+        console.log('Calculated scale for ScrollTrigger position:', {
+            triggerTop: triggerTop,
+            triggerHeight: triggerHeight,
+            progress: progress,
+            startScale: startPos.scale,
+            targetScale: targetPos.scale,
+            currentScale: currentScale
+        });
+        
+        return currentScale;
+    });
+}
+
 // Global reference
 export let backgroundPlane = null;
 
@@ -45,21 +123,26 @@ export function captureHeroAsTexture() {
                 // Mark texture as ready and trigger mesh scale animation
                 window.textureReady = true;
                 if (window.wrapper) {
-                    // Get correct scale from animation state
-                    import('../utils/viewport.js').then(({ calculateStartPosition }) => {
-                        const startPos = calculateStartPosition();
-                        const targetScale = startPos.scale || MODEL_CONFIG.startScale;
-                        
-                        // Animate mesh scale from tiny to target scale
+                    // Calculate correct scale based on current scroll position
+                    calculateCorrectScaleForScroll().then(targetScale => {
+                        // Animate mesh scale from tiny to calculated target scale
+                        disableScrolling(); // Disable scrolling when animation starts
                         gsap.to(window.wrapper.scale, {
                             x: targetScale,
                             y: targetScale,
                             z: targetScale,
                             duration: 1.5,
                             ease: "power2.out",
+                            onStart: () => {
+                                console.log('Initial scale animation started with scroll-adjusted scale:', targetScale);
+                            },
                             onUpdate: () => {
                                 // Ensure scale is applied
                                 window.wrapper.scale.needsUpdate = true;
+                            },
+                            onComplete: () => {
+                                enableScrolling(); // Enable scrolling when animation completes
+                                console.log('Initial scale animation completed');
                             }
                         });
                     });
@@ -72,17 +155,22 @@ export function captureHeroAsTexture() {
                 // Even if texture fails, still scale up the mesh
                 window.textureReady = true;
                 if (window.wrapper) {
-                    // Get correct scale from animation state
-                    import('../utils/viewport.js').then(({ calculateStartPosition }) => {
-                        const startPos = calculateStartPosition();
-                        const targetScale = startPos.scale || MODEL_CONFIG.startScale;
-                        
+                    // Calculate correct scale based on current scroll position
+                    calculateCorrectScaleForScroll().then(targetScale => {
+                        disableScrolling(); // Disable scrolling for fallback animation
                         gsap.to(window.wrapper.scale, {
                             x: targetScale,
                             y: targetScale,
                             z: targetScale,
                             duration: 1.5,
-                            ease: "power2.out"
+                            ease: "power2.out",
+                            onStart: () => {
+                                console.log('Fallback scale animation started with scroll-adjusted scale:', targetScale);
+                            },
+                            onComplete: () => {
+                                enableScrolling(); // Enable scrolling when fallback animation completes
+                                console.log('Fallback scale animation completed');
+                            }
                         });
                     });
                 }

@@ -124,6 +124,12 @@ body {
     position: relative;
 }
 
+/* Scroll prevention styles */
+body.scroll-disabled {
+    overflow: hidden !important;
+    cursor: wait;
+}
+
 /* Animated Morphing Gradients Background */
 .gradients-bg {
     position: fixed;
