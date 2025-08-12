@@ -7,6 +7,8 @@ import { showBackgroundPlane, hideBackgroundPlane } from '../objects/backgroundP
 import { getScrollSpinVelocity } from '../controls/scrollTrigger.js';
 import { calculateStartPosition } from '../utils/viewport.js';
 import { ANIMATION_CONFIG, MODEL_CONFIG } from '../config.js';
+// NEW: Import ScrollSmoother performance monitoring
+import { startPerformanceFrame, recordScrollEvent } from '../controls/scrollSynchronizer.js';
 
 // Global references (will be set by main.js)
 let mesh, wrapper, isModelReady;
@@ -23,6 +25,9 @@ export function initializeAnimationLoop(meshInstance, wrapperInstance, isModelRe
 // Main animation loop
 export function animate() {
     requestAnimationFrame(animate);
+
+    // NEW: Start performance monitoring for this frame
+    startPerformanceFrame();
 
     // ANIMATION LOOP RE-ENABLED
     if (wrapper && isModelReady) {

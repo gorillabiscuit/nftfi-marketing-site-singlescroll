@@ -1,6 +1,8 @@
 // DOM Utilities Module for NFTfi Marketing Site
 // Handles DOM-related utilities and event binding
 
+import { recordScrollEvent } from '../controls/scrollSynchronizer.js';
+
 // Debounced texture update function
 let textureUpdateTimeout;
 
@@ -25,37 +27,92 @@ export function createWindowResizeHandler(onThreeJSResize, updatePlaneForViewpor
     };
 }
 
-// Add event listeners for mouse movement and window resize
+/**
+ * Add event listeners for the application
+ */
 export function addEventListeners(onWindowResize) {
-    // Mouse move handler with sophisticated tracking
-    // Use window events since canvas has pointer-events: none
-    window.addEventListener('mousemove', (e) => {
-        // Initialize lastMousePos if it hasn't been set yet
-        if (window.lastMousePos && window.lastMousePos.x === 0 && window.lastMousePos.y === 0) {
-            window.lastMousePos.x = e.clientX;
-            window.lastMousePos.y = e.clientY;
-            return;
-        }
+    // Window resize event
+    window.addEventListener('resize', onWindowResize);
+    
+    // NEW: Add scroll event monitoring for performance tracking
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        // Record scroll event for performance monitoring
+        recordScrollEvent();
         
-        if (!window.lastMousePos) {
-            window.lastMousePos = { x: e.clientX, y: e.clientY };
-            return;
-        }
+        // Debounce scroll events to prevent excessive performance monitoring
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            // Additional scroll processing can go here if needed
+        }, 16); // ~60fps
+    }, { passive: true }); // Use passive listener for better performance
+    
+    // Mouse movement for 3D model interaction
+    window.addEventListener('mousemove', (event) => {
+        if (!window.mouseInfluence) return;
         
-        const deltaX = e.clientX - window.lastMousePos.x;
-        const deltaY = e.clientY - window.lastMousePos.y;
+        // Calculate normalized mouse position (-1 to 1)
+        const normalizedX = (event.clientX / window.innerWidth) * 2 - 1;
+        const normalizedY = (event.clientY / window.innerHeight) * 2 - 1;
         
-        // Add mouse movement to influence (normalized to screen size)
-        // Enhanced mouse influence calculation like the working example
-        if (window.mouseInfluence) {
-            window.mouseInfluence.x += deltaX / window.innerWidth * 2.0;
-            window.mouseInfluence.y += deltaY / window.innerHeight * 2.0;
-        }
+        // Apply influence with smoothing
+        window.mouseInfluence.x += (normalizedX - window.mouseInfluence.x) * 0.1;
+        window.mouseInfluence.y += (normalizedY - window.mouseInfluence.y) * 0.1;
         
-        window.lastMousePos.x = e.clientX;
-        window.lastMousePos.y = e.clientY;
+        // Store last mouse position
+        window.lastMousePos = { x: event.clientX, y: event.clientY };
     });
     
-    // Window resize handler
-    window.addEventListener('resize', onWindowResize);
+    // Touch events for mobile devices
+    window.addEventListener('touchmove', (event) => {
+        if (!window.mouseInfluence || event.touches.length === 0) return;
+        
+        const touch = event.touches[0];
+        const normalizedX = (touch.clientX / window.innerWidth) * 2 - 1;
+        const normalizedY = (touch.clientY / window.innerHeight) * 2 - 1;
+        
+        // Apply touch influence with different sensitivity
+        window.mouseInfluence.x += (normalizedX - window.mouseInfluence.x) * 0.05;
+        window.mouseInfluence.y += (normalizedY - window.mouseInfluence.y) * 0.05;
+        
+        // Store last touch position
+        window.lastMousePos = { x: touch.clientX, y: touch.clientY };
+    }, { passive: true });
+    
+    // Keyboard events for debugging
+    window.addEventListener('keydown', (event) => {
+        // Debug key: 'S' to toggle ScrollSmoother
+        if (event.key.toLowerCase() === 's' && event.ctrlKey) {
+            event.preventDefault();
+            if (window.scrollSmoother) {
+                const status = window.scrollSmoother.status();
+                if (status.isEnabled) {
+                    window.scrollSmoother.disable();
+                    console.log('🔄 ScrollSmoother disabled via keyboard shortcut');
+                } else {
+                    window.scrollSmoother.enable();
+                    console.log('🔄 ScrollSmoother enabled via keyboard shortcut');
+                }
+            }
+        }
+        
+        // Debug key: 'T' to test ScrollSmoother
+        if (event.key.toLowerCase() === 't' && event.ctrlKey) {
+            event.preventDefault();
+            if (window.scrollSmoother) {
+                window.scrollSmoother.test();
+            }
+        }
+        
+        // Debug key: 'E' for emergency disable
+        if (event.key.toLowerCase() === 'e' && event.ctrlKey) {
+            event.preventDefault();
+            if (window.scrollSmoother) {
+                window.scrollSmoother.emergency();
+                console.log('🚨 Emergency ScrollSmoother disable triggered');
+            }
+        }
+    });
+    
+    console.log('Event listeners added successfully');
 } 

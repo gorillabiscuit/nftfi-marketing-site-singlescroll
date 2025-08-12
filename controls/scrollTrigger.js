@@ -71,7 +71,7 @@ function createScrollTimeline() {
         scrollTrigger: {
             trigger: ".section[data-section='1']",
             start: "top top",
-            end: "bottom top",
+            end: "bottom 30%",
             scrub: MODEL_CONFIG.scrubDuration, // Smooth scrubbing
             onUpdate: (self) => {
                 // Update Three.js wrapper position and scale based on scroll progress

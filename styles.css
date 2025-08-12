@@ -93,7 +93,7 @@
     --font-size-base: clamp(18px, 2vw, 16px);     /* Primary body text */
     --font-size-lg: clamp(16px, 2.25vw, 18px);   /* Subheadings, emphasized */
     --font-size-xl: clamp(16px, 2.75vw, 20px);   /* Section headings */
-    --font-size-2xl: clamp(28px, 4vw, 32px);     /* Page titles, hero text */
+    --font-size-2xl: clamp(32px, 4vw, 40px);     /* Page titles, hero text */
     --font-size-3xl: clamp(39px, 6vw, 48px);     /* Main headlines */     /* Main headlines */
     
     /* ==========================================================================
@@ -678,10 +678,19 @@ body.scroll-disabled {
 }
 
 /* Content Container for ScrollSmoother */
+#smooth-wrapper {
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    z-index: 50;
+}
+
 #smooth-content {
     position: relative;
     z-index: 50; /* Lower z-index to be behind canvas but above background */
     pointer-events: auto; /* Ensure content is clickable */
+    height: auto;
+    min-height: 100vh;
 }
 
 /* Hero Section */
@@ -759,10 +768,12 @@ body.scroll-disabled {
 .hero-text {
     display: inline-block;
     text-align: left;
-    padding-bottom: 80px; /* Add space between subtitle and buttons */
+    padding-bottom: 7vw; /* Add space between subtitle and buttons */
 }
 
-.hero h1 {
+/* Shared base styles for hero headings */
+h1,
+h2 {
     font-family: 'Satoshi Variable';
     font-style: normal;
     font-weight: 300;
@@ -776,6 +787,10 @@ body.scroll-disabled {
     flex-grow: 0;
     text-align: left;
     width: fit-content; /* Size to content */
+}
+
+h2 {
+    font-size: var(--font-size-2xl); /* Different size for h2 */
 }
 
 .hero .subtitle {
@@ -826,8 +841,8 @@ body.scroll-disabled {
 }
 
 .content {
-    max-width: 800px;
     text-align: center;
+    vertical-align: middle;
     position: relative;
     z-index: 3;
     width: 100%;
@@ -842,34 +857,81 @@ body.scroll-disabled {
     width: 100%;
 }
 
-.section.half {
-    min-height: 50vh !important; /* Override the 100vh min-height */
-    height: 50vh; /* Set explicit height */
-    max-height: 50vh; /* Ensure it doesn't exceed 50% viewport height */
+
+
+
+.section[data-section="2"] {
+    /* Your styles here */
+    
+    
+  /*  min-height: 50vh !important; /* Override the 100vh min-height */
+  /*  max-height: 50vh; /* Ensure it doesn't exceed 50% viewport height */
+    
+    /* Center content both vertically and horizontally */
+    align-items: center !important;
+    justify-content: center !important;
 }
 
+/* Ensure content in section 2 is properly centered */
+.section[data-section="2"] .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 
+/* Center align the h2 text in section 2 */
+.section[data-section="2"] h1 {
+    text-align: center !important;
+    padding-bottom: 5vw;
+}
 
   .stats {
-
     display: flex;
-    
     justify-content: space-around; 
     align-items: center;    
-
-    background-color: #bbdefb;
+    
     height: 100%;
     padding: 15px;
     gap: 5px;
-
+    width: 100%;
+    /* Desktop: horizontal layout */
+    flex-direction: row;
   }
 
   .stats > div{
-    background: #ffecb3;
-    border: 3px solid #ffcc80;
-    border-radius: 5px;
     padding: 8px;
+    
+    /* Make stat elements display vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: left;
+    text-align: left;
+    gap: 4px;
   }
+  
+  /* Style the number and label elements */
+  .stats .number {
+    font-family: 'Roboto Mono', monospace;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 32px;
+    line-height: 46px;
+    color: #C9C9C9;
+  }
+  
+  .stats .label {
+    font-family: 'Satoshi Variable';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 28px;
+    color: #B5B5B5;
+  }
+
+
 
 
 
@@ -1085,7 +1147,6 @@ body.scroll-disabled {
     
     .content {
         margin-left: 0;
-
     }
     
     .control-row {
@@ -1096,6 +1157,18 @@ body.scroll-disabled {
     
     .control-row label {
         min-width: auto;
+    }
+    
+    /* Mobile: vertical layout for stats */
+    .stats {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+    }
+    
+    .stats > div {
+        width: 100%;
+        text-align: center;
     }
 } 
 

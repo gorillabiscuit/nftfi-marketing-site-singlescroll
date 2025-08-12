@@ -8,10 +8,20 @@ import { initializeNavigation } from './controls/navigation.js';
 import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane } from './objects/backgroundPlane.js';
 import { setupScrollAnimation, resetScrollAnimation } from './controls/scrollTrigger.js';
+import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
 import { createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
 import { TARGET_CONFIG, MODEL_CONFIG } from './config.js';
 import { initializeBreakpointDetection, getCurrentAnimationState, onStateChange, debugSetState, getAnimationState } from './utils/breakpointManager.js';
+// NEW: Import ScrollSmoother synchronization layer
+import { 
+    initializeScrollSmoother, 
+    enableScrollSmoother, 
+    disableScrollSmoother, 
+    getScrollSmootherStatus, 
+    testScrollSmoother,
+    emergencyDisable 
+} from './controls/scrollSynchronizer.js';
 
 // Main initialization function
 function init() {
@@ -36,6 +46,10 @@ function init() {
     
     // Initialize breakpoint detection first
     initializeBreakpointDetection();
+    
+    // NEW: Initialize ScrollSmoother safely (will be paused initially)
+    const scrollSmootherStatus = initializeScrollSmoother();
+    console.log('ScrollSmoother initialization result:', scrollSmootherStatus ? 'success' : 'skipped');
     
     // Initialize Three.js components using modular structure
     const { scene, camera, renderer, mainRenderTarget, backRenderTarget, uniforms } = initThreeJS();
@@ -65,6 +79,10 @@ function init() {
     // Initialize controls after Three.js setup is complete
     initializeControls(camera, uniforms, updatePlane);
     
+    // Initialize text effects
+    initStatsScrambleReveal();
+    initHeadingReveal();
+    
     // Initialize animation loop when model is ready
     const checkModelReady = () => {
         if (isModelReady && mesh && wrapper) {
@@ -81,6 +99,15 @@ function init() {
     // Expose debug functions globally
     window.debugSetState = debugSetState;
     window.getCurrentAnimationState = getCurrentAnimationState;
+    
+    // NEW: Expose ScrollSmoother control functions globally for testing
+    window.scrollSmoother = {
+        enable: enableScrollSmoother,
+        disable: disableScrollSmoother,
+        status: getScrollSmootherStatus,
+        test: testScrollSmoother,
+        emergency: emergencyDisable
+    };
     
     // Add debug functions for testing animation states
     window.debugAnimationStates = {
@@ -132,4 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
             window.DEBUG.updatePlaneTexture();
         }
     }, 500);
+    
+    // NEW: Test ScrollSmoother after everything is loaded
+    setTimeout(() => {
+        console.log('Testing ScrollSmoother integration...');
+        const testResult = testScrollSmoother();
+        if (testResult) {
+            console.log('✅ ScrollSmoother test passed - ready for safe integration');
+        } else {
+            console.log('⚠️ ScrollSmoother test failed - continuing with native scroll');
+        }
+    }, 1000);
 }); 
