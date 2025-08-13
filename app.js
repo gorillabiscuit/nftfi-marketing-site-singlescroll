@@ -8,6 +8,7 @@ import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane } from './objects/backgroundPlane.js';
 import { setupScrollAnimation, resetScrollAnimation } from './controls/scrollTrigger.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
+import { initHeaderAnimation } from './controls/headerAnimation.js';
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
 import { createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
 import { TARGET_CONFIG, MODEL_CONFIG } from './config.js';
@@ -40,6 +41,9 @@ function init() {
     // NEW: Initialize ScrollSmoother safely (will be paused initially)
     const scrollSmootherStatus = initializeScrollSmoother();
     console.log('ScrollSmoother initialization result:', scrollSmootherStatus ? 'success' : 'skipped');
+    
+    // Initialize header hide/show animation after ScrollSmoother is ready
+    initHeaderAnimation();
     
     // Initialize Three.js components using modular structure
     const { scene, camera, renderer, mainRenderTarget, backRenderTarget, uniforms } = initThreeJS();

@@ -100,8 +100,8 @@ export function initializeScrollSmoother() {
         smoother = ScrollSmoother.create({
             wrapper: "#smooth-wrapper", // Use the wrapper div
             content: "#smooth-content", // Use the content div
-            smooth: 1.2, // Moderate smoothness
-            effects: false, // Disable effects to prevent interference
+            smooth: 2, // Moderate smoothness
+            effects: true, // Disable effects to prevent interference
             normalizeScroll: false, // Keep native scroll behavior
             ignoreMobileResize: true,
             smoothTouch: 0.1, // Minimal touch smoothness

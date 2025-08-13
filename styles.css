@@ -341,6 +341,12 @@ body.scroll-disabled {
     pointer-events: auto; /* Ensure navigation is clickable */
 }
 
+/* Desktop navigation wrapper for animation */
+.desktop-nav-wrapper {
+    transform-origin: top center; /* Ensure smooth slide animation */
+    will-change: transform; /* Optimize for transform animations */
+}
+
 .nav-container {
     display: flex;
     gap: 48px;
