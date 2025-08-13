@@ -97,6 +97,9 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
         recreateScrollAnimation();
     });
     
+    // Set up section 2 pinning
+    setupSection2Pinning();
+    
     console.log('Scroll animation setup complete');
 }
 
@@ -235,4 +238,23 @@ export function cleanupScrollTrigger() {
 export function enableScrollBasedPositioning() {
     window.isInitialLoadComplete = true;
     console.log('Scroll-based mesh positioning enabled');
+}
+
+// Set up section 2 pinning
+function setupSection2Pinning() {
+    ScrollTrigger.create({
+        trigger: "section[data-section='2']",
+        start: "top top",
+        end: "bottom top",
+        pin: true,
+        pinSpacing: true,
+        onEnter: () => {
+            console.log('Section 2 pinned - scrolling stopped');
+        },
+        onLeave: () => {
+            console.log('Section 2 unpinned - scrolling resumed');
+        }
+    });
+    
+    console.log('Section 2 pinning setup complete');
 } 
