@@ -709,6 +709,14 @@ body.scroll-disabled {
     /* Create new stacking context for backdrop-filter to work properly */
     isolation: isolate;
     box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
+    
+    /* Smooth transitions for size changes when scrollbars appear */
+    transition: 
+        max-width 0.3s ease-out,
+        width 0.3s ease-out,
+        margin-left 0.3s ease-out,
+        margin-right 0.3s ease-out,
+        padding 0.3s ease-out;
 }
 
 /* SVG Background - Top Right Copy */
@@ -763,12 +771,24 @@ body.scroll-disabled {
     margin: 0; /* Remove auto margin to align left */
     /* Ensure content is below glass card for proper distortion */
     z-index: 1;
+    
+    /* Smooth transitions for content sizing */
+    transition: 
+        width 0.3s ease-out,
+        height 0.3s ease-out,
+        padding 0.3s ease-out,
+        gap 0.3s ease-out;
 }
 
 .hero-text {
     display: inline-block;
     text-align: left;
     padding-bottom: 7vw; /* Add space between subtitle and buttons */
+    
+    /* Smooth transitions for text sizing */
+    transition: 
+        width 0.3s ease-out,
+        padding-bottom 0.3s ease-out;
 }
 
 /* Shared base styles for hero headings */
@@ -820,6 +840,12 @@ h2 {
     flex: none;
     order: 1;
     flex-grow: 0;
+    
+    /* Smooth transitions for actions sizing */
+    transition: 
+        width 0.3s ease-out,
+        gap 0.3s ease-out,
+        padding 0.3s ease-out;
 }
 
 

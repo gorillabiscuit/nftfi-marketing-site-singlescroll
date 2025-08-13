@@ -31,17 +31,8 @@ function init() {
         window.scrollTo(0, 0);
     }, 0);
     
-    // Disable scrolling initially until animation completes
-    document.body.style.overflow = 'hidden';
-    console.log('App initialized - scrolling disabled until animation completes');
-    
-    // Fallback timer to enable scrolling after 3 seconds in case animation fails
-    setTimeout(() => {
-        if (!window.isAnimationComplete || !window.isAnimationComplete()) {
-            console.log('Fallback: Enabling scrolling after timeout');
-            document.body.style.overflow = 'auto';
-        }
-    }, 3000);
+    // ScrollSmoother will handle scrolling prevention during initial animation
+    console.log('App initialized - ScrollSmoother will manage scrolling during animation');
     
     // Initialize breakpoint detection first
     initializeBreakpointDetection();

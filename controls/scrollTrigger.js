@@ -58,8 +58,34 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
     // Set flag to prevent ScrollTrigger from updating mesh position until we're ready
     window.isInitialLoadComplete = false;
     
-    // Create scroll timeline
-    createScrollTimeline();
+    // Create initial animation timeline that ONLY scales up the mesh
+    // No position changes - just scale from current position
+    const initialAnimationTimeline = gsap.timeline()
+        .to(wrapper.scale, {
+            x: () => calculateTargetPosition().scale, // Scale to target size
+            y: () => calculateTargetPosition().scale, // Scale to target size
+            z: () => calculateTargetPosition().scale, // Scale to target size
+            duration: 1.5,
+            ease: "power2.out"
+        })
+        .add(() => {
+            console.log('Initial scale animation complete');
+            // Re-enable scrolling by restoring normal ScrollSmoother effects
+            if (window.smoother) {
+                window.smoother.effects("body", { speed: 1 }); // Normal speed = normal scrolling
+                console.log('ScrollSmoother effects restored - normal scrolling enabled');
+            }
+        });
+    
+    // Prevent scrolling during initial animation while keeping scrollbars visible
+    if (window.smoother) {
+        // Keep scrollbars visible but prevent scrolling
+        window.smoother.effects("body", { speed: 0 }); // Zero speed = no scrolling
+        console.log('ScrollSmoother effects disabled - scrolling prevented during animation');
+    }
+    
+    // Start the initial animation immediately
+    initialAnimationTimeline.play();
     
     // Listen for state changes and recreate animation
     onStateChange((newState, oldState) => {
@@ -85,7 +111,7 @@ function createScrollTimeline() {
             end: "bottom 30%",
             scrub: MODEL_CONFIG.scrubDuration, // Smooth scrubbing
             onUpdate: (self) => {
-                // Only update mesh position if we're not in the initial load state
+                // Only update mesh position if scroll-based positioning is enabled
                 if (window.isInitialLoadComplete) {
                     // Update Three.js wrapper position and scale based on scroll progress
                     const progress = self.progress;

@@ -121,7 +121,10 @@ export function initializeScrollSmoother() {
         
         isInitialized = true;
         console.log('ScrollSmoother initialized and enabled by default');
-
+        
+        // Expose ScrollSmoother globally for other modules to use
+        window.smoother = smoother;
+        
         return smoother;
 
     } catch (error) {

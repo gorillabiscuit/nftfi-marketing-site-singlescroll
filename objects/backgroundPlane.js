@@ -2,29 +2,15 @@ import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { MODEL_CONFIG } from '../config.js';
 
-// Add scroll prevention at the top of the file
+// Animation completion tracking
 let isInitialAnimationComplete = false;
-
-// Function to enable scrolling
-function enableScrolling() {
-    isInitialAnimationComplete = true;
-    document.body.style.overflow = 'auto';
-    console.log('Initial animation complete - scrolling enabled');
-}
-
-// Function to disable scrolling
-function disableScrolling() {
-    isInitialAnimationComplete = false;
-    document.body.style.overflow = 'hidden';
-    console.log('Initial animation started - scrolling disabled');
-}
 
 // Export the completion status for other modules to check
 export function isAnimationComplete() {
     return isInitialAnimationComplete;
 }
 
-// Expose globally for fallback timer
+// Expose globally for other modules to check
 window.isAnimationComplete = isAnimationComplete;
 
 // Function to calculate correct scale based on current scroll position
@@ -126,7 +112,6 @@ export function captureHeroAsTexture() {
                     // Calculate correct scale based on current scroll position
                     calculateCorrectScaleForScroll().then(targetScale => {
                         // Animate mesh scale from tiny to calculated target scale
-                        disableScrolling(); // Disable scrolling when animation starts
                         gsap.to(window.wrapper.scale, {
                             x: targetScale,
                             y: targetScale,
@@ -141,7 +126,7 @@ export function captureHeroAsTexture() {
                                 window.wrapper.scale.needsUpdate = true;
                             },
                             onComplete: () => {
-                                enableScrolling(); // Enable scrolling when animation completes
+                                isInitialAnimationComplete = true;
                                 console.log('Initial scale animation completed');
                             }
                         });
@@ -157,7 +142,6 @@ export function captureHeroAsTexture() {
                 if (window.wrapper) {
                     // Calculate correct scale based on current scroll position
                     calculateCorrectScaleForScroll().then(targetScale => {
-                        disableScrolling(); // Disable scrolling for fallback animation
                         gsap.to(window.wrapper.scale, {
                             x: targetScale,
                             y: targetScale,
@@ -168,7 +152,7 @@ export function captureHeroAsTexture() {
                                 console.log('Fallback scale animation started with scroll-adjusted scale:', targetScale);
                             },
                             onComplete: () => {
-                                enableScrolling(); // Enable scrolling when fallback animation completes
+                                isInitialAnimationComplete = true;
                                 console.log('Fallback scale animation completed');
                             }
                         });
