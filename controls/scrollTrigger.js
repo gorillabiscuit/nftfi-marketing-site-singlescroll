@@ -242,19 +242,61 @@ export function enableScrollBasedPositioning() {
 
 // Set up section 2 pinning
 function setupSection2Pinning() {
-    ScrollTrigger.create({
-        trigger: "section[data-section='2']",
-        start: "top top",
-        end: "bottom top",
-        pin: true,
-        pinSpacing: true,
-        onEnter: () => {
-            console.log('Section 2 pinned - scrolling stopped');
-        },
-        onLeave: () => {
-            console.log('Section 2 unpinned - scrolling resumed');
-        }
-    });
+    let rotationCount = 0;
+    const targetRotations = 3;
+    let section2Trigger;
     
-    console.log('Section 2 pinning setup complete');
+    // The pinning is now handled by the rotation animation's ScrollTrigger
+    // No need for a separate pinning ScrollTrigger
+    console.log('Section 2 pinning will be handled by rotation animation');
+    
+    // Start the rotation animation immediately
+    startRotationMonitoring();
+    
+    // Function to start monitoring scroll velocity for rotation
+    function startRotationMonitoring() {
+        const square = document.querySelector('.test-square');
+        if (!square) {
+            console.error('Square element not found!');
+            return;
+        }
+        
+        console.log('Square found:', square);
+        
+        // Position the square in the center using GSAP
+        gsap.set(square, {
+            x: '-50%',
+            y: '-50%'
+        });
+        
+        // Create the rotation animation with ScrollTrigger scrub
+        // This follows the exact pattern from your working example
+        gsap.fromTo(square, 
+            { rotation: 0 },
+            {
+                rotation: 1080, // 3 full rotations (3 * 360)
+                scrollTrigger: {
+                    trigger: "section[data-section='2']",
+                    scrub: true,
+                    pin: true,
+                    start: "top top",
+                    end: "+=100%",
+                    onComplete: () => {
+                        console.log('Rotation animation complete - unpinning section 2');
+                        // The pinning will automatically end when the animation completes
+                    }
+                },
+                ease: "none"
+            }
+        );
+        
+        console.log('Rotation animation with ScrollTrigger scrub created successfully');
+    }
+    
+    // Function to stop rotation monitoring (no longer needed with scrub animation)
+    function stopRotationMonitoring() {
+        // This is handled automatically by ScrollTrigger
+    }
+    
+    console.log('Section 2 pinning setup complete with rotation monitoring');
 } 
