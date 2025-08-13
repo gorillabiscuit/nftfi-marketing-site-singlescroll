@@ -1275,11 +1275,12 @@ h2 {
 }
 
 #lines-svg {
-    width: 100%;
-    height: 100%;
+    width: 400px;  /* Fixed width to match viewBox */
+    height: 400px; /* Fixed height to match viewBox */
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the SVG */
 }
 
 /* SVG Line Styles */
@@ -1288,14 +1289,4 @@ h2 {
     stroke-width: 2;
     fill: none;
     vector-effect: non-scaling-stroke;
-}
-
-.line.horizontal {
-    stroke-dasharray: 2000;
-    stroke-dashoffset: 2000;
-}
-
-.line.vertical {
-    stroke-dasharray: 2000;
-    stroke-dashoffset: 2000;
 }

@@ -3,11 +3,12 @@
 
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { MODEL_CONFIG, TARGET_CONFIG } from '../config.js';
 import { onStateChange } from '../utils/breakpointManager.js';
 
-// Register ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
 
 // Scroll animation variables
 let scrollTimeline;
@@ -304,7 +305,7 @@ function setupSection2Pinning() {
     console.log('Section 2 pinning setup complete with rotation monitoring');
 }
 
-// Set up SVG line drawing animations using the canonical GSAP pattern
+// Set up SVG line drawing animations using the canonical GSAP DrawSVGPlugin pattern
 function setupLineAnimations() {
     // Get all SVG lines
     const lines = document.querySelectorAll('.line');
@@ -314,22 +315,25 @@ function setupLineAnimations() {
         return;
     }
     
-    console.log(`Found ${lines.length} SVG lines for animation`);
+    console.log(`Found ${lines.length} SVG lines for center-out animation`);
+    console.log('DrawSVGPlugin available:', !!gsap.DrawSVGPlugin);
     
-    // Set up each line with the canonical stroke-dasharray animation
+    // All lines are now properly sized path elements, so DrawSVGPlugin should work correctly
+    console.log(`Found ${lines.length} SVG path elements for center-out animation`);
+    console.log('DrawSVGPlugin available:', !!gsap.DrawSVGPlugin);
+    
+    // Set up each line with the world-class center-out drawSVG pattern
     lines.forEach((line, index) => {
-        // Get the actual path length (for more accurate animation)
-        const length = line.getTotalLength ? line.getTotalLength() : 2000;
+        console.log(`Setting up line ${index + 1}:`, line);
         
-        // Set initial state: line is invisible (stroke-dashoffset = length)
-        gsap.set(line, { 
-            strokeDasharray: length, 
-            strokeDashoffset: length 
-        });
+        // Create the center-out drawing animation using DrawSVGPlugin
+        // Start with lines invisible (center point only)
+        gsap.set(line, { drawSVG: "50% 50%" });
+        console.log(`Line ${index + 1} initial state set to center point only`);
         
-        // Create the drawing animation with ScrollTrigger scrub
+        // Animate to fully drawn from center outward
         gsap.to(line, {
-            strokeDashoffset: 0, // Line becomes fully visible
+            drawSVG: "0% 100%",   // End: fully drawn from center outward
             ease: "none", // Linear animation for smooth scrub
             scrollTrigger: {
                 trigger: "section[data-section='2']",
@@ -339,14 +343,14 @@ function setupLineAnimations() {
                 onUpdate: (self) => {
                     // Optional: Log progress for debugging
                     if (index === 0) { // Only log first line to avoid spam
-                        console.log(`Line drawing progress: ${Math.round(self.progress * 100)}%`);
+                        console.log(`Center-out line drawing progress: ${Math.round(self.progress * 100)}%`);
                     }
                 }
             }
         });
         
-        console.log(`Line ${index + 1} animation setup complete (length: ${length})`);
+        console.log(`Line ${index + 1} center-out animation setup complete`);
     });
     
-    console.log('All SVG line animations setup complete');
+    console.log('All SVG center-out line animations setup complete');
 } 
