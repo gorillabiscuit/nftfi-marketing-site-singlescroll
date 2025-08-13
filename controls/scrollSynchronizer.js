@@ -5,6 +5,9 @@
 import { gsap } from 'gsap';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 
+// Register the ScrollSmoother plugin with GSAP
+gsap.registerPlugin(ScrollSmoother);
+
 // Global state
 let smoother = null;
 let isInitialized = false;
@@ -112,11 +115,12 @@ export function initializeScrollSmoother() {
         // Initialize performance monitor
         performanceMonitor = new PerformanceMonitor();
 
-        // Start with ScrollSmoother PAUSED to prevent interference
-        smoother.paused(true);
+        // Start with ScrollSmoother ENABLED by default
+        smoother.paused(false);
+        isEnabled = true;
         
         isInitialized = true;
-        console.log('ScrollSmoother initialized safely (paused)');
+        console.log('ScrollSmoother initialized and enabled by default');
 
         return smoother;
 
@@ -173,6 +177,8 @@ export function disableScrollSmoother() {
         return false;
     }
 }
+
+
 
 /**
  * Get current ScrollSmoother status
@@ -234,6 +240,12 @@ export function testScrollSmoother() {
         // Test basic functionality
         const status = getScrollSmootherStatus();
         console.log('ScrollSmoother test results:', status);
+        
+        // Test if ScrollSmoother is actually active
+        console.log('ScrollSmoother instance:', smoother);
+        console.log('Is paused:', smoother.paused());
+        console.log('Progress:', smoother.progress);
+        console.log('ScrollTop:', smoother.scrollTop());
         
         // Test performance
         if (performanceMonitor) {

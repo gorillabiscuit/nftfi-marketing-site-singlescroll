@@ -3,7 +3,6 @@
 
 import { init as initThreeJS, onWindowResize as onThreeJSResize } from './core/init.js';
 import { animate, initializeAnimationLoop } from './core/loop.js';
-import { initializeControls } from './controls/controlPanel.js';
 import { initializeNavigation } from './controls/navigation.js';
 import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane } from './objects/backgroundPlane.js';
@@ -76,8 +75,7 @@ function init() {
     // Initialize viewport utilities
     initializeViewport(camera);
     
-    // Initialize controls after Three.js setup is complete
-    initializeControls(camera, uniforms, updatePlane);
+
     
     // Initialize text effects
     initStatsScrambleReveal();
@@ -100,14 +98,7 @@ function init() {
     window.debugSetState = debugSetState;
     window.getCurrentAnimationState = getCurrentAnimationState;
     
-    // NEW: Expose ScrollSmoother control functions globally for testing
-    window.scrollSmoother = {
-        enable: enableScrollSmoother,
-        disable: disableScrollSmoother,
-        status: getScrollSmootherStatus,
-        test: testScrollSmoother,
-        emergency: emergencyDisable
-    };
+
     
     // Add debug functions for testing animation states
     window.debugAnimationStates = {
@@ -160,14 +151,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 500);
     
-    // NEW: Test ScrollSmoother after everything is loaded
-    setTimeout(() => {
-        console.log('Testing ScrollSmoother integration...');
-        const testResult = testScrollSmoother();
-        if (testResult) {
-            console.log('✅ ScrollSmoother test passed - ready for safe integration');
-        } else {
-            console.log('⚠️ ScrollSmoother test failed - continuing with native scroll');
-        }
-    }, 1000);
+
 }); 

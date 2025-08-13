@@ -942,168 +942,9 @@ h2 {
 
 
 
-/* Controls Panel Styles */
-.controls-panel {
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 12px;
-    backdrop-filter: blur(10px);
-    max-width: 280px;
-    position: fixed;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 9999; /* Very high z-index to be above everything */
-    max-height: 75vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    pointer-events: auto !important; /* Ensure controls are clickable */
-    isolation: isolate; /* Create new stacking context */
-}
 
-.controls-panel h3 {
-    color: #F2F2F2;
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-}
 
-/* Ensure all controls panel elements are clickable */
-.controls-panel * {
-    pointer-events: auto !important;
-}
 
-/* Accordion Styles */
-.accordion-section {
-    margin-bottom: 8px;
-}
-
-.accordion-section:last-child {
-    margin-bottom: 0;
-}
-
-.accordion-header {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    padding: 8px 12px;
-    color: #F2F2F2;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.2s ease;
-}
-
-.accordion-header:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-.accordion-header:active {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.accordion-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.accordion-content.expanded {
-    max-height: 500px; /* Sufficient for largest section */
-}
-
-.chevron {
-    transition: transform 0.3s ease;
-    color: #F2F2F2;
-}
-
-.accordion-header.expanded .chevron {
-    transform: rotate(180deg);
-}
-
-.control-group {
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.control-group:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.control-group label {
-    display: block;
-    color: #F2F2F2;
-    font-size: 11px;
-    font-weight: 500;
-    margin-bottom: 6px;
-}
-
-.control-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 5px;
-    gap: 6px;
-}
-
-.control-row label {
-    color: #F2F2F2;
-    font-size: 10px;
-    font-weight: 400;
-    margin: 0;
-    min-width: 70px;
-}
-
-.control-slider {
-    flex: 1;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.control-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #F2F2F2;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.control-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    background: #F2F2F2;
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-}
-
-.vector-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.control-label {
-    color: #F2F2F2;
-    font-size: 11px;
-    font-weight: 400;
-    opacity: 0.8;
-}
 
 .glass {
     position: relative;
@@ -1134,29 +975,8 @@ h2 {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .controls-panel {
-        position: fixed;
-        left: 10px;
-        right: 10px;
-        top: 10px;
-        transform: none;
-        max-width: none;
-        max-height: 40vh;
-        margin: 0;
-    }
-    
     .content {
         margin-left: 0;
-    }
-    
-    .control-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 5px;
-    }
-    
-    .control-row label {
-        min-width: auto;
     }
     
     /* Mobile: vertical layout for stats */
@@ -1331,28 +1151,9 @@ h2 {
         font-size: var(--font-size-sm);
     }
     
-    /* Mobile Controls Panel */
-    .controls-panel {
-        left: var(--spacing-sm);
-        right: var(--spacing-sm);
-        max-width: none;
-        width: calc(100vw - (var(--spacing-sm) * 2));
-        max-height: 60vh;
-    }
-    
     /* Mobile Content */
     .content {
         padding: 0 var(--spacing-sm);
-    }
-    
-    .control-row {
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-    
-    .control-row label {
-        min-width: auto;
-        text-align: left;
     }
     
     /* Mobile Gradient Optimization */
