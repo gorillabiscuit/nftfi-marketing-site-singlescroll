@@ -1263,3 +1263,39 @@ h2 {
     transform-origin: center;
     will-change: transform;
 }
+
+/* SVG Lines Container */
+.svg-lines-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#lines-svg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* SVG Line Styles */
+.line {
+    stroke: #F2F2F2;
+    stroke-width: 2;
+    fill: none;
+    vector-effect: non-scaling-stroke;
+}
+
+.line.horizontal {
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+}
+
+.line.vertical {
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+}

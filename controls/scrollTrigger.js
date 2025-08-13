@@ -290,6 +290,9 @@ function setupSection2Pinning() {
             }
         );
         
+        // Set up SVG line drawing animations
+        setupLineAnimations();
+        
         console.log('Rotation animation with ScrollTrigger scrub created successfully');
     }
     
@@ -299,4 +302,51 @@ function setupSection2Pinning() {
     }
     
     console.log('Section 2 pinning setup complete with rotation monitoring');
+}
+
+// Set up SVG line drawing animations using the canonical GSAP pattern
+function setupLineAnimations() {
+    // Get all SVG lines
+    const lines = document.querySelectorAll('.line');
+    
+    if (lines.length === 0) {
+        console.error('No SVG lines found for animation');
+        return;
+    }
+    
+    console.log(`Found ${lines.length} SVG lines for animation`);
+    
+    // Set up each line with the canonical stroke-dasharray animation
+    lines.forEach((line, index) => {
+        // Get the actual path length (for more accurate animation)
+        const length = line.getTotalLength ? line.getTotalLength() : 2000;
+        
+        // Set initial state: line is invisible (stroke-dashoffset = length)
+        gsap.set(line, { 
+            strokeDasharray: length, 
+            strokeDashoffset: length 
+        });
+        
+        // Create the drawing animation with ScrollTrigger scrub
+        gsap.to(line, {
+            strokeDashoffset: 0, // Line becomes fully visible
+            ease: "none", // Linear animation for smooth scrub
+            scrollTrigger: {
+                trigger: "section[data-section='2']",
+                start: "top top",
+                end: "+=100%",
+                scrub: true, // Ties animation to scroll position
+                onUpdate: (self) => {
+                    // Optional: Log progress for debugging
+                    if (index === 0) { // Only log first line to avoid spam
+                        console.log(`Line drawing progress: ${Math.round(self.progress * 100)}%`);
+                    }
+                }
+            }
+        });
+        
+        console.log(`Line ${index + 1} animation setup complete (length: ${length})`);
+    });
+    
+    console.log('All SVG line animations setup complete');
 } 
