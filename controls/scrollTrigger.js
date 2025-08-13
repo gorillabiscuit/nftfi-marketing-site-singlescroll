@@ -47,6 +47,17 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
         z: wrapper.scale.z
     };
     
+    // Prevent browser scroll restoration and ensure mesh starts at initial position
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    
+    // Force scroll to top to prevent any scroll-based positioning
+    window.scrollTo(0, 0);
+    
+    // Set flag to prevent ScrollTrigger from updating mesh position until we're ready
+    window.isInitialLoadComplete = false;
+    
     // Create scroll timeline
     createScrollTimeline();
     
@@ -74,48 +85,51 @@ function createScrollTimeline() {
             end: "bottom 30%",
             scrub: MODEL_CONFIG.scrubDuration, // Smooth scrubbing
             onUpdate: (self) => {
-                // Update Three.js wrapper position and scale based on scroll progress
-                const progress = self.progress;
-                
-                // Track scroll direction for spin animation
-                const scrollDirection = self.direction || 0;
-                updateScrollSpin(scrollDirection);
-                
-                // Calculate dynamic target position based on current viewport and state
-                const dynamicTarget = calculateTargetPosition();
-                
-                // Calculate starting position for interpolation
-                const startPos = calculateStartPosition();
-                
-                // Interpolate position using dynamic target values
-                wrapper.position.x = gsap.utils.interpolate(
-                    startPos.x, 
-                    dynamicTarget.x, 
-                    progress
-                );
-                
-                // Store the target Y position for scroll animation (floating will add offset)
-                wrapper.userData.targetY = gsap.utils.interpolate(
-                    startPos.y, 
-                    dynamicTarget.y, 
-                    progress
-                );
-                
-                wrapper.position.z = gsap.utils.interpolate(
-                    startPos.z, 
-                    dynamicTarget.z, // Use Z from calculateTargetPosition()
-                    progress
-                );
-                
-                // Interpolate scale using dynamic target scale
-                const currentScale = gsap.utils.interpolate(
-                    startPos.scale || MODEL_CONFIG.startScale, 
-                    dynamicTarget.scale, 
-                    progress
-                );
-                wrapper.scale.setScalar(currentScale);
-                
-                console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
+                // Only update mesh position if we're not in the initial load state
+                if (window.isInitialLoadComplete) {
+                    // Update Three.js wrapper position and scale based on scroll progress
+                    const progress = self.progress;
+                    
+                    // Track scroll direction for spin animation
+                    const scrollDirection = self.direction || 0;
+                    updateScrollSpin(scrollDirection);
+                    
+                    // Calculate dynamic target position based on current viewport and state
+                    const dynamicTarget = calculateTargetPosition();
+                    
+                    // Calculate starting position for interpolation
+                    const startPos = calculateStartPosition();
+                    
+                    // Interpolate position using dynamic target values
+                    wrapper.position.x = gsap.utils.interpolate(
+                        startPos.x, 
+                        dynamicTarget.x, 
+                        progress
+                    );
+                    
+                    // Store the target Y position for scroll animation (floating will add offset)
+                    wrapper.userData.targetY = gsap.utils.interpolate(
+                        startPos.y, 
+                        dynamicTarget.y, 
+                        progress
+                    );
+                    
+                    wrapper.position.z = gsap.utils.interpolate(
+                        startPos.z, 
+                        dynamicTarget.z, // Use Z from calculateTargetPosition()
+                        progress
+                    );
+                    
+                    // Interpolate scale using dynamic target scale
+                    const currentScale = gsap.utils.interpolate(
+                        startPos.scale || MODEL_CONFIG.startScale, 
+                        dynamicTarget.scale, 
+                        progress
+                    );
+                    wrapper.scale.setScalar(currentScale);
+                    
+                    console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
+                }
             }
         }
     });
@@ -185,4 +199,10 @@ export function cleanupScrollTrigger() {
         scrollTimeline = null;
     }
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+}
+
+// Enable scroll-based mesh positioning after initial load is complete
+export function enableScrollBasedPositioning() {
+    window.isInitialLoadComplete = true;
+    console.log('Scroll-based mesh positioning enabled');
 } 
