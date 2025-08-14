@@ -354,10 +354,6 @@ function setupSection2Pinning() {
         const drawingPhase = createDrawingPhase();
         masterTimeline.add(drawingPhase, "draw");
         
-        // Build static cells BEFORE outward expansion so phase tweens can target them
-        const staticCellsPhase = createStaticCellsPhase();
-        masterTimeline.add(staticCellsPhase, "draw");
-
         // Phase 2: Outward Expansion (25-50% of timeline)
         const outwardExpansionPhase = createOutwardExpansionPhase();
         masterTimeline.add(outwardExpansionPhase, "expand-outward");
@@ -370,7 +366,9 @@ function setupSection2Pinning() {
         const expansionPhase = createExpansionPhase();
         masterTimeline.add(expansionPhase, "expand-grid");
 
-        // Cells already created before outward expansion
+        // Stage 1 cells: static rectangles at cell centers (desktop-only by config), no animation yet
+        const staticCellsPhase = createStaticCellsPhase();
+        masterTimeline.add(staticCellsPhase, "draw");
         
         console.log('Master timeline with 4-phase animation created successfully');
     }
@@ -577,26 +575,20 @@ function createOutwardExpansionPhase() {
     if (cellsGroup) {
         const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
-        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+        const baseSize = Math.max(2, baseSpacing * (rectStateCfg.sizeFactor ?? 0.5));
+        const targetScale = outwardExpansionFactor;
         rects.forEach((rect) => {
             const i = Number(rect.dataset.i || 0);
             const j = Number(rect.dataset.j || 0);
-            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - baseSize / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - baseSize / 2;
             outwardExpansionTimeline.to(rect, {
-                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
+                attr: { x: x1, y: y1 },
+                scale: targetScale,
                 ease: 'none',
                 duration: 0.25
             }, 0);
         });
-        // Appearance scale-up exactly with outward expansion
-        outwardExpansionTimeline.to(rects, {
-            scale: 1,
-            opacity: 1,
-            ease: 'none',
-            duration: 0.25
-        }, 0);
     }
 
     console.log('Phase 2: Outward expansion + rotation phase timeline created successfully');
@@ -692,15 +684,16 @@ function createExpansionPhase() {
     if (cellsGroup) {
         const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
-        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+        const baseSize = Math.max(2, baseSpacing * (rectStateCfg.sizeFactor ?? 0.5));
+        const targetScale = expansionFactor;
         rects.forEach((rect) => {
             const i = Number(rect.dataset.i || 0);
             const j = Number(rect.dataset.j || 0);
-            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - baseSize / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - baseSize / 2;
             expansionTimeline.to(rect, {
-                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
+                attr: { x: x1, y: y1 },
+                scale: targetScale,
                 ease: 'none',
                 duration: 0.25
             }, 0);
@@ -764,8 +757,6 @@ function createStaticCellsPhase() {
             rect.dataset.i = String(i);
             rect.dataset.j = String(j);
             gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
-            // Prepare for appearance scale-up in Phase 2
-            gsap.set(rect, { scale: 0, opacity: 0, transformOrigin: '50% 50%' });
             cellsGroup.appendChild(rect);
         }
     }
