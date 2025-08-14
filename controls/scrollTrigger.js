@@ -657,6 +657,17 @@ function createRotationPhase(square) {
         ease: "none",
         duration: 0.25
     }, 0);
+
+    // Subtle per-line micro-rotation with stagger for organic feel (does not affect final angle)
+    // Keeps gridGroup rotation as the authoritative rotation to preserve alignment
+    rotationTimeline.fromTo(allLines, {
+        rotation: -2 // degrees
+    }, {
+        rotation: 0,
+        ease: "none",
+        duration: 0.25,
+        stagger: { each: 0.01, from: "center" }
+    }, 0);
     
     console.log('Phase 3: Rotation phase timeline created successfully');
     return rotationTimeline;
