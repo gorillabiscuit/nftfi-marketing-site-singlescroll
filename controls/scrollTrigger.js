@@ -241,21 +241,19 @@ export function enableScrollBasedPositioning() {
     console.log('Scroll-based mesh positioning enabled');
 }
 
-// Set up section 2 pinning
+// Set up Section 2 with sophisticated 4-phase animation sequence
 function setupSection2Pinning() {
-    let rotationCount = 0;
-    const targetRotations = 3;
-    let section2Trigger;
+    console.log('Setting up Section 2 with 4-phase animation sequence');
     
-    // The pinning is now handled by the rotation animation's ScrollTrigger
+    // The pinning is now handled by the master timeline's ScrollTrigger
     // No need for a separate pinning ScrollTrigger
-    console.log('Section 2 pinning will be handled by rotation animation');
+    console.log('Section 2 pinning will be handled by master timeline');
     
-    // Start the rotation animation immediately
-    startRotationMonitoring();
+    // Start the sophisticated animation sequence immediately
+    startAdvancedAnimationSequence();
     
-    // Function to start monitoring scroll velocity for rotation
-    function startRotationMonitoring() {
+    // Function to start the advanced 3-phase animation sequence
+    function startAdvancedAnimationSequence() {
         const square = document.querySelector('.test-square');
         if (!square) {
             console.error('Square element not found!');
@@ -270,87 +268,363 @@ function setupSection2Pinning() {
             y: '-50%'
         });
         
-        // Create the rotation animation with ScrollTrigger scrub
-        // This follows the exact pattern from your working example
-        gsap.fromTo(square, 
-            { rotation: 0 },
-            {
-                rotation: 1080, // 3 full rotations (3 * 360)
-                scrollTrigger: {
-                    trigger: "section[data-section='2']",
-                    scrub: true,
-                    pin: true,
-                    start: "top top",
-                    end: "+=100%",
-                    onComplete: () => {
-                        console.log('Rotation animation complete - unpinning section 2');
-                        // The pinning will automatically end when the animation completes
-                    }
-                },
-                ease: "none"
-            }
-        );
-        
-        // Set up SVG line drawing animations
-        setupLineAnimations();
-        
-        console.log('Rotation animation with ScrollTrigger scrub created successfully');
-    }
-    
-    // Function to stop rotation monitoring (no longer needed with scrub animation)
-    function stopRotationMonitoring() {
-        // This is handled automatically by ScrollTrigger
-    }
-    
-    console.log('Section 2 pinning setup complete with rotation monitoring');
-}
-
-// Set up SVG line drawing animations using the canonical GSAP DrawSVGPlugin pattern
-function setupLineAnimations() {
-    // Get all SVG lines
-    const lines = document.querySelectorAll('.line');
-    
-    if (lines.length === 0) {
-        console.error('No SVG lines found for animation');
-        return;
-    }
-    
-    console.log(`Found ${lines.length} SVG lines for center-out animation`);
-    console.log('DrawSVGPlugin available:', !!gsap.DrawSVGPlugin);
-    
-    // All lines are now properly sized path elements, so DrawSVGPlugin should work correctly
-    console.log(`Found ${lines.length} SVG path elements for center-out animation`);
-    console.log('DrawSVGPlugin available:', !!gsap.DrawSVGPlugin);
-    
-    // Set up each line with the world-class center-out drawSVG pattern
-    lines.forEach((line, index) => {
-        console.log(`Setting up line ${index + 1}:`, line);
-        
-        // Create the center-out drawing animation using DrawSVGPlugin
-        // Start with lines invisible (center point only)
-        gsap.set(line, { drawSVG: "50% 50%" });
-        console.log(`Line ${index + 1} initial state set to center point only`);
-        
-        // Animate to fully drawn from center outward
-        gsap.to(line, {
-            drawSVG: "0% 100%",   // End: fully drawn from center outward
-            ease: "none", // Linear animation for smooth scrub
+        // Create the master timeline with ScrollTrigger for the entire sequence
+        const masterTimeline = gsap.timeline({
             scrollTrigger: {
                 trigger: "section[data-section='2']",
+                scrub: true,
+                pin: true,
                 start: "top top",
-                end: "+=100%",
-                scrub: true, // Ties animation to scroll position
+                end: "+=200%", // Extended for 3 phases
                 onUpdate: (self) => {
-                    // Optional: Log progress for debugging
-                    if (index === 0) { // Only log first line to avoid spam
-                        console.log(`Center-out line drawing progress: ${Math.round(self.progress * 100)}%`);
+                    // Log progress through the 4 phases
+                    const phase = self.progress < 0.25 ? 1 : 
+                                 self.progress < 0.50 ? 2 : 
+                                 self.progress < 0.75 ? 3 : 4;
+                    const phaseProgress = self.progress < 0.25 ? 
+                        (self.progress / 0.25) * 100 : 
+                        self.progress < 0.50 ? 
+                            ((self.progress - 0.25) / 0.25) * 100 : 
+                            self.progress < 0.75 ?
+                                ((self.progress - 0.50) / 0.25) * 100 :
+                                ((self.progress - 0.75) / 0.25) * 100;
+                    
+                    if (Math.round(phaseProgress) % 10 === 0) { // Log every 10%
+                        console.log(`Phase ${phase} progress: ${Math.round(phaseProgress)}%`);
                     }
                 }
             }
         });
         
-        console.log(`Line ${index + 1} center-out animation setup complete`);
+        // Phase 1: Line Drawing (0-25% of timeline)
+        const drawingPhase = createDrawingPhase();
+        masterTimeline.add(drawingPhase, "draw");
+        
+        // Phase 2: Outward Expansion (25-50% of timeline)
+        const outwardExpansionPhase = createOutwardExpansionPhase();
+        masterTimeline.add(outwardExpansionPhase, "expand-outward");
+        
+        // Phase 3: Rotation (50-75% of timeline)
+        const rotationPhase = createRotationPhase(square);
+        masterTimeline.add(rotationPhase, "rotate");
+        
+        // Phase 4: Grid Expansion (75-100% of timeline)
+        const expansionPhase = createExpansionPhase();
+        masterTimeline.add(expansionPhase, "expand-grid");
+        
+        console.log('Master timeline with 4-phase animation created successfully');
+    }
+    
+    // Function to stop animation monitoring (no longer needed with master timeline)
+    function stopAnimationMonitoring() {
+        // This is handled automatically by the master timeline
+    }
+    
+    console.log('Section 2 3-phase animation setup complete');
+}
+
+// Phase 1: Create sophisticated line drawing phase with 12 lines
+function createDrawingPhase() {
+    const drawingTimeline = gsap.timeline();
+    
+    // Get the SVG container
+    const svg = document.getElementById('lines-svg');
+    if (!svg) {
+        console.error('SVG container not found for drawing phase');
+        return drawingTimeline;
+    }
+    
+    // Calculate dynamic line length and SVG dimensions
+    const lineLength = calculateLineLength();
+    // Use a more reasonable SVG size that's closer to viewport dimensions
+    // This should make centering more accurate and visually apparent
+    const svgSize = Math.max(window.innerWidth, window.innerHeight) * 1.5; // 1.5x viewport size instead of 2x line length
+    
+    console.log(`Phase 1: Setting up ${14} lines with dynamic length: ${lineLength}px`);
+    console.log(`SVG dimensions: ${svgSize}x${svgSize}px (more reasonable size)`);
+    console.log(`Viewport dimensions: ${window.innerWidth}x${window.innerHeight}`);
+    console.log(`Original calculated line length: ${lineLength}px`);
+    
+    // Set SVG dimensions and viewBox - centered coordinate system
+    // This creates a coordinate system where (0,0) is at the center of the SVG
+    const halfSize = svgSize / 2;
+    svg.setAttribute('viewBox', `-${halfSize} -${halfSize} ${svgSize} ${svgSize}`);
+    svg.style.width = `${svgSize}px`;
+    svg.style.height = `${svgSize}px`;
+    
+    // Use GSAP's canonical centering approach instead of custom positioning
+    // Reset any previous transforms and center the SVG using GSAP
+    gsap.set(svg, {
+        clearProps: "transform", // Clear any existing transforms
+        x: "-50%", // Center horizontally using GSAP's percentage-based transforms
+        y: "-50%"  // Center vertically using GSAP's percentage-based transforms
     });
     
-    console.log('All SVG center-out line animations setup complete');
-} 
+    console.log('SVG centered using GSAP canonical approach');
+    
+    // Clear existing lines and create new ones with enhanced positioning
+    svg.innerHTML = '';
+    
+    // Calculate center point - now (0,0) in our centered coordinate system
+    const center = 0; // In centered viewBox, (0,0) is the center
+    
+    console.log(`Center point is now at (0,0) in centered coordinate system`);
+    console.log(`SVG viewBox: -${svgSize/2} -${svgSize/2} ${svgSize} ${svgSize}`);
+    
+    // Create 12 lines (6 horizontal + 6 vertical) with dynamic spacing
+    const initialSpacing = 50;
+    
+    // Create horizontal lines (will be rotated 45° later)
+    // Position lines around the center (0,0) with proper spacing
+    const horizontalLines = [
+        { y: center, class: 'horizontal' },                    // Center line at (0,0)
+        { y: center - initialSpacing, class: 'horizontal' },   // Above center
+        { y: center + initialSpacing, class: 'horizontal' },   // Below center
+        { y: center - initialSpacing * 2, class: 'horizontal' }, // Further above
+        { y: center + initialSpacing * 2, class: 'horizontal' }, // Further below
+        { y: center - initialSpacing * 3, class: 'horizontal' }, // Furthest above
+        { y: center + initialSpacing * 3, class: 'horizontal' }  // Furthest below
+    ];
+    
+    // Create vertical lines (will be rotated 45° later)
+    // Position lines around the center (0,0) with proper spacing
+    const verticalLines = [
+        { x: center, class: 'vertical' },                      // Center line at (0,0)
+        { x: center - initialSpacing, class: 'vertical' },     // Left of center
+        { x: center + initialSpacing, class: 'vertical' },     // Right of center
+        { x: center - initialSpacing * 2, class: 'vertical' }, // Further left
+        { x: center + initialSpacing * 2, class: 'vertical' }, // Further right
+        { x: center - initialSpacing * 3, class: 'vertical' }, // Furthest left
+        { x: center + initialSpacing * 3, class: 'vertical' }  // Furthest right
+    ];
+    
+    console.log(`Center point is now at (0,0) in centered coordinate system`);
+    console.log(`Horizontal lines Y positions:`, horizontalLines.map(l => l.y));
+    console.log(`Vertical lines X positions:`, verticalLines.map(l => l.x));
+    
+    // Create all lines and organize into groups
+    const lineGroups = {
+        horizontal: [],
+        vertical: [],
+        all: []
+    };
+    
+    // Add horizontal lines
+    horizontalLines.forEach((lineData, index) => {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('class', `line ${lineData.class}`);
+        // Horizontal lines go from left edge to right edge of SVG in centered coordinate system
+        const leftEdge = -svgSize / 2;
+        const rightEdge = svgSize / 2;
+        path.setAttribute('d', `M${leftEdge} ${lineData.y} L${rightEdge} ${lineData.y}`);
+        svg.appendChild(path);
+        lineGroups.horizontal.push(path);
+        lineGroups.all.push(path);
+    });
+    
+    // Add vertical lines
+    verticalLines.forEach((lineData, index) => {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('class', `line ${lineData.class}`);
+        // Vertical lines go from top edge to bottom edge of SVG in centered coordinate system
+        const topEdge = -svgSize / 2;
+        const bottomEdge = svgSize / 2;
+        path.setAttribute('d', `M${lineData.x} ${topEdge} L${lineData.x} ${bottomEdge}`);
+        svg.appendChild(path);
+        lineGroups.vertical.push(path);
+        lineGroups.all.push(path);
+    });
+    
+    console.log(`Phase 1: Created ${lineGroups.all.length} SVG path elements`);
+    console.log('DrawSVGPlugin available:', !!gsap.DrawSVGPlugin);
+    
+    // Store line groups globally for use in later phases
+    window.lineGroups = lineGroups;
+    window.svgSize = svgSize;
+    window.svgCenter = 0; // In centered coordinate system, center is always (0,0)
+    
+    // Set up each line with the world-class center-out drawSVG pattern
+    lineGroups.all.forEach((line, index) => {
+        // Start with lines invisible (center point only)
+        gsap.set(line, { drawSVG: "50% 50%" });
+        
+        // Add to drawing timeline with staggered start for visual interest
+        drawingTimeline.to(line, {
+            drawSVG: "0% 100%",   // End: fully drawn from center outward
+            ease: "none", // Linear animation for smooth scrub
+            duration: 0.25 // This phase takes 25% of the total timeline
+        }, index * 0.02); // Stagger each line by 0.02 seconds for visual effect
+    });
+    
+    console.log('Phase 1: Drawing phase timeline created successfully');
+    return drawingTimeline;
+}
+
+// Phase 2: Create outward expansion phase with simultaneous rotation (lines travel outwards from center + grid rotates 45°)
+function createOutwardExpansionPhase() {
+    const outwardExpansionTimeline = gsap.timeline();
+    
+    // Ensure line groups are available
+    if (!window.lineGroups || !window.svgSize) {
+        console.error('Line groups not available for outward expansion phase');
+        return outwardExpansionTimeline;
+    }
+    
+    const { horizontal: horizontalLines, vertical: verticalLines, all: allLines } = window.lineGroups;
+    const svgSize = window.svgSize;
+    
+    console.log('Phase 2: Setting up outward expansion + 45° rotation - lines travel outwards from center while grid rotates');
+    
+    // Set transform origin to SVG center for proper rotation
+    // Use GSAP's canonical approach: "50% 50%" or "center center" for perfect centering
+    gsap.set(allLines, { 
+        transformOrigin: "50% 50%" // This centers the rotation axis perfectly
+    });
+    
+    console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
+    
+    // Calculate expansion factors for outward movement
+    const outwardExpansionFactor = 1.8; // Lines will spread 1.8x further apart
+    const newSpacing = 50 * outwardExpansionFactor; // New spacing between lines
+    
+    // DISABLED: Create outward expansion animation for horizontal lines
+    // horizontalLines.forEach((line, index) => {
+    //     // In centered coordinate system, lines are positioned relative to (0,0)
+    //     const targetY = (index - 3) * newSpacing; // Target Y position from center (3 is middle index for 7 lines)
+    //     
+    //     outwardExpansionTimeline.to(line, {
+    //         attr: { d: `M${-svgSize/2} ${targetY} L${svgSize/2} ${targetY}` },
+    //         ease: "none",
+    //         duration: 0.25 // This phase takes 25% of the total timeline
+    //     }, 0);
+    // });
+    
+    // DISABLED: Create outward expansion animation for vertical lines
+    // verticalLines.forEach((line, index) => {
+    //     // In centered coordinate system, lines are positioned relative to (0,0)
+    //     const targetX = (index - 3) * newSpacing; // Target X position from center (3 is middle index for 7 lines)
+    //     
+    //     outwardExpansionTimeline.to(line, {
+    //         attr: { d: `M${targetX} ${-svgSize/2} L${targetX} ${svgSize/2}` },
+    //         ease: "none",
+    //         duration: 0.25 // This phase takes 25% of the total timeline
+    //     }, 0);
+    // });
+    
+    // Add simultaneous rotation animation for the entire grid
+    outwardExpansionTimeline.to(allLines, {
+        rotation: 45, // Rotate all lines 45° simultaneously with expansion
+        ease: "none",
+        duration: 0.25 // This phase takes 25% of the total timeline
+    }, 0); // Same start time (0) for simultaneous animation
+    
+    console.log('Phase 2: Outward expansion + rotation phase timeline created successfully');
+    return outwardExpansionTimeline;
+}
+
+// Phase 3: Create coordinated rotation phase
+function createRotationPhase(square) {
+    const rotationTimeline = gsap.timeline();
+    
+    // Ensure line groups are available
+    if (!window.lineGroups || !window.svgCenter) {
+        console.error('Line groups not available for rotation phase');
+        return rotationTimeline;
+    }
+    
+    const { all: allLines } = window.lineGroups;
+    const svgCenter = window.svgCenter;
+    
+    console.log('Phase 3: Setting up coordinated rotation for all lines');
+    
+    // Set transform origin to SVG center for proper rotation
+    // Use GSAP's canonical approach: "50% 50%" or "center center" for perfect centering
+    gsap.set(allLines, { 
+        transformOrigin: "50% 50%" // This centers the rotation axis perfectly
+    });
+    
+    console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
+    
+    // Add square rotation to the rotation timeline
+    rotationTimeline.to(square, {
+        rotation: 1080, // 3 full rotations (3 * 360)
+        ease: "none",
+        duration: 0.25 // This phase takes 25% of the total timeline
+    }, 0);
+    
+    // Add coordinated line rotation to the rotation timeline
+    // Lines are already at 45° from previous phase, so rotate additional 45° to reach 90° total
+    rotationTimeline.to(allLines, {
+        rotation: 90, // Rotate all lines to 90° total (45° + 45° additional)
+        ease: "none",
+        duration: 0.25 // This phase takes 25% of the total timeline
+    }, 0);
+    
+    console.log('Phase 3: Rotation phase timeline created successfully');
+    return rotationTimeline;
+}
+
+// Phase 4: Create grid expansion phase
+function createExpansionPhase() {
+    const expansionTimeline = gsap.timeline();
+    
+    // Ensure line groups are available
+    if (!window.lineGroups || !window.svgSize || !window.svgCenter) {
+        console.error('Line groups not available for expansion phase');
+        return expansionTimeline;
+    }
+    
+    const { horizontal: horizontalLines, vertical: verticalLines, all: allLines } = window.lineGroups;
+    const svgSize = window.svgSize;
+    const svgCenter = window.svgCenter;
+    
+    console.log('Phase 4: Setting up grid expansion while maintaining structure');
+    
+    // Calculate expansion factors for maintaining grid structure
+    const expansionFactor = 2.5; // Lines will spread 2.5x further apart
+    const newSpacing = 50 * expansionFactor; // New spacing between lines
+    
+    // DISABLED: Create expansion animation for horizontal lines
+    // horizontalLines.forEach((line, index) => {
+    //     // In centered coordinate system, lines are positioned relative to (0,0)
+    //     const targetX = (index - 2.5) * newSpacing; // Target X position from center
+    //     
+    //     expansionTimeline.to(line, {
+    //         attr: { d: `M${-svgSize/2} ${targetY} L${svgSize/2} ${targetY}` },
+    //         ease: "none",
+    //         duration: 0.25 // This phase takes 25% of the total timeline
+    //     }, 0);
+    // });
+    
+    // DISABLED: Create expansion animation for vertical lines
+    // verticalLines.forEach((line, index) => {
+    //     // In centered coordinate system, lines are positioned relative to (0,0)
+    //     const targetX = (index - 2.5) * newSpacing; // Target X position from center
+    //     
+    //     expansionTimeline.to(line, {
+    //         attr: { d: `M${targetX} ${-svgSize/2} L${targetX} ${svgSize/2}` },
+    //         duration: 0.25 // This phase takes 25% of the total timeline
+    //     }, 0);
+    // });
+    
+    console.log('Phase 4: Expansion phase timeline created successfully');
+    return expansionTimeline;
+}
+
+// Calculate dynamic line length that extends beyond any screen size
+function calculateLineLength() {
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Calculate the diagonal distance from center to corner (hypotenuse)
+    const diagonalDistance = Math.sqrt(viewportWidth * viewportWidth + viewportHeight * viewportHeight);
+    
+    // Add extra padding to ensure lines extend beyond screen edges
+    const extraPadding = Math.max(viewportWidth, viewportHeight) * 0.5;
+    
+    // Return the total line length (diagonal + padding)
+    return Math.ceil(diagonalDistance + extraPadding);
+}
+
+ 
