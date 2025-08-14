@@ -498,6 +498,49 @@ function createDrawingPhase() {
     window.gridInitialSpacing = initialSpacing;
     window.gridState = gridState;
 
+    // Build cells group up-front so they can track spacing changes even before they appear
+    try {
+        const rectState = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || { enabled: false };
+        // Clear any previous cells group
+        const prevCells = document.getElementById('grid-cells');
+        if (prevCells && prevCells.parentNode) prevCells.parentNode.removeChild(prevCells);
+        if (rectState.enabled) {
+            const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            gsap.set(cellsGroup, { attr: { id: 'grid-cells' } });
+            gridGroup.appendChild(cellsGroup);
+            gsap.set(cellsGroup, { transformOrigin: '50% 50%' });
+
+            const size = Math.max(2, initialSpacing * (rectState.sizeFactor ?? 0.5));
+            const rx = size * (rectState.cornerRadiusFactor ?? 0.15);
+            const created = [];
+            // Build inner cells for i,j in [minLevel..maxLevel-1]
+            for (let i = -levels; i <= levels - 1; i++) {
+                for (let j = -levels; j <= levels - 1; j++) {
+                    const include = rectState.pattern === 'all' ? true : rectState.pattern === 'checker' ? ((i + j) % 2 === 0) : false;
+                    if (!include) continue;
+                    const cx = i * initialSpacing + initialSpacing / 2;
+                    const cy = j * initialSpacing + initialSpacing / 2;
+                    const x = cx - size / 2;
+                    const y = cy - size / 2;
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.dataset.i = String(i);
+                    rect.dataset.j = String(j);
+                    gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
+                    // Invisible initially; will appear later at configured phase
+                    gsap.set(rect, { opacity: 0, scale: 0, transformOrigin: '50% 50%' });
+                    cellsGroup.appendChild(rect);
+                    created.push(rect);
+                }
+            }
+            window.gridCells = created;
+        } else {
+            window.gridCells = [];
+        }
+    } catch (e) {
+        console.warn('Cells build warning during drawing phase:', e);
+        window.gridCells = [];
+    }
+
     // Ensure group rotates around center
     gsap.set(gridGroup, { transformOrigin: "50% 50%" });
     
@@ -573,6 +616,26 @@ function createOutwardExpansionPhase() {
         ease: "none",
         duration: 0.25
     }, 0);
+
+    // Move cells to match outward spacing if present
+    if (Array.isArray(window.gridCells) && window.gridCells.length) {
+        const rectState = window.gridState || {};
+        const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
+        window.gridCells.forEach((rect) => {
+            const i = Number(rect.dataset.i || 0);
+            const j = Number(rect.dataset.j || 0);
+            const x0 = i * baseSpacing + baseSpacing / 2 - size / 2;
+            const y0 = j * baseSpacing + baseSpacing / 2 - size / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - size / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - size / 2;
+            outwardExpansionTimeline.to(rect, {
+                x: x1 - x0,
+                y: y1 - y0,
+                ease: 'none',
+                duration: 0.25
+            }, 0);
+        });
+    }
     
     console.log('Phase 2: Outward expansion + rotation phase timeline created successfully');
     return outwardExpansionTimeline;
@@ -661,6 +724,26 @@ function createExpansionPhase() {
             duration: 0.25
         }, 0);
     });
+
+    // Move cells to match final spacing if present
+    if (Array.isArray(window.gridCells) && window.gridCells.length) {
+        const rectState = window.gridState || {};
+        const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
+        window.gridCells.forEach((rect) => {
+            const i = Number(rect.dataset.i || 0);
+            const j = Number(rect.dataset.j || 0);
+            const x0 = i * baseSpacing + baseSpacing / 2 - size / 2;
+            const y0 = j * baseSpacing + baseSpacing / 2 - size / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - size / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - size / 2;
+            expansionTimeline.to(rect, {
+                x: x1 - x0,
+                y: y1 - y0,
+                ease: 'none',
+                duration: 0.25
+            }, 0);
+        });
+    }
     
     console.log('Phase 4: Expansion phase timeline created successfully');
     return expansionTimeline;
