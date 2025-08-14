@@ -254,9 +254,11 @@ function setupSection2Pinning() {
     console.log('Section 2 pinning will be handled by master timeline');
     
     // Use GSAP's matchMedia for canonical breakpoint handling and automatic cleanup
-    if (!window.__section2MatchMedia) {
-        window.__section2MatchMedia = gsap.matchMedia();
+    // Create a fresh instance here; GSAP cleans up listeners on revert automatically
+    if (window.__section2MatchMedia && window.__section2MatchMedia.revert) {
+        try { window.__section2MatchMedia.revert(); } catch (_) {}
     }
+    window.__section2MatchMedia = gsap.matchMedia();
 
     window.__section2MatchMedia.add({
         mobile: "(max-width: 767px)",
@@ -273,7 +275,8 @@ function setupSection2Pinning() {
             startAdvancedAnimationSequence();
         }, "section[data-section='2']");
 
-        try { ScrollTrigger.refresh(); } catch (_) {}
+        // Avoid immediate refresh storms; let GSAP set up first
+        requestAnimationFrame(() => { try { ScrollTrigger.refresh(); } catch (_) {} });
 
         // Cleanup when media query stops matching
         return () => {
@@ -297,13 +300,19 @@ function setupSection2Pinning() {
             y: '-50%'
         });
         
+        // Resolve scroller element explicitly (works better with ScrollSmoother)
+        const scrollerEl = document.getElementById('smooth-content') || document.querySelector('#smooth-content');
+
         // Create the master timeline with ScrollTrigger for the entire sequence
         const masterTimeline = gsap.timeline({
             scrollTrigger: {
+                scroller: scrollerEl || undefined,
                 trigger: "section[data-section='2']",
                 scrub: true,
                 pin: true,
 				invalidateOnRefresh: true,
+                anticipatePin: 1,
+                pinSpacing: true,
                 start: "top top",
                 end: "+=200%", // Extended for 3 phases
                 onUpdate: (self) => {
