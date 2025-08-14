@@ -292,7 +292,6 @@ function setupSection2Pinning() {
 				invalidateOnRefresh: true,
                 start: "top top",
                 end: "+=200%", // Extended for 3 phases
-                scroller: scrollerEl || undefined,
                 onUpdate: (self) => {
                     // Log progress through the 4 phases
                     const phase = self.progress < 0.25 ? 1 : 
