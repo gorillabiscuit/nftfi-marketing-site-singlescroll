@@ -289,17 +289,26 @@ function setupSection2Pinning() {
                 start: "top top",
                 end: "+=200%", // Extended for 3 phases
                 onUpdate: (self) => {
-                    // Log progress through the 4 phases
-                    const phase = self.progress < 0.25 ? 1 : 
-                                 self.progress < 0.50 ? 2 : 
-                                 self.progress < 0.75 ? 3 : 4;
-                    const phaseProgress = self.progress < 0.25 ? 
-                        (self.progress / 0.25) * 100 : 
-                        self.progress < 0.50 ? 
-                            ((self.progress - 0.25) / 0.25) * 100 : 
-                            self.progress < 0.75 ?
-                                ((self.progress - 0.50) / 0.25) * 100 :
-                                ((self.progress - 0.75) / 0.25) * 100;
+                    // Log progress through the 4 phases with overlap awareness
+                    let phase, phaseProgress;
+                    
+                    if (self.progress < 0.25) {
+                        // Phase 1: Drawing (0-25%)
+                        phase = 1;
+                        phaseProgress = (self.progress / 0.25) * 100;
+                    } else if (self.progress < 0.50) {
+                        // Phase 2: Outward Expansion (25-50%) + Drawing continues
+                        phase = 2;
+                        phaseProgress = ((self.progress - 0.25) / 0.25) * 100;
+                    } else if (self.progress < 0.75) {
+                        // Phase 3: Rotation (40-75%) + Drawing finishes
+                        phase = 3;
+                        phaseProgress = ((self.progress - 0.40) / 0.35) * 100;
+                    } else {
+                        // Phase 4: Grid Expansion (75-100%)
+                        phase = 4;
+                        phaseProgress = ((self.progress - 0.75) / 0.25) * 100;
+                    }
                     
                     if (Math.round(phaseProgress) % 10 === 0) { // Log every 10%
                         console.log(`Phase ${phase} progress: ${Math.round(phaseProgress)}%`);
@@ -308,23 +317,24 @@ function setupSection2Pinning() {
             }
         });
         
-        // Phase 1: Line Drawing (0-25% of timeline)
+        // Phase 1: Line Drawing (0-50% of timeline) - Extended for overlap
         const drawingPhase = createDrawingPhase();
         masterTimeline.add(drawingPhase, "draw");
         
-        // Phase 2: Outward Expansion (25-50% of timeline)
+        // Phase 2: Outward Expansion (25-50% of timeline) - Overlaps with drawing
         const outwardExpansionPhase = createOutwardExpansionPhase();
         masterTimeline.add(outwardExpansionPhase, "expand-outward");
         
-        // Phase 3: Rotation (50-75% of timeline)
+        // Phase 3: Rotation (40-75% of timeline) - Starts while lines are still drawing
         const rotationPhase = createRotationPhase(square);
-        masterTimeline.add(rotationPhase, "rotate");
+        masterTimeline.add(rotationPhase, "rotate", 0.4); // Start at 40% for overlap
         
         // Phase 4: Grid Expansion (75-100% of timeline)
         const expansionPhase = createExpansionPhase();
         masterTimeline.add(expansionPhase, "expand-grid");
         
-        console.log('Master timeline with 4-phase animation created successfully');
+        console.log('Master timeline with 4-phase overlapping animation created successfully');
+        console.log('Phase overlap: Drawing (0-50%) overlaps with Rotation (40-75%)');
     }
     
     // Function to stop animation monitoring (no longer needed with master timeline)
@@ -464,7 +474,7 @@ function createDrawingPhase() {
         drawingTimeline.to(line, {
             drawSVG: "0% 100%",   // End: fully drawn from center outward
             ease: "none", // Linear animation for smooth scrub
-            duration: 0.25 // This phase takes 25% of the total timeline
+            duration: 0.5 // This phase now takes 50% of the total timeline for overlap
         }, index * 0.02); // Stagger each line by 0.02 seconds for visual effect
     });
     
