@@ -253,8 +253,10 @@ function setupSection2Pinning() {
     // No need for a separate pinning ScrollTrigger
     console.log('Section 2 pinning will be handled by master timeline');
     
-    // Start the sophisticated animation sequence immediately
-    startAdvancedAnimationSequence();
+    // Start the sophisticated animation sequence immediately, scoped to Section 2
+    gsap.context(() => {
+        startAdvancedAnimationSequence();
+    }, "section[data-section='2']");
     
     // Function to start the advanced 3-phase animation sequence
     function startAdvancedAnimationSequence() {
