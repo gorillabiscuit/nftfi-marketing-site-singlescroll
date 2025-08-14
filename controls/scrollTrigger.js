@@ -73,7 +73,11 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
             ease: "power2.out"
         })
         .add(() => {
-            console.log('Initial GSAP scale animation complete - mesh now at target scale');
+            console.log('Initial GSAP scale animation complete - mesh now at target scale', {
+                at: Date.now(),
+                targetScale: calculateTargetPosition().scale,
+                wrapperScale: wrapper.scale.x
+            });
             // Enable scroll-based positioning for future scroll interactions
             window.isInitialLoadComplete = true;
             // Create the ScrollTrigger animation now that initial animation is complete
@@ -165,7 +169,14 @@ function createScrollTimeline() {
                     );
                     wrapper.scale.setScalar(currentScale);
                     
-                    console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
+                    console.log('S1 scroll debug', {
+                        progress,
+                        startScale: startPos.scale,
+                        targetScale: dynamicTarget.scale,
+                        currentScale,
+                        wrapperScale: wrapper.scale.x,
+                        at: Date.now()
+                    });
                 }
             }
         }
