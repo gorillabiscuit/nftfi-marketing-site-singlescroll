@@ -77,7 +77,12 @@ export const RECT_STATES = {
         sizeFactorOutStart: undefined,
         sizeFactorOutEnd: undefined,
         sizeFactorFinalStart: undefined,
-        sizeFactorFinalEnd: undefined
+        sizeFactorFinalEnd: undefined,
+        // Outward travel multipliers (1 = match grid exactly)
+        positionOutMultiplierStart: 1,
+        positionOutMultiplierEnd: 1,
+        positionFinalMultiplierStart: 1,
+        positionFinalMultiplierEnd: 1
     },
     tablet: {
         enabled: false,
@@ -87,7 +92,11 @@ export const RECT_STATES = {
         sizeFactorOutStart: undefined,
         sizeFactorOutEnd: undefined,
         sizeFactorFinalStart: undefined,
-        sizeFactorFinalEnd: undefined
+        sizeFactorFinalEnd: undefined,
+        positionOutMultiplierStart: 1,
+        positionOutMultiplierEnd: 1,
+        positionFinalMultiplierStart: 1,
+        positionFinalMultiplierEnd: 1
     },
     desktop: {
         enabled: true,
@@ -95,9 +104,13 @@ export const RECT_STATES = {
         cornerRadiusFactor: 0.15,
         pattern: 'checker',
         sizeFactorOutStart: 1,
-        sizeFactorOutEnd: 7,
+        sizeFactorOutEnd: 2,
         sizeFactorFinalStart: 1,
-        sizeFactorFinalEnd: 1
+        sizeFactorFinalEnd: 1,
+        positionOutMultiplierStart: 1,
+        positionOutMultiplierEnd: 1,
+        positionFinalMultiplierStart: 1,
+        positionFinalMultiplierEnd: 1
     }
 };
 

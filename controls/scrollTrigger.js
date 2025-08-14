@@ -580,15 +580,19 @@ function createOutwardExpansionPhase() {
         outwardExpansionTimeline.eventCallback('onUpdate', () => {
             const tl = outwardExpansionTimeline;
             const t = tl.totalProgress();
-            const spacing = gsap.utils.interpolate(baseSpacing, newSpacing, t);
+            const spacingBase = gsap.utils.interpolate(baseSpacing, newSpacing, t);
             const sizeF = gsap.utils.interpolate(sfStart, sfEnd, t);
-            const size = Math.max(2, spacing * sizeF);
+            const size = Math.max(2, spacingBase * sizeF);
             const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+            // Outward position multiplier to control radial travel of blocks
+            const pmStart = (typeof rectStateCfg.positionOutMultiplierStart === 'number') ? rectStateCfg.positionOutMultiplierStart : 1;
+            const pmEnd = (typeof rectStateCfg.positionOutMultiplierEnd === 'number') ? rectStateCfg.positionOutMultiplierEnd : 1;
+            const posMult = gsap.utils.interpolate(pmStart, pmEnd, t);
             rects.forEach((rect) => {
                 const i = Number(rect.dataset.i || 0);
                 const j = Number(rect.dataset.j || 0);
-                const cx = i * spacing + spacing / 2;
-                const cy = j * spacing + spacing / 2;
+                const cx = i * spacingBase * posMult + (spacingBase * posMult) / 2;
+                const cy = j * spacingBase * posMult + (spacingBase * posMult) / 2;
                 const x = cx - size / 2;
                 const y = cy - size / 2;
                 gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx } });
@@ -694,15 +698,18 @@ function createExpansionPhase() {
         expansionTimeline.eventCallback('onUpdate', () => {
             const tl = expansionTimeline;
             const t = tl.totalProgress();
-            const spacing = gsap.utils.interpolate(baseSpacing, newSpacing, t);
+            const spacingBase = gsap.utils.interpolate(baseSpacing, newSpacing, t);
             const sizeF = gsap.utils.interpolate(sfStart, sfEnd, t);
-            const size = Math.max(2, spacing * sizeF);
+            const size = Math.max(2, spacingBase * sizeF);
             const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+            const pmStart = (typeof rectStateCfg.positionFinalMultiplierStart === 'number') ? rectStateCfg.positionFinalMultiplierStart : 1;
+            const pmEnd = (typeof rectStateCfg.positionFinalMultiplierEnd === 'number') ? rectStateCfg.positionFinalMultiplierEnd : 1;
+            const posMult = gsap.utils.interpolate(pmStart, pmEnd, t);
             rects.forEach((rect) => {
                 const i = Number(rect.dataset.i || 0);
                 const j = Number(rect.dataset.j || 0);
-                const cx = i * spacing + spacing / 2;
-                const cy = j * spacing + spacing / 2;
+                const cx = i * spacingBase * posMult + (spacingBase * posMult) / 2;
+                const cy = j * spacingBase * posMult + (spacingBase * posMult) / 2;
                 const x = cx - size / 2;
                 const y = cy - size / 2;
                 gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx } });
