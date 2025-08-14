@@ -73,36 +73,25 @@ export const RECT_STATES = {
         sizeFactor: 0.45,          // rect size as fraction of spacing
         cornerRadiusFactor: 0.2,   // rounded corner as fraction of rect size
         pattern: 'none',           // 'all' | 'checker' | 'none'
-        appearPhase: 'expand-grid',
-        appearOffset: 0,           // seconds relative to phase label
-        appearDuration: 0.25,
-        appearEase: 'power1.out',
-        staggerEach: 0.0125,
-        staggerFrom: 'center'      // 'center' | 'edges' | number index
+        // Manual scale controls (phase 2 / phase 4). If undefined, falls back to grid factors
+        scaleOutFactor: 2.2,
+        scaleFinalFactor: 3.4
     },
     tablet: {
         enabled: false,
         sizeFactor: 0.48,
         cornerRadiusFactor: 0.18,
         pattern: 'none',
-        appearPhase: 'expand-grid',
-        appearOffset: 0,
-        appearDuration: 0.25,
-        appearEase: 'power1.out',
-        staggerEach: 0.0125,
-        staggerFrom: 'center'
+        scaleOutFactor: 2.0,
+        scaleFinalFactor: 3.2
     },
     desktop: {
         enabled: true,
         sizeFactor: 0.5,
         cornerRadiusFactor: 0.15,
         pattern: 'all',
-        appearPhase: 'expand-grid',
-        appearOffset: 0,
-        appearDuration: 0.25,
-        appearEase: 'power1.out',
-        staggerEach: 0.015,
-        staggerFrom: 'center'
+        scaleOutFactor: 1.9,
+        scaleFinalFactor: 3.0
     }
 };
 

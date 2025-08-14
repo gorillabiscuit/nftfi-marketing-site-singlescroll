@@ -575,15 +575,16 @@ function createOutwardExpansionPhase() {
     if (cellsGroup) {
         const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
-        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+        const baseSize = Math.max(2, baseSpacing * (rectStateCfg.sizeFactor ?? 0.5));
+        const targetScale = (typeof rectStateCfg.scaleOutFactor === 'number') ? rectStateCfg.scaleOutFactor : outwardExpansionFactor;
         rects.forEach((rect) => {
             const i = Number(rect.dataset.i || 0);
             const j = Number(rect.dataset.j || 0);
-            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - baseSize / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - baseSize / 2;
             outwardExpansionTimeline.to(rect, {
-                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
+                attr: { x: x1, y: y1 },
+                scale: targetScale,
                 ease: 'none',
                 duration: 0.25
             }, 0);
@@ -683,15 +684,16 @@ function createExpansionPhase() {
     if (cellsGroup) {
         const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
-        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+        const baseSize = Math.max(2, baseSpacing * (rectStateCfg.sizeFactor ?? 0.5));
+        const targetScale = (typeof rectStateCfg.scaleFinalFactor === 'number') ? rectStateCfg.scaleFinalFactor : expansionFactor;
         rects.forEach((rect) => {
             const i = Number(rect.dataset.i || 0);
             const j = Number(rect.dataset.j || 0);
-            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - baseSize / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - baseSize / 2;
             expansionTimeline.to(rect, {
-                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
+                attr: { x: x1, y: y1 },
+                scale: targetScale,
                 ease: 'none',
                 duration: 0.25
             }, 0);
