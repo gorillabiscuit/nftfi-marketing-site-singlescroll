@@ -575,16 +575,16 @@ function createOutwardExpansionPhase() {
     if (cellsGroup) {
         const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const baseSize = Math.max(2, baseSpacing * (rectStateCfg.sizeFactor ?? 0.5));
-        const targetScale = (typeof rectStateCfg.scaleOutFactor === 'number') ? rectStateCfg.scaleOutFactor : outwardExpansionFactor;
+        // Compute rects by width/height from spacing for exact fit (no transform scale)
+        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
+        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
         rects.forEach((rect) => {
             const i = Number(rect.dataset.i || 0);
             const j = Number(rect.dataset.j || 0);
-            const x1 = i * newSpacing + newSpacing / 2 - baseSize / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - baseSize / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
             outwardExpansionTimeline.to(rect, {
-                attr: { x: x1, y: y1 },
-                scale: targetScale,
+                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
                 ease: 'none',
                 duration: 0.25
             }, 0);
@@ -684,16 +684,15 @@ function createExpansionPhase() {
     if (cellsGroup) {
         const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const baseSize = Math.max(2, baseSpacing * (rectStateCfg.sizeFactor ?? 0.5));
-        const targetScale = (typeof rectStateCfg.scaleFinalFactor === 'number') ? rectStateCfg.scaleFinalFactor : expansionFactor;
+        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
+        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
         rects.forEach((rect) => {
             const i = Number(rect.dataset.i || 0);
             const j = Number(rect.dataset.j || 0);
-            const x1 = i * newSpacing + newSpacing / 2 - baseSize / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - baseSize / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
             expansionTimeline.to(rect, {
-                attr: { x: x1, y: y1 },
-                scale: targetScale,
+                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
                 ease: 'none',
                 duration: 0.25
             }, 0);
@@ -757,6 +756,8 @@ function createStaticCellsPhase() {
             rect.dataset.i = String(i);
             rect.dataset.j = String(j);
             gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
+            // Ensure scaling is perfectly centered on the rect itself
+            gsap.set(rect, { transformOrigin: '50% 50%', transformBox: 'fill-box' });
             cellsGroup.appendChild(rect);
         }
     }
