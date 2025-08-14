@@ -65,6 +65,29 @@ export const GRID_STATES = {
     }
 };
 
+// Rectangle cell states for Section 2 (breakpoint-aware)
+// Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern
+export const RECT_STATES = {
+    mobile: {
+        enabled: false,
+        sizeFactor: 0.45,          // rect size as fraction of spacing
+        cornerRadiusFactor: 0.2,   // rounded corner as fraction of rect size
+        pattern: 'none'            // 'all' | 'checker' | 'none'
+    },
+    tablet: {
+        enabled: false,
+        sizeFactor: 0.48,
+        cornerRadiusFactor: 0.18,
+        pattern: 'none'
+    },
+    desktop: {
+        enabled: true,
+        sizeFactor: 0.5,
+        cornerRadiusFactor: 0.15,
+        pattern: 'all'
+    }
+};
+
 export const WHITE_SPHERE_POSITIONS = {
     mobile: { x: -3.5, y: 5.6, z: -6 },
     tablet: { x: -10.0, y: 4.8, z: -6.5 },

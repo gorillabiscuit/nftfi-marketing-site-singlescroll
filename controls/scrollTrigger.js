@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES } from '../config.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 
 // Register GSAP plugins
@@ -365,6 +365,10 @@ function setupSection2Pinning() {
         // Phase 4: Grid Expansion (75-100% of timeline)
         const expansionPhase = createExpansionPhase();
         masterTimeline.add(expansionPhase, "expand-grid");
+
+        // Stage 1 cells: static rectangles at cell centers (desktop-only by config), no animation yet
+        const staticCellsPhase = createStaticCellsPhase();
+        masterTimeline.add(staticCellsPhase, "draw");
         
         console.log('Master timeline with 4-phase animation created successfully');
     }
@@ -656,6 +660,63 @@ function createExpansionPhase() {
     
     console.log('Phase 4: Expansion phase timeline created successfully');
     return expansionTimeline;
+}
+
+// Stage 1: create static rounded rectangles at grid cell centers (no animation yet)
+function createStaticCellsPhase() {
+    const cellsTimeline = gsap.timeline();
+
+    if (!window.lineGroups || !window.gridState || !window.gridInitialSpacing || !window.gridGroup) {
+        console.warn('Cells: prerequisites not met, skipping');
+        return cellsTimeline;
+    }
+
+    const rectState = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || { enabled: false };
+    if (!rectState.enabled) {
+        return cellsTimeline;
+    }
+
+    const { horizontal, vertical } = window.lineGroups;
+    const levels = new Set([...horizontal, ...vertical].map(el => Number(el.dataset.level)));
+    const maxLevel = Math.max(...levels);
+    const minLevel = Math.min(...levels);
+
+    const baseSpacing = Number(window.gridInitialSpacing) || 50;
+    const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
+    const rx = size * (rectState.cornerRadiusFactor ?? 0.15);
+    const group = window.gridGroup;
+
+    // Remove previous cells group if exists
+    const old = document.getElementById('grid-cells');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+
+    const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gsap.set(cellsGroup, { attr: { id: 'grid-cells' } });
+    group.appendChild(cellsGroup);
+    gsap.set(cellsGroup, { transformOrigin: '50% 50%' }); // inherit rotation with gridGroup
+
+    // Build rects for each inner cell (between grid lines)
+    // Logical centers at (i * baseSpacing, j * baseSpacing) for i,j in [minLevel..maxLevel]
+    // We place cells for pairs where both exist; avoid edges by requiring neighbors
+    for (let i = minLevel; i <= maxLevel - 1; i++) {
+        for (let j = minLevel; j <= maxLevel - 1; j++) {
+            // Pattern filtering
+            const include = rectState.pattern === 'all' ? true : rectState.pattern === 'checker' ? ((i + j) % 2 === 0) : false;
+            if (!include) continue;
+
+            const cx = i * baseSpacing + baseSpacing / 2;
+            const cy = j * baseSpacing + baseSpacing / 2;
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            // Position by top-left (x,y); center at (cx,cy)
+            const x = cx - size / 2;
+            const y = cy - size / 2;
+            gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
+            cellsGroup.appendChild(rect);
+        }
+    }
+
+    return cellsTimeline;
 }
 
 // Calculate dynamic line length that extends beyond any screen size
