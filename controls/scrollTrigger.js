@@ -17,7 +17,6 @@ let originalWrapperScale = { x: 3, y: 3, z: 3 };
 
 // Section 2 timeline reference for safe teardown/rebuild on breakpoint changes
 let section2Timeline;
-let section2ResizerRegistered = false;
 
 // Scroll spin tracking variables
 let scrollSpinVelocity = 0;
@@ -377,14 +376,7 @@ function setupSection2Pinning() {
     
     console.log('Section 2 3-phase animation setup complete');
 
-    // Register a single breakpoint-change listener to rebuild Section 2 grid sizing responsively
-    if (!section2ResizerRegistered) {
-        onStateChange((newState, oldState) => {
-            rebuildFor(newState);
-            console.log('Section 2 rebuilt for breakpoint change:', { from: oldState, to: newState });
-        });
-        section2ResizerRegistered = true;
-    }
+    // Responsive rebuilds are handled via gsap.matchMedia above.
 }
 
 // Phase 1: Create sophisticated line drawing phase with 12 lines
