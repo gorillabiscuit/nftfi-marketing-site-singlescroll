@@ -354,6 +354,10 @@ function setupSection2Pinning() {
         const drawingPhase = createDrawingPhase();
         masterTimeline.add(drawingPhase, "draw");
         
+        // Build static cells BEFORE outward expansion so phase tweens can target them
+        const staticCellsPhase = createStaticCellsPhase();
+        masterTimeline.add(staticCellsPhase, "draw");
+
         // Phase 2: Outward Expansion (25-50% of timeline)
         const outwardExpansionPhase = createOutwardExpansionPhase();
         masterTimeline.add(outwardExpansionPhase, "expand-outward");
@@ -366,9 +370,7 @@ function setupSection2Pinning() {
         const expansionPhase = createExpansionPhase();
         masterTimeline.add(expansionPhase, "expand-grid");
 
-        // Stage 1 cells: static rectangles at cell centers (desktop-only by config), no animation yet
-        const staticCellsPhase = createStaticCellsPhase();
-        masterTimeline.add(staticCellsPhase, "draw");
+        // Cells already created before outward expansion
         
         console.log('Master timeline with 4-phase animation created successfully');
     }
