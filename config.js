@@ -73,25 +73,31 @@ export const RECT_STATES = {
         sizeFactor: 0.45,          // rect size as fraction of spacing
         cornerRadiusFactor: 0.2,   // rounded corner as fraction of rect size
         pattern: 'none',           // 'all' | 'checker' | 'none'
-        // Manual scale controls (phase 2 / phase 4). If undefined, falls back to grid factors
-        scaleOutFactor: 2.2,
-        scaleFinalFactor: 3.4
+        // Optional per-phase size factors (override sizeFactor if set)
+        sizeFactorOutStart: undefined,
+        sizeFactorOutEnd: undefined,
+        sizeFactorFinalStart: undefined,
+        sizeFactorFinalEnd: undefined
     },
     tablet: {
         enabled: false,
         sizeFactor: 0.48,
         cornerRadiusFactor: 0.18,
         pattern: 'none',
-        scaleOutFactor: 2.0,
-        scaleFinalFactor: 3.2
+        sizeFactorOutStart: undefined,
+        sizeFactorOutEnd: undefined,
+        sizeFactorFinalStart: undefined,
+        sizeFactorFinalEnd: undefined
     },
     desktop: {
         enabled: true,
-        sizeFactor: 0.5,
+        sizeFactor: 1,
         cornerRadiusFactor: 0.15,
         pattern: 'all',
-        scaleOutFactor: 1.9,
-        scaleFinalFactor: 3.0
+        sizeFactorOutStart: undefined,
+        sizeFactorOutEnd: undefined,
+        sizeFactorFinalStart: undefined,
+        sizeFactorFinalEnd: undefined
     }
 };
 

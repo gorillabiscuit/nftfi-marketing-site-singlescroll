@@ -570,24 +570,29 @@ function createOutwardExpansionPhase() {
         duration: 0.25
     }, 0);
     
-    // Move and resize cells to match outward spacing (keep centered within grid)
+    // Move and resize cells in lockstep with spacing over this phase
     const cellsGroup = document.getElementById('grid-cells');
     if (cellsGroup) {
         const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        // Compute rects by width/height from spacing for exact fit (no transform scale)
-        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
-        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
-        rects.forEach((rect) => {
-            const i = Number(rect.dataset.i || 0);
-            const j = Number(rect.dataset.j || 0);
-            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
-            outwardExpansionTimeline.to(rect, {
-                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
-                ease: 'none',
-                duration: 0.25
-            }, 0);
+        const sfStart = (typeof rectStateCfg.sizeFactorOutStart === 'number') ? rectStateCfg.sizeFactorOutStart : (rectStateCfg.sizeFactor ?? 0.5);
+        const sfEnd = (typeof rectStateCfg.sizeFactorOutEnd === 'number') ? rectStateCfg.sizeFactorOutEnd : (rectStateCfg.sizeFactor ?? 0.5);
+        outwardExpansionTimeline.eventCallback('onUpdate', () => {
+            const tl = outwardExpansionTimeline;
+            const t = tl.totalProgress();
+            const spacing = gsap.utils.interpolate(baseSpacing, newSpacing, t);
+            const sizeF = gsap.utils.interpolate(sfStart, sfEnd, t);
+            const size = Math.max(2, spacing * sizeF);
+            const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+            rects.forEach((rect) => {
+                const i = Number(rect.dataset.i || 0);
+                const j = Number(rect.dataset.j || 0);
+                const cx = i * spacing + spacing / 2;
+                const cy = j * spacing + spacing / 2;
+                const x = cx - size / 2;
+                const y = cy - size / 2;
+                gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx } });
+            });
         });
     }
 
@@ -679,23 +684,29 @@ function createExpansionPhase() {
         }, 0);
     });
     
-    // Move and resize cells to match final spacing (keep centered within grid)
+    // Move and resize cells in lockstep with spacing over this phase
     const cellsGroup = document.getElementById('grid-cells');
     if (cellsGroup) {
         const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
-        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
-        rects.forEach((rect) => {
-            const i = Number(rect.dataset.i || 0);
-            const j = Number(rect.dataset.j || 0);
-            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
-            expansionTimeline.to(rect, {
-                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
-                ease: 'none',
-                duration: 0.25
-            }, 0);
+        const sfStart = (typeof rectStateCfg.sizeFactorFinalStart === 'number') ? rectStateCfg.sizeFactorFinalStart : (rectStateCfg.sizeFactor ?? 0.5);
+        const sfEnd = (typeof rectStateCfg.sizeFactorFinalEnd === 'number') ? rectStateCfg.sizeFactorFinalEnd : (rectStateCfg.sizeFactor ?? 0.5);
+        expansionTimeline.eventCallback('onUpdate', () => {
+            const tl = expansionTimeline;
+            const t = tl.totalProgress();
+            const spacing = gsap.utils.interpolate(baseSpacing, newSpacing, t);
+            const sizeF = gsap.utils.interpolate(sfStart, sfEnd, t);
+            const size = Math.max(2, spacing * sizeF);
+            const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+            rects.forEach((rect) => {
+                const i = Number(rect.dataset.i || 0);
+                const j = Number(rect.dataset.j || 0);
+                const cx = i * spacing + spacing / 2;
+                const cy = j * spacing + spacing / 2;
+                const x = cx - size / 2;
+                const y = cy - size / 2;
+                gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx } });
+            });
         });
     }
 
