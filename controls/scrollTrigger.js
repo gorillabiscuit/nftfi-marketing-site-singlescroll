@@ -155,14 +155,26 @@ function createScrollTimeline() {
                     );
                     
                     // Interpolate scale using dynamic target scale
+                    // Ensure we have valid scale values - only fallback if scale is undefined/null
+                    const startScale = startPos.scale !== undefined && startPos.scale !== null ? startPos.scale : MODEL_CONFIG.startScale;
+                    const targetScale = dynamicTarget.scale !== undefined && dynamicTarget.scale !== null ? dynamicTarget.scale : MODEL_CONFIG.targetScale;
+                    
                     const currentScale = gsap.utils.interpolate(
-                        startPos.scale || MODEL_CONFIG.startScale, 
-                        dynamicTarget.scale, 
+                        startScale, 
+                        targetScale, 
                         progress
                     );
-                    wrapper.scale.setScalar(currentScale);
                     
-                    console.log('Scroll animation progress:', progress, 'Scale:', currentScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
+                    // Clamp scale to prevent extreme values
+                    const clampedScale = gsap.utils.clamp(0.01, 10, currentScale);
+                    wrapper.scale.setScalar(clampedScale);
+                    
+                    // Enhanced logging for scale debugging
+                    if (Math.abs(currentScale - clampedScale) > 0.01) {
+                        console.warn('Scale was clamped:', { original: currentScale, clamped: clampedScale, startScale, targetScale });
+                    }
+                    
+                    console.log('Scroll animation progress:', progress, 'Scale:', clampedScale, 'Target:', dynamicTarget, 'Spin velocity:', scrollSpinVelocity);
                 }
             }
         }

@@ -33,11 +33,16 @@ export function calculateTargetPosition() {
     // Use animation state target values instead of hardcoded TARGET_CONFIG
     const worldPos = worldToPosition(animationState.target.x, animationState.target.y);
     
+    // Ensure scale is always a valid number
+    const targetScale = typeof animationState.target.scale === 'number' && !isNaN(animationState.target.scale) 
+        ? animationState.target.scale 
+        : 0.235; // Fallback to desktop target scale
+    
     return {
         x: worldPos.x,
         y: worldPos.y,
         z: animationState.target.z, // Use Z from animation state
-        scale: animationState.target.scale // Use scale directly without scaleFactor
+        scale: targetScale
     };
 }
 
@@ -49,10 +54,15 @@ export function calculateStartPosition() {
     // Use animation state start values instead of hardcoded TARGET_CONFIG
     const worldPos = worldToPosition(animationState.start.x, animationState.start.y);
     
+    // Ensure scale is always a valid number
+    const startScale = typeof animationState.start.scale === 'number' && !isNaN(animationState.start.scale) 
+        ? animationState.start.scale 
+        : 3.0; // Fallback to desktop start scale
+    
     return {
         x: worldPos.x,
         y: worldPos.y,
         z: animationState.start.z, // Use Z from animation state
-        scale: animationState.start.scale // Use scale directly without scaleFactor
+        scale: startScale
     };
 } 

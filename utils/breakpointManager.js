@@ -34,7 +34,20 @@ export function getCurrentAnimationState() {
 
 // Get animation state for a specific breakpoint
 export function getAnimationState(breakpoint) {
-    return ANIMATION_STATES[breakpoint] || ANIMATION_STATES.desktop;
+    const state = ANIMATION_STATES[breakpoint] || ANIMATION_STATES.desktop;
+    
+    // Validate scale values to prevent animation issues
+    if (typeof state.start.scale !== 'number' || isNaN(state.start.scale)) {
+        console.warn(`Invalid start scale for ${breakpoint}:`, state.start.scale, 'falling back to desktop');
+        return ANIMATION_STATES.desktop;
+    }
+    
+    if (typeof state.target.scale !== 'number' || isNaN(state.target.scale)) {
+        console.warn(`Invalid target scale for ${breakpoint}:`, state.target.scale, 'falling back to desktop');
+        return ANIMATION_STATES.desktop;
+    }
+    
+    return state;
 }
 
 // Check if state has changed
