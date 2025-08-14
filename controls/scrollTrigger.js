@@ -266,6 +266,42 @@ function setupSection2Pinning() {
         // Fallback without context if element not found
         startAdvancedAnimationSequence(section2El, scrollerEl);
     }
+
+    // Minimal gsap.matchMedia integration for responsive rebuilds
+    let isRebuilding = false;
+    let lastBpLabel = null;
+    const rebuildFor = (label) => {
+        // Avoid duplicate work when the same label fires repeatedly
+        if (isRebuilding || (label && label === lastBpLabel)) return;
+        isRebuilding = true;
+        if (label) lastBpLabel = label;
+        try {
+            if (section2Timeline) {
+                if (section2Timeline.scrollTrigger) section2Timeline.scrollTrigger.kill();
+                section2Timeline.kill();
+                section2Timeline = null;
+            }
+        } catch (e) {
+            console.warn('Section 2 teardown warning (matchMedia):', e);
+        }
+        const el = document.querySelector("section[data-section='2']");
+        if (el) {
+            gsap.context(() => {
+                startAdvancedAnimationSequence(el, document.getElementById('smooth-content'));
+            }, el);
+        } else {
+            startAdvancedAnimationSequence(el, document.getElementById('smooth-content'));
+        }
+        requestAnimationFrame(() => {
+            try { ScrollTrigger.refresh(); } catch (_) {}
+            isRebuilding = false;
+        });
+    };
+
+    const mm = gsap.matchMedia();
+    mm.add("(max-width: 767px)", () => rebuildFor('mobile'));
+    mm.add("(min-width: 768px) and (max-width: 1023px)", () => rebuildFor('tablet'));
+    mm.add("(min-width: 1024px)", () => rebuildFor('desktop'));
     
     // Function to start the advanced 3-phase animation sequence
     function startAdvancedAnimationSequence(triggerEl, scrollerEl) {
@@ -344,24 +380,7 @@ function setupSection2Pinning() {
     // Register a single breakpoint-change listener to rebuild Section 2 grid sizing responsively
     if (!section2ResizerRegistered) {
         onStateChange((newState, oldState) => {
-            try {
-                if (section2Timeline) {
-                    // Kill timeline and its ScrollTrigger cleanly
-                    if (section2Timeline.scrollTrigger) {
-                        section2Timeline.scrollTrigger.kill();
-                    }
-                    section2Timeline.kill();
-                    section2Timeline = null;
-                }
-            } catch (e) {
-                console.warn('Section 2 teardown warning:', e);
-            }
-
-            // Rebuild fresh with new breakpoint-aware config
-            const section2ElNext = document.querySelector("section[data-section='2']");
-            const scrollerElNext = document.getElementById('smooth-content');
-            startAdvancedAnimationSequence(section2ElNext, scrollerElNext);
-            try { ScrollTrigger.refresh(); } catch (_) {}
+            rebuildFor(newState);
             console.log('Section 2 rebuilt for breakpoint change:', { from: oldState, to: newState });
         });
         section2ResizerRegistered = true;
