@@ -366,13 +366,9 @@ function setupSection2Pinning() {
         const expansionPhase = createExpansionPhase();
         masterTimeline.add(expansionPhase, "expand-grid");
 
-        // Cells: build & animate rectangles according to RECT_STATES
-        const cellsPhase = createCellsPhase();
-        // Add at configured phase label
-        const rectStateForPhase = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const phaseLabel = rectStateForPhase.appearPhase || 'expand-grid';
-        const offset = rectStateForPhase.appearOffset || 0;
-        masterTimeline.add(cellsPhase, `${phaseLabel}+=${offset}`);
+        // Stage 1 cells: static rectangles at cell centers (desktop-only by config), no animation yet
+        const staticCellsPhase = createStaticCellsPhase();
+        masterTimeline.add(staticCellsPhase, "draw");
         
         console.log('Master timeline with 4-phase animation created successfully');
     }
@@ -498,49 +494,6 @@ function createDrawingPhase() {
     window.gridInitialSpacing = initialSpacing;
     window.gridState = gridState;
 
-    // Build cells group up-front so they can track spacing changes even before they appear
-    try {
-        const rectState = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || { enabled: false };
-        // Clear any previous cells group
-        const prevCells = document.getElementById('grid-cells');
-        if (prevCells && prevCells.parentNode) prevCells.parentNode.removeChild(prevCells);
-        if (rectState.enabled) {
-            const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            gsap.set(cellsGroup, { attr: { id: 'grid-cells' } });
-            gridGroup.appendChild(cellsGroup);
-            gsap.set(cellsGroup, { transformOrigin: '50% 50%' });
-
-            const size = Math.max(2, initialSpacing * (rectState.sizeFactor ?? 0.5));
-            const rx = size * (rectState.cornerRadiusFactor ?? 0.15);
-            const created = [];
-            // Build inner cells for i,j in [minLevel..maxLevel-1]
-            for (let i = -levels; i <= levels - 1; i++) {
-                for (let j = -levels; j <= levels - 1; j++) {
-                    const include = rectState.pattern === 'all' ? true : rectState.pattern === 'checker' ? ((i + j) % 2 === 0) : false;
-                    if (!include) continue;
-                    const cx = i * initialSpacing + initialSpacing / 2;
-                    const cy = j * initialSpacing + initialSpacing / 2;
-                    const x = cx - size / 2;
-                    const y = cy - size / 2;
-                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    rect.dataset.i = String(i);
-                    rect.dataset.j = String(j);
-                    gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
-                    // Invisible initially; will appear later at configured phase
-                    gsap.set(rect, { opacity: 0, scale: 0, transformOrigin: '50% 50%' });
-                    cellsGroup.appendChild(rect);
-                    created.push(rect);
-                }
-            }
-            window.gridCells = created;
-        } else {
-            window.gridCells = [];
-        }
-    } catch (e) {
-        console.warn('Cells build warning during drawing phase:', e);
-        window.gridCells = [];
-    }
-
     // Ensure group rotates around center
     gsap.set(gridGroup, { transformOrigin: "50% 50%" });
     
@@ -616,27 +569,27 @@ function createOutwardExpansionPhase() {
         ease: "none",
         duration: 0.25
     }, 0);
-
-    // Move cells to match outward spacing if present
-    if (Array.isArray(window.gridCells) && window.gridCells.length) {
-        const rectState = window.gridState || {};
-        const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
-        window.gridCells.forEach((rect) => {
+    
+    // Move and resize cells to match outward spacing (keep centered within grid)
+    const cellsGroup = document.getElementById('grid-cells');
+    if (cellsGroup) {
+        const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
+        const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
+        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
+        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+        rects.forEach((rect) => {
             const i = Number(rect.dataset.i || 0);
             const j = Number(rect.dataset.j || 0);
-            const x0 = i * baseSpacing + baseSpacing / 2 - size / 2;
-            const y0 = j * baseSpacing + baseSpacing / 2 - size / 2;
-            const x1 = i * newSpacing + newSpacing / 2 - size / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - size / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
             outwardExpansionTimeline.to(rect, {
-                x: x1 - x0,
-                y: y1 - y0,
+                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
                 ease: 'none',
                 duration: 0.25
             }, 0);
         });
     }
-    
+
     console.log('Phase 2: Outward expansion + rotation phase timeline created successfully');
     return outwardExpansionTimeline;
 }
@@ -724,33 +677,33 @@ function createExpansionPhase() {
             duration: 0.25
         }, 0);
     });
-
-    // Move cells to match final spacing if present
-    if (Array.isArray(window.gridCells) && window.gridCells.length) {
-        const rectState = window.gridState || {};
-        const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
-        window.gridCells.forEach((rect) => {
+    
+    // Move and resize cells to match final spacing (keep centered within grid)
+    const cellsGroup = document.getElementById('grid-cells');
+    if (cellsGroup) {
+        const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
+        const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
+        const newSize = Math.max(2, newSpacing * (rectStateCfg.sizeFactor ?? 0.5));
+        const newRx = newSize * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+        rects.forEach((rect) => {
             const i = Number(rect.dataset.i || 0);
             const j = Number(rect.dataset.j || 0);
-            const x0 = i * baseSpacing + baseSpacing / 2 - size / 2;
-            const y0 = j * baseSpacing + baseSpacing / 2 - size / 2;
-            const x1 = i * newSpacing + newSpacing / 2 - size / 2;
-            const y1 = j * newSpacing + newSpacing / 2 - size / 2;
+            const x1 = i * newSpacing + newSpacing / 2 - newSize / 2;
+            const y1 = j * newSpacing + newSpacing / 2 - newSize / 2;
             expansionTimeline.to(rect, {
-                x: x1 - x0,
-                y: y1 - y0,
+                attr: { x: x1, y: y1, width: newSize, height: newSize, rx: newRx, ry: newRx },
                 ease: 'none',
                 duration: 0.25
             }, 0);
         });
     }
-    
+
     console.log('Phase 4: Expansion phase timeline created successfully');
     return expansionTimeline;
 }
 
 // Stage 1: create static rounded rectangles at grid cell centers (no animation yet)
-function createCellsPhase() {
+function createStaticCellsPhase() {
     const cellsTimeline = gsap.timeline();
 
     if (!window.lineGroups || !window.gridState || !window.gridInitialSpacing || !window.gridGroup) {
@@ -785,7 +738,6 @@ function createCellsPhase() {
     // Build rects for each inner cell (between grid lines)
     // Logical centers at (i * baseSpacing, j * baseSpacing) for i,j in [minLevel..maxLevel]
     // We place cells for pairs where both exist; avoid edges by requiring neighbors
-    const createdRects = [];
     for (let i = minLevel; i <= maxLevel - 1; i++) {
         for (let j = minLevel; j <= maxLevel - 1; j++) {
             // Pattern filtering
@@ -799,25 +751,12 @@ function createCellsPhase() {
             // Position by top-left (x,y); center at (cx,cy)
             const x = cx - size / 2;
             const y = cy - size / 2;
+            // Store logical indices for later spacing-based animations
+            rect.dataset.i = String(i);
+            rect.dataset.j = String(j);
             gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
             cellsGroup.appendChild(rect);
-            createdRects.push(rect);
         }
-    }
-
-    // Animate appearance
-    if (createdRects.length) {
-        // from opacity/scale 0 to 1 with optional stagger
-        gsap.set(createdRects, { opacity: 0, scale: 0, transformOrigin: '50% 50%' });
-        const each = rectState.staggerEach ?? 0.01;
-        const from = rectState.staggerFrom ?? 'center';
-        cellsTimeline.to(createdRects, {
-            opacity: 1,
-            scale: 1,
-            duration: rectState.appearDuration ?? 0.25,
-            ease: rectState.appearEase ?? 'power1.out',
-            stagger: { each, from }
-        }, 0);
     }
 
     return cellsTimeline;
