@@ -766,7 +766,7 @@ function createStaticCellsPhase() {
             // Store logical indices for later spacing-based animations
             rect.dataset.i = String(i);
             rect.dataset.j = String(j);
-            gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
+            gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect', fill: '#000000', 'fill-opacity': 0.5, stroke: '#000000', 'stroke-opacity': 1, 'stroke-width': 1 } });
             // Ensure scaling is perfectly centered on the rect itself
             gsap.set(rect, { transformOrigin: '50% 50%', transformBox: 'fill-box' });
             cellsGroup.appendChild(rect);
