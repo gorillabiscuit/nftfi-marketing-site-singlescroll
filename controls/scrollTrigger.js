@@ -274,6 +274,7 @@ function setupSection2Pinning() {
                 trigger: "section[data-section='2']",
                 scrub: true,
                 pin: true,
+				invalidateOnRefresh: true,
                 start: "top top",
                 end: "+=200%", // Extended for 3 phases
                 onUpdate: (self) => {
@@ -348,9 +349,12 @@ function createDrawingPhase() {
     // Set SVG dimensions and viewBox - centered coordinate system
     // This creates a coordinate system where (0,0) is at the center of the SVG
     const halfSize = svgSize / 2;
-    svg.setAttribute('viewBox', `-${halfSize} -${halfSize} ${svgSize} ${svgSize}`);
-    svg.style.width = `${svgSize}px`;
-    svg.style.height = `${svgSize}px`;
+    // Use GSAP to set SVG attributes and dimensions (canonical approach)
+    gsap.set(svg, {
+        attr: { viewBox: `-${halfSize} -${halfSize} ${svgSize} ${svgSize}` },
+        width: svgSize,
+        height: svgSize
+    });
     
     // Use GSAP's canonical centering approach instead of custom positioning
     // Reset any previous transforms and center the SVG using GSAP
@@ -362,8 +366,13 @@ function createDrawingPhase() {
     
     console.log('SVG centered using GSAP canonical approach');
     
-    // Clear existing lines and create new ones with enhanced positioning
-    svg.innerHTML = '';
+    // Clear existing lines without innerHTML (avoid direct manipulation)
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    // Create a group container to hold all grid lines (rotate the group, not individual lines)
+    const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gsap.set(gridGroup, { attr: { id: 'grid-lines' } });
+    svg.appendChild(gridGroup);
     
     // Calculate center point - now (0,0) in our centered coordinate system
     const center = 0; // In centered viewBox, (0,0) is the center
@@ -371,36 +380,10 @@ function createDrawingPhase() {
     console.log(`Center point is now at (0,0) in centered coordinate system`);
     console.log(`SVG viewBox: -${svgSize/2} -${svgSize/2} ${svgSize} ${svgSize}`);
     
-    // Create 12 lines (6 horizontal + 6 vertical) with dynamic spacing
+    // Create 14 lines (7 horizontal + 7 vertical) with dynamic spacing using consistent levels
+    // We assign a logical level in [-3..3] to every line so future transforms map consistently
     const initialSpacing = 50;
-    
-    // Create horizontal lines (will be rotated 45° later)
-    // Position lines around the center (0,0) with proper spacing
-    const horizontalLines = [
-        { y: center, class: 'horizontal' },                    // Center line at (0,0)
-        { y: center - initialSpacing, class: 'horizontal' },   // Above center
-        { y: center + initialSpacing, class: 'horizontal' },   // Below center
-        { y: center - initialSpacing * 2, class: 'horizontal' }, // Further above
-        { y: center + initialSpacing * 2, class: 'horizontal' }, // Further below
-        { y: center - initialSpacing * 3, class: 'horizontal' }, // Furthest above
-        { y: center + initialSpacing * 3, class: 'horizontal' }  // Furthest below
-    ];
-    
-    // Create vertical lines (will be rotated 45° later)
-    // Position lines around the center (0,0) with proper spacing
-    const verticalLines = [
-        { x: center, class: 'vertical' },                      // Center line at (0,0)
-        { x: center - initialSpacing, class: 'vertical' },     // Left of center
-        { x: center + initialSpacing, class: 'vertical' },     // Right of center
-        { x: center - initialSpacing * 2, class: 'vertical' }, // Further left
-        { x: center + initialSpacing * 2, class: 'vertical' }, // Further right
-        { x: center - initialSpacing * 3, class: 'vertical' }, // Furthest left
-        { x: center + initialSpacing * 3, class: 'vertical' }  // Furthest right
-    ];
-    
     console.log(`Center point is now at (0,0) in centered coordinate system`);
-    console.log(`Horizontal lines Y positions:`, horizontalLines.map(l => l.y));
-    console.log(`Vertical lines X positions:`, verticalLines.map(l => l.x));
     
     // Create all lines and organize into groups
     const lineGroups = {
@@ -409,39 +392,49 @@ function createDrawingPhase() {
         all: []
     };
     
-    // Add horizontal lines
-    horizontalLines.forEach((lineData, index) => {
+    // Add horizontal lines (levels -3..3, increasing order)
+    for (let level = -3; level <= 3; level++) {
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('class', `line ${lineData.class}`);
         // Horizontal lines go from left edge to right edge of SVG in centered coordinate system
         const leftEdge = -svgSize / 2;
         const rightEdge = svgSize / 2;
-        path.setAttribute('d', `M${leftEdge} ${lineData.y} L${rightEdge} ${lineData.y}`);
-        svg.appendChild(path);
+        const y = center + level * initialSpacing;
+        gsap.set(path, { attr: { class: `line horizontal`, d: `M${leftEdge} ${y} L${rightEdge} ${y}` } });
+        // Store logical position for future transforms
+        path.dataset.axis = 'h';
+        path.dataset.level = String(level);
+        gridGroup.appendChild(path);
         lineGroups.horizontal.push(path);
         lineGroups.all.push(path);
-    });
+    }
     
-    // Add vertical lines
-    verticalLines.forEach((lineData, index) => {
+    // Add vertical lines (levels -3..3, increasing order)
+    for (let level = -3; level <= 3; level++) {
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('class', `line ${lineData.class}`);
         // Vertical lines go from top edge to bottom edge of SVG in centered coordinate system
         const topEdge = -svgSize / 2;
         const bottomEdge = svgSize / 2;
-        path.setAttribute('d', `M${lineData.x} ${topEdge} L${lineData.x} ${bottomEdge}`);
-        svg.appendChild(path);
+        const x = center + level * initialSpacing;
+        gsap.set(path, { attr: { class: `line vertical`, d: `M${x} ${topEdge} L${x} ${bottomEdge}` } });
+        // Store logical position for future transforms
+        path.dataset.axis = 'v';
+        path.dataset.level = String(level);
+        gridGroup.appendChild(path);
         lineGroups.vertical.push(path);
         lineGroups.all.push(path);
-    });
+    }
     
     console.log(`Phase 1: Created ${lineGroups.all.length} SVG path elements`);
     console.log('DrawSVGPlugin available:', !!gsap.DrawSVGPlugin);
     
-    // Store line groups globally for use in later phases
+    // Store line groups and group container globally for use in later phases
     window.lineGroups = lineGroups;
     window.svgSize = svgSize;
     window.svgCenter = 0; // In centered coordinate system, center is always (0,0)
+    window.gridGroup = gridGroup;
+
+    // Ensure group rotates around center
+    gsap.set(gridGroup, { transformOrigin: "50% 50%" });
     
     // Set up each line with the world-class center-out drawSVG pattern
     lineGroups.all.forEach((line, index) => {
@@ -457,6 +450,8 @@ function createDrawingPhase() {
     });
     
     console.log('Phase 1: Drawing phase timeline created successfully');
+    // Force ST to re-measure after dynamic SVG rebuild
+    try { ScrollTrigger.refresh(); } catch (_) {}
     return drawingTimeline;
 }
 
@@ -471,15 +466,13 @@ function createOutwardExpansionPhase() {
     }
     
     const { horizontal: horizontalLines, vertical: verticalLines, all: allLines } = window.lineGroups;
+    const gridGroup = window.gridGroup;
     const svgSize = window.svgSize;
     
     console.log('Phase 2: Setting up outward expansion + 45° rotation - lines travel outwards from center while grid rotates');
     
-    // Set transform origin to SVG center for proper rotation
-    // Use GSAP's canonical approach: "50% 50%" or "center center" for perfect centering
-    gsap.set(allLines, { 
-        transformOrigin: "50% 50%" // This centers the rotation axis perfectly
-    });
+    // Set transform origin on the group and rotate the group as a whole
+    gsap.set(gridGroup, { transformOrigin: "50% 50%" });
     
     console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
     
@@ -487,36 +480,33 @@ function createOutwardExpansionPhase() {
     const outwardExpansionFactor = 1.8; // Lines will spread 1.8x further apart
     const newSpacing = 50 * outwardExpansionFactor; // New spacing between lines
     
-    // DISABLED: Create outward expansion animation for horizontal lines
-    // horizontalLines.forEach((line, index) => {
-    //     // In centered coordinate system, lines are positioned relative to (0,0)
-    //     const targetY = (index - 3) * newSpacing; // Target Y position from center (3 is middle index for 7 lines)
-    //     
-    //     outwardExpansionTimeline.to(line, {
-    //         attr: { d: `M${-svgSize/2} ${targetY} L${svgSize/2} ${targetY}` },
-    //         ease: "none",
-    //         duration: 0.25 // This phase takes 25% of the total timeline
-    //     }, 0);
-    // });
+    // Canonical transforms: move lines using x/y transforms instead of mutating SVG path data
+    horizontalLines.forEach((line) => {
+        const level = Number(line.dataset.level || 0);
+        const targetY = level * newSpacing; // map by logical level
+        outwardExpansionTimeline.to(line, {
+            y: targetY,
+            ease: "none",
+            duration: 0.25
+        }, 0); // simultaneous with rotation
+    });
+
+    verticalLines.forEach((line) => {
+        const level = Number(line.dataset.level || 0);
+        const targetX = level * newSpacing; // map by logical level
+        outwardExpansionTimeline.to(line, {
+            x: targetX,
+            ease: "none",
+            duration: 0.25
+        }, 0); // simultaneous with rotation
+    });
     
-    // DISABLED: Create outward expansion animation for vertical lines
-    // verticalLines.forEach((line, index) => {
-    //     // In centered coordinate system, lines are positioned relative to (0,0)
-    //     const targetX = (index - 3) * newSpacing; // Target X position from center (3 is middle index for 7 lines)
-    //     
-    //     outwardExpansionTimeline.to(line, {
-    //         attr: { d: `M${targetX} ${-svgSize/2} L${targetX} ${svgSize/2}` },
-    //         ease: "none",
-    //         duration: 0.25 // This phase takes 25% of the total timeline
-    //     }, 0);
-    // });
-    
-    // Add simultaneous rotation animation for the entire grid
-    outwardExpansionTimeline.to(allLines, {
-        rotation: 45, // Rotate all lines 45° simultaneously with expansion
+    // Rotate the entire group (preserves ordering/spacing). Avoid rotating individual lines.
+    outwardExpansionTimeline.to(gridGroup, {
+        rotation: 45,
         ease: "none",
-        duration: 0.25 // This phase takes 25% of the total timeline
-    }, 0); // Same start time (0) for simultaneous animation
+        duration: 0.25
+    }, 0);
     
     console.log('Phase 2: Outward expansion + rotation phase timeline created successfully');
     return outwardExpansionTimeline;
@@ -552,12 +542,11 @@ function createRotationPhase(square) {
         duration: 0.25 // This phase takes 25% of the total timeline
     }, 0);
     
-    // Add coordinated line rotation to the rotation timeline
-    // Lines are already at 45° from previous phase, so rotate additional 45° to reach 90° total
-    rotationTimeline.to(allLines, {
-        rotation: 90, // Rotate all lines to 90° total (45° + 45° additional)
+    // Rotate the whole grid group to preserve relative ordering and spacing
+    rotationTimeline.to(gridGroup, {
+        rotation: 90, // Rotate to 90° total relative to initial (Phase 2 adds first 45° over group too)
         ease: "none",
-        duration: 0.25 // This phase takes 25% of the total timeline
+        duration: 0.25
     }, 0);
     
     console.log('Phase 3: Rotation phase timeline created successfully');
@@ -584,28 +573,26 @@ function createExpansionPhase() {
     const expansionFactor = 2.5; // Lines will spread 2.5x further apart
     const newSpacing = 50 * expansionFactor; // New spacing between lines
     
-    // DISABLED: Create expansion animation for horizontal lines
-    // horizontalLines.forEach((line, index) => {
-    //     // In centered coordinate system, lines are positioned relative to (0,0)
-    //     const targetX = (index - 2.5) * newSpacing; // Target X position from center
-    //     
-    //     expansionTimeline.to(line, {
-    //         attr: { d: `M${-svgSize/2} ${targetY} L${svgSize/2} ${targetY}` },
-    //         ease: "none",
-    //         duration: 0.25 // This phase takes 25% of the total timeline
-    //     }, 0);
-    // });
-    
-    // DISABLED: Create expansion animation for vertical lines
-    // verticalLines.forEach((line, index) => {
-    //     // In centered coordinate system, lines are positioned relative to (0,0)
-    //     const targetX = (index - 2.5) * newSpacing; // Target X position from center
-    //     
-    //     expansionTimeline.to(line, {
-    //         attr: { d: `M${targetX} ${-svgSize/2} L${targetX} ${svgSize/2}` },
-    //         duration: 0.25 // This phase takes 25% of the total timeline
-    //     }, 0);
-    // });
+    // Canonical transforms: continue expanding via x/y, avoid mutating path data
+    horizontalLines.forEach((line) => {
+        const level = Number(line.dataset.level || 0);
+        const targetY = level * newSpacing; // keep symmetry via logical level
+        expansionTimeline.to(line, {
+            y: targetY,
+            ease: "none",
+            duration: 0.25
+        }, 0);
+    });
+
+    verticalLines.forEach((line) => {
+        const level = Number(line.dataset.level || 0);
+        const targetX = level * newSpacing;
+        expansionTimeline.to(line, {
+            x: targetX,
+            ease: "none",
+            duration: 0.25
+        }, 0);
+    });
     
     console.log('Phase 4: Expansion phase timeline created successfully');
     return expansionTimeline;
