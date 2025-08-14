@@ -588,6 +588,13 @@ function createOutwardExpansionPhase() {
                 duration: 0.25
             }, 0);
         });
+        // Appearance scale-up exactly with outward expansion
+        outwardExpansionTimeline.to(rects, {
+            scale: 1,
+            opacity: 1,
+            ease: 'none',
+            duration: 0.25
+        }, 0);
     }
 
     console.log('Phase 2: Outward expansion + rotation phase timeline created successfully');
@@ -755,6 +762,8 @@ function createStaticCellsPhase() {
             rect.dataset.i = String(i);
             rect.dataset.j = String(j);
             gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
+            // Prepare for appearance scale-up in Phase 2
+            gsap.set(rect, { scale: 0, opacity: 0, transformOrigin: '50% 50%' });
             cellsGroup.appendChild(rect);
         }
     }
