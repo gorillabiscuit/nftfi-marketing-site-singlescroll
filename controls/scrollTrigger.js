@@ -253,13 +253,22 @@ function setupSection2Pinning() {
     // No need for a separate pinning ScrollTrigger
     console.log('Section 2 pinning will be handled by master timeline');
     
+    // Resolve scope & scroller elements once
+    const section2El = document.querySelector("section[data-section='2']");
+    const scrollerEl = document.getElementById('smooth-content');
+
     // Start the sophisticated animation sequence immediately, scoped to Section 2
-    gsap.context(() => {
-        startAdvancedAnimationSequence();
-    }, "section[data-section='2']");
+    if (section2El) {
+        gsap.context(() => {
+            startAdvancedAnimationSequence(section2El, scrollerEl);
+        }, section2El);
+    } else {
+        // Fallback without context if element not found
+        startAdvancedAnimationSequence(section2El, scrollerEl);
+    }
     
     // Function to start the advanced 3-phase animation sequence
-    function startAdvancedAnimationSequence() {
+    function startAdvancedAnimationSequence(triggerEl, scrollerEl) {
         const square = document.querySelector('.test-square');
         if (!square) {
             console.error('Square element not found!');
@@ -277,12 +286,13 @@ function setupSection2Pinning() {
         // Create the master timeline with ScrollTrigger for the entire sequence
         const masterTimeline = gsap.timeline({
             scrollTrigger: {
-                trigger: "section[data-section='2']",
+                trigger: triggerEl || "section[data-section='2']",
                 scrub: true,
                 pin: true,
 				invalidateOnRefresh: true,
                 start: "top top",
                 end: "+=200%", // Extended for 3 phases
+                scroller: scrollerEl || undefined,
                 onUpdate: (self) => {
                     // Log progress through the 4 phases
                     const phase = self.progress < 0.25 ? 1 : 
@@ -349,7 +359,9 @@ function setupSection2Pinning() {
             }
 
             // Rebuild fresh with new breakpoint-aware config
-            startAdvancedAnimationSequence();
+            const section2ElNext = document.querySelector("section[data-section='2']");
+            const scrollerElNext = document.getElementById('smooth-content');
+            startAdvancedAnimationSequence(section2ElNext, scrollerElNext);
             try { ScrollTrigger.refresh(); } catch (_) {}
             console.log('Section 2 rebuilt for breakpoint change:', { from: oldState, to: newState });
         });
