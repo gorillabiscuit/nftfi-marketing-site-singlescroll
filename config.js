@@ -57,7 +57,7 @@ export const GRID_STATES = {
         svgSizeMultiplier: 1.7
     },
     desktop: {
-        initialSpacing: 50,
+        initialSpacing: 80,
         outwardFactor: 1.9,
         finalFactor: 3.0,
         levels: 4,
