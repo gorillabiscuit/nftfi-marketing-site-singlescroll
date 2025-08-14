@@ -72,19 +72,37 @@ export const RECT_STATES = {
         enabled: false,
         sizeFactor: 0.45,          // rect size as fraction of spacing
         cornerRadiusFactor: 0.2,   // rounded corner as fraction of rect size
-        pattern: 'none'            // 'all' | 'checker' | 'none'
+        pattern: 'none',           // 'all' | 'checker' | 'none'
+        appearPhase: 'expand-grid',
+        appearOffset: 0,           // seconds relative to phase label
+        appearDuration: 0.25,
+        appearEase: 'power1.out',
+        staggerEach: 0.0125,
+        staggerFrom: 'center'      // 'center' | 'edges' | number index
     },
     tablet: {
         enabled: false,
         sizeFactor: 0.48,
         cornerRadiusFactor: 0.18,
-        pattern: 'none'
+        pattern: 'none',
+        appearPhase: 'expand-grid',
+        appearOffset: 0,
+        appearDuration: 0.25,
+        appearEase: 'power1.out',
+        staggerEach: 0.0125,
+        staggerFrom: 'center'
     },
     desktop: {
         enabled: true,
         sizeFactor: 0.5,
         cornerRadiusFactor: 0.15,
-        pattern: 'all'
+        pattern: 'all',
+        appearPhase: 'expand-grid',
+        appearOffset: 0,
+        appearDuration: 0.25,
+        appearEase: 'power1.out',
+        staggerEach: 0.015,
+        staggerFrom: 'center'
     }
 };
 

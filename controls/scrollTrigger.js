@@ -366,9 +366,13 @@ function setupSection2Pinning() {
         const expansionPhase = createExpansionPhase();
         masterTimeline.add(expansionPhase, "expand-grid");
 
-        // Stage 1 cells: static rectangles at cell centers (desktop-only by config), no animation yet
-        const staticCellsPhase = createStaticCellsPhase();
-        masterTimeline.add(staticCellsPhase, "draw");
+        // Cells: build & animate rectangles according to RECT_STATES
+        const cellsPhase = createCellsPhase();
+        // Add at configured phase label
+        const rectStateForPhase = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
+        const phaseLabel = rectStateForPhase.appearPhase || 'expand-grid';
+        const offset = rectStateForPhase.appearOffset || 0;
+        masterTimeline.add(cellsPhase, `${phaseLabel}+=${offset}`);
         
         console.log('Master timeline with 4-phase animation created successfully');
     }
@@ -663,7 +667,7 @@ function createExpansionPhase() {
 }
 
 // Stage 1: create static rounded rectangles at grid cell centers (no animation yet)
-function createStaticCellsPhase() {
+function createCellsPhase() {
     const cellsTimeline = gsap.timeline();
 
     if (!window.lineGroups || !window.gridState || !window.gridInitialSpacing || !window.gridGroup) {
@@ -698,6 +702,7 @@ function createStaticCellsPhase() {
     // Build rects for each inner cell (between grid lines)
     // Logical centers at (i * baseSpacing, j * baseSpacing) for i,j in [minLevel..maxLevel]
     // We place cells for pairs where both exist; avoid edges by requiring neighbors
+    const createdRects = [];
     for (let i = minLevel; i <= maxLevel - 1; i++) {
         for (let j = minLevel; j <= maxLevel - 1; j++) {
             // Pattern filtering
@@ -713,7 +718,23 @@ function createStaticCellsPhase() {
             const y = cy - size / 2;
             gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
             cellsGroup.appendChild(rect);
+            createdRects.push(rect);
         }
+    }
+
+    // Animate appearance
+    if (createdRects.length) {
+        // from opacity/scale 0 to 1 with optional stagger
+        gsap.set(createdRects, { opacity: 0, scale: 0, transformOrigin: '50% 50%' });
+        const each = rectState.staggerEach ?? 0.01;
+        const from = rectState.staggerFrom ?? 'center';
+        cellsTimeline.to(createdRects, {
+            opacity: 1,
+            scale: 1,
+            duration: rectState.appearDuration ?? 0.25,
+            ease: rectState.appearEase ?? 'power1.out',
+            stagger: { each, from }
+        }, 0);
     }
 
     return cellsTimeline;
