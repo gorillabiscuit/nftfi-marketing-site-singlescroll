@@ -104,11 +104,11 @@ export const RECT_STATES = {
         cornerRadiusFactor: 0.15,
         pattern: 'checker',
         sizeFactorOutStart: 1,
-        sizeFactorOutEnd: 2,
+        sizeFactorOutEnd: 1.525,
         sizeFactorFinalStart: 1,
         sizeFactorFinalEnd: 1,
         positionOutMultiplierStart: 1,
-        positionOutMultiplierEnd: 1,
+        positionOutMultiplierEnd: 1.525,
         positionFinalMultiplierStart: 1,
         positionFinalMultiplierEnd: 1
     }
