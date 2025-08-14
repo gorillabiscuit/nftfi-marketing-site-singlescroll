@@ -66,16 +66,16 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
     // This is a regular GSAP animation, NOT a ScrollTrigger animation
     const initialAnimationTimeline = gsap.timeline()
         .to(wrapper.scale, {
-            x: () => calculateTargetPosition().scale,
-            y: () => calculateTargetPosition().scale,
-            z: () => calculateTargetPosition().scale,
+            x: () => calculateStartPosition().scale,
+            y: () => calculateStartPosition().scale,
+            z: () => calculateStartPosition().scale,
             duration: 1.5,
             ease: "power2.out"
         })
         .add(() => {
-            console.log('Initial GSAP scale animation complete - mesh now at target scale', {
+            console.log('Initial GSAP scale animation complete - mesh now at START scale', {
                 at: Date.now(),
-                targetScale: calculateTargetPosition().scale,
+                startScale: calculateStartPosition().scale,
                 wrapperScale: wrapper.scale.x
             });
             // Enable scroll-based positioning for future scroll interactions
