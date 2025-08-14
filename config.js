@@ -93,11 +93,11 @@ export const RECT_STATES = {
         enabled: true,
         sizeFactor: 1,
         cornerRadiusFactor: 0.15,
-        pattern: 'all',
-        sizeFactorOutStart: undefined,
-        sizeFactorOutEnd: undefined,
-        sizeFactorFinalStart: undefined,
-        sizeFactorFinalEnd: undefined
+        pattern: 'checker',
+        sizeFactorOutStart: 1,
+        sizeFactorOutEnd: 7,
+        sizeFactorFinalStart: 1,
+        sizeFactorFinalEnd: 1
     }
 };
 
