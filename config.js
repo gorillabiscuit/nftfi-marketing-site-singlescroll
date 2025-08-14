@@ -34,6 +34,37 @@ export const ANIMATION_STATES = {
     }
 };
 
+// Grid sizing states for Section 2 (breakpoint-aware)
+// Controls: line spacing and counts, plus how far they expand and SVG sizing multiplier
+export const GRID_STATES = {
+    mobile: {
+        // Base spacing between logical levels before expansion
+        initialSpacing: 60,
+        // How far lines spread during outward expansion (phase 2)
+        outwardFactor: 2.2,
+        // Final spacing factor for the last phase (phase 4)
+        finalFactor: 3.4,
+        // Levels per axis (total lines per axis = 2*levels + 1)
+        levels: 4,
+        // SVG size multiplier relative to max(viewportWidth, viewportHeight)
+        svgSizeMultiplier: 1.8
+    },
+    tablet: {
+        initialSpacing: 55,
+        outwardFactor: 2.0,
+        finalFactor: 3.2,
+        levels: 4,
+        svgSizeMultiplier: 1.7
+    },
+    desktop: {
+        initialSpacing: 50,
+        outwardFactor: 1.9,
+        finalFactor: 3.0,
+        levels: 4,
+        svgSizeMultiplier: 1.6
+    }
+};
+
 export const WHITE_SPHERE_POSITIONS = {
     mobile: { x: -3.5, y: 5.6, z: -6 },
     tablet: { x: -10.0, y: 4.8, z: -6.5 },

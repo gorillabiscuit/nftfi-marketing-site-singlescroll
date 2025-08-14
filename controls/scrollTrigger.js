@@ -4,8 +4,8 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG } from '../config.js';
-import { onStateChange } from '../utils/breakpointManager.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES } from '../config.js';
+import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
@@ -14,6 +14,10 @@ gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
 let scrollTimeline;
 let originalWrapperPosition = { x: 0, y: 0, z: 0 };
 let originalWrapperScale = { x: 3, y: 3, z: 3 };
+
+// Section 2 timeline reference for safe teardown/rebuild on breakpoint changes
+let section2Timeline;
+let section2ResizerRegistered = false;
 
 // Scroll spin tracking variables
 let scrollSpinVelocity = 0;
@@ -296,6 +300,9 @@ function setupSection2Pinning() {
                 }
             }
         });
+
+        // Expose for teardown/rebuild
+        section2Timeline = masterTimeline;
         
         // Phase 1: Line Drawing (0-25% of timeline)
         const drawingPhase = createDrawingPhase();
@@ -322,6 +329,30 @@ function setupSection2Pinning() {
     }
     
     console.log('Section 2 3-phase animation setup complete');
+
+    // Register a single breakpoint-change listener to rebuild Section 2 grid sizing responsively
+    if (!section2ResizerRegistered) {
+        onStateChange((newState, oldState) => {
+            try {
+                if (section2Timeline) {
+                    // Kill timeline and its ScrollTrigger cleanly
+                    if (section2Timeline.scrollTrigger) {
+                        section2Timeline.scrollTrigger.kill();
+                    }
+                    section2Timeline.kill();
+                    section2Timeline = null;
+                }
+            } catch (e) {
+                console.warn('Section 2 teardown warning:', e);
+            }
+
+            // Rebuild fresh with new breakpoint-aware config
+            startAdvancedAnimationSequence();
+            try { ScrollTrigger.refresh(); } catch (_) {}
+            console.log('Section 2 rebuilt for breakpoint change:', { from: oldState, to: newState });
+        });
+        section2ResizerRegistered = true;
+    }
 }
 
 // Phase 1: Create sophisticated line drawing phase with 12 lines
@@ -335,11 +366,11 @@ function createDrawingPhase() {
         return drawingTimeline;
     }
     
-    // Calculate dynamic line length and SVG dimensions
+    // Calculate dynamic SVG dimensions based on breakpoint-aware grid settings
     const lineLength = calculateLineLength();
-    // Use a more reasonable SVG size that's closer to viewport dimensions
-    // This should make centering more accurate and visually apparent
-    const svgSize = Math.max(window.innerWidth, window.innerHeight) * 1.5; // 1.5x viewport size instead of 2x line length
+    const gridState = (GRID_STATES && GRID_STATES[getCurrentAnimationState()]) || GRID_STATES?.desktop || {};
+    const svgSizeMultiplier = typeof gridState.svgSizeMultiplier === 'number' ? gridState.svgSizeMultiplier : 1.5;
+    const svgSize = Math.max(window.innerWidth, window.innerHeight) * svgSizeMultiplier;
     
     console.log(`Phase 1: Setting up ${14} lines with dynamic length: ${lineLength}px`);
     console.log(`SVG dimensions: ${svgSize}x${svgSize}px (more reasonable size)`);
@@ -380,9 +411,9 @@ function createDrawingPhase() {
     console.log(`Center point is now at (0,0) in centered coordinate system`);
     console.log(`SVG viewBox: -${svgSize/2} -${svgSize/2} ${svgSize} ${svgSize}`);
     
-    // Create 14 lines (7 horizontal + 7 vertical) with dynamic spacing using consistent levels
-    // We assign a logical level in [-3..3] to every line so future transforms map consistently
-    const initialSpacing = 50;
+    // Create lines with dynamic spacing and count per breakpoint using logical levels
+    const initialSpacing = typeof gridState.initialSpacing === 'number' ? gridState.initialSpacing : 50;
+    const levels = Number.isInteger(gridState.levels) ? gridState.levels : 3; // levels per axis -> total lines = (2*levels+1)
     console.log(`Center point is now at (0,0) in centered coordinate system`);
     
     // Create all lines and organize into groups
@@ -392,8 +423,8 @@ function createDrawingPhase() {
         all: []
     };
     
-    // Add horizontal lines (levels -3..3, increasing order)
-    for (let level = -3; level <= 3; level++) {
+    // Add horizontal lines (levels -N..N, increasing order)
+    for (let level = -levels; level <= levels; level++) {
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         // Horizontal lines go from left edge to right edge of SVG in centered coordinate system
         const leftEdge = -svgSize / 2;
@@ -408,8 +439,8 @@ function createDrawingPhase() {
         lineGroups.all.push(path);
     }
     
-    // Add vertical lines (levels -3..3, increasing order)
-    for (let level = -3; level <= 3; level++) {
+    // Add vertical lines (levels -N..N, increasing order)
+    for (let level = -levels; level <= levels; level++) {
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         // Vertical lines go from top edge to bottom edge of SVG in centered coordinate system
         const topEdge = -svgSize / 2;
@@ -432,6 +463,8 @@ function createDrawingPhase() {
     window.svgSize = svgSize;
     window.svgCenter = 0; // In centered coordinate system, center is always (0,0)
     window.gridGroup = gridGroup;
+    window.gridInitialSpacing = initialSpacing;
+    window.gridState = gridState;
 
     // Ensure group rotates around center
     gsap.set(gridGroup, { transformOrigin: "50% 50%" });
@@ -476,9 +509,10 @@ function createOutwardExpansionPhase() {
     
     console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
     
-    // Calculate expansion factors for outward movement
-    const outwardExpansionFactor = 1.8; // Lines will spread 1.8x further apart
-    const newSpacing = 50 * outwardExpansionFactor; // New spacing between lines
+    // Calculate expansion spacing for outward movement (breakpoint-aware)
+    const baseSpacing = typeof window.gridInitialSpacing === 'number' ? window.gridInitialSpacing : 50;
+    const outwardExpansionFactor = (window.gridState && typeof window.gridState.outwardFactor === 'number') ? window.gridState.outwardFactor : 1.8;
+    const newSpacing = baseSpacing * outwardExpansionFactor;
     
     // Canonical transforms: move lines using x/y transforms instead of mutating SVG path data
     horizontalLines.forEach((line) => {
@@ -524,6 +558,7 @@ function createRotationPhase(square) {
     
     const { all: allLines } = window.lineGroups;
     const svgCenter = window.svgCenter;
+    const gridGroup = window.gridGroup;
     
     console.log('Phase 3: Setting up coordinated rotation for all lines');
     
@@ -569,9 +604,10 @@ function createExpansionPhase() {
     
     console.log('Phase 4: Setting up grid expansion while maintaining structure');
     
-    // Calculate expansion factors for maintaining grid structure
-    const expansionFactor = 2.5; // Lines will spread 2.5x further apart
-    const newSpacing = 50 * expansionFactor; // New spacing between lines
+    // Calculate expansion spacing for maintaining grid structure (breakpoint-aware)
+    const baseSpacing = typeof window.gridInitialSpacing === 'number' ? window.gridInitialSpacing : 50;
+    const expansionFactor = (window.gridState && typeof window.gridState.finalFactor === 'number') ? window.gridState.finalFactor : 2.5;
+    const newSpacing = baseSpacing * expansionFactor;
     
     // Canonical transforms: continue expanding via x/y, avoid mutating path data
     horizontalLines.forEach((line) => {
