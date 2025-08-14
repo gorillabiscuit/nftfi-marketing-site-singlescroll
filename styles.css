@@ -1275,18 +1275,20 @@ h2 {
 }
 
 #lines-svg {
-    width: 400px;  /* Fixed width to match viewBox */
-    height: 400px; /* Fixed height to match viewBox */
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); /* Center the SVG */
+    /* Width and height will be set dynamically via JavaScript */
+    /* Debug: Add a subtle border to see the SVG boundaries */
+    /* border: 1px solid rgba(255, 255, 255, 0.1); */
 }
 
 /* SVG Line Styles */
 .line {
     stroke: #F2F2F2;
-    stroke-width: 2;
+    stroke-width: 0.5;
     fill: none;
     vector-effect: non-scaling-stroke;
+    opacity: 0.8; /* 20% transparent */
 }
