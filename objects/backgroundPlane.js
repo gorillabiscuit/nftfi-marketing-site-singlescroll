@@ -108,7 +108,7 @@ export function captureHeroAsTexture() {
                 
                 // Mark texture as ready and trigger mesh scale animation
                 window.textureReady = true;
-                if (window.wrapper) {
+                if (window.wrapper && !window.scrollScaleActive) {
                     // Calculate correct scale based on current scroll position
                     calculateCorrectScaleForScroll().then(targetScale => {
                         // Animate mesh scale from tiny to calculated target scale
@@ -139,7 +139,7 @@ export function captureHeroAsTexture() {
                 
                 // Even if texture fails, still scale up the mesh
                 window.textureReady = true;
-                if (window.wrapper) {
+                if (window.wrapper && !window.scrollScaleActive) {
                     // Calculate correct scale based on current scroll position
                     calculateCorrectScaleForScroll().then(targetScale => {
                         gsap.to(window.wrapper.scale, {
@@ -221,7 +221,7 @@ export function createBackgroundPlane(scene, uniforms) {
     
     // Safety timeout to ensure mesh scales up even if html2canvas takes too long
     setTimeout(() => {
-        if (!window.textureReady && window.wrapper) {
+        if (!window.textureReady && window.wrapper && !window.scrollScaleActive) {
             window.textureReady = true;
             import('../utils/viewport.js').then(({ calculateStartPosition }) => {
                 const startPos = calculateStartPosition();

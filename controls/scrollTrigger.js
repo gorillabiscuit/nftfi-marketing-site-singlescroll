@@ -80,6 +80,9 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
             });
             // Enable scroll-based positioning for future scroll interactions
             window.isInitialLoadComplete = true;
+            // Prevent any other tweens from controlling wrapper.scale from here on
+            window.scrollScaleActive = true;
+            try { gsap.killTweensOf(wrapper.scale); } catch (_) {}
             // Create the ScrollTrigger animation now that initial animation is complete
             createScrollTimeline();
             // Re-enable scrolling by restoring normal ScrollSmoother effects
@@ -117,6 +120,8 @@ function createScrollTimeline() {
     if (scrollTimeline) {
         scrollTimeline.kill();
     }
+    // Ensure no competing tweens are acting on wrapper.scale
+    try { gsap.killTweensOf(wrapper?.scale); } catch (_) {}
     
     // Create new scroll timeline
     scrollTimeline = gsap.timeline({
