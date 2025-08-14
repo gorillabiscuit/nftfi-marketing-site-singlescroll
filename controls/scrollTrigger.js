@@ -253,36 +253,8 @@ function setupSection2Pinning() {
     // No need for a separate pinning ScrollTrigger
     console.log('Section 2 pinning will be handled by master timeline');
     
-    // Use GSAP's matchMedia for canonical breakpoint handling and automatic cleanup
-    // Create a fresh instance here; GSAP cleans up listeners on revert automatically
-    if (window.__section2MatchMedia && window.__section2MatchMedia.revert) {
-        try { window.__section2MatchMedia.revert(); } catch (_) {}
-    }
-    window.__section2MatchMedia = gsap.matchMedia();
-
-    window.__section2MatchMedia.add({
-        mobile: "(max-width: 767px)",
-        tablet: "(min-width: 768px) and (max-width: 1023px)",
-        desktop: "(min-width: 1024px)"
-    }, (context) => {
-        const { conditions } = context;
-        const bp = conditions.desktop ? 'desktop' : (conditions.tablet ? 'tablet' : 'mobile');
-        window.__currentGridBreakpoint = bp;
-
-        // Build Section 2 inside a GSAP context for scoped cleanup
-        try { if (window.__section2Ctx) { window.__section2Ctx.revert(); window.__section2Ctx = null; } } catch (_) {}
-        window.__section2Ctx = gsap.context(() => {
-            startAdvancedAnimationSequence();
-        }, "section[data-section='2']");
-
-        // Avoid immediate refresh storms; let GSAP set up first
-        requestAnimationFrame(() => { try { ScrollTrigger.refresh(); } catch (_) {} });
-
-        // Cleanup when media query stops matching
-        return () => {
-            try { if (window.__section2Ctx) { window.__section2Ctx.revert(); window.__section2Ctx = null; } } catch (_) {}
-        };
-    });
+    // Start the sophisticated animation sequence immediately
+    startAdvancedAnimationSequence();
     
     // Function to start the advanced 3-phase animation sequence
     function startAdvancedAnimationSequence() {
@@ -300,19 +272,13 @@ function setupSection2Pinning() {
             y: '-50%'
         });
         
-        // Resolve scroller element explicitly (works better with ScrollSmoother)
-        const scrollerEl = document.getElementById('smooth-content') || document.querySelector('#smooth-content');
-
         // Create the master timeline with ScrollTrigger for the entire sequence
         const masterTimeline = gsap.timeline({
             scrollTrigger: {
-                scroller: scrollerEl || undefined,
                 trigger: "section[data-section='2']",
                 scrub: true,
                 pin: true,
 				invalidateOnRefresh: true,
-                anticipatePin: 1,
-                pinSpacing: true,
                 start: "top top",
                 end: "+=200%", // Extended for 3 phases
                 onUpdate: (self) => {
@@ -363,6 +329,30 @@ function setupSection2Pinning() {
     }
     
     console.log('Section 2 3-phase animation setup complete');
+
+    // Register a single breakpoint-change listener to rebuild Section 2 grid sizing responsively
+    if (!section2ResizerRegistered) {
+        onStateChange((newState, oldState) => {
+            try {
+                if (section2Timeline) {
+                    // Kill timeline and its ScrollTrigger cleanly
+                    if (section2Timeline.scrollTrigger) {
+                        section2Timeline.scrollTrigger.kill();
+                    }
+                    section2Timeline.kill();
+                    section2Timeline = null;
+                }
+            } catch (e) {
+                console.warn('Section 2 teardown warning:', e);
+            }
+
+            // Rebuild fresh with new breakpoint-aware config
+            startAdvancedAnimationSequence();
+            try { ScrollTrigger.refresh(); } catch (_) {}
+            console.log('Section 2 rebuilt for breakpoint change:', { from: oldState, to: newState });
+        });
+        section2ResizerRegistered = true;
+    }
 }
 
 // Phase 1: Create sophisticated line drawing phase with 12 lines
@@ -378,8 +368,7 @@ function createDrawingPhase() {
     
     // Calculate dynamic SVG dimensions based on breakpoint-aware grid settings
     const lineLength = calculateLineLength();
-    const breakpoint = window.__currentGridBreakpoint || getCurrentAnimationState();
-    const gridState = (GRID_STATES && GRID_STATES[breakpoint]) || GRID_STATES?.desktop || {};
+    const gridState = (GRID_STATES && GRID_STATES[getCurrentAnimationState()]) || GRID_STATES?.desktop || {};
     const svgSizeMultiplier = typeof gridState.svgSizeMultiplier === 'number' ? gridState.svgSizeMultiplier : 1.5;
     const svgSize = Math.max(window.innerWidth, window.innerHeight) * svgSizeMultiplier;
     
