@@ -253,8 +253,33 @@ function setupSection2Pinning() {
     // No need for a separate pinning ScrollTrigger
     console.log('Section 2 pinning will be handled by master timeline');
     
-    // Start the sophisticated animation sequence immediately
-    startAdvancedAnimationSequence();
+    // Use GSAP's matchMedia for canonical breakpoint handling and automatic cleanup
+    if (!window.__section2MatchMedia) {
+        window.__section2MatchMedia = gsap.matchMedia();
+    }
+
+    window.__section2MatchMedia.add({
+        mobile: "(max-width: 767px)",
+        tablet: "(min-width: 768px) and (max-width: 1023px)",
+        desktop: "(min-width: 1024px)"
+    }, (context) => {
+        const { conditions } = context;
+        const bp = conditions.desktop ? 'desktop' : (conditions.tablet ? 'tablet' : 'mobile');
+        window.__currentGridBreakpoint = bp;
+
+        // Build Section 2 inside a GSAP context for scoped cleanup
+        try { if (window.__section2Ctx) { window.__section2Ctx.revert(); window.__section2Ctx = null; } } catch (_) {}
+        window.__section2Ctx = gsap.context(() => {
+            startAdvancedAnimationSequence();
+        }, "section[data-section='2']");
+
+        try { ScrollTrigger.refresh(); } catch (_) {}
+
+        // Cleanup when media query stops matching
+        return () => {
+            try { if (window.__section2Ctx) { window.__section2Ctx.revert(); window.__section2Ctx = null; } } catch (_) {}
+        };
+    });
     
     // Function to start the advanced 3-phase animation sequence
     function startAdvancedAnimationSequence() {
@@ -329,30 +354,6 @@ function setupSection2Pinning() {
     }
     
     console.log('Section 2 3-phase animation setup complete');
-
-    // Register a single breakpoint-change listener to rebuild Section 2 grid sizing responsively
-    if (!section2ResizerRegistered) {
-        onStateChange((newState, oldState) => {
-            try {
-                if (section2Timeline) {
-                    // Kill timeline and its ScrollTrigger cleanly
-                    if (section2Timeline.scrollTrigger) {
-                        section2Timeline.scrollTrigger.kill();
-                    }
-                    section2Timeline.kill();
-                    section2Timeline = null;
-                }
-            } catch (e) {
-                console.warn('Section 2 teardown warning:', e);
-            }
-
-            // Rebuild fresh with new breakpoint-aware config
-            startAdvancedAnimationSequence();
-            try { ScrollTrigger.refresh(); } catch (_) {}
-            console.log('Section 2 rebuilt for breakpoint change:', { from: oldState, to: newState });
-        });
-        section2ResizerRegistered = true;
-    }
 }
 
 // Phase 1: Create sophisticated line drawing phase with 12 lines
@@ -368,7 +369,8 @@ function createDrawingPhase() {
     
     // Calculate dynamic SVG dimensions based on breakpoint-aware grid settings
     const lineLength = calculateLineLength();
-    const gridState = (GRID_STATES && GRID_STATES[getCurrentAnimationState()]) || GRID_STATES?.desktop || {};
+    const breakpoint = window.__currentGridBreakpoint || getCurrentAnimationState();
+    const gridState = (GRID_STATES && GRID_STATES[breakpoint]) || GRID_STATES?.desktop || {};
     const svgSizeMultiplier = typeof gridState.svgSizeMultiplier === 'number' ? gridState.svgSizeMultiplier : 1.5;
     const svgSize = Math.max(window.innerWidth, window.innerHeight) * svgSizeMultiplier;
     
@@ -456,7 +458,7 @@ function createDrawingPhase() {
     }
     
     console.log(`Phase 1: Created ${lineGroups.all.length} SVG path elements`);
-    console.log('DrawSVGPlugin available:', !!gsap.DrawSVGPlugin);
+    console.log('DrawSVGPlugin available:', typeof DrawSVGPlugin !== 'undefined');
     
     // Store line groups and group container globally for use in later phases
     window.lineGroups = lineGroups;
