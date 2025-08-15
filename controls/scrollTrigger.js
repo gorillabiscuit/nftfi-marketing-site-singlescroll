@@ -374,6 +374,10 @@ function setupSection2Pinning() {
         const staticCellsPhase = createStaticCellsPhase();
         masterTimeline.add(staticCellsPhase, "draw");
 
+        // Stroke-draw blocks first (scrubbed like grid lines)
+        const cellsStrokePhase = createCellsStrokeDrawPhase();
+        masterTimeline.add(cellsStrokePhase, "draw");
+        
         // Phase 2: Outward Expansion (25-50% of timeline)
         const outwardExpansionPhase = createOutwardExpansionPhase();
         masterTimeline.add(outwardExpansionPhase, "expand-outward");
@@ -776,7 +780,7 @@ function createExpansionPhase() {
     return expansionTimeline;
 }
 
-// Stage 1: create static rounded rectangles at grid cell centers (no animation yet)
+// Phase 1: create static rounded rectangles at grid cell centers (no animation yet)
 function createStaticCellsPhase() {
     const cellsTimeline = gsap.timeline();
 
@@ -1010,6 +1014,44 @@ function createStaticCellsPhase() {
     window.visibleCellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
 
     return cellsTimeline;
+}
+
+// Phase: Stroke draw for block rectangles using DrawSVG (scrubbed)
+function createCellsStrokeDrawPhase() {
+    const tl = gsap.timeline();
+    const cellsGroup = document.getElementById('grid-cells');
+    if (!cellsGroup) return tl;
+    const rects = Array.from(cellsGroup.querySelectorAll('rect.cell-rect'));
+    if (!rects.length) return tl;
+
+    // Prepare: hide fill, start strokes from center
+    rects.forEach((rect) => {
+        // ensure stroke visible
+        gsap.set(rect, { attr: { 'fill-opacity': 0 } });
+        gsap.set(rect, { drawSVG: "50% 50%" });
+        // ensure node visible during draw
+        const node = rect.parentNode;
+        if (node && node.classList && node.classList.contains('cell-node')) {
+            gsap.set(node, { opacity: 1 });
+        }
+    });
+
+    // Draw strokes with a small stagger; linear for scrub
+    rects.forEach((rect, index) => {
+        tl.to(rect, {
+            drawSVG: "0% 100%",
+            ease: "none",
+            duration: 0.25
+        }, index * 0.03);
+        // Fade in fill near the end of its stroke draw
+        tl.to(rect, {
+            attr: { 'fill-opacity': 1 },
+            duration: 0.1,
+            ease: 'power1.out'
+        }, index * 0.03 + 0.22);
+    });
+
+    return tl;
 }
 
 // Blocks Reveal Phase: sequentially fade in visible blocks
