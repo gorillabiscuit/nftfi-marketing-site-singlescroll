@@ -339,7 +339,7 @@ function setupSection2Pinning() {
             scrollTrigger: {
                 trigger: triggerEl || "section[data-section='2']",
                 scrub: true,
-                pin: true,
+                pin: false,
 				invalidateOnRefresh: true,
                 start: "top top",
                 end: "+=200%", // Extended for 3 phases
@@ -832,6 +832,8 @@ function createStaticCellsPhase() {
             cellNode.dataset.i = String(i);
             cellNode.dataset.j = String(j);
             cellNode.setAttribute('transform', `translate(${x} ${y})`);
+            // start hidden; reveal on its own trigger
+            gsap.set(cellNode, { opacity: 0 });
 
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             gsap.set(rect, { attr: { x: 0, y: 0, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
@@ -910,6 +912,23 @@ function createStaticCellsPhase() {
             const rxOverride = Number(rectCfg.rxOverride ?? NaN);
             const rxFinal = Number.isFinite(rxOverride) ? rxOverride : rx;
             gsap.set(rect, { attr: { rx: rxFinal, ry: rxFinal, fill: `url(#${gradId})`, stroke: (rectCfg.strokeColor ?? '#FFFFFF'), 'stroke-opacity': (rectCfg.strokeOpacity ?? 0.38), 'stroke-width': (rectCfg.strokeWidth ?? 1) } });
+
+            // Per-block pin + reveal when rect reaches center
+            try {
+                const section2El = document.querySelector("section[data-section='2']");
+                const revealTl = gsap.timeline({ paused: true }).to(cellNode, { opacity: 1, duration: 0.5, ease: 'power1.out' });
+                ScrollTrigger.create({
+                    trigger: rect,
+                    start: 'center center',
+                    end: '+=200',
+                    pin: section2El,
+                    scrub: false,
+                    onEnter: () => revealTl.play(),
+                    onEnterBack: () => revealTl.play()
+                });
+            } catch (e) {
+                console.warn('Per-block pin/reveal setup failed', e);
+            }
 
             // If there is text config for this block, render amount/label
             if (amtCfg || lblCfg) {
