@@ -961,6 +961,8 @@ function createStaticCellsPhase() {
                     }
 
                     cellNode.appendChild(amount);
+                    // Start hidden; will appear after label reveal completes
+                    gsap.set(amount, { opacity: 0 });
                 }
 
                 if (lblCfg) {
@@ -1179,17 +1181,22 @@ function createBlocksRevealPhase() {
                 });
                 const counter = { value: 0 };
 
-                // Start after highlight shrink completes
+                // Timings
                 const expandStart = pos + 0.02;
                 const expandDur = 0.22;
                 const labelRevealDur = 0.05;
-                const shrinkDur = 0.22;
-                const gap = 0.05;
-                const amtStart = expandStart + expandDur + labelRevealDur + shrinkDur + gap;
+                const labelRevealEnd = expandStart + expandDur + labelRevealDur;
 
-                // Initialize display
+                // Appear amount right after label is fully visible
+                const amountAppearStart = labelRevealEnd + 0.03;
+                const amountAppearDur = 0.15;
+                tl.to(amountEl, { opacity: 1, duration: amountAppearDur, ease: 'power1.out' }, amountAppearStart);
+
+                // Initialize display at 0
                 amountEl.textContent = prefix + formatter.format(0) + suffix;
 
+                // Start counting immediately after it appears
+                const countStart = amountAppearStart + amountAppearDur;
                 tl.to(counter, {
                     value: target,
                     duration: 2,
@@ -1200,7 +1207,7 @@ function createBlocksRevealPhase() {
                     onComplete: () => {
                         amountEl.textContent = prefix + formatter.format(target) + suffix;
                     }
-                }, amtStart);
+                }, countStart);
             }
         }
     });
