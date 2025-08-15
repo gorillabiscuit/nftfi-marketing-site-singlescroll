@@ -856,7 +856,7 @@ function createStaticCellsPhase() {
                 label.setAttribute('font-family', 'Satoshi Variable, sans-serif');
                 label.setAttribute('font-weight', '500');
                 label.setAttribute('font-size', '16');
-                // Bottom-left with padding, rotated -45deg
+                // Bottom-left with padding, no rotation
                 const pad = 8;
                 const lx = x + pad;
                 const ly = y + size - pad;
@@ -864,7 +864,7 @@ function createStaticCellsPhase() {
                 label.setAttribute('y', String(ly));
                 label.setAttribute('text-anchor', 'start');
                 label.setAttribute('dominant-baseline', 'alphabetic');
-                label.setAttribute('transform', `rotate(-45 ${lx} ${ly})`);
+                // No rotate transform
                 textGroup.appendChild(label);
             }
 
