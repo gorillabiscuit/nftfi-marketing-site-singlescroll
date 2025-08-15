@@ -657,10 +657,10 @@ function createRotationPhase(square) {
     
     console.log('Phase 3: Setting up coordinated rotation for all lines');
     
-    // Ensure each line rotates around its own center within its SVG box
-    gsap.set(allLines, {
-        transformOrigin: "50% 50%",
-        transformBox: "fill-box"
+    // Set transform origin to SVG center for proper rotation
+    // Use GSAP's canonical approach: "50% 50%" or "center center" for perfect centering
+    gsap.set(allLines, { 
+        transformOrigin: "50% 50%" // This centers the rotation axis perfectly
     });
     
     console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
@@ -674,39 +674,21 @@ function createRotationPhase(square) {
     
     // Rotate the whole grid group to preserve relative ordering and spacing
     rotationTimeline.to(gridGroup, {
-        rotation: 90, // group rotation drives final orientation
+        rotation: 90, // Rotate to 90° total relative to initial (Phase 2 adds first 45° over group too)
         ease: "none",
         duration: 0.25
     }, 0);
 
-    // Implement true visual stagger via per-line counter-rotation tied to group progress
-    // 1) Build a center-out release map so inner lines start first
-    const linesArray = Array.from(allLines);
-    const linesSorted = linesArray.slice().sort((a, b) => {
-        const la = Math.abs(Number(a.dataset.level || 0));
-        const lb = Math.abs(Number(b.dataset.level || 0));
-        return la - lb;
-    });
-    const releaseMap = new Map();
-    const maxDelay = 0.2; // portion of phase (0..1) when last line starts
-    const step = linesSorted.length > 1 ? (maxDelay / (linesSorted.length - 1)) : 0;
-    linesSorted.forEach((el, idx) => {
-        releaseMap.set(el, idx * step);
-    });
-
-    // 2) On every tick, counter-rotate lines that haven't "released" yet, then let them catch up
-    rotationTimeline.eventCallback('onUpdate', () => {
-        const p = rotationTimeline.totalProgress(); // 0..1 within this phase
-        const groupAngle = 90 * p; // degrees
-        linesArray.forEach((el) => {
-            const r = releaseMap.get(el) ?? 0;        // release time (0..maxDelay)
-            const denom = (1 - r) || 1;               // avoid divide by 0
-            const local = Math.min(Math.max((p - r) / denom, 0), 1); // 0..1 after release
-            const cancel = 1 - local;                 // full cancel before release → 0 at end
-            const lineAngle = -groupAngle * cancel;   // counter-rotation in degrees
-            gsap.set(el, { rotation: lineAngle });
-        });
-    });
+    // Subtle per-line micro-rotation with stagger for organic feel (does not affect final angle)
+    // Keeps gridGroup rotation as the authoritative rotation to preserve alignment
+    rotationTimeline.fromTo(allLines, {
+        rotation: -2 // degrees
+    }, {
+        rotation: 0,
+        ease: "none",
+        duration: 0.25,
+        stagger: { each: 0.01, from: "center" }
+    }, 0);
     
     console.log('Phase 3: Rotation phase timeline created successfully');
     return rotationTimeline;
@@ -880,7 +862,26 @@ function createStaticCellsPhase() {
                     grad.appendChild(stop2);
                     defs.appendChild(grad);
                 }
-                gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 0.5 } });
+                gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 1 } });
+                
+                // Amount text (top-left area, tweak x/y as needed)
+                const amount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                amount.textContent = '$700M+';
+                amount.setAttribute('fill', 'rgba(255, 255, 255, 0.90)');
+                amount.setAttribute('font-family', 'Roboto Mono, monospace');
+                amount.setAttribute('font-weight', '300');
+                amount.setAttribute('font-size', '36');
+                amount.setAttribute('letter-spacing', '1.44');
+                // Position inside the block with padding
+                const padTop = 18; // tweak
+                const padLeft = 8; // tweak
+                amount.setAttribute('x', String(padLeft));
+                amount.setAttribute('y', String(padTop + 36));
+                amount.setAttribute('text-anchor', 'start');
+                amount.setAttribute('dominant-baseline', 'alphabetic');
+                cellNode.appendChild(amount);
+
+                // Label text (bottom-left)
                 const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 label.textContent = 'LOAN VOLUME';
                 label.setAttribute('fill', '#FFFFFF');
@@ -888,12 +889,11 @@ function createStaticCellsPhase() {
                 label.setAttribute('font-family', 'Satoshi Variable, sans-serif');
                 label.setAttribute('font-weight', '500');
                 label.setAttribute('font-size', '16');
-                const pad = 16;
-                label.setAttribute('x', String(pad*4 ));
-                label.setAttribute('y', String(size*2.2));
-                label.setAttribute('text-anchor', 'end');
+                const pad = 8;
+                label.setAttribute('x', String(pad));
+                label.setAttribute('y', String(size - pad));
+                label.setAttribute('text-anchor', 'start');
                 label.setAttribute('dominant-baseline', 'alphabetic');
-                label.setAttribute('transform', `rotate(-90, ${size}, ${size - pad})`);
                 cellNode.appendChild(label);
             }
 
