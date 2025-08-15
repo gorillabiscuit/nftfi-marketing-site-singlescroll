@@ -926,30 +926,28 @@ function createStaticCellsPhase() {
             if (amtCfg || lblCfg) {
                 if (amtCfg) {
                     const amount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    amount.textContent = (amtCfg.text ?? '$700M+');
-                    amount.setAttribute('fill', (amtCfg.color ?? 'rgba(255, 255, 255, 0.90)'));
-                    amount.setAttribute('font-family', (amtCfg.fontFamily ?? 'Roboto Mono, monospace'));
-                    amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '300'));
+                    amount.textContent = (amtCfg.text ?? '$2,250,000,000');
+                    amount.setAttribute('fill', (amtCfg.color ?? '#FFFFFF'));
+                    if (amtCfg.opacity != null) amount.setAttribute('opacity', String(amtCfg.opacity));
+                    amount.setAttribute('font-family', (amtCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
+                    amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '700'));
                     amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
                     if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
                     amount.setAttribute('data-role', 'amount');
 
                     const fontSize = Number(amtCfg.fontSize ?? 36);
                     const centerMode = (amtCfg.anchor === 'middle') || (amtCfg.center === true);
-                    const amtPadLeft = Number(amtCfg.padLeft ?? 10);
-                    const amtPadRight = Number(amtCfg.padRight ?? 10);
-                    const amtPadTop = Number(amtCfg.padTop ?? 10);
-                    const amtPadBottom = Number(amtCfg.padBottom ?? 10);
-                    let ax = centerMode ? size / 2 : amtPadLeft;
-                    let ay = centerMode ? size / 2 : (size - amtPadBottom);
-                    let anchorVal = centerMode ? 'middle' : (amtCfg.anchor ?? 'start');
-                    let baselineVal = centerMode ? 'middle' : (amtCfg.baseline ?? 'alphabetic');
-                    if (amtCfg.anchor === 'end') {
-                        ax = size - amtPadRight;
-                        ay = size - amtPadBottom;
-                        anchorVal = 'end';
-                        baselineVal = 'alphabetic';
-                    } else if (!centerMode && amtCfg.padTop != null) {
+                    let ax, ay;
+                    let anchorVal = (amtCfg.anchor != null) ? amtCfg.anchor : (centerMode ? 'middle' : 'start');
+                    let baselineVal = (amtCfg.baseline != null) ? amtCfg.baseline : (centerMode ? 'middle' : 'alphabetic');
+                    if (centerMode) {
+                        const offX = Number(amtCfg.centerOffsetX ?? 0);
+                        const offY = Number(amtCfg.centerOffsetY ?? 0);
+                        ax = size / 2 + offX;
+                        ay = size / 2 + offY;
+                    } else {
+                        const amtPadLeft = Number(amtCfg.padLeft ?? 8);
+                        const amtPadTop = Number(amtCfg.padTop ?? 18);
                         ax = amtPadLeft;
                         ay = amtPadTop + fontSize;
                     }
@@ -961,22 +959,7 @@ function createStaticCellsPhase() {
                     if (amtRot != null) {
                         amount.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
                     }
-                    // Create an overlay highlight rect above the amount to sweep-reveal (rotation-aware)
-                    const amountHighlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    const ahPadX = 2; const ahPadY = 2;
-                    const ahX = ax - (anchorVal === 'end' ? 0 : ahPadX);
-                    const ahY = (baselineVal === 'alphabetic' ? (ay - fontSize - ahPadY) : (ay - fontSize/2 - ahPadY));
-                    const ahH = fontSize + ahPadY * 2;
-                    const amountFill = (amtCfg.color ?? 'rgba(255, 255, 255, 0.90)');
-                    gsap.set(amountHighlight, { attr: { x: ahX, y: ahY, width: 0, height: ahH, fill: amountFill, 'fill-opacity': 1 } });
-                    amountHighlight.setAttribute('class', 'amount-highlight');
-                    if (amtRot != null) {
-                        amountHighlight.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
-                    }
-                    // Append amount (below), then overlay (above)
                     cellNode.appendChild(amount);
-                    cellNode.appendChild(amountHighlight);
-                    // Start with amount hidden until overlay fully expanded
                     gsap.set(amount, { opacity: 0 });
                 }
 
@@ -1177,38 +1160,45 @@ function createBlocksRevealPhase() {
             }
         }
 
-        // 4) Amount sweep reveal using overlay (rotation-aware like label)
+        // 4) Amount text effect: slide-up reveal and optional scramble (like the provided example)
         const amountEl = node.querySelector('text[data-role="amount"]');
-        const amountHl = node.querySelector('rect.amount-highlight');
-        if (amountEl && amountHl) {
-            const sweepStart = (highlight && labelEl) ? (pos + 0.02 + 0.22 + 0.12) : (pos + 0.2);
-            const aAnchor = (amountEl.getAttribute('text-anchor')) || 'start';
-            const axAttr = amountEl.getAttribute('x');
-            const axVal = axAttr != null ? Number(axAttr) : 0;
-            const measureAmount = () => {
-                let w = 0;
-                if (typeof amountEl.getComputedTextLength === 'function') {
-                    try { w = amountEl.getComputedTextLength(); } catch (_) {}
+        if (amountEl) {
+            const expandStart = pos + 0.02;
+            const expandDur = 0.22;
+            const labelRevealDur = 0.05;
+            const shrinkDur = 0.22;
+            const gap = 0.05;
+            const amtStart = expandStart + expandDur + labelRevealDur + shrinkDur + gap;
+
+            // Slide-up + fade in
+            tl.fromTo(
+                amountEl,
+                { opacity: 0, y: 10 },
+                { opacity: 1, y: 0, duration: 0.35, ease: 'customEase' },
+                amtStart
+            );
+
+            // Optional scramble overlay if plugin is available
+            try {
+                const hasScramble = !!(gsap.plugins && gsap.plugins.ScrambleTextPlugin);
+                if (hasScramble) {
+                    const originalText = amountEl.textContent || '';
+                    tl.to(
+                        amountEl,
+                        {
+                            duration: 0.6,
+                            scrambleText: {
+                                text: originalText,
+                                chars: '▪',
+                                revealDelay: 0,
+                                speed: 0.3
+                            },
+                            ease: 'none'
+                        },
+                        amtStart
+                    );
                 }
-                if (!w || w <= 0) {
-                    try { w = amountEl.getBBox().width; } catch (_) { w = 0; }
-                }
-                return Math.max(8, w + 4); // include small padding
-            };
-            // expand overlay to cover amount
-            if (aAnchor === 'end') {
-                tl.to(amountHl, { attr: { width: () => measureAmount(), x: () => (axVal - measureAmount()) }, ease: 'power2.out', duration: 0.28 }, sweepStart);
-            } else {
-                tl.to(amountHl, { attr: { width: () => measureAmount() }, ease: 'power2.out', duration: 0.28 }, sweepStart);
-            }
-            // reveal amount text
-            tl.to(amountEl, { opacity: 1, duration: 0.06, ease: 'none' }, sweepStart + 0.28);
-            // shrink overlay left-to-right
-            if (aAnchor === 'end') {
-                tl.to(amountHl, { attr: { width: 0, x: () => axVal }, ease: 'none', duration: 0.24 }, sweepStart + 0.28 + 0.06);
-            } else {
-                tl.to(amountHl, { attr: { width: 0, x: () => (axVal + measureAmount()) }, ease: 'none', duration: 0.24 }, sweepStart + 0.28 + 0.06);
-            }
+            } catch (_) {}
         }
     });
     return tl;
