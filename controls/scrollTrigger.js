@@ -837,6 +837,9 @@ function createStaticCellsPhase() {
             gsap.set(rect, { attr: { x: 0, y: 0, width: size, height: size, rx, ry: rx, class: 'cell-rect', fill: '#000000', 'fill-opacity': 0.5, stroke: '#000000', 'stroke-opacity': 1, 'stroke-width': 1 } });
             gsap.set(rect, { transformOrigin: '50% 50%', transformBox: 'fill-box' });
 
+            // Append rect first so that subsequent text elements render on top
+            cellNode.appendChild(rect);
+
             if (!primaryPlaced && getCurrentAnimationState() === 'desktop') {
                 primaryPlaced = true;
                 // gradient defs
@@ -877,14 +880,27 @@ function createStaticCellsPhase() {
                 amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '300'));
                 amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
                 if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
-                const amtPadLeft = Number(amtCfg.padLeft ?? 8);
-                const amtPadTop = Number(amtCfg.padTop ?? 18);
-                const ax = amtPadLeft;
-                const ay = amtPadTop + (amtCfg.fontSize ?? 36); // baseline y
+
+                const fontSize = Number(amtCfg.fontSize ?? 36);
+                const centerMode = (amtCfg.anchor === 'middle') || (amtCfg.center === true);
+                let ax, ay;
+                let anchorVal = (amtCfg.anchor != null) ? amtCfg.anchor : (centerMode ? 'middle' : 'start');
+                let baselineVal = (amtCfg.baseline != null) ? amtCfg.baseline : (centerMode ? 'middle' : 'alphabetic');
+                if (centerMode) {
+                    const offX = Number(amtCfg.centerOffsetX ?? 0);
+                    const offY = Number(amtCfg.centerOffsetY ?? 0);
+                    ax = size / 2 + offX;
+                    ay = size / 2 + offY;
+                } else {
+                    const amtPadLeft = Number(amtCfg.padLeft ?? 8);
+                    const amtPadTop = Number(amtCfg.padTop ?? 18);
+                    ax = amtPadLeft;
+                    ay = amtPadTop + fontSize; // baseline y
+                }
                 amount.setAttribute('x', String(ax));
                 amount.setAttribute('y', String(ay));
-                amount.setAttribute('text-anchor', (amtCfg.anchor ?? 'start'));
-                amount.setAttribute('dominant-baseline', (amtCfg.baseline ?? 'alphabetic'));
+                amount.setAttribute('text-anchor', anchorVal);
+                amount.setAttribute('dominant-baseline', baselineVal);
                 // Optional rotation around its own anchor point
                 const amtRot = (amtCfg.rotateDeg != null) ? Number(amtCfg.rotateDeg) : null;
                 if (amtRot != null) {
@@ -940,7 +956,7 @@ function createStaticCellsPhase() {
                 cellNode.appendChild(label);
             }
 
-            cellNode.appendChild(rect);
+            // rect already appended earlier
             cellsGroup.appendChild(cellNode);
         }
     }
