@@ -863,37 +863,43 @@ function createStaticCellsPhase() {
                     defs.appendChild(grad);
                 }
                 gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 1 } });
-                
-                // Amount text (top-left area, tweak x/y as needed)
+
+                // Read per-text configs
+                const state = RECT_STATES.desktop;
+                const amtCfg = state.amount || {};
+                const lblCfg = state.label || {};
+
+                // Amount text (independent positioning)
                 const amount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                amount.textContent = '$700M+';
-                amount.setAttribute('fill', 'rgba(255, 255, 255, 0.90)');
-                amount.setAttribute('font-family', 'Roboto Mono, monospace');
-                amount.setAttribute('font-weight', '300');
-                amount.setAttribute('font-size', '36');
-                amount.setAttribute('letter-spacing', '1.44');
-                // Position inside the block with padding
-                const padTop = 18; // tweak
-                const padLeft = 8; // tweak
-                amount.setAttribute('x', String(padLeft));
-                amount.setAttribute('y', String(padTop + 36));
-                amount.setAttribute('text-anchor', 'start');
-                amount.setAttribute('dominant-baseline', 'alphabetic');
+                amount.textContent = (amtCfg.text ?? '$700M+');
+                amount.setAttribute('fill', (amtCfg.color ?? 'rgba(255, 255, 255, 0.90)'));
+                amount.setAttribute('font-family', (amtCfg.fontFamily ?? 'Roboto Mono, monospace'));
+                amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '300'));
+                amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
+                if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
+                const amtPadLeft = Number(amtCfg.padLeft ?? 8);
+                const amtPadTop = Number(amtCfg.padTop ?? 18);
+                amount.setAttribute('x', String(amtPadLeft));
+                // y is baseline; add font size for top padding
+                amount.setAttribute('y', String(amtPadTop + (amtCfg.fontSize ?? 36)));
+                amount.setAttribute('text-anchor', (amtCfg.anchor ?? 'start'));
+                amount.setAttribute('dominant-baseline', (amtCfg.baseline ?? 'alphabetic'));
                 cellNode.appendChild(amount);
 
-                // Label text (bottom-left)
+                // Label text (restore original bottom-left padding logic)
                 const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                label.textContent = 'LOAN VOLUME';
-                label.setAttribute('fill', '#FFFFFF');
-                label.setAttribute('opacity', '0.5');
-                label.setAttribute('font-family', 'Satoshi Variable, sans-serif');
-                label.setAttribute('font-weight', '500');
-                label.setAttribute('font-size', '16');
-                const pad = 8;
-                label.setAttribute('x', String(pad));
-                label.setAttribute('y', String(size - pad));
-                label.setAttribute('text-anchor', 'start');
-                label.setAttribute('dominant-baseline', 'alphabetic');
+                label.textContent = (lblCfg.text ?? 'LOAN VOLUME');
+                label.setAttribute('fill', (lblCfg.color ?? '#FFFFFF'));
+                if (lblCfg.opacity != null) label.setAttribute('opacity', String(lblCfg.opacity));
+                label.setAttribute('font-family', (lblCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
+                label.setAttribute('font-weight', (lblCfg.fontWeight ?? '500'));
+                label.setAttribute('font-size', String(lblCfg.fontSize ?? 16));
+                const lblPadLeft = Number(lblCfg.padLeft ?? 8);
+                const lblPadBottom = Number(lblCfg.padBottom ?? 8);
+                label.setAttribute('x', String(lblPadLeft));
+                label.setAttribute('y', String(size - lblPadBottom));
+                label.setAttribute('text-anchor', (lblCfg.anchor ?? 'start'));
+                label.setAttribute('dominant-baseline', (lblCfg.baseline ?? 'alphabetic'));
                 cellNode.appendChild(label);
             }
 

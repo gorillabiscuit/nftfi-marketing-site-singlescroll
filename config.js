@@ -69,9 +69,9 @@ export const GRID_STATES = {
         finalFactor: 3.0,
         levels: 4,
         svgSizeMultiplier: 1.6,
-        lineWidth: 4,
+        lineWidth: 0.5,
         lineColor: '#F2F2F2',
-        lineOpacity: 0.8
+        lineOpacity: 0.5
     }
 };
 
@@ -93,7 +93,10 @@ export const RECT_STATES = {
         positionOutMultiplierStart: 1,
         positionOutMultiplierEnd: 1,
         positionFinalMultiplierStart: 1,
-        positionFinalMultiplierEnd: 1
+        positionFinalMultiplierEnd: 1,
+        // Optional text configs (unused on mobile by default)
+        amount: {},
+        label: {}
     },
     tablet: {
         enabled: false,
@@ -108,7 +111,9 @@ export const RECT_STATES = {
         positionOutMultiplierStart: 1,
         positionOutMultiplierEnd: 1,
         positionFinalMultiplierStart: 1,
-        positionFinalMultiplierEnd: 1
+        positionFinalMultiplierEnd: 1,
+        amount: {},
+        label: {}
     },
     desktop: {
         enabled: true,
@@ -123,7 +128,32 @@ export const RECT_STATES = {
         positionOutMultiplierStart: 1,
         positionOutMultiplierEnd: 1.5265,
         positionFinalMultiplierStart: 1,
-        positionFinalMultiplierEnd: 1
+        positionFinalMultiplierEnd: 1,
+        // Text configurations for the primary cell
+        amount: {
+            text: '$700M+',
+            color: 'rgba(255, 255, 255, 0.90)',
+            fontFamily: 'Roboto Mono, monospace',
+            fontSize: 36,
+            fontWeight: '300',
+            letterSpacing: 1.44,
+            padLeft: 8,
+            padTop: 18,
+            anchor: 'start',
+            baseline: 'alphabetic'
+        },
+        label: {
+            text: 'LOAN VOLUME',
+            color: '#FFFFFF',
+            opacity: 0.5,
+            fontFamily: 'Satoshi Variable, sans-serif',
+            fontSize: 16,
+            fontWeight: '500',
+            padLeft: 8,
+            padBottom: 8,
+            anchor: 'start',
+            baseline: 'alphabetic'
+        }
     }
 };
 
