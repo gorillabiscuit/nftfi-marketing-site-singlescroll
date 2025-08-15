@@ -860,7 +860,7 @@ function createStaticCellsPhase() {
             const lblCfg = bCfg && bCfg.label ? { ...baseLbl, ...bCfg.label } : baseLbl;
 
             // Apply gradient/stroke per block (overriding defaults if provided)
-            const rectCfg = (bCfg && bCfg.rect) ? { ...rectDefaults, ...bCfg.rect } : rectDefaults;
+            const rectCfg = (bCfg && bCfg.rect);
             const svg = document.getElementById('lines-svg');
             let defs = svg.querySelector('defs');
             if (!defs) {
@@ -960,13 +960,14 @@ function createStaticCellsPhase() {
                     cellNode.appendChild(amount);
                 }
 
-                if (lblCfg) {
+                const hasLabelText = lblCfg && typeof lblCfg.text === 'string' && lblCfg.text.trim().length > 0;
+                if (hasLabelText) {
                     // Create a wrapper so label and highlight share the exact same transform
                     const labelWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     labelWrap.setAttribute('class', 'label-wrap');
 
                     const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    label.textContent = (lblCfg.text ?? 'LOAN VOLUME');
+                    label.textContent = lblCfg.text;
                     label.setAttribute('fill', (lblCfg.color ?? '#FFFFFF'));
                     if (lblCfg.opacity != null) label.setAttribute('opacity', String(lblCfg.opacity));
                     label.setAttribute('font-family', (lblCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
