@@ -961,33 +961,23 @@ function createStaticCellsPhase() {
                     if (amtRot != null) {
                         amount.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
                     }
-                    // Apply a clipPath sweep to amount for reveal effect
-                    const svg = document.getElementById('lines-svg');
-                    let defs = svg.querySelector('defs');
-                    if (!defs) {
-                        defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-                        svg.insertBefore(defs, svg.firstChild);
-                    }
-                    const clipId = `amount-clip-${i}-${j}`;
-                    const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-                    clipPath.setAttribute('id', clipId);
-                    clipPath.setAttribute('clipPathUnits', 'userSpaceOnUse');
-                    const clipRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    const clipPadX = 2; const clipPadY = 2;
-                    const clipX = ax - (anchorVal === 'end' ? 0 : clipPadX);
-                    const clipY = (baselineVal === 'alphabetic' ? (ay - fontSize - clipPadY) : (ay - fontSize/2 - clipPadY));
-                    const clipH = fontSize + clipPadY * 2;
-                    gsap.set(clipRect, { attr: { x: clipX, y: clipY, width: 0, height: clipH } });
+                    // Create an overlay highlight rect above the amount to sweep-reveal (rotation-aware)
+                    const amountHighlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    const ahPadX = 2; const ahPadY = 2;
+                    const ahX = ax - (anchorVal === 'end' ? 0 : ahPadX);
+                    const ahY = (baselineVal === 'alphabetic' ? (ay - fontSize - ahPadY) : (ay - fontSize/2 - ahPadY));
+                    const ahH = fontSize + ahPadY * 2;
+                    const amountFill = (amtCfg.color ?? 'rgba(255, 255, 255, 0.90)');
+                    gsap.set(amountHighlight, { attr: { x: ahX, y: ahY, width: 0, height: ahH, fill: amountFill, 'fill-opacity': 1 } });
+                    amountHighlight.setAttribute('class', 'amount-highlight');
                     if (amtRot != null) {
-                        clipRect.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
+                        amountHighlight.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
                     }
-                    clipRect.setAttribute('data-role', 'amount-clip');
-                    clipPath.appendChild(clipRect);
-                    defs.appendChild(clipPath);
-                    amount.setAttribute('clip-path', `url(#${clipId})`);
-                    amount.setAttribute('data-clip-id', clipId);
-                    amount.setAttribute('data-clip-pad-x', String(clipPadX));
+                    // Append amount (below), then overlay (above)
                     cellNode.appendChild(amount);
+                    cellNode.appendChild(amountHighlight);
+                    // Start with amount hidden until overlay fully expanded
+                    gsap.set(amount, { opacity: 0 });
                 }
 
                 if (lblCfg) {
@@ -1187,31 +1177,37 @@ function createBlocksRevealPhase() {
             }
         }
 
-        // 4) Amount sweep reveal using clipPath
+        // 4) Amount sweep reveal using overlay (rotation-aware like label)
         const amountEl = node.querySelector('text[data-role="amount"]');
-        if (amountEl) {
-            const clipId = amountEl.getAttribute('data-clip-id');
-            let clipRect = null;
-            if (clipId) {
-                const cp = document.getElementById(clipId);
-                if (cp) {
-                    clipRect = cp.querySelector('rect[data-role="amount-clip"]');
+        const amountHl = node.querySelector('rect.amount-highlight');
+        if (amountEl && amountHl) {
+            const sweepStart = (highlight && labelEl) ? (pos + 0.02 + 0.22 + 0.12) : (pos + 0.2);
+            const aAnchor = (amountEl.getAttribute('text-anchor')) || 'start';
+            const axAttr = amountEl.getAttribute('x');
+            const axVal = axAttr != null ? Number(axAttr) : 0;
+            const measureAmount = () => {
+                let w = 0;
+                if (typeof amountEl.getComputedTextLength === 'function') {
+                    try { w = amountEl.getComputedTextLength(); } catch (_) {}
                 }
+                if (!w || w <= 0) {
+                    try { w = amountEl.getBBox().width; } catch (_) { w = 0; }
+                }
+                return Math.max(8, w + 4); // include small padding
+            };
+            // expand overlay to cover amount
+            if (aAnchor === 'end') {
+                tl.to(amountHl, { attr: { width: () => measureAmount(), x: () => (axVal - measureAmount()) }, ease: 'power2.out', duration: 0.28 }, sweepStart);
+            } else {
+                tl.to(amountHl, { attr: { width: () => measureAmount() }, ease: 'power2.out', duration: 0.28 }, sweepStart);
             }
-            if (clipRect) {
-                const sweepStart = (highlight && labelEl) ? (pos + 0.02 + 0.22 + 0.12) : (pos + 0.2);
-                const padX = Number(amountEl.getAttribute('data-clip-pad-x') || 2);
-                const measureAmount = () => {
-                    let w = 0;
-                    if (typeof amountEl.getComputedTextLength === 'function') {
-                        try { w = amountEl.getComputedTextLength(); } catch (_) {}
-                    }
-                    if (!w || w <= 0) {
-                        try { w = amountEl.getBBox().width; } catch (_) { w = 0; }
-                    }
-                    return Math.max(8, w + padX * 2);
-                };
-                tl.to(clipRect, { attr: { width: () => measureAmount() }, ease: 'power2.out', duration: 0.32 }, sweepStart);
+            // reveal amount text
+            tl.to(amountEl, { opacity: 1, duration: 0.06, ease: 'none' }, sweepStart + 0.28);
+            // shrink overlay left-to-right
+            if (aAnchor === 'end') {
+                tl.to(amountHl, { attr: { width: 0, x: () => axVal }, ease: 'none', duration: 0.24 }, sweepStart + 0.28 + 0.06);
+            } else {
+                tl.to(amountHl, { attr: { width: 0, x: () => (axVal + measureAmount()) }, ease: 'none', duration: 0.24 }, sweepStart + 0.28 + 0.06);
             }
         }
     });
