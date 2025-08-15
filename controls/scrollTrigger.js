@@ -933,21 +933,23 @@ function createStaticCellsPhase() {
                     amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
                     if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
                     amount.setAttribute('data-role', 'amount');
-                    amount.setAttribute('data-original', amount.textContent);
 
                     const fontSize = Number(amtCfg.fontSize ?? 36);
                     const centerMode = (amtCfg.anchor === 'middle') || (amtCfg.center === true);
-                    let ax, ay;
-                    let anchorVal = (amtCfg.anchor != null) ? amtCfg.anchor : (centerMode ? 'middle' : 'start');
-                    let baselineVal = (amtCfg.baseline != null) ? amtCfg.baseline : (centerMode ? 'middle' : 'alphabetic');
-                    if (centerMode) {
-                        const offX = Number(amtCfg.centerOffsetX ?? 0);
-                        const offY = Number(amtCfg.centerOffsetY ?? 0);
-                        ax = size / 2 + offX;
-                        ay = size / 2 + offY;
-                    } else {
-                        const amtPadLeft = Number(amtCfg.padLeft ?? 8);
-                        const amtPadTop = Number(amtCfg.padTop ?? 18);
+                    const amtPadLeft = Number(amtCfg.padLeft ?? 10);
+                    const amtPadRight = Number(amtCfg.padRight ?? 10);
+                    const amtPadTop = Number(amtCfg.padTop ?? 10);
+                    const amtPadBottom = Number(amtCfg.padBottom ?? 10);
+                    let ax = centerMode ? size / 2 : amtPadLeft;
+                    let ay = centerMode ? size / 2 : (size - amtPadBottom);
+                    let anchorVal = centerMode ? 'middle' : (amtCfg.anchor ?? 'start');
+                    let baselineVal = centerMode ? 'middle' : (amtCfg.baseline ?? 'alphabetic');
+                    if (amtCfg.anchor === 'end') {
+                        ax = size - amtPadRight;
+                        ay = size - amtPadBottom;
+                        anchorVal = 'end';
+                        baselineVal = 'alphabetic';
+                    } else if (!centerMode && amtCfg.padTop != null) {
                         ax = amtPadLeft;
                         ay = amtPadTop + fontSize;
                     }
@@ -959,6 +961,32 @@ function createStaticCellsPhase() {
                     if (amtRot != null) {
                         amount.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
                     }
+                    // Apply a clipPath sweep to amount for reveal effect
+                    const svg = document.getElementById('lines-svg');
+                    let defs = svg.querySelector('defs');
+                    if (!defs) {
+                        defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                        svg.insertBefore(defs, svg.firstChild);
+                    }
+                    const clipId = `amount-clip-${i}-${j}`;
+                    const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+                    clipPath.setAttribute('id', clipId);
+                    clipPath.setAttribute('clipPathUnits', 'userSpaceOnUse');
+                    const clipRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    const clipPadX = 2; const clipPadY = 2;
+                    const clipX = ax - (anchorVal === 'end' ? 0 : clipPadX);
+                    const clipY = (baselineVal === 'alphabetic' ? (ay - fontSize - clipPadY) : (ay - fontSize/2 - clipPadY));
+                    const clipH = fontSize + clipPadY * 2;
+                    gsap.set(clipRect, { attr: { x: clipX, y: clipY, width: 0, height: clipH } });
+                    if (amtRot != null) {
+                        clipRect.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
+                    }
+                    clipRect.setAttribute('data-role', 'amount-clip');
+                    clipPath.appendChild(clipRect);
+                    defs.appendChild(clipPath);
+                    amount.setAttribute('clip-path', `url(#${clipId})`);
+                    amount.setAttribute('data-clip-id', clipId);
+                    amount.setAttribute('data-clip-pad-x', String(clipPadX));
                     cellNode.appendChild(amount);
                 }
 
@@ -1078,7 +1106,6 @@ function createBlocksRevealPhase() {
         const rect = node.querySelector('rect.cell-rect');
         const highlight = node.querySelector('rect.label-highlight');
         const labelEl = node.querySelector('text[data-role="label"]');
-        const amountEl = node.querySelector('text[data-role="amount"]');
         const pos = index * 0.15; // stagger each block
         // Reveal entire node (text + rect)
         tl.to(node, { opacity: 1, duration: 0.01 }, pos);
@@ -1160,36 +1187,32 @@ function createBlocksRevealPhase() {
             }
         }
 
-        // 4) Progressive scramble reveal for amount text (inspired by preloader)
+        // 4) Amount sweep reveal using clipPath
+        const amountEl = node.querySelector('text[data-role="amount"]');
         if (amountEl) {
-            const startTime = (highlight && labelEl) ? (pos + 0.02 + 0.22 + 0.02) : (pos + 0.1);
-            const original = amountEl.getAttribute('data-original') || amountEl.textContent || '';
-            const chars = '▪';
-            const proxy = { p: 0 };
-            tl.to(proxy, {
-                p: 1,
-                duration: 0.9,
-                ease: 'power2.out',
-                onUpdate: () => {
-                    const len = original.length;
-                    const revealCount = Math.floor(proxy.p * len);
-                    let s = '';
-                    for (let i = 0; i < len; i++) {
-                        const ch = original[i];
-                        if (ch === ' ') {
-                            s += ' ';
-                        } else if (i < revealCount) {
-                            s += ch;
-                        } else {
-                            s += chars;
-                        }
-                    }
-                    amountEl.textContent = s;
-                },
-                onComplete: () => {
-                    amountEl.textContent = original;
+            const clipId = amountEl.getAttribute('data-clip-id');
+            let clipRect = null;
+            if (clipId) {
+                const cp = document.getElementById(clipId);
+                if (cp) {
+                    clipRect = cp.querySelector('rect[data-role="amount-clip"]');
                 }
-            }, startTime);
+            }
+            if (clipRect) {
+                const sweepStart = (highlight && labelEl) ? (pos + 0.02 + 0.22 + 0.12) : (pos + 0.2);
+                const padX = Number(amountEl.getAttribute('data-clip-pad-x') || 2);
+                const measureAmount = () => {
+                    let w = 0;
+                    if (typeof amountEl.getComputedTextLength === 'function') {
+                        try { w = amountEl.getComputedTextLength(); } catch (_) {}
+                    }
+                    if (!w || w <= 0) {
+                        try { w = amountEl.getBBox().width; } catch (_) { w = 0; }
+                    }
+                    return Math.max(8, w + padX * 2);
+                };
+                tl.to(clipRect, { attr: { width: () => measureAmount() }, ease: 'power2.out', duration: 0.32 }, sweepStart);
+            }
         }
     });
     return tl;
