@@ -1135,7 +1135,7 @@ function createBlocksRevealPhase() {
             }
 
             // 2) Make label visible once fully covered
-            tl.to(labelEl, { opacity: 1, duration: 0.05, ease: 'none' }, 
+            tl.to(labelEl, { opacity: 0.5, duration: 0.05, ease: 'none' }, 
                  pos + 0.02 + 0.22);
 
             // 3) Disappear highlight left-to-right
