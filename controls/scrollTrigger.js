@@ -860,7 +860,7 @@ function createStaticCellsPhase() {
             const lblCfg = bCfg && bCfg.label ? { ...baseLbl, ...bCfg.label } : baseLbl;
 
             // Apply gradient/stroke per block (overriding defaults if provided)
-            const rectCfg = (bCfg && bCfg.rect);
+            const rectCfg = (bCfg && bCfg.rect) ? { ...rectDefaults, ...bCfg.rect } : rectDefaults;
             const svg = document.getElementById('lines-svg');
             let defs = svg.querySelector('defs');
             if (!defs) {
@@ -960,14 +960,9 @@ function createStaticCellsPhase() {
                     cellNode.appendChild(amount);
                 }
 
-                const hasLabelText = lblCfg && typeof lblCfg.text === 'string' && lblCfg.text.trim().length > 0;
-                if (hasLabelText) {
-                    // Create a wrapper so label and highlight share the exact same transform
-                    const labelWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                    labelWrap.setAttribute('class', 'label-wrap');
-
+                if (lblCfg) {
                     const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    label.textContent = lblCfg.text;
+                    label.textContent = (lblCfg.text ?? 'LOAN VOLUME');
                     label.setAttribute('fill', (lblCfg.color ?? '#FFFFFF'));
                     if (lblCfg.opacity != null) label.setAttribute('opacity', String(lblCfg.opacity));
                     label.setAttribute('font-family', (lblCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
@@ -1003,6 +998,9 @@ function createStaticCellsPhase() {
                     label.setAttribute('dominant-baseline', baseline);
 
                     const rot = (lblCfg.rotateDeg != null) ? Number(lblCfg.rotateDeg) : null;
+                    if (rot != null) {
+                        label.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
+                    }
 
                     // Insert a highlight wipe rect behind the label text (inspired by the CodePen effect)
                     const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -1016,25 +1014,17 @@ function createStaticCellsPhase() {
                     // initial width 0; will animate to measured text width + padding
                     gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: '#ffcc00', 'fill-opacity': 1 } });
                     highlight.setAttribute('class', 'label-highlight');
-                    // Persist metadata for reveal-time measurement
-                    highlight.dataset.padX = String(padX);
-                    highlight.dataset.anchor = anchor;
-                    highlight.dataset.lx = String(lx);
-                    highlight.dataset.ly = String(ly);
-                    // Append into wrapper (highlight first so label stays on top)
-                    labelWrap.appendChild(highlight);
-                    labelWrap.appendChild(label);
                     if (rot != null) {
-                        labelWrap.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
+                        highlight.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
                     }
-                    cellNode.appendChild(labelWrap);
+                    // Append highlight first so text stays on top
+                    cellNode.appendChild(highlight);
+
+                    // Append label text above highlight
+                    cellNode.appendChild(label);
 
                     // Measure text width and store target width for reveal
-                    try {
-                        const computedLen = label.getComputedTextLength ? label.getComputedTextLength() : 0;
-                        const targetW = (computedLen > 0 ? computedLen : label.getBBox().width) + (anchor === 'end' ? 0 : padX * 2);
-                        highlight.dataset.targetWidth = String(Math.max(0, targetW));
-                    } catch (_) {}
+                    // Defer width measurement to reveal phase via function-based values
                 }
             }
 
@@ -1094,48 +1084,62 @@ function createBlocksRevealPhase() {
             tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: 0.1, ease: 'power1.out' }, pos + 0.22);
         }
         if (highlight) {
-            const padX = Number(highlight.dataset.padX || 4);
-            const anchor = highlight.dataset.anchor || 'start';
-            const lx = Number(highlight.dataset.lx || 0);
-            let w = Number(highlight.dataset.targetWidth || 0);
+            const padding = 8;
+            const anchor = (labelEl && labelEl.getAttribute('text-anchor')) || 'start';
+            const labelXAttr = labelEl ? labelEl.getAttribute('x') : null;
+            const labelX = labelXAttr != null ? Number(labelXAttr) : 0;
 
             const measure = () => {
-                let measured = 0;
-                if (labelEl && labelEl.getComputedTextLength) {
-                    measured = labelEl.getComputedTextLength();
-                } else if (labelEl) {
-                    try { measured = labelEl.getBBox().width; } catch (_) {}
+                if (!labelEl) return padding;
+                let width = 0;
+                if (typeof labelEl.getComputedTextLength === 'function') {
+                    try { width = labelEl.getComputedTextLength(); } catch (_) {}
                 }
-                if (measured > 0) {
-                    w = measured + (anchor === 'end' ? 0 : padX * 2);
-                    // Adjust x for end-anchored labels so left edge aligns
-                    if (anchor === 'end') {
-                        gsap.set(highlight, { attr: { x: lx - w } });
-                    }
+                if (!width || width <= 0) {
+                    try { width = labelEl.getBBox().width; } catch (_) { width = 0; }
                 }
+                return Math.max(padding, width + (anchor === 'end' ? 0 : padding));
             };
 
-            if (!w || w <= 1) {
-                measure();
-            }
-
-            tl.to(highlight, { attr: { width: w }, ease: 'none', duration: 0.22 }, pos + 0.02);
-
-            // If fonts load later, correct the width once
-            if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(() => {
-                    const before = w;
-                    measure();
-                    const after = w;
-                    if (after && Math.abs(after - before) > 1) {
-                        gsap.to(highlight, { attr: { width: after, x: anchor === 'end' ? (lx - after) : undefined }, duration: 0.15, overwrite: true });
-                    }
-                }).catch(() => {});
+            if (anchor === 'end') {
+                tl.to(
+                    highlight,
+                    {
+                        attr: {
+                            width: () => measure(),
+                            x: () => (labelX - measure())
+                        },
+                        ease: 'none',
+                        duration: 0.22
+                    },
+                    pos + 0.02
+                );
+            } else {
+                tl.to(
+                    highlight,
+                    {
+                        attr: { width: () => measure() },
+                        ease: 'none',
+                        duration: 0.22
+                    },
+                    pos + 0.02
+                );
             }
         }
     });
     return tl;
 }
+
+// Ensure ScrollTrigger refreshes once fonts are ready so text metrics are stable
+try {
+    if (document && document.fonts && typeof document.fonts.ready?.then === 'function') {
+        document.fonts.ready.then(() => {
+            if (typeof ScrollTrigger !== 'undefined' && ScrollTrigger?.refresh) {
+                ScrollTrigger.refresh();
+            }
+        }).catch(() => {});
+    }
+} catch (_) {}
 
 // Calculate dynamic line length that extends beyond any screen size
 function calculateLineLength() {
