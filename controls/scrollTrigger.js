@@ -807,11 +807,10 @@ function createStaticCellsPhase() {
     gsap.set(cellsGroup, { transformOrigin: '50% 50%' }); // inherit rotation with gridGroup
 
     // Build rects for each inner cell (between grid lines)
-    // Logical centers at (i * baseSpacing, j * baseSpacing) for i,j in [minLevel..maxLevel]
-    // We place cells for pairs where both exist; avoid edges by requiring neighbors
     const explicit = Array.isArray(rectState.cells) ? rectState.cells : [];
     const hasExplicit = explicit.length > 0;
-    let primaryPlaced = false;
+    const blocksCfg = Array.isArray(rectState.blocks) ? rectState.blocks : null;
+    let visibleIdx = 0;
     for (let i = minLevel; i <= maxLevel - 1; i++) {
         for (let j = minLevel; j <= maxLevel - 1; j++) {
             let include = false;
@@ -840,9 +839,20 @@ function createStaticCellsPhase() {
             // Append rect first so that subsequent text elements render on top
             cellNode.appendChild(rect);
 
-            if (!primaryPlaced && getCurrentAnimationState() === 'desktop') {
-                primaryPlaced = true;
-                // gradient defs
+            const blockIndex = visibleIdx;
+            const isPrimary = blockIndex === 0;
+            let amtCfg, lblCfg;
+            if (blocksCfg && blocksCfg[blockIndex]) {
+                amtCfg = blocksCfg[blockIndex].amount || {};
+                lblCfg = blocksCfg[blockIndex].label || {};
+            } else if (isPrimary && getCurrentAnimationState() === 'desktop') {
+                // Backward-compat: use top-level amount/label for first block if no blocks[] provided
+                amtCfg = rectState.amount || {};
+                lblCfg = rectState.label || {};
+            }
+
+            // Special styling for the first (primary) block only
+            if (isPrimary) {
                 const svg = document.getElementById('lines-svg');
                 let defs = svg.querySelector('defs');
                 if (!defs) {
@@ -866,98 +876,93 @@ function createStaticCellsPhase() {
                     defs.appendChild(grad);
                 }
                 gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 1 } });
-
-                // Read per-text configs
-                const state = RECT_STATES.desktop;
-                const amtCfg = state.amount || {};
-                const lblCfg = state.label || {};
-
-                // Amount text (independent positioning)
-                const amount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                amount.textContent = (amtCfg.text ?? '$700M+');
-                amount.setAttribute('fill', (amtCfg.color ?? 'rgba(255, 255, 255, 0.90)'));
-                amount.setAttribute('font-family', (amtCfg.fontFamily ?? 'Roboto Mono, monospace'));
-                amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '300'));
-                amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
-                if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
-
-                const fontSize = Number(amtCfg.fontSize ?? 36);
-                const centerMode = (amtCfg.anchor === 'middle') || (amtCfg.center === true);
-                let ax, ay;
-                let anchorVal = (amtCfg.anchor != null) ? amtCfg.anchor : (centerMode ? 'middle' : 'start');
-                let baselineVal = (amtCfg.baseline != null) ? amtCfg.baseline : (centerMode ? 'middle' : 'alphabetic');
-                if (centerMode) {
-                    const offX = Number(amtCfg.centerOffsetX ?? 0);
-                    const offY = Number(amtCfg.centerOffsetY ?? 0);
-                    ax = size / 2 + offX;
-                    ay = size / 2 + offY;
-                } else {
-                    const amtPadLeft = Number(amtCfg.padLeft ?? 8);
-                    const amtPadTop = Number(amtCfg.padTop ?? 18);
-                    ax = amtPadLeft;
-                    ay = amtPadTop + fontSize; // baseline y
-                }
-                amount.setAttribute('x', String(ax));
-                amount.setAttribute('y', String(ay));
-                amount.setAttribute('text-anchor', anchorVal);
-                amount.setAttribute('dominant-baseline', baselineVal);
-                // Optional rotation around its own anchor point
-                const amtRot = (amtCfg.rotateDeg != null) ? Number(amtCfg.rotateDeg) : null;
-                if (amtRot != null) {
-                    amount.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
-                }
-                cellNode.appendChild(amount);
-
-                // Label text (restore original bottom-left padding logic; now configurable)
-                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                label.textContent = (lblCfg.text ?? 'LOAN VOLUME');
-                label.setAttribute('fill', (lblCfg.color ?? '#FFFFFF'));
-                if (lblCfg.opacity != null) label.setAttribute('opacity', String(lblCfg.opacity));
-                label.setAttribute('font-family', (lblCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
-                label.setAttribute('font-weight', (lblCfg.fontWeight ?? '500'));
-                label.setAttribute('font-size', String(lblCfg.fontSize ?? 16));
-
-                // Choose corner: if padRight provided, use bottom-right; else if padTop provided use top-left; else bottom-left
-                const lblPadLeft = Number(lblCfg.padLeft ?? 8);
-                const lblPadBottom = Number(lblCfg.padBottom ?? 8);
-                const lblPadRight = (lblCfg.padRight != null) ? Number(lblCfg.padRight) : null;
-                const lblPadTop = (lblCfg.padTop != null) ? Number(lblCfg.padTop) : null;
-
-                let lx = lblPadLeft;
-                let ly = size - lblPadBottom;
-                let anchor = (lblCfg.anchor ?? 'start');
-                let baseline = (lblCfg.baseline ?? 'alphabetic');
-
-                if (lblPadRight != null) {
-                    // bottom-right
-                    lx = size - lblPadRight;
-                    ly = size - (lblCfg.padBottom ?? 8);
-                    anchor = 'end';
-                    baseline = 'alphabetic';
-                } else if (lblPadTop != null) {
-                    // top-left
-                    lx = lblPadLeft;
-                    ly = lblPadTop + (lblCfg.fontSize ?? 16);
-                    anchor = 'start';
-                    baseline = 'alphabetic';
-                }
-
-                label.setAttribute('x', String(lx));
-                label.setAttribute('y', String(ly));
-                label.setAttribute('text-anchor', anchor);
-                label.setAttribute('dominant-baseline', baseline);
-
-                // Optional rotation around its own anchor point
-                const rot = (lblCfg.rotateDeg != null) ? Number(lblCfg.rotateDeg) : null;
-                if (rot != null) {
-                    label.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
-                }
-
-                cellNode.appendChild(label);
             }
 
-            // rect already appended earlier
+            // If there is text config for this block, render amount/label
+            if (amtCfg || lblCfg) {
+                if (amtCfg) {
+                    const amount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    amount.textContent = (amtCfg.text ?? '$700M+');
+                    amount.setAttribute('fill', (amtCfg.color ?? 'rgba(255, 255, 255, 0.90)'));
+                    amount.setAttribute('font-family', (amtCfg.fontFamily ?? 'Roboto Mono, monospace'));
+                    amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '300'));
+                    amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
+                    if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
+
+                    const fontSize = Number(amtCfg.fontSize ?? 36);
+                    const centerMode = (amtCfg.anchor === 'middle') || (amtCfg.center === true);
+                    let ax, ay;
+                    let anchorVal = (amtCfg.anchor != null) ? amtCfg.anchor : (centerMode ? 'middle' : 'start');
+                    let baselineVal = (amtCfg.baseline != null) ? amtCfg.baseline : (centerMode ? 'middle' : 'alphabetic');
+                    if (centerMode) {
+                        const offX = Number(amtCfg.centerOffsetX ?? 0);
+                        const offY = Number(amtCfg.centerOffsetY ?? 0);
+                        ax = size / 2 + offX;
+                        ay = size / 2 + offY;
+                    } else {
+                        const amtPadLeft = Number(amtCfg.padLeft ?? 8);
+                        const amtPadTop = Number(amtCfg.padTop ?? 18);
+                        ax = amtPadLeft;
+                        ay = amtPadTop + fontSize;
+                    }
+                    amount.setAttribute('x', String(ax));
+                    amount.setAttribute('y', String(ay));
+                    amount.setAttribute('text-anchor', anchorVal);
+                    amount.setAttribute('dominant-baseline', baselineVal);
+                    const amtRot = (amtCfg.rotateDeg != null) ? Number(amtCfg.rotateDeg) : null;
+                    if (amtRot != null) {
+                        amount.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
+                    }
+                    cellNode.appendChild(amount);
+                }
+
+                if (lblCfg) {
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.textContent = (lblCfg.text ?? 'LOAN VOLUME');
+                    label.setAttribute('fill', (lblCfg.color ?? '#FFFFFF'));
+                    if (lblCfg.opacity != null) label.setAttribute('opacity', String(lblCfg.opacity));
+                    label.setAttribute('font-family', (lblCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
+                    label.setAttribute('font-weight', (lblCfg.fontWeight ?? '500'));
+                    label.setAttribute('font-size', String(lblCfg.fontSize ?? 16));
+
+                    const lblPadLeft = Number(lblCfg.padLeft ?? 8);
+                    const lblPadBottom = Number(lblCfg.padBottom ?? 8);
+                    const lblPadRight = (lblCfg.padRight != null) ? Number(lblCfg.padRight) : null;
+                    const lblPadTop = (lblCfg.padTop != null) ? Number(lblCfg.padTop) : null;
+
+                    let lx = lblPadLeft;
+                    let ly = size - lblPadBottom;
+                    let anchor = (lblCfg.anchor ?? 'start');
+                    let baseline = (lblCfg.baseline ?? 'alphabetic');
+
+                    if (lblPadRight != null) {
+                        lx = size - lblPadRight;
+                        ly = size - (lblCfg.padBottom ?? 8);
+                        anchor = 'end';
+                        baseline = 'alphabetic';
+                    } else if (lblPadTop != null) {
+                        lx = lblPadLeft;
+                        ly = lblPadTop + (lblCfg.fontSize ?? 16);
+                        anchor = 'start';
+                        baseline = 'alphabetic';
+                    }
+
+                    label.setAttribute('x', String(lx));
+                    label.setAttribute('y', String(ly));
+                    label.setAttribute('text-anchor', anchor);
+                    label.setAttribute('dominant-baseline', baseline);
+
+                    const rot = (lblCfg.rotateDeg != null) ? Number(lblCfg.rotateDeg) : null;
+                    if (rot != null) {
+                        label.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
+                    }
+
+                    cellNode.appendChild(label);
+                }
+            }
+
             cellsGroup.appendChild(cellNode);
+            visibleIdx++;
         }
     }
 

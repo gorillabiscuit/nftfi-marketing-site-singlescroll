@@ -138,8 +138,8 @@ export const RECT_STATES = {
             fontWeight: '300',
             letterSpacing: 1.44,
             center: true,
-            centerOffsetX: 0,
-            centerOffsetY: 0,
+            centerOffsetX: 70,
+            centerOffsetY: 65,
             rotateDeg: -45,
             anchor: 'middle',
             baseline: 'middle'
@@ -159,7 +159,55 @@ export const RECT_STATES = {
             rotateDeg: -90,
             anchor: 'start',
             baseline: 'alphabetic'
-        }
+        },
+        // New blocks array: order maps to visible cells sequence
+        blocks: [
+            // 0: Primary (kept for clarity; amount/label above already used)
+            {
+                amount: {
+                    text: '$700M+', color: 'rgba(255,255,255,0.90)', fontFamily: 'Roboto Mono, monospace', fontSize: 36,
+                    fontWeight: '300', letterSpacing: 1.44, center: true, anchor: 'middle', baseline: 'middle',
+                    centerOffsetX: 70, centerOffsetY: 65
+                },
+                label: {
+                    text: 'LOAN VOLUME', color: '#FFFFFF', opacity: 0.5, fontFamily: 'Satoshi Variable, sans-serif', fontSize: 16,
+                    fontWeight: '500', rotateDeg: -90, padLeft: 200, padTop: 180, anchor: 'start', baseline: 'alphabetic'
+                }
+            },
+            // 1: Next visible block: 73,000 LOANS
+            {
+                amount: {
+                    text: '73,000', color: 'rgba(255,255,255,0.90)', fontFamily: 'Roboto Mono, monospace', fontSize: 28,
+                    fontWeight: '300', center: true, anchor: 'middle', baseline: 'middle', centerOffsetX: 0, centerOffsetY: 0
+                },
+                label: {
+                    text: 'LOANS', color: '#FFFFFF', opacity: 0.7, fontFamily: 'Satoshi Variable, sans-serif', fontSize: 14,
+                    fontWeight: '500', padLeft: 10, padBottom: 10, rotateDeg: -45, anchor: 'start', baseline: 'alphabetic'
+                }
+            },
+            // 2: Next visible block: $20,000 AVERAGE LOAN
+            {
+                amount: {
+                    text: '$20,000', color: 'rgba(255,255,255,0.90)', fontFamily: 'Roboto Mono, monospace', fontSize: 28,
+                    fontWeight: '300', center: true, anchor: 'middle', baseline: 'middle', centerOffsetX: 0, centerOffsetY: 0
+                },
+                label: {
+                    text: 'AVERAGE LOAN', color: '#FFFFFF', opacity: 0.7, fontFamily: 'Satoshi Variable, sans-serif', fontSize: 14,
+                    fontWeight: '500', padLeft: 10, padBottom: 10, rotateDeg: -45, anchor: 'start', baseline: 'alphabetic'
+                }
+            },
+            // 3: Next visible block: May 2020 RUNNING SAFE SINCE
+            {
+                amount: {
+                    text: 'May 2020', color: 'rgba(255,255,255,0.90)', fontFamily: 'Roboto Mono, monospace', fontSize: 24,
+                    fontWeight: '300', center: true, anchor: 'middle', baseline: 'middle', centerOffsetX: 0, centerOffsetY: 0
+                },
+                label: {
+                    text: 'RUNNING SAFE SINCE', color: '#FFFFFF', opacity: 0.7, fontFamily: 'Satoshi Variable, sans-serif', fontSize: 12,
+                    fontWeight: '500', padLeft: 10, padBottom: 10, rotateDeg: -45, anchor: 'start', baseline: 'alphabetic'
+                }
+            }
+        ]
     }
 };
 
