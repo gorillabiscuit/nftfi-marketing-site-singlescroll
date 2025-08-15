@@ -129,7 +129,17 @@ export const RECT_STATES = {
         positionOutMultiplierEnd: 1.5265,
         positionFinalMultiplierStart: 1,
         positionFinalMultiplierEnd: 1,
-        // Text configurations for the primary cell
+        // Default rect styling for all blocks (can be overridden per block)
+        rectDefaults: {
+            gradientStart: '#6D3E58',
+            gradientEnd: 'rgba(109, 62, 88, 0.45)',
+            gradientAngle: 135,
+            strokeColor: '#FFFFFF',
+            strokeOpacity: 0.38,
+            strokeWidth: 1,
+            rxOverride: 15 // optional override; otherwise computed from cornerRadiusFactor
+        },
+        // Text configurations for the primary cell (global defaults)
         amount: {
             text: '$700M+',
             color: 'rgba(255, 255, 255, 0.90)',
@@ -138,11 +148,11 @@ export const RECT_STATES = {
             fontWeight: '300',
             letterSpacing: 1.44,
             center: true,
+            anchor: 'middle',
+            baseline: 'middle',
             centerOffsetX: 70,
             centerOffsetY: 65,
-            rotateDeg: -45,
-            anchor: 'middle',
-            baseline: 'middle'
+            rotateDeg: -45
         },
         label: {
             text: 'LOAN VOLUME',
@@ -160,12 +170,12 @@ export const RECT_STATES = {
             anchor: 'start',
             baseline: 'alphabetic'
         },
-        // New blocks array: order maps to visible cells sequence
+        // Blocks array: order maps to visible cells sequence. Only text is required; rect can override gradient.
         blocks: [
-            { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' } },
-            { amount: { text: '73,000' },  label: { text: 'LOANS' } },
-            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' } },
-            { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' } }
+            { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' }, rect: { /* uses defaults */ } },
+            { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { /* gradientStart: '#xxxxxx', gradientEnd: 'rgba(...)' */ } },
+            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { /* overrides optional */ } },
+            { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
         ]
     }
 };

@@ -794,6 +794,7 @@ function createStaticCellsPhase() {
     const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
     const rx = size * (rectState.cornerRadiusFactor ?? 0.15);
     const group = window.gridGroup;
+    const rectDefaults = rectState.rectDefaults || {};
 
     // Remove previous cells group if exists
     const old = document.getElementById('grid-cells');
@@ -833,14 +834,13 @@ function createStaticCellsPhase() {
             cellNode.setAttribute('transform', `translate(${x} ${y})`);
 
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            gsap.set(rect, { attr: { x: 0, y: 0, width: size, height: size, rx, ry: rx, class: 'cell-rect', fill: '#000000', 'fill-opacity': 0.5, stroke: '#000000', 'stroke-opacity': 1, 'stroke-width': 1 } });
+            gsap.set(rect, { attr: { x: 0, y: 0, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
             gsap.set(rect, { transformOrigin: '50% 50%', transformBox: 'fill-box' });
 
             // Append rect first so that subsequent text elements render on top
             cellNode.appendChild(rect);
 
             const blockIndex = visibleIdx;
-            const isPrimary = blockIndex === 0;
             const state = RECT_STATES[getCurrentAnimationState()] || RECT_STATES.desktop || {};
             const baseAmt = state.amount || {};
             const baseLbl = state.label || {};
@@ -848,32 +848,68 @@ function createStaticCellsPhase() {
             const amtCfg = bCfg && bCfg.amount ? { ...baseAmt, ...bCfg.amount } : baseAmt;
             const lblCfg = bCfg && bCfg.label ? { ...baseLbl, ...bCfg.label } : baseLbl;
 
-            // Special styling for the first (primary) block only
-            if (isPrimary) {
-                const svg = document.getElementById('lines-svg');
-                let defs = svg.querySelector('defs');
-                if (!defs) {
-                    defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-                    svg.insertBefore(defs, svg.firstChild);
-                }
-                let grad = svg.querySelector('#rect-primary-grad');
-                if (!grad) {
-                    grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-                    grad.setAttribute('id', 'rect-primary-grad');
-                    grad.setAttribute('gradientTransform', 'rotate(135)');
-                    const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-                    stop1.setAttribute('offset', '0%');
-                    stop1.setAttribute('stop-color', '#6D3E58');
-                    const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-                    stop2.setAttribute('offset', '97.66%');
-                    stop2.setAttribute('stop-color', '#6D3E58');
-                    stop2.setAttribute('stop-opacity', '0.45');
-                    grad.appendChild(stop1);
-                    grad.appendChild(stop2);
-                    defs.appendChild(grad);
-                }
-                gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 1 } });
+            // Apply gradient/stroke per block (overriding defaults if provided)
+            const rectCfg = (bCfg && bCfg.rect) ? { ...rectDefaults, ...bCfg.rect } : rectDefaults;
+            const svg = document.getElementById('lines-svg');
+            let defs = svg.querySelector('defs');
+            if (!defs) {
+                defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                svg.insertBefore(defs, svg.firstChild);
             }
+            const gradId = `rect-grad-${blockIndex}`;
+            let grad = svg.querySelector(`#${gradId}`);
+            if (!grad) {
+                grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                grad.setAttribute('id', gradId);
+                const angle = Number(rectCfg.gradientAngle ?? 135);
+                grad.setAttribute('gradientTransform', `rotate(${angle})`);
+                const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop1.setAttribute('offset', '0%');
+                stop1.setAttribute('stop-color', rectCfg.gradientStart ?? '#000000');
+                const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop2.setAttribute('offset', '97.66%');
+                // Support rgba end colors: if provided, split color/opacity; otherwise set color only
+                const end = rectCfg.gradientEnd ?? 'rgba(0,0,0,0.5)';
+                if (/rgba\(/i.test(end)) {
+                    const m = end.match(/rgba\(([^)]+)\)/i);
+                    if (m) {
+                        const parts = m[1].split(',').map(s => s.trim());
+                        const [r,g,b,a] = parts;
+                        stop2.setAttribute('stop-color', `rgb(${r}, ${g}, ${b})`);
+                        if (a != null) stop2.setAttribute('stop-opacity', `${a}`);
+                    }
+                } else {
+                    stop2.setAttribute('stop-color', end);
+                }
+                grad.appendChild(stop1);
+                grad.appendChild(stop2);
+                defs.appendChild(grad);
+            } else {
+                // Update stops if gradient exists
+                const stops = grad.querySelectorAll('stop');
+                const startStop = stops[0];
+                const endStop = stops[1];
+                if (startStop) startStop.setAttribute('stop-color', rectCfg.gradientStart ?? '#000000');
+                if (endStop) {
+                    const end = rectCfg.gradientEnd ?? 'rgba(0,0,0,0.5)';
+                    if (/rgba\(/i.test(end)) {
+                        const m = end.match(/rgba\(([^)]+)\)/i);
+                        if (m) {
+                            const parts = m[1].split(',').map(s => s.trim());
+                            const [r,g,b,a] = parts;
+                            endStop.setAttribute('stop-color', `rgb(${r}, ${g}, ${b})`);
+                            if (a != null) endStop.setAttribute('stop-opacity', `${a}`);
+                        }
+                    } else {
+                        endStop.setAttribute('stop-color', end);
+                        endStop.removeAttribute('stop-opacity');
+                    }
+                }
+            }
+
+            const rxOverride = Number(rectCfg.rxOverride ?? NaN);
+            const rxFinal = Number.isFinite(rxOverride) ? rxOverride : rx;
+            gsap.set(rect, { attr: { rx: rxFinal, ry: rxFinal, fill: `url(#${gradId})`, stroke: (rectCfg.strokeColor ?? '#FFFFFF'), 'stroke-opacity': (rectCfg.strokeOpacity ?? 0.38), 'stroke-width': (rectCfg.strokeWidth ?? 1) } });
 
             // If there is text config for this block, render amount/label
             if (amtCfg || lblCfg) {
