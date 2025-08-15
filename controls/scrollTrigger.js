@@ -879,11 +879,17 @@ function createStaticCellsPhase() {
                 if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
                 const amtPadLeft = Number(amtCfg.padLeft ?? 8);
                 const amtPadTop = Number(amtCfg.padTop ?? 18);
-                amount.setAttribute('x', String(amtPadLeft));
-                // y is baseline; add font size for top padding
-                amount.setAttribute('y', String(amtPadTop + (amtCfg.fontSize ?? 36)));
+                const ax = amtPadLeft;
+                const ay = amtPadTop + (amtCfg.fontSize ?? 36); // baseline y
+                amount.setAttribute('x', String(ax));
+                amount.setAttribute('y', String(ay));
                 amount.setAttribute('text-anchor', (amtCfg.anchor ?? 'start'));
                 amount.setAttribute('dominant-baseline', (amtCfg.baseline ?? 'alphabetic'));
+                // Optional rotation around its own anchor point
+                const amtRot = (amtCfg.rotateDeg != null) ? Number(amtCfg.rotateDeg) : null;
+                if (amtRot != null) {
+                    amount.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
+                }
                 cellNode.appendChild(amount);
 
                 // Label text (restore original bottom-left padding logic; now configurable)
