@@ -1002,28 +1002,27 @@ function createStaticCellsPhase() {
                         label.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
                     }
 
-                    // Insert a highlight wipe rect behind the label text (inspired by the CodePen effect)
+                    // Insert a highlight wipe rect (above the text): append after label so it sits on top visually
                     const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                     const fontSize = Number(lblCfg.fontSize ?? 16);
                     const padX = 4;
                     const padY = 2;
-                    // Baseline y -> top = y - fontSize
                     const hlTop = ly - fontSize - padY;
                     const hlLeft = lx - (anchor === 'end' ? 0 : padX);
                     const hlHeight = fontSize + padY * 2;
-                    // initial width 0; will animate to measured text width + padding
                     gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: '#ffcc00', 'fill-opacity': 1 } });
                     highlight.setAttribute('class', 'label-highlight');
                     if (rot != null) {
                         highlight.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
                     }
-                    // Append highlight first so text stays on top
+
+                    // Append label first (below), then highlight (above)
+                    cellNode.appendChild(label);
                     cellNode.appendChild(highlight);
 
-                    // Append label text above highlight
-                    cellNode.appendChild(label);
+                    // Make label initially invisible; will reveal after highlight expansion
+                    gsap.set(label, { opacity: 0 });
 
-                    // Measure text width and store target width for reveal
                     // Defer width measurement to reveal phase via function-based values
                 }
             }
@@ -1083,14 +1082,13 @@ function createBlocksRevealPhase() {
             tl.to(rect, { drawSVG: "0% 100%", ease: "none", duration: 0.25 }, pos);
             tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: 0.1, ease: 'power1.out' }, pos + 0.22);
         }
-        if (highlight) {
+        if (highlight && labelEl) {
             const padding = 8;
-            const anchor = (labelEl && labelEl.getAttribute('text-anchor')) || 'start';
-            const labelXAttr = labelEl ? labelEl.getAttribute('x') : null;
+            const anchor = (labelEl.getAttribute('text-anchor')) || 'start';
+            const labelXAttr = labelEl.getAttribute('x');
             const labelX = labelXAttr != null ? Number(labelXAttr) : 0;
 
             const measure = () => {
-                if (!labelEl) return padding;
                 let width = 0;
                 if (typeof labelEl.getComputedTextLength === 'function') {
                     try { width = labelEl.getComputedTextLength(); } catch (_) {}
@@ -1098,9 +1096,11 @@ function createBlocksRevealPhase() {
                 if (!width || width <= 0) {
                     try { width = labelEl.getBBox().width; } catch (_) { width = 0; }
                 }
+                // Include padding on start-anchor; end-anchor handled via x shift
                 return Math.max(padding, width + (anchor === 'end' ? 0 : padding));
             };
 
+            // 1) Expand highlight to cover text
             if (anchor === 'end') {
                 tl.to(
                     highlight,
@@ -1123,6 +1123,35 @@ function createBlocksRevealPhase() {
                         duration: 0.22
                     },
                     pos + 0.02
+                );
+            }
+
+            // 2) Make label visible once fully covered
+            tl.to(labelEl, { opacity: 1, duration: 0.05, ease: 'none' }, 
+                 pos + 0.02 + 0.22);
+
+            // 3) Disappear highlight left-to-right
+            if (anchor === 'end') {
+                // Keep right edge at labelX; left edge moves right
+                tl.to(
+                    highlight,
+                    {
+                        attr: { width: 0, x: () => labelX },
+                        ease: 'none',
+                        duration: 0.22
+                    },
+                    pos + 0.02 + 0.22 + 0.05
+                );
+            } else {
+                // Move left edge right while shrinking to 0
+                tl.to(
+                    highlight,
+                    {
+                        attr: { width: 0, x: () => (labelX + measure()) },
+                        ease: 'none',
+                        duration: 0.22
+                    },
+                    pos + 0.02 + 0.22 + 0.05
                 );
             }
         }
