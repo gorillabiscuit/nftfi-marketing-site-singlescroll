@@ -374,9 +374,9 @@ function setupSection2Pinning() {
         const staticCellsPhase = createStaticCellsPhase();
         masterTimeline.add(staticCellsPhase, "draw");
 
-        // Stroke-draw blocks first (scrubbed like grid lines)
-        const cellsStrokePhase = createCellsStrokeDrawPhase();
-        masterTimeline.add(cellsStrokePhase, "draw");
+        // Prepare cells' stroke draw (set initial states only)
+        const cellsStrokePrep = prepareCellsStrokeDraw();
+        masterTimeline.add(cellsStrokePrep, "draw");
         
         // Phase 2: Outward Expansion (25-50% of timeline)
         const outwardExpansionPhase = createOutwardExpansionPhase();
@@ -1016,41 +1016,16 @@ function createStaticCellsPhase() {
     return cellsTimeline;
 }
 
-// Phase: Stroke draw for block rectangles using DrawSVG (scrubbed)
-function createCellsStrokeDrawPhase() {
+// Prep: set initial stroke draw state (no tweens). Actual draw happens during reveal.
+function prepareCellsStrokeDraw() {
     const tl = gsap.timeline();
     const cellsGroup = document.getElementById('grid-cells');
     if (!cellsGroup) return tl;
     const rects = Array.from(cellsGroup.querySelectorAll('rect.cell-rect'));
-    if (!rects.length) return tl;
-
-    // Prepare: hide fill, start strokes from center
     rects.forEach((rect) => {
-        // ensure stroke visible
-        gsap.set(rect, { attr: { 'fill-opacity': 0 } });
         gsap.set(rect, { drawSVG: "50% 50%" });
-        // ensure node visible during draw
-        const node = rect.parentNode;
-        if (node && node.classList && node.classList.contains('cell-node')) {
-            gsap.set(node, { opacity: 1 });
-        }
+        gsap.set(rect, { attr: { 'fill-opacity': 0 } });
     });
-
-    // Draw strokes with a small stagger; linear for scrub
-    rects.forEach((rect, index) => {
-        tl.to(rect, {
-            drawSVG: "0% 100%",
-            ease: "none",
-            duration: 0.25
-        }, index * 0.03);
-        // Fade in fill near the end of its stroke draw
-        tl.to(rect, {
-            attr: { 'fill-opacity': 1 },
-            duration: 0.1,
-            ease: 'power1.out'
-        }, index * 0.03 + 0.22);
-    });
-
     return tl;
 }
 
@@ -1064,12 +1039,17 @@ function createBlocksRevealPhase() {
         console.warn('Reveal phase: no cell nodes to reveal');
         return tl;
     }
-    tl.to(nodes, {
-        opacity: 1,
-        duration: 0.25,
-        ease: 'power1.out',
-        stagger: { each: 0.15 }
-    }, 0);
+    // For each node, reveal node and draw its rect stroke, then fade in fill
+    nodes.forEach((node, index) => {
+        const rect = node.querySelector('rect.cell-rect');
+        const pos = index * 0.15; // stagger each block
+        // Reveal entire node (text + rect)
+        tl.to(node, { opacity: 1, duration: 0.01 }, pos);
+        if (rect) {
+            tl.to(rect, { drawSVG: "0% 100%", ease: "none", duration: 0.25 }, pos);
+            tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: 0.1, ease: 'power1.out' }, pos + 0.22);
+        }
+    });
     return tl;
 }
 
