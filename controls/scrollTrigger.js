@@ -968,6 +968,7 @@ function createStaticCellsPhase() {
                     label.setAttribute('font-family', (lblCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
                     label.setAttribute('font-weight', (lblCfg.fontWeight ?? '500'));
                     label.setAttribute('font-size', String(lblCfg.fontSize ?? 16));
+                    label.setAttribute('data-role', 'label');
 
                     const lblPadLeft = Number(lblCfg.padLeft ?? 8);
                     const lblPadBottom = Number(lblCfg.padBottom ?? 8);
@@ -1011,7 +1012,8 @@ function createStaticCellsPhase() {
                     const hlLeft = lx - (anchor === 'end' ? 0 : padX);
                     const hlHeight = fontSize + padY * 2;
                     // initial width 0; will animate to measured text width + padding
-                    gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: '#ffcc00', 'fill-opacity': 1 }, class: 'label-highlight' });
+                    gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: '#ffcc00', 'fill-opacity': 1 } });
+                    highlight.setAttribute('class', 'label-highlight');
                     if (rot != null) {
                         highlight.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
                     }
@@ -1077,6 +1079,7 @@ function createBlocksRevealPhase() {
     nodes.forEach((node, index) => {
         const rect = node.querySelector('rect.cell-rect');
         const highlight = node.querySelector('rect.label-highlight');
+        const labelEl = node.querySelector('text[data-role="label"]');
         const pos = index * 0.15; // stagger each block
         // Reveal entire node (text + rect)
         tl.to(node, { opacity: 1, duration: 0.01 }, pos);
@@ -1085,7 +1088,13 @@ function createBlocksRevealPhase() {
             tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: 0.1, ease: 'power1.out' }, pos + 0.22);
         }
         if (highlight) {
-            const w = Number(highlight.dataset.targetWidth || 0);
+            let w = Number(highlight.dataset.targetWidth || 0);
+            if ((!w || w <= 0) && labelEl) {
+                try {
+                    const bbox = labelEl.getBBox();
+                    w = bbox.width + 8; // fallback padding
+                } catch (_) {}
+            }
             tl.to(highlight, { attr: { width: w }, ease: 'none', duration: 0.22 }, pos + 0.02);
         }
     });
