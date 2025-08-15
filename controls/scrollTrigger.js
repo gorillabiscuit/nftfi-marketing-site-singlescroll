@@ -336,7 +336,7 @@ function setupSection2Pinning() {
                 pin: true,
                 anticipatePin: 1,
                 invalidateOnRefresh: true,
-                scrub: false
+                scrub: true
             }
         });
 
