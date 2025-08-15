@@ -932,6 +932,8 @@ function createStaticCellsPhase() {
                     amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '300'));
                     amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
                     if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
+                    amount.setAttribute('class', 'amount-text');
+                    amount.setAttribute('data-original', amount.textContent);
 
                     const fontSize = Number(amtCfg.fontSize ?? 36);
                     const centerMode = (amtCfg.anchor === 'middle') || (amtCfg.center === true);
@@ -1076,6 +1078,7 @@ function createBlocksRevealPhase() {
         const rect = node.querySelector('rect.cell-rect');
         const highlight = node.querySelector('rect.label-highlight');
         const labelEl = node.querySelector('text[data-role="label"]');
+        const amountEl = node.querySelector('text.amount-text');
         const pos = index * 0.15; // stagger each block
         // Reveal entire node (text + rect)
         tl.to(node, { opacity: 1, duration: 0.01 }, pos);
@@ -1155,6 +1158,44 @@ function createBlocksRevealPhase() {
                     pos + 0.02 + 0.22 + 0.05
                 );
             }
+        }
+
+        // 4) Decoder text effect for amount (scramble then resolve)
+        if (amountEl) {
+            const start = (highlight && labelEl) ? (pos + 0.02 + 0.22 + 0.05 + 0.02) : (pos + 0.1);
+            const original = amountEl.getAttribute('data-original') || amountEl.textContent || '';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-+=[]{}|;:,.<>?';
+            const keepChar = (ch) => ch === ' ';
+            const makeRand = (len) => {
+                let out = '';
+                for (let i = 0; i < len; i++) {
+                    out += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return out;
+            };
+
+            const proxy = { p: 0 };
+            tl.to(proxy, {
+                p: 1,
+                duration: 1.2,
+                ease: 'power2.inOut',
+                onUpdate: () => {
+                    const len = original.length;
+                    let s = '';
+                    for (let i = 0; i < len; i++) {
+                        const ch = original[i];
+                        if (keepChar(ch)) {
+                            s += ch;
+                        } else {
+                            s += chars.charAt(Math.floor(Math.random() * chars.length));
+                        }
+                    }
+                    amountEl.textContent = s;
+                },
+                onComplete: () => {
+                    amountEl.textContent = original;
+                }
+            }, start);
         }
     });
     return tl;
