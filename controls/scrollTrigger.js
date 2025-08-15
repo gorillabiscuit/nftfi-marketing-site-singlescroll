@@ -1171,9 +1171,11 @@ function createBlocksRevealPhase() {
                 const suffix = original.slice(m.index + numStr.length);
                 const decimals = (numStr.split('.')[1] || '').length;
                 const target = parseFloat(numStr.replace(/,/g, '')) || 0;
+                const monthLike = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(prefix + suffix);
                 const formatter = new Intl.NumberFormat('en-US', {
                     minimumFractionDigits: decimals,
-                    maximumFractionDigits: decimals
+                    maximumFractionDigits: decimals,
+                    useGrouping: monthLike ? false : true
                 });
                 const counter = { value: 0 };
 
