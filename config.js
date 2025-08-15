@@ -48,8 +48,10 @@ export const GRID_STATES = {
         levels: 4,
         // SVG size multiplier relative to max(viewportWidth, viewportHeight)
         svgSizeMultiplier: 1.8,
-        // Optional stroke width (px) for grid lines
-        lineWidth: 1.5
+        // Grid line styling
+        lineWidth: 1.5,
+        lineColor: '#F2F2F2',
+        lineOpacity: 0.8
     },
     tablet: {
         initialSpacing: 55,
@@ -57,7 +59,9 @@ export const GRID_STATES = {
         finalFactor: 3.2,
         levels: 4,
         svgSizeMultiplier: 1.7,
-        lineWidth: 1.5
+        lineWidth: 1.5,
+        lineColor: '#F2F2F2',
+        lineOpacity: 0.8
     },
     desktop: {
         initialSpacing: 80,
@@ -65,7 +69,9 @@ export const GRID_STATES = {
         finalFactor: 3.0,
         levels: 4,
         svgSizeMultiplier: 1.6,
-        lineWidth: 1.5
+        lineWidth: 4,
+        lineColor: '#F2F2F2',
+        lineOpacity: 0.8
     }
 };
 

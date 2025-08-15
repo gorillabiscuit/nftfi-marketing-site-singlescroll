@@ -1286,9 +1286,9 @@ h2 {
 
 /* SVG Line Styles */
 .line {
-    stroke: #F2F2F2;
-    stroke-width: 0.5;
+    stroke: var(--grid-line-color, #F2F2F2);
+    stroke-width: var(--grid-line-width, 0.5px);
     fill: none;
     vector-effect: non-scaling-stroke;
-    opacity: 0.8; /* 20% transparent */
+    opacity: var(--grid-line-opacity, 0.8);
 }

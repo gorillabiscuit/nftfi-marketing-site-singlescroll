@@ -474,7 +474,17 @@ function createDrawingPhase() {
         const leftEdge = -svgSize / 2;
         const rightEdge = svgSize / 2;
         const y = center + level * initialSpacing;
-        gsap.set(path, { attr: { class: `line horizontal`, d: `M${leftEdge} ${y} L${rightEdge} ${y}`, stroke: '#FFFFFF', 'stroke-opacity': 1, 'stroke-width': (gridState.lineWidth ?? 1), fill: 'none' } });
+        gsap.set(path, {
+            attr: {
+                class: `line horizontal`,
+                d: `M${leftEdge} ${y} L${rightEdge} ${y}`,
+                'vector-effect': 'non-scaling-stroke',
+                fill: 'none',
+                stroke: gridState.lineColor ?? '#FFFFFF',
+                'stroke-opacity': gridState.lineOpacity ?? 0.8
+            },
+            strokeWidth: (gridState.lineWidth ?? 1)
+        });
         // Store logical position for future transforms
         path.dataset.axis = 'h';
         path.dataset.level = String(level);
@@ -490,7 +500,17 @@ function createDrawingPhase() {
         const topEdge = -svgSize / 2;
         const bottomEdge = svgSize / 2;
         const x = center + level * initialSpacing;
-        gsap.set(path, { attr: { class: `line vertical`, d: `M${x} ${topEdge} L${x} ${bottomEdge}`, stroke: '#FFFFFF', 'stroke-opacity': 1, 'stroke-width': (gridState.lineWidth ?? 1), fill: 'none' } });
+        gsap.set(path, {
+            attr: {
+                class: `line vertical`,
+                d: `M${x} ${topEdge} L${x} ${bottomEdge}`,
+                'vector-effect': 'non-scaling-stroke',
+                fill: 'none',
+                stroke: gridState.lineColor ?? '#FFFFFF',
+                'stroke-opacity': gridState.lineOpacity ?? 0.8
+            },
+            strokeWidth: (gridState.lineWidth ?? 1)
+        });
         // Store logical position for future transforms
         path.dataset.axis = 'v';
         path.dataset.level = String(level);
