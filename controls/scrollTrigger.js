@@ -977,8 +977,8 @@ function createStaticCellsPhase() {
 
                     let lx = lblPadLeft;
                     let ly = size - lblPadBottom;
-                    let anchor = (lblCfg.anchor ?? 'start');
-                    let baseline = (lblCfg.baseline ?? 'alphabetic');
+                    let anchor = (lblCfg.anchor != null) ? lblCfg.anchor : (centerMode ? 'middle' : 'start');
+                    let baseline = (lblCfg.baseline != null) ? lblCfg.baseline : (centerMode ? 'middle' : 'alphabetic');
 
                     if (lblPadRight != null) {
                         lx = size - lblPadRight;
@@ -1014,6 +1014,11 @@ function createStaticCellsPhase() {
                     // initial width 0; will animate to measured text width + padding
                     gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: '#ffcc00', 'fill-opacity': 1 } });
                     highlight.setAttribute('class', 'label-highlight');
+                    // Persist metadata for reveal-time measurement
+                    highlight.dataset.padX = String(padX);
+                    highlight.dataset.anchor = anchor;
+                    highlight.dataset.lx = String(lx);
+                    highlight.dataset.ly = String(ly);
                     if (rot != null) {
                         highlight.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
                     }
@@ -1025,8 +1030,8 @@ function createStaticCellsPhase() {
 
                     // Measure text width and store target width for reveal
                     try {
-                        const bbox = label.getBBox();
-                        const targetW = bbox.width + (anchor === 'end' ? 0 : padX * 2);
+                        const computedLen = label.getComputedTextLength ? label.getComputedTextLength() : 0;
+                        const targetW = (computedLen > 0 ? computedLen : label.getBBox().width) + (anchor === 'end' ? 0 : padX * 2);
                         highlight.dataset.targetWidth = String(Math.max(0, targetW));
                     } catch (_) {}
                 }
@@ -1088,14 +1093,44 @@ function createBlocksRevealPhase() {
             tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: 0.1, ease: 'power1.out' }, pos + 0.22);
         }
         if (highlight) {
+            const padX = Number(highlight.dataset.padX || 4);
+            const anchor = highlight.dataset.anchor || 'start';
+            const lx = Number(highlight.dataset.lx || 0);
             let w = Number(highlight.dataset.targetWidth || 0);
-            if ((!w || w <= 0) && labelEl) {
-                try {
-                    const bbox = labelEl.getBBox();
-                    w = bbox.width + 8; // fallback padding
-                } catch (_) {}
+
+            const measure = () => {
+                let measured = 0;
+                if (labelEl && labelEl.getComputedTextLength) {
+                    measured = labelEl.getComputedTextLength();
+                } else if (labelEl) {
+                    try { measured = labelEl.getBBox().width; } catch (_) {}
+                }
+                if (measured > 0) {
+                    w = measured + (anchor === 'end' ? 0 : padX * 2);
+                    // Adjust x for end-anchored labels so left edge aligns
+                    if (anchor === 'end') {
+                        gsap.set(highlight, { attr: { x: lx - w } });
+                    }
+                }
+            };
+
+            if (!w || w <= 1) {
+                measure();
             }
+
             tl.to(highlight, { attr: { width: w }, ease: 'none', duration: 0.22 }, pos + 0.02);
+
+            // If fonts load later, correct the width once
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => {
+                    const before = w;
+                    measure();
+                    const after = w;
+                    if (after && Math.abs(after - before) > 1) {
+                        gsap.to(highlight, { attr: { width: after, x: anchor === 'end' ? (lx - after) : undefined }, duration: 0.15, overwrite: true });
+                    }
+                }).catch(() => {});
+            }
         }
     });
     return tl;
