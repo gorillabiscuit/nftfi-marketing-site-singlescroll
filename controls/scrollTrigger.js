@@ -474,7 +474,7 @@ function createDrawingPhase() {
         const leftEdge = -svgSize / 2;
         const rightEdge = svgSize / 2;
         const y = center + level * initialSpacing;
-        gsap.set(path, { attr: { class: `line horizontal`, d: `M${leftEdge} ${y} L${rightEdge} ${y}` } });
+        gsap.set(path, { attr: { class: `line horizontal`, d: `M${leftEdge} ${y} L${rightEdge} ${y}`, stroke: '#FFFFFF', 'stroke-opacity': 1, 'stroke-width': (gridState.lineWidth ?? 1), fill: 'none' } });
         // Store logical position for future transforms
         path.dataset.axis = 'h';
         path.dataset.level = String(level);
@@ -490,7 +490,7 @@ function createDrawingPhase() {
         const topEdge = -svgSize / 2;
         const bottomEdge = svgSize / 2;
         const x = center + level * initialSpacing;
-        gsap.set(path, { attr: { class: `line vertical`, d: `M${x} ${topEdge} L${x} ${bottomEdge}` } });
+        gsap.set(path, { attr: { class: `line vertical`, d: `M${x} ${topEdge} L${x} ${bottomEdge}`, stroke: '#FFFFFF', 'stroke-opacity': 1, 'stroke-width': (gridState.lineWidth ?? 1), fill: 'none' } });
         // Store logical position for future transforms
         path.dataset.axis = 'v';
         path.dataset.level = String(level);
@@ -842,7 +842,7 @@ function createStaticCellsPhase() {
                     grad.appendChild(stop2);
                     defs.appendChild(grad);
                 }
-                gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 1 } });
+                gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 0.5 } });
                 const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 label.textContent = 'LOAN VOLUME';
                 label.setAttribute('fill', '#FFFFFF');
@@ -850,11 +850,12 @@ function createStaticCellsPhase() {
                 label.setAttribute('font-family', 'Satoshi Variable, sans-serif');
                 label.setAttribute('font-weight', '500');
                 label.setAttribute('font-size', '16');
-                const pad = 8;
-                label.setAttribute('x', String(pad));
-                label.setAttribute('y', String(size - pad));
-                label.setAttribute('text-anchor', 'start');
+                const pad = 16;
+                label.setAttribute('x', String(pad*4 ));
+                label.setAttribute('y', String(size*2.2));
+                label.setAttribute('text-anchor', 'end');
                 label.setAttribute('dominant-baseline', 'alphabetic');
+                label.setAttribute('transform', `rotate(-90, ${size}, ${size - pad})`);
                 cellNode.appendChild(label);
             }
 

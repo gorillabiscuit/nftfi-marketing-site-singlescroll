@@ -47,21 +47,25 @@ export const GRID_STATES = {
         // Levels per axis (total lines per axis = 2*levels + 1)
         levels: 4,
         // SVG size multiplier relative to max(viewportWidth, viewportHeight)
-        svgSizeMultiplier: 1.8
+        svgSizeMultiplier: 1.8,
+        // Optional stroke width (px) for grid lines
+        lineWidth: 1.5
     },
     tablet: {
         initialSpacing: 55,
         outwardFactor: 2.0,
         finalFactor: 3.2,
         levels: 4,
-        svgSizeMultiplier: 1.7
+        svgSizeMultiplier: 1.7,
+        lineWidth: 1.5
     },
     desktop: {
         initialSpacing: 80,
         outwardFactor: 1.9,
         finalFactor: 3.0,
         levels: 4,
-        svgSizeMultiplier: 1.6
+        svgSizeMultiplier: 1.6,
+        lineWidth: 1.5
     }
 };
 
@@ -71,7 +75,7 @@ export const RECT_STATES = {
     mobile: {
         enabled: false,
         sizeFactor: 0.45,          // rect size as fraction of spacing
-        cornerRadiusFactor: 0.2,   // rounded corner as fraction of rect size
+        cornerRadiusFactor: 0.1,   // rounded corner as fraction of rect size
         pattern: 'none',           // 'all' | 'checker' | 'none'
         cells: [],                 // Explicit [i,j] pairs. If non-empty, overrides pattern
         // Optional per-phase size factors (override sizeFactor if set)
@@ -103,15 +107,15 @@ export const RECT_STATES = {
     desktop: {
         enabled: true,
         sizeFactor: 1,
-        cornerRadiusFactor: 0.15,
+        cornerRadiusFactor: 0.1,
         pattern: 'checker',
-        cells: [],
+        cells: [[-2,1],[1,-1],[1,1],[1,3]],
         sizeFactorOutStart: 1,
-        sizeFactorOutEnd: 1.525,
+        sizeFactorOutEnd: 1.4,
         sizeFactorFinalStart: 1,
         sizeFactorFinalEnd: 1,
         positionOutMultiplierStart: 1,
-        positionOutMultiplierEnd: 1.525,
+        positionOutMultiplierEnd: 1.5265,
         positionFinalMultiplierStart: 1,
         positionFinalMultiplierEnd: 1
     }
