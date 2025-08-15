@@ -841,15 +841,12 @@ function createStaticCellsPhase() {
 
             const blockIndex = visibleIdx;
             const isPrimary = blockIndex === 0;
-            let amtCfg, lblCfg;
-            if (blocksCfg && blocksCfg[blockIndex]) {
-                amtCfg = blocksCfg[blockIndex].amount || {};
-                lblCfg = blocksCfg[blockIndex].label || {};
-            } else if (isPrimary && getCurrentAnimationState() === 'desktop') {
-                // Backward-compat: use top-level amount/label for first block if no blocks[] provided
-                amtCfg = rectState.amount || {};
-                lblCfg = rectState.label || {};
-            }
+            const state = RECT_STATES[getCurrentAnimationState()] || RECT_STATES.desktop || {};
+            const baseAmt = state.amount || {};
+            const baseLbl = state.label || {};
+            const bCfg = (blocksCfg && blocksCfg[blockIndex]) ? blocksCfg[blockIndex] : null;
+            const amtCfg = bCfg && bCfg.amount ? { ...baseAmt, ...bCfg.amount } : baseAmt;
+            const lblCfg = bCfg && bCfg.label ? { ...baseLbl, ...bCfg.label } : baseLbl;
 
             // Special styling for the first (primary) block only
             if (isPrimary) {
