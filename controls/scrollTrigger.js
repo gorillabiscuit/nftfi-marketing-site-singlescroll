@@ -1081,7 +1081,9 @@ function createBlocksRevealPhase() {
         const rect = node.querySelector('rect.cell-rect');
         const highlight = node.querySelector('rect.label-highlight');
         const labelEl = node.querySelector('text[data-role="label"]');
-        const pos = index * 0.15; // stagger each block
+        const extraBetweenBlocks = 1.0; // extra delay between blocks (seconds)
+        const baseStagger = 0.15;
+        const pos = index * (baseStagger + extraBetweenBlocks); // increased stagger per block
         // Reveal entire node (text + rect)
         tl.to(node, { opacity: 1, duration: 0.01 }, pos);
         if (rect) {
@@ -1188,7 +1190,7 @@ function createBlocksRevealPhase() {
                 const labelRevealEnd = expandStart + expandDur + labelRevealDur;
 
                 // Appear amount right after label is fully visible
-                const amountAppearStart = labelRevealEnd + 1.0;
+                const amountAppearStart = labelRevealEnd + 0.5;
                 const amountAppearDur = 0.15;
                 tl.to(amountEl, { opacity: 1, duration: amountAppearDur, ease: 'power1.out' }, amountAppearStart);
 
