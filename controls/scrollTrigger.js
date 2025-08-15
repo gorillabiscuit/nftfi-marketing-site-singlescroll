@@ -961,6 +961,10 @@ function createStaticCellsPhase() {
                 }
 
                 if (lblCfg) {
+                    // Create a wrapper so label and highlight share the exact same transform
+                    const labelWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    labelWrap.setAttribute('class', 'label-wrap');
+
                     const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     label.textContent = (lblCfg.text ?? 'LOAN VOLUME');
                     label.setAttribute('fill', (lblCfg.color ?? '#FFFFFF'));
@@ -977,8 +981,8 @@ function createStaticCellsPhase() {
 
                     let lx = lblPadLeft;
                     let ly = size - lblPadBottom;
-                    let anchor = (lblCfg.anchor != null) ? lblCfg.anchor : (centerMode ? 'middle' : 'start');
-                    let baseline = (lblCfg.baseline != null) ? lblCfg.baseline : (centerMode ? 'middle' : 'alphabetic');
+                    let anchor = (lblCfg.anchor ?? 'start');
+                    let baseline = (lblCfg.baseline ?? 'alphabetic');
 
                     if (lblPadRight != null) {
                         lx = size - lblPadRight;
@@ -998,9 +1002,6 @@ function createStaticCellsPhase() {
                     label.setAttribute('dominant-baseline', baseline);
 
                     const rot = (lblCfg.rotateDeg != null) ? Number(lblCfg.rotateDeg) : null;
-                    if (rot != null) {
-                        label.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
-                    }
 
                     // Insert a highlight wipe rect behind the label text (inspired by the CodePen effect)
                     const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -1019,14 +1020,13 @@ function createStaticCellsPhase() {
                     highlight.dataset.anchor = anchor;
                     highlight.dataset.lx = String(lx);
                     highlight.dataset.ly = String(ly);
+                    // Append into wrapper (highlight first so label stays on top)
+                    labelWrap.appendChild(highlight);
+                    labelWrap.appendChild(label);
                     if (rot != null) {
-                        highlight.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
+                        labelWrap.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
                     }
-                    // Append highlight first so text stays on top
-                    cellNode.appendChild(highlight);
-
-                    // Append label text above highlight
-                    cellNode.appendChild(label);
+                    cellNode.appendChild(labelWrap);
 
                     // Measure text width and store target width for reveal
                     try {
