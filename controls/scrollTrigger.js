@@ -320,9 +320,60 @@ function setupSection2Pinning() {
     
     // Function to start the advanced 3-phase animation sequence
     function startAdvancedAnimationSequence(triggerEl, scrollerEl) {
-        // Removed test-square usage
-        
+        // Build the Section 2 master timeline (pinned) without relying on any external anchor element
+        if (section2Timeline && section2Timeline.scrollTrigger) {
+            try { section2Timeline.scrollTrigger.kill(); } catch (_) {}
+        }
+        if (section2Timeline) {
+            try { section2Timeline.kill(); } catch (_) {}
+        }
+
+        section2Timeline = gsap.timeline({
+            scrollTrigger: {
+                trigger: triggerEl || "section[data-section='2']",
+                start: 'top top',
+                end: '+=2500',
+                pin: true,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+                scrub: false
+            }
+        });
+
+        // Labels to control overlaps between phases
+        section2Timeline.addLabel('draw', 0);
+        section2Timeline.addLabel('outward', 0.25);
+        section2Timeline.addLabel('rotate', 0.5);
+        section2Timeline.addLabel('expand', 0.55);
+
+        // Phase 1: lines drawing (also rebuilds SVG and sets globals)
+        const drawingPhase = createDrawingPhase();
+        section2Timeline.add(drawingPhase, 'draw');
+
+        // Static cells (builds cell nodes but no animation yet) and prep strokes
+        const staticCellsPhase = createStaticCellsPhase();
+        section2Timeline.add(staticCellsPhase, 'draw');
+        const cellsStrokePrep = prepareCellsStrokeDraw();
+        section2Timeline.add(cellsStrokePrep, 'draw');
+
+        // Phase 2: outward + rotation 45
+        const outwardExpansionPhase = createOutwardExpansionPhase();
+        section2Timeline.add(outwardExpansionPhase, 'outward');
+
+        // Phase 3: additional rotation
+        const rotationPhase = createRotationPhase();
+        section2Timeline.add(rotationPhase, 'rotate');
+
+        // Phase 4: final expansion
+        const expansionPhase = createExpansionPhase();
+        section2Timeline.add(expansionPhase, 'expand');
+
+        // Blocks (labels + amounts) reveal phase – starts around rotation
+        const blocksRevealPhase = createBlocksRevealPhase();
+        section2Timeline.add(blocksRevealPhase, 'rotate');
+
         console.log('Master timeline with 4-phase animation created successfully');
+        try { ScrollTrigger.refresh(); } catch (_) {}
     }
     
     // Function to stop animation monitoring (no longer needed with master timeline)
