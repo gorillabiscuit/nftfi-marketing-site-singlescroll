@@ -586,32 +586,33 @@ function createOutwardExpansionPhase() {
         duration: 0.25
     }, 0);
     
-    // Move and resize cells in lockstep with spacing over this phase
+    // Move and resize cells in lockstep with spacing over this phase (update group transform)
     const cellsGroup = document.getElementById('grid-cells');
     if (cellsGroup) {
-        const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
+        const cellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
         const sfStart = (typeof rectStateCfg.sizeFactorOutStart === 'number') ? rectStateCfg.sizeFactorOutStart : (rectStateCfg.sizeFactor ?? 0.5);
         const sfEnd = (typeof rectStateCfg.sizeFactorOutEnd === 'number') ? rectStateCfg.sizeFactorOutEnd : (rectStateCfg.sizeFactor ?? 0.5);
+        const pmStart = (typeof rectStateCfg.positionOutMultiplierStart === 'number') ? rectStateCfg.positionOutMultiplierStart : 1;
+        const pmEnd = (typeof rectStateCfg.positionOutMultiplierEnd === 'number') ? rectStateCfg.positionOutMultiplierEnd : 1;
         outwardExpansionTimeline.eventCallback('onUpdate', () => {
             const tl = outwardExpansionTimeline;
             const t = tl.totalProgress();
             const spacingBase = gsap.utils.interpolate(baseSpacing, newSpacing, t);
             const sizeF = gsap.utils.interpolate(sfStart, sfEnd, t);
+            const posMult = gsap.utils.interpolate(pmStart, pmEnd, t);
             const size = Math.max(2, spacingBase * sizeF);
             const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
-            // Outward position multiplier to control radial travel of blocks
-            const pmStart = (typeof rectStateCfg.positionOutMultiplierStart === 'number') ? rectStateCfg.positionOutMultiplierStart : 1;
-            const pmEnd = (typeof rectStateCfg.positionOutMultiplierEnd === 'number') ? rectStateCfg.positionOutMultiplierEnd : 1;
-            const posMult = gsap.utils.interpolate(pmStart, pmEnd, t);
-            rects.forEach((rect) => {
-                const i = Number(rect.dataset.i || 0);
-                const j = Number(rect.dataset.j || 0);
-                const cx = i * spacingBase * posMult + (spacingBase * posMult) / 2;
-                const cy = j * spacingBase * posMult + (spacingBase * posMult) / 2;
+            cellNodes.forEach((node) => {
+                const i = Number(node.dataset.i || 0);
+                const j = Number(node.dataset.j || 0);
+                const cx = i * (spacingBase * posMult) + (spacingBase * posMult) / 2;
+                const cy = j * (spacingBase * posMult) + (spacingBase * posMult) / 2;
                 const x = cx - size / 2;
                 const y = cy - size / 2;
-                gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx } });
+                node.setAttribute('transform', `translate(${x} ${y})`);
+                const rect = node.querySelector('.cell-rect');
+                if (rect) gsap.set(rect, { attr: { width: size, height: size, rx, ry: rx } });
             });
         });
     }
@@ -715,31 +716,33 @@ function createExpansionPhase() {
         }, 0);
     });
     
-    // Move and resize cells in lockstep with spacing over this phase
+    // Move and resize cells in lockstep with spacing over this phase (update group transform)
     const cellsGroup = document.getElementById('grid-cells');
     if (cellsGroup) {
-        const rects = Array.from(cellsGroup.querySelectorAll('.cell-rect'));
+        const cellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
         const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
         const sfStart = (typeof rectStateCfg.sizeFactorFinalStart === 'number') ? rectStateCfg.sizeFactorFinalStart : (rectStateCfg.sizeFactor ?? 0.5);
         const sfEnd = (typeof rectStateCfg.sizeFactorFinalEnd === 'number') ? rectStateCfg.sizeFactorFinalEnd : (rectStateCfg.sizeFactor ?? 0.5);
+        const pmStart = (typeof rectStateCfg.positionFinalMultiplierStart === 'number') ? rectStateCfg.positionFinalMultiplierStart : 1;
+        const pmEnd = (typeof rectStateCfg.positionFinalMultiplierEnd === 'number') ? rectStateCfg.positionFinalMultiplierEnd : 1;
         expansionTimeline.eventCallback('onUpdate', () => {
             const tl = expansionTimeline;
             const t = tl.totalProgress();
             const spacingBase = gsap.utils.interpolate(baseSpacing, newSpacing, t);
             const sizeF = gsap.utils.interpolate(sfStart, sfEnd, t);
+            const posMult = gsap.utils.interpolate(pmStart, pmEnd, t);
             const size = Math.max(2, spacingBase * sizeF);
             const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
-            const pmStart = (typeof rectStateCfg.positionFinalMultiplierStart === 'number') ? rectStateCfg.positionFinalMultiplierStart : 1;
-            const pmEnd = (typeof rectStateCfg.positionFinalMultiplierEnd === 'number') ? rectStateCfg.positionFinalMultiplierEnd : 1;
-            const posMult = gsap.utils.interpolate(pmStart, pmEnd, t);
-            rects.forEach((rect) => {
-                const i = Number(rect.dataset.i || 0);
-                const j = Number(rect.dataset.j || 0);
-                const cx = i * spacingBase * posMult + (spacingBase * posMult) / 2;
-                const cy = j * spacingBase * posMult + (spacingBase * posMult) / 2;
+            cellNodes.forEach((node) => {
+                const i = Number(node.dataset.i || 0);
+                const j = Number(node.dataset.j || 0);
+                const cx = i * (spacingBase * posMult) + (spacingBase * posMult) / 2;
+                const cy = j * (spacingBase * posMult) + (spacingBase * posMult) / 2;
                 const x = cx - size / 2;
                 const y = cy - size / 2;
-                gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx } });
+                node.setAttribute('transform', `translate(${x} ${y})`);
+                const rect = node.querySelector('.cell-rect');
+                if (rect) gsap.set(rect, { attr: { width: size, height: size, rx, ry: rx } });
             });
         });
     }
@@ -775,6 +778,8 @@ function createStaticCellsPhase() {
     // Remove previous cells group if exists
     const old = document.getElementById('grid-cells');
     if (old && old.parentNode) old.parentNode.removeChild(old);
+    // Reset primary-cell flag for fresh build
+    window._primaryCellPlaced = false;
 
     const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     gsap.set(cellsGroup, { attr: { id: 'grid-cells' } });
@@ -789,7 +794,6 @@ function createStaticCellsPhase() {
     let primaryPlaced = false;
     for (let i = minLevel; i <= maxLevel - 1; i++) {
         for (let j = minLevel; j <= maxLevel - 1; j++) {
-            // Selection: explicit cells override pattern if provided
             let include = false;
             if (hasExplicit) {
                 include = explicit.some(([ci, cj]) => ci === i && cj === j);
@@ -803,22 +807,19 @@ function createStaticCellsPhase() {
             const x = cx - size / 2;
             const y = cy - size / 2;
 
-            // Create per-cell group so text inherits transforms from rect
             const cellNode = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             cellNode.setAttribute('class', 'cell-node');
             cellNode.dataset.i = String(i);
             cellNode.dataset.j = String(j);
-            // Position group at top-left of cell
             cellNode.setAttribute('transform', `translate(${x} ${y})`);
 
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             gsap.set(rect, { attr: { x: 0, y: 0, width: size, height: size, rx, ry: rx, class: 'cell-rect', fill: '#000000', 'fill-opacity': 0.5, stroke: '#000000', 'stroke-opacity': 1, 'stroke-width': 1 } });
             gsap.set(rect, { transformOrigin: '50% 50%', transformBox: 'fill-box' });
 
-            // Optional primary styling + label on first cell (desktop)
             if (!primaryPlaced && getCurrentAnimationState() === 'desktop') {
                 primaryPlaced = true;
-                // Ensure gradient defs exist
+                // gradient defs
                 const svg = document.getElementById('lines-svg');
                 let defs = svg.querySelector('defs');
                 if (!defs) {
@@ -841,9 +842,7 @@ function createStaticCellsPhase() {
                     grad.appendChild(stop2);
                     defs.appendChild(grad);
                 }
-                // Override rect styling
                 gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 1 } });
-                // Add text label inside the cell (bottom-left padding)
                 const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 label.textContent = 'LOAN VOLUME';
                 label.setAttribute('fill', '#FFFFFF');
