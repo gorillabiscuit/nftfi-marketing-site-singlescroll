@@ -781,11 +781,20 @@ function createStaticCellsPhase() {
     group.appendChild(cellsGroup);
     gsap.set(cellsGroup, { transformOrigin: '50% 50%' }); // inherit rotation with gridGroup
 
+    // Also create a separate text group for labels
+    const existingTextGroup = document.getElementById('grid-cells-text');
+    if (existingTextGroup && existingTextGroup.parentNode) existingTextGroup.parentNode.removeChild(existingTextGroup);
+    const textGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gsap.set(textGroup, { attr: { id: 'grid-cells-text' } });
+    group.appendChild(textGroup);
+    gsap.set(textGroup, { transformOrigin: '50% 50%' });
+
     // Build rects for each inner cell (between grid lines)
     // Logical centers at (i * baseSpacing, j * baseSpacing) for i,j in [minLevel..maxLevel]
     // We place cells for pairs where both exist; avoid edges by requiring neighbors
     const explicit = Array.isArray(rectState.cells) ? rectState.cells : [];
     const hasExplicit = explicit.length > 0;
+    let primaryPlaced = false;
     for (let i = minLevel; i <= maxLevel - 1; i++) {
         for (let j = minLevel; j <= maxLevel - 1; j++) {
             // Selection: explicit cells override pattern if provided
@@ -810,6 +819,55 @@ function createStaticCellsPhase() {
             gsap.set(rect, { attr: { x, y, width: size, height: size, rx, ry: rx, class: 'cell-rect', fill: '#000000', 'fill-opacity': 0.5, stroke: '#000000', 'stroke-opacity': 1, 'stroke-width': 1 } });
             // Ensure scaling is perfectly centered on the rect itself
             gsap.set(rect, { transformOrigin: '50% 50%', transformBox: 'fill-box' });
+
+            // For the first included cell on desktop, apply special styling and label
+            if (!primaryPlaced && getCurrentAnimationState() === 'desktop') {
+                primaryPlaced = true;
+                // Ensure gradient defs exist
+                const svg = document.getElementById('lines-svg');
+                let defs = svg.querySelector('defs');
+                if (!defs) {
+                    defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                    svg.insertBefore(defs, svg.firstChild);
+                }
+                let grad = svg.querySelector('#rect-primary-grad');
+                if (!grad) {
+                    grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                    grad.setAttribute('id', 'rect-primary-grad');
+                    grad.setAttribute('gradientTransform', 'rotate(135)');
+                    const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                    stop1.setAttribute('offset', '0%');
+                    stop1.setAttribute('stop-color', '#6D3E58');
+                    const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                    stop2.setAttribute('offset', '97.66%');
+                    stop2.setAttribute('stop-color', '#6D3E58');
+                    stop2.setAttribute('stop-opacity', '0.45');
+                    grad.appendChild(stop1);
+                    grad.appendChild(stop2);
+                    defs.appendChild(grad);
+                }
+                // Override styling
+                gsap.set(rect, { attr: { rx: 15, ry: 15, fill: 'url(#rect-primary-grad)', stroke: '#FFFFFF', 'stroke-opacity': 0.38, 'stroke-width': 1 } });
+                // Add label
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.textContent = 'LOAN VOLUME';
+                label.setAttribute('fill', '#FFFFFF');
+                label.setAttribute('opacity', '0.5');
+                label.setAttribute('font-family', 'Satoshi Variable, sans-serif');
+                label.setAttribute('font-weight', '500');
+                label.setAttribute('font-size', '16');
+                // Bottom-left with padding, rotated -45deg
+                const pad = 8;
+                const lx = x + pad;
+                const ly = y + size - pad;
+                label.setAttribute('x', String(lx));
+                label.setAttribute('y', String(ly));
+                label.setAttribute('text-anchor', 'start');
+                label.setAttribute('dominant-baseline', 'alphabetic');
+                label.setAttribute('transform', `rotate(-45 ${lx} ${ly})`);
+                textGroup.appendChild(label);
+            }
+
             cellsGroup.appendChild(rect);
         }
     }
