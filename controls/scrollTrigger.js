@@ -886,7 +886,7 @@ function createStaticCellsPhase() {
                 amount.setAttribute('dominant-baseline', (amtCfg.baseline ?? 'alphabetic'));
                 cellNode.appendChild(amount);
 
-                // Label text (restore original bottom-left padding logic)
+                // Label text (restore original bottom-left padding logic; now configurable)
                 const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 label.textContent = (lblCfg.text ?? 'LOAN VOLUME');
                 label.setAttribute('fill', (lblCfg.color ?? '#FFFFFF'));
@@ -894,12 +894,43 @@ function createStaticCellsPhase() {
                 label.setAttribute('font-family', (lblCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
                 label.setAttribute('font-weight', (lblCfg.fontWeight ?? '500'));
                 label.setAttribute('font-size', String(lblCfg.fontSize ?? 16));
+
+                // Choose corner: if padRight provided, use bottom-right; else if padTop provided use top-left; else bottom-left
                 const lblPadLeft = Number(lblCfg.padLeft ?? 8);
                 const lblPadBottom = Number(lblCfg.padBottom ?? 8);
-                label.setAttribute('x', String(lblPadLeft));
-                label.setAttribute('y', String(size - lblPadBottom));
-                label.setAttribute('text-anchor', (lblCfg.anchor ?? 'start'));
-                label.setAttribute('dominant-baseline', (lblCfg.baseline ?? 'alphabetic'));
+                const lblPadRight = (lblCfg.padRight != null) ? Number(lblCfg.padRight) : null;
+                const lblPadTop = (lblCfg.padTop != null) ? Number(lblCfg.padTop) : null;
+
+                let lx = lblPadLeft;
+                let ly = size - lblPadBottom;
+                let anchor = (lblCfg.anchor ?? 'start');
+                let baseline = (lblCfg.baseline ?? 'alphabetic');
+
+                if (lblPadRight != null) {
+                    // bottom-right
+                    lx = size - lblPadRight;
+                    ly = size - (lblCfg.padBottom ?? 8);
+                    anchor = 'end';
+                    baseline = 'alphabetic';
+                } else if (lblPadTop != null) {
+                    // top-left
+                    lx = lblPadLeft;
+                    ly = lblPadTop + (lblCfg.fontSize ?? 16);
+                    anchor = 'start';
+                    baseline = 'alphabetic';
+                }
+
+                label.setAttribute('x', String(lx));
+                label.setAttribute('y', String(ly));
+                label.setAttribute('text-anchor', anchor);
+                label.setAttribute('dominant-baseline', baseline);
+
+                // Optional rotation around its own anchor point
+                const rot = (lblCfg.rotateDeg != null) ? Number(lblCfg.rotateDeg) : null;
+                if (rot != null) {
+                    label.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
+                }
+
                 cellNode.appendChild(label);
             }
 

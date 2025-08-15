@@ -94,9 +94,9 @@ export const RECT_STATES = {
         positionOutMultiplierEnd: 1,
         positionFinalMultiplierStart: 1,
         positionFinalMultiplierEnd: 1,
-        // Optional text configs (unused on mobile by default)
+        // Optional text configs
         amount: {},
-        label: {}
+        label: { rotateDeg: undefined, padRight: undefined, padTop: undefined, padBottom: undefined }
     },
     tablet: {
         enabled: false,
@@ -113,7 +113,7 @@ export const RECT_STATES = {
         positionFinalMultiplierStart: 1,
         positionFinalMultiplierEnd: 1,
         amount: {},
-        label: {}
+        label: { rotateDeg: undefined, padRight: undefined, padTop: undefined, padBottom: undefined }
     },
     desktop: {
         enabled: true,
@@ -149,8 +149,12 @@ export const RECT_STATES = {
             fontFamily: 'Satoshi Variable, sans-serif',
             fontSize: 16,
             fontWeight: '500',
+            // bottom-left by default; you can switch to bottom-right using padRight
             padLeft: 8,
             padBottom: 8,
+            padRight: undefined,
+            padTop: undefined,
+            rotateDeg: -45,
             anchor: 'start',
             baseline: 'alphabetic'
         }
