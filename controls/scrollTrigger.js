@@ -529,7 +529,7 @@ function createDrawingPhase() {
         drawingTimeline.to(line, {
             drawSVG: "0% 100%",   // End: fully drawn from center outward
             ease: "none", // Linear animation for smooth scrub
-            duration: 0.25 // This phase takes 25% of the total timeline
+            duration: 0.75 // Tripled duration for slower drawing
         }, index * 0.02); // Stagger each line by 0.02 seconds for visual effect
     });
     
@@ -572,7 +572,7 @@ function createOutwardExpansionPhase() {
         outwardExpansionTimeline.to(line, {
             y: targetY,
             ease: "none",
-            duration: 0.25
+            duration: 0.75 // Tripled to keep in sync with slower rotation
         }, 0); // simultaneous with rotation
     });
 
@@ -582,7 +582,7 @@ function createOutwardExpansionPhase() {
         outwardExpansionTimeline.to(line, {
             x: targetX,
             ease: "none",
-            duration: 0.25
+            duration: 0.75 // Tripled to keep in sync with slower rotation
         }, 0); // simultaneous with rotation
     });
     
@@ -590,7 +590,7 @@ function createOutwardExpansionPhase() {
     outwardExpansionTimeline.to(gridGroup, {
         rotation: 45,
         ease: "none",
-        duration: 0.25
+        duration: 0.75 // Tripled rotation duration
     }, 0);
     
     // Move and resize cells in lockstep with spacing over this phase (update group transform)
@@ -656,14 +656,14 @@ function createRotationPhase() {
     rotationTimeline.to(gridGroup, {
         rotation: 45,
         ease: "none",
-        duration: 0.25 // This phase takes 25% of the total timeline
+        duration: 0.75 // Tripled duration for slower rotation
     }, 0);
     
     // Rotate the whole grid group to preserve relative ordering and spacing
     rotationTimeline.to(gridGroup, {
         rotation: 90, // Rotate to 90° total relative to initial (Phase 2 adds first 45° over group too)
         ease: "none",
-        duration: 0.25
+        duration: 0.75 // Tripled duration for slower rotation
     }, 0);
 
     // Subtle per-line micro-rotation with stagger for organic feel (does not affect final angle)
@@ -673,7 +673,7 @@ function createRotationPhase() {
     }, {
         rotation: 0,
         ease: "none",
-        duration: 0.25,
+        duration: 0.75, // Tripled duration to match slower rotation phase
         stagger: { each: 0.01, from: "center" }
     }, 0);
     
