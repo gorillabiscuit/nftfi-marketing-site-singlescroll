@@ -137,10 +137,12 @@ export const RECT_STATES = {
             fontSize: 36,
             fontWeight: '300',
             letterSpacing: 1.44,
-            padLeft: 8,
-            padTop: 18,
-            anchor: 'start',
-            baseline: 'alphabetic'
+            center: true,
+            centerOffsetX: 0,
+            centerOffsetY: 0,
+            rotateDeg: -45,
+            anchor: 'middle',
+            baseline: 'middle'
         },
         label: {
             text: 'LOAN VOLUME',
@@ -150,11 +152,11 @@ export const RECT_STATES = {
             fontSize: 16,
             fontWeight: '500',
             // bottom-left by default; you can switch to bottom-right using padRight
-            padLeft: 8,
-            padBottom: 8,
+            padLeft: 200,
+            padBottom: undefined,
             padRight: undefined,
-            padTop: undefined,
-            rotateDeg: -45,
+            padTop: 180,
+            rotateDeg: -90,
             anchor: 'start',
             baseline: 'alphabetic'
         }
