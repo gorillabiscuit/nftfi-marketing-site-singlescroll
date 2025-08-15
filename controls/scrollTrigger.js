@@ -657,7 +657,7 @@ function createRotationPhase(square) {
     
     console.log('Phase 3: Setting up coordinated rotation for all lines');
     
-    // Ensure each line rotates around its own center in a consistent SVG box
+    // Ensure each line rotates around its own center within its SVG box
     gsap.set(allLines, {
         transformOrigin: "50% 50%",
         transformBox: "fill-box"
@@ -674,26 +674,39 @@ function createRotationPhase(square) {
     
     // Rotate the whole grid group to preserve relative ordering and spacing
     rotationTimeline.to(gridGroup, {
-        rotation: 90, // Rotate to 90° total relative to initial (Phase 2 adds first 45° over group too)
+        rotation: 90, // group rotation drives final orientation
         ease: "none",
         duration: 0.25
     }, 0);
 
-    // Per-line counter-rotation with visible stagger so they don't start at the exact same time
-    // Sort lines by absolute level (center-out ripple); fall back to original order if no level
-    const linesSorted = [...allLines].sort((a, b) => {
+    // Implement true visual stagger via per-line counter-rotation tied to group progress
+    // 1) Build a center-out release map so inner lines start first
+    const linesArray = Array.from(allLines);
+    const linesSorted = linesArray.slice().sort((a, b) => {
         const la = Math.abs(Number(a.dataset.level || 0));
         const lb = Math.abs(Number(b.dataset.level || 0));
         return la - lb;
     });
-    rotationTimeline.fromTo(linesSorted, {
-        rotation: -15 // degrees offset at start of phase
-    }, {
-        rotation: 0,
-        ease: "none",
-        duration: 0.25,
-        stagger: { each: 0.035, from: "center" }
-    }, 0);
+    const releaseMap = new Map();
+    const maxDelay = 0.2; // portion of phase (0..1) when last line starts
+    const step = linesSorted.length > 1 ? (maxDelay / (linesSorted.length - 1)) : 0;
+    linesSorted.forEach((el, idx) => {
+        releaseMap.set(el, idx * step);
+    });
+
+    // 2) On every tick, counter-rotate lines that haven't "released" yet, then let them catch up
+    rotationTimeline.eventCallback('onUpdate', () => {
+        const p = rotationTimeline.totalProgress(); // 0..1 within this phase
+        const groupAngle = 90 * p; // degrees
+        linesArray.forEach((el) => {
+            const r = releaseMap.get(el) ?? 0;        // release time (0..maxDelay)
+            const denom = (1 - r) || 1;               // avoid divide by 0
+            const local = Math.min(Math.max((p - r) / denom, 0), 1); // 0..1 after release
+            const cancel = 1 - local;                 // full cancel before release → 0 at end
+            const lineAngle = -groupAngle * cancel;   // counter-rotation in degrees
+            gsap.set(el, { rotation: lineAngle });
+        });
+    });
     
     console.log('Phase 3: Rotation phase timeline created successfully');
     return rotationTimeline;
