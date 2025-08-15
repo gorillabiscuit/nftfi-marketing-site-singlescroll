@@ -73,6 +73,7 @@ export const RECT_STATES = {
         sizeFactor: 0.45,          // rect size as fraction of spacing
         cornerRadiusFactor: 0.2,   // rounded corner as fraction of rect size
         pattern: 'none',           // 'all' | 'checker' | 'none'
+        cells: [],                 // Explicit [i,j] pairs. If non-empty, overrides pattern
         // Optional per-phase size factors (override sizeFactor if set)
         sizeFactorOutStart: undefined,
         sizeFactorOutEnd: undefined,
@@ -89,6 +90,7 @@ export const RECT_STATES = {
         sizeFactor: 0.48,
         cornerRadiusFactor: 0.18,
         pattern: 'none',
+        cells: [],
         sizeFactorOutStart: undefined,
         sizeFactorOutEnd: undefined,
         sizeFactorFinalStart: undefined,
@@ -103,6 +105,7 @@ export const RECT_STATES = {
         sizeFactor: 1,
         cornerRadiusFactor: 0.15,
         pattern: 'checker',
+        cells: [],
         sizeFactorOutStart: 1,
         sizeFactorOutEnd: 1.525,
         sizeFactorFinalStart: 1,

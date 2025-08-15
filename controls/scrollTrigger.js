@@ -784,10 +784,17 @@ function createStaticCellsPhase() {
     // Build rects for each inner cell (between grid lines)
     // Logical centers at (i * baseSpacing, j * baseSpacing) for i,j in [minLevel..maxLevel]
     // We place cells for pairs where both exist; avoid edges by requiring neighbors
+    const explicit = Array.isArray(rectState.cells) ? rectState.cells : [];
+    const hasExplicit = explicit.length > 0;
     for (let i = minLevel; i <= maxLevel - 1; i++) {
         for (let j = minLevel; j <= maxLevel - 1; j++) {
-            // Pattern filtering
-            const include = rectState.pattern === 'all' ? true : rectState.pattern === 'checker' ? ((i + j) % 2 === 0) : false;
+            // Selection: explicit cells override pattern if provided
+            let include = false;
+            if (hasExplicit) {
+                include = explicit.some(([ci, cj]) => ci === i && cj === j);
+            } else {
+                include = rectState.pattern === 'all' ? true : rectState.pattern === 'checker' ? ((i + j) % 2 === 0) : false;
+            }
             if (!include) continue;
 
             const cx = i * baseSpacing + baseSpacing / 2;
