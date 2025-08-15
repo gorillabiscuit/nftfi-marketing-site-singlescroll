@@ -1010,7 +1010,8 @@ function createStaticCellsPhase() {
                     const hlTop = ly - fontSize - padY;
                     const hlLeft = lx - (anchor === 'end' ? 0 : padX);
                     const hlHeight = fontSize + padY * 2;
-                    gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: '#ffcc00', 'fill-opacity': 1 } });
+                    const labelFill = (lblCfg.color ?? '#FFFFFF');
+                    gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: labelFill, 'fill-opacity': 1 } });
                     highlight.setAttribute('class', 'label-highlight');
                     if (rot != null) {
                         highlight.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
