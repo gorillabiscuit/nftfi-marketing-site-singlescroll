@@ -657,10 +657,10 @@ function createRotationPhase(square) {
     
     console.log('Phase 3: Setting up coordinated rotation for all lines');
     
-    // Set transform origin to SVG center for proper rotation
-    // Use GSAP's canonical approach: "50% 50%" or "center center" for perfect centering
-    gsap.set(allLines, { 
-        transformOrigin: "50% 50%" // This centers the rotation axis perfectly
+    // Ensure each line rotates around its own center in a consistent SVG box
+    gsap.set(allLines, {
+        transformOrigin: "50% 50%",
+        transformBox: "fill-box"
     });
     
     console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
@@ -679,15 +679,20 @@ function createRotationPhase(square) {
         duration: 0.25
     }, 0);
 
-    // Per-line micro-rotation with consecutive stagger so lines don't begin exactly together
-    // Grid group rotation remains authoritative to preserve alignment
-    rotationTimeline.fromTo(allLines, {
-        rotation: -2 // degrees
+    // Per-line counter-rotation with visible stagger so they don't start at the exact same time
+    // Sort lines by absolute level (center-out ripple); fall back to original order if no level
+    const linesSorted = [...allLines].sort((a, b) => {
+        const la = Math.abs(Number(a.dataset.level || 0));
+        const lb = Math.abs(Number(b.dataset.level || 0));
+        return la - lb;
+    });
+    rotationTimeline.fromTo(linesSorted, {
+        rotation: -15 // degrees offset at start of phase
     }, {
         rotation: 0,
         ease: "none",
         duration: 0.25,
-        stagger: { each: 0.02, from: 0 } // left-to-right consecutive start
+        stagger: { each: 0.035, from: "center" }
     }, 0);
     
     console.log('Phase 3: Rotation phase timeline created successfully');
