@@ -1188,7 +1188,7 @@ function createBlocksRevealPhase() {
                 const labelRevealEnd = expandStart + expandDur + labelRevealDur;
 
                 // Appear amount right after label is fully visible
-                const amountAppearStart = labelRevealEnd + 0.03;
+                const amountAppearStart = labelRevealEnd + 1.0;
                 const amountAppearDur = 0.15;
                 tl.to(amountEl, { opacity: 1, duration: amountAppearDur, ease: 'power1.out' }, amountAppearStart);
 
