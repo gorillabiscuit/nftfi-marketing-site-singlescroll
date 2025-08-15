@@ -926,11 +926,10 @@ function createStaticCellsPhase() {
             if (amtCfg || lblCfg) {
                 if (amtCfg) {
                     const amount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    amount.textContent = (amtCfg.text ?? '$2,250,000,000');
-                    amount.setAttribute('fill', (amtCfg.color ?? '#FFFFFF'));
-                    if (amtCfg.opacity != null) amount.setAttribute('opacity', String(amtCfg.opacity));
-                    amount.setAttribute('font-family', (amtCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
-                    amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '700'));
+                    amount.textContent = (amtCfg.text ?? '$700M+');
+                    amount.setAttribute('fill', (amtCfg.color ?? 'rgba(255, 255, 255, 0.90)'));
+                    amount.setAttribute('font-family', (amtCfg.fontFamily ?? 'Roboto Mono, monospace'));
+                    amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '300'));
                     amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
                     if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
                     amount.setAttribute('data-role', 'amount');
@@ -951,6 +950,7 @@ function createStaticCellsPhase() {
                         ax = amtPadLeft;
                         ay = amtPadTop + fontSize;
                     }
+
                     amount.setAttribute('x', String(ax));
                     amount.setAttribute('y', String(ay));
                     amount.setAttribute('text-anchor', anchorVal);
@@ -959,8 +959,8 @@ function createStaticCellsPhase() {
                     if (amtRot != null) {
                         amount.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
                     }
+
                     cellNode.appendChild(amount);
-                    gsap.set(amount, { opacity: 0 });
                 }
 
                 if (lblCfg) {
@@ -1160,45 +1160,46 @@ function createBlocksRevealPhase() {
             }
         }
 
-        // 4) Amount text effect: slide-up reveal and optional scramble (like the provided example)
+        // 4) Amount number-only counting effect (e.g., "$700M+" => count 0 -> 700)
         const amountEl = node.querySelector('text[data-role="amount"]');
         if (amountEl) {
-            const expandStart = pos + 0.02;
-            const expandDur = 0.22;
-            const labelRevealDur = 0.05;
-            const shrinkDur = 0.22;
-            const gap = 0.05;
-            const amtStart = expandStart + expandDur + labelRevealDur + shrinkDur + gap;
+            const original = amountEl.textContent || '';
+            const m = original.match(/(-?[\d,]+(?:\.[\d]+)?)/);
+            if (m && m.index != null) {
+                const numStr = m[1];
+                const prefix = original.slice(0, m.index);
+                const suffix = original.slice(m.index + numStr.length);
+                const decimals = (numStr.split('.')[1] || '').length;
+                const target = parseFloat(numStr.replace(/,/g, '')) || 0;
+                const formatter = new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+                const counter = { value: 0 };
 
-            // Slide-up + fade in
-            tl.fromTo(
-                amountEl,
-                { opacity: 0, y: 10 },
-                { opacity: 1, y: 0, duration: 0.35, ease: 'customEase' },
-                amtStart
-            );
+                // Start after highlight shrink completes
+                const expandStart = pos + 0.02;
+                const expandDur = 0.22;
+                const labelRevealDur = 0.05;
+                const shrinkDur = 0.22;
+                const gap = 0.05;
+                const amtStart = expandStart + expandDur + labelRevealDur + shrinkDur + gap;
 
-            // Optional scramble overlay if plugin is available
-            try {
-                const hasScramble = !!(gsap.plugins && gsap.plugins.ScrambleTextPlugin);
-                if (hasScramble) {
-                    const originalText = amountEl.textContent || '';
-                    tl.to(
-                        amountEl,
-                        {
-                            duration: 0.6,
-                            scrambleText: {
-                                text: originalText,
-                                chars: '▪',
-                                revealDelay: 0,
-                                speed: 0.3
-                            },
-                            ease: 'none'
-                        },
-                        amtStart
-                    );
-                }
-            } catch (_) {}
+                // Initialize display
+                amountEl.textContent = prefix + formatter.format(0) + suffix;
+
+                tl.to(counter, {
+                    value: target,
+                    duration: 2,
+                    ease: 'power2.out',
+                    onUpdate: () => {
+                        amountEl.textContent = prefix + formatter.format(counter.value) + suffix;
+                    },
+                    onComplete: () => {
+                        amountEl.textContent = prefix + formatter.format(target) + suffix;
+                    }
+                }, amtStart);
+            }
         }
     });
     return tl;
