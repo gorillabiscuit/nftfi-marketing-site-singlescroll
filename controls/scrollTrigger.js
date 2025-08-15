@@ -320,80 +320,7 @@ function setupSection2Pinning() {
     
     // Function to start the advanced 3-phase animation sequence
     function startAdvancedAnimationSequence(triggerEl, scrollerEl) {
-        const square = document.querySelector('.test-square');
-        if (!square) {
-            console.error('Square element not found!');
-            return;
-        }
-        
-        console.log('Square found:', square);
-        
-        // Position the square in the center using GSAP
-        gsap.set(square, {
-            x: '-50%',
-            y: '-50%'
-        });
-        
-        // Create the master timeline with ScrollTrigger for the entire sequence
-        const masterTimeline = gsap.timeline({
-            scrollTrigger: {
-                trigger: triggerEl || "section[data-section='2']",
-                scrub: true,
-                pin: true,
-				invalidateOnRefresh: true,
-                start: "top top",
-                end: "+=250%", // Extended to accommodate block reveal
-                onUpdate: (self) => {
-                    // Log progress through the 4 phases
-                    const phase = self.progress < 0.25 ? 1 : 
-                                 self.progress < 0.50 ? 2 : 
-                                 self.progress < 0.75 ? 3 : 4;
-                    const phaseProgress = self.progress < 0.25 ? 
-                        (self.progress / 0.25) * 100 : 
-                        self.progress < 0.50 ? 
-                            ((self.progress - 0.25) / 0.25) * 100 : 
-                            self.progress < 0.75 ?
-                                ((self.progress - 0.50) / 0.25) * 100 :
-                                ((self.progress - 0.75) / 0.25) * 100;
-                    
-                    if (Math.round(phaseProgress) % 10 === 0) { // Log every 10%
-                        console.log(`Phase ${phase} progress: ${Math.round(phaseProgress)}%`);
-                    }
-                }
-            }
-        });
-
-        // Expose for teardown/rebuild
-        section2Timeline = masterTimeline;
-        
-        // Phase 1: Line Drawing (0-25% of timeline)
-        const drawingPhase = createDrawingPhase();
-        masterTimeline.add(drawingPhase, "draw");
-        
-        // Build cells early so Phase 2/4 can attach tweens to them
-        const staticCellsPhase = createStaticCellsPhase();
-        masterTimeline.add(staticCellsPhase, "draw");
-
-        // Prepare cells' stroke draw (set initial states only)
-        const cellsStrokePrep = prepareCellsStrokeDraw();
-        masterTimeline.add(cellsStrokePrep, "draw");
-        
-        // Phase 2: Outward Expansion (25-50% of timeline)
-        const outwardExpansionPhase = createOutwardExpansionPhase();
-        masterTimeline.add(outwardExpansionPhase, "expand-outward");
-        
-        // Phase 3: Rotation (50-75% of timeline)
-        const rotationPhase = createRotationPhase(square);
-        masterTimeline.add(rotationPhase, "rotate");
-        
-        // Phase 4: Grid Expansion (75-100% of timeline)
-        const expansionPhase = createExpansionPhase();
-        masterTimeline.add(expansionPhase, "expand-grid");
-
-        // Blocks Reveal: sequentially fade in blocks during the pinned scroll
-        const revealPhase = createBlocksRevealPhase();
-        // Start reveal around rotation phase so they appear as you scroll
-        masterTimeline.add(revealPhase, "rotate");
+        // Removed test-square usage
         
         console.log('Master timeline with 4-phase animation created successfully');
     }
@@ -651,7 +578,7 @@ function createOutwardExpansionPhase() {
 }
 
 // Phase 3: Create coordinated rotation phase
-function createRotationPhase(square) {
+function createRotationPhase() {
     const rotationTimeline = gsap.timeline();
     
     // Ensure line groups are available
@@ -675,8 +602,8 @@ function createRotationPhase(square) {
     console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
     
     // Add square rotation to the rotation timeline
-    rotationTimeline.to(square, {
-        rotation: 1080, // 3 full rotations (3 * 360)
+    rotationTimeline.to(gridGroup, {
+        rotation: 45,
         ease: "none",
         duration: 0.25 // This phase takes 25% of the total timeline
     }, 0);

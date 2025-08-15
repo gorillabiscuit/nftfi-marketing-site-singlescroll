@@ -1252,18 +1252,6 @@ h2 {
     }
 }
 
-/* Test Square Styles */
-.test-square {
-    width: 50px;
-    height: 50px;
-    background-color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform-origin: center;
-    will-change: transform;
-}
-
 /* SVG Lines Container */
 .svg-lines-container {
     position: absolute;
