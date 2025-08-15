@@ -1001,7 +1001,32 @@ function createStaticCellsPhase() {
                         label.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
                     }
 
+                    // Insert a highlight wipe rect behind the label text (inspired by the CodePen effect)
+                    const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    const fontSize = Number(lblCfg.fontSize ?? 16);
+                    const padX = 4;
+                    const padY = 2;
+                    // Baseline y -> top = y - fontSize
+                    const hlTop = ly - fontSize - padY;
+                    const hlLeft = lx - (anchor === 'end' ? 0 : padX);
+                    const hlHeight = fontSize + padY * 2;
+                    // initial width 0; will animate to measured text width + padding
+                    gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: '#ffcc00', 'fill-opacity': 1 }, class: 'label-highlight' });
+                    if (rot != null) {
+                        highlight.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
+                    }
+                    // Append highlight first so text stays on top
+                    cellNode.appendChild(highlight);
+
+                    // Append label text above highlight
                     cellNode.appendChild(label);
+
+                    // Measure text width and store target width for reveal
+                    try {
+                        const bbox = label.getBBox();
+                        const targetW = bbox.width + (anchor === 'end' ? 0 : padX * 2);
+                        highlight.dataset.targetWidth = String(Math.max(0, targetW));
+                    } catch (_) {}
                 }
             }
 
@@ -1026,6 +1051,15 @@ function prepareCellsStrokeDraw() {
         gsap.set(rect, { drawSVG: "50% 50%" });
         gsap.set(rect, { attr: { 'fill-opacity': 0 } });
     });
+    const highlights = Array.from(cellsGroup.querySelectorAll('rect.label-highlight'));
+    highlights.forEach((hl) => {
+        const y = hl.getAttribute('y');
+        const h = hl.getAttribute('height');
+        // ensure width starts at 0
+        gsap.set(hl, { attr: { width: 0 } });
+        // keep fully opaque to mimic wipe
+        gsap.set(hl, { attr: { 'fill-opacity': 1 } });
+    });
     return tl;
 }
 
@@ -1042,12 +1076,17 @@ function createBlocksRevealPhase() {
     // For each node, reveal node and draw its rect stroke, then fade in fill
     nodes.forEach((node, index) => {
         const rect = node.querySelector('rect.cell-rect');
+        const highlight = node.querySelector('rect.label-highlight');
         const pos = index * 0.15; // stagger each block
         // Reveal entire node (text + rect)
         tl.to(node, { opacity: 1, duration: 0.01 }, pos);
         if (rect) {
             tl.to(rect, { drawSVG: "0% 100%", ease: "none", duration: 0.25 }, pos);
             tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: 0.1, ease: 'power1.out' }, pos + 0.22);
+        }
+        if (highlight) {
+            const w = Number(highlight.dataset.targetWidth || 0);
+            tl.to(highlight, { attr: { width: w }, ease: 'none', duration: 0.22 }, pos + 0.02);
         }
     });
     return tl;
