@@ -339,10 +339,10 @@ function setupSection2Pinning() {
             scrollTrigger: {
                 trigger: triggerEl || "section[data-section='2']",
                 scrub: true,
-                pin: false,
+                pin: true,
 				invalidateOnRefresh: true,
                 start: "top top",
-                end: "+=200%", // Extended for 3 phases
+                end: "+=250%", // Extended to accommodate block reveal
                 onUpdate: (self) => {
                     // Log progress through the 4 phases
                     const phase = self.progress < 0.25 ? 1 : 
@@ -385,6 +385,11 @@ function setupSection2Pinning() {
         // Phase 4: Grid Expansion (75-100% of timeline)
         const expansionPhase = createExpansionPhase();
         masterTimeline.add(expansionPhase, "expand-grid");
+
+        // Blocks Reveal: sequentially fade in blocks during the pinned scroll
+        const revealPhase = createBlocksRevealPhase();
+        // Start reveal around rotation phase so they appear as you scroll
+        masterTimeline.add(revealPhase, "rotate");
         
         console.log('Master timeline with 4-phase animation created successfully');
     }
@@ -832,7 +837,7 @@ function createStaticCellsPhase() {
             cellNode.dataset.i = String(i);
             cellNode.dataset.j = String(j);
             cellNode.setAttribute('transform', `translate(${x} ${y})`);
-            // start hidden; reveal on its own trigger
+            // Start hidden; reveal during reveal phase
             gsap.set(cellNode, { opacity: 0 });
 
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -912,23 +917,6 @@ function createStaticCellsPhase() {
             const rxOverride = Number(rectCfg.rxOverride ?? NaN);
             const rxFinal = Number.isFinite(rxOverride) ? rxOverride : rx;
             gsap.set(rect, { attr: { rx: rxFinal, ry: rxFinal, fill: `url(#${gradId})`, stroke: (rectCfg.strokeColor ?? '#FFFFFF'), 'stroke-opacity': (rectCfg.strokeOpacity ?? 0.38), 'stroke-width': (rectCfg.strokeWidth ?? 1) } });
-
-            // Per-block pin + reveal when rect reaches center
-            try {
-                const section2El = document.querySelector("section[data-section='2']");
-                const revealTl = gsap.timeline({ paused: true }).to(cellNode, { opacity: 1, duration: 0.5, ease: 'power1.out' });
-                ScrollTrigger.create({
-                    trigger: rect,
-                    start: 'center center',
-                    end: '+=200',
-                    pin: section2El,
-                    scrub: false,
-                    onEnter: () => revealTl.play(),
-                    onEnterBack: () => revealTl.play()
-                });
-            } catch (e) {
-                console.warn('Per-block pin/reveal setup failed', e);
-            }
 
             // If there is text config for this block, render amount/label
             if (amtCfg || lblCfg) {
@@ -1018,7 +1006,29 @@ function createStaticCellsPhase() {
         }
     }
 
+    // Expose ordered cell nodes for reveal phase
+    window.visibleCellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
+
     return cellsTimeline;
+}
+
+// Blocks Reveal Phase: sequentially fade in visible blocks
+function createBlocksRevealPhase() {
+    const tl = gsap.timeline();
+    const nodes = (window.visibleCellNodes && window.visibleCellNodes.length)
+        ? window.visibleCellNodes
+        : Array.from((document.getElementById('grid-cells') || { querySelectorAll: () => [] }).querySelectorAll('.cell-node'));
+    if (!nodes || nodes.length === 0) {
+        console.warn('Reveal phase: no cell nodes to reveal');
+        return tl;
+    }
+    tl.to(nodes, {
+        opacity: 1,
+        duration: 0.25,
+        ease: 'power1.out',
+        stagger: { each: 0.15 }
+    }, 0);
+    return tl;
 }
 
 // Calculate dynamic line length that extends beyond any screen size
