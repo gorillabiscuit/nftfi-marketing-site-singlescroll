@@ -71,8 +71,35 @@ export const GRID_STATES = {
         svgSizeMultiplier: 1.6,
         lineWidth: 0.5,
         lineColor: '#F2F2F2',
-        lineOpacity: 0.5
+        lineOpacity: 0.25
     }
+};
+
+// Exposed timings for Section 2 animation (tweak as needed)
+export const SECTION2_TIMINGS = {
+    // Phase durations
+    draw: 0.75,              // duration per line draw tween
+    outward: 0.75,           // outward expansion + initial rotation
+    rotateStep: 0.75,        // additional rotation step
+    microRotate: 0.75,       // subtle per-line micro-rotation
+    expand: 0.25,            // final grid expansion
+
+    // Staggers and inter-block delays
+    lineStagger: 0.02,       // stagger between line draw tweens
+    blockBaseStagger: 0.15,  // base per-block stagger
+    blockExtraDelay: 1.0,    // extra seconds between blocks
+
+    // Rect/label highlight timings
+    rectDraw: 0.25,          // cell stroke draw duration
+    rectFillFade: 0.10,      // cell fill fade-in
+    highlightExpand: 0.22,   // highlight wipe expand
+    labelReveal: 0.05,       // label fade-in after wipe
+    highlightShrink: 0.22,   // highlight wipe shrink
+
+    // Amount timings
+    amountDelayAfterLabel: 0.5, // delay after label reveal before amount appears
+    amountAppear: 0.15,         // amount fade-in
+    amountCount: 2.0            // count-up duration
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
@@ -120,7 +147,7 @@ export const RECT_STATES = {
         sizeFactor: 1,
         cornerRadiusFactor: 0.1,
         pattern: 'checker',
-        cells: [[-2,1],[1,-1],[1,1],[1,3]],
+        cells: [[-2,0],[-1,0],[1,-1],[0,-2]],
         sizeFactorOutStart: 1,
         sizeFactorOutEnd: 1.4,
         sizeFactorFinalStart: 1,
@@ -131,9 +158,9 @@ export const RECT_STATES = {
         positionFinalMultiplierEnd: 1,
         // Default rect styling for all blocks (can be overridden per block)
         rectDefaults: {
-            gradientStart: '#6D3E58',
-            gradientEnd: 'rgba(109, 62, 88, 0.45)',
-            gradientAngle: 135,
+            gradientStart: 'rgba(109, 62, 88, 0.0)',
+            gradientEnd: 'rgba(109, 62, 88, 0.8)',
+            gradientAngle: 45,
             strokeColor: '#FFFFFF',
             strokeOpacity: 0.38,
             strokeWidth: 1,
@@ -142,7 +169,7 @@ export const RECT_STATES = {
         // Text configurations for the primary cell (global defaults)
         amount: {
             text: '$700M+',
-            color: 'rgba(255, 255, 255, 0.90)',
+            color: 'rgba(255, 255, 255, 0.75)',
             fontFamily: 'Roboto Mono, monospace',
             fontSize: 36,
             fontWeight: '300',
@@ -173,8 +200,8 @@ export const RECT_STATES = {
         // Blocks array: order maps to visible cells sequence. Only text is required; rect can override gradient.
         blocks: [
             { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' }, rect: { /* uses defaults */ } },
-            { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { /* gradientStart: '#xxxxxx', gradientEnd: 'rgba(...)' */ } },
-            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { /* overrides optional */ } },
+            { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { gradientStart: 'rgba(139, 103, 76, 0.10)', gradientEnd: 'rgba(139, 103, 76, 0.80)', gradientAngle: 45 } },
+            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { gradientStart: 'rgba(72, 55, 65, 0.10)', gradientEnd: 'rgba(72, 55, 65, 0.80)', gradientAngle: 45 } },
             { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
         ]
     }

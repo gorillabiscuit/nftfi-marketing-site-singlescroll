@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES } from '../config.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 
 // Register GSAP plugins
@@ -529,8 +529,8 @@ function createDrawingPhase() {
         drawingTimeline.to(line, {
             drawSVG: "0% 100%",   // End: fully drawn from center outward
             ease: "none", // Linear animation for smooth scrub
-            duration: 0.75 // Tripled duration for slower drawing
-        }, index * 0.02); // Stagger each line by 0.02 seconds for visual effect
+            duration: SECTION2_TIMINGS.draw
+        }, index * SECTION2_TIMINGS.lineStagger);
     });
     
     console.log('Phase 1: Drawing phase timeline created successfully');
@@ -572,7 +572,7 @@ function createOutwardExpansionPhase() {
         outwardExpansionTimeline.to(line, {
             y: targetY,
             ease: "none",
-            duration: 0.75 // Tripled to keep in sync with slower rotation
+            duration: SECTION2_TIMINGS.outward
         }, 0); // simultaneous with rotation
     });
 
@@ -582,7 +582,7 @@ function createOutwardExpansionPhase() {
         outwardExpansionTimeline.to(line, {
             x: targetX,
             ease: "none",
-            duration: 0.75 // Tripled to keep in sync with slower rotation
+            duration: SECTION2_TIMINGS.outward
         }, 0); // simultaneous with rotation
     });
     
@@ -590,7 +590,7 @@ function createOutwardExpansionPhase() {
     outwardExpansionTimeline.to(gridGroup, {
         rotation: 45,
         ease: "none",
-        duration: 0.75 // Tripled rotation duration
+        duration: SECTION2_TIMINGS.outward
     }, 0);
     
     // Move and resize cells in lockstep with spacing over this phase (update group transform)
@@ -656,14 +656,14 @@ function createRotationPhase() {
     rotationTimeline.to(gridGroup, {
         rotation: 45,
         ease: "none",
-        duration: 0.75 // Tripled duration for slower rotation
+        duration: SECTION2_TIMINGS.outward
     }, 0);
     
     // Rotate the whole grid group to preserve relative ordering and spacing
     rotationTimeline.to(gridGroup, {
         rotation: 90, // Rotate to 90° total relative to initial (Phase 2 adds first 45° over group too)
         ease: "none",
-        duration: 0.75 // Tripled duration for slower rotation
+        duration: SECTION2_TIMINGS.outward
     }, 0);
 
     // Subtle per-line micro-rotation with stagger for organic feel (does not affect final angle)
@@ -673,7 +673,7 @@ function createRotationPhase() {
     }, {
         rotation: 0,
         ease: "none",
-        duration: 0.75, // Tripled duration to match slower rotation phase
+        duration: SECTION2_TIMINGS.microRotate,
         stagger: { each: 0.01, from: "center" }
     }, 0);
     
@@ -1059,14 +1059,14 @@ function createBlocksRevealPhase() {
         const rect = node.querySelector('rect.cell-rect');
         const highlight = node.querySelector('rect.label-highlight');
         const labelEl = node.querySelector('text[data-role="label"]');
-        const extraBetweenBlocks = 1.0; // extra delay between blocks (seconds)
-        const baseStagger = 0.15;
-        const pos = index * (baseStagger + extraBetweenBlocks); // increased stagger per block
+        const extraBetweenBlocks = SECTION2_TIMINGS.blockExtraDelay;
+        const baseStagger = SECTION2_TIMINGS.blockBaseStagger;
+        const pos = index * (baseStagger + extraBetweenBlocks);
         // Reveal entire node (text + rect)
         tl.to(node, { opacity: 1, duration: 0.01 }, pos);
         if (rect) {
-            tl.to(rect, { drawSVG: "0% 100%", ease: "none", duration: 0.25 }, pos);
-            tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: 0.1, ease: 'power1.out' }, pos + 0.22);
+            tl.to(rect, { drawSVG: "0% 100%", ease: "none", duration: SECTION2_TIMINGS.rectDraw }, pos);
+            tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: SECTION2_TIMINGS.rectFillFade, ease: 'power1.out' }, pos + (SECTION2_TIMINGS.rectDraw - 0.03));
         }
         if (highlight && labelEl) {
             const padding = 8;
@@ -1096,7 +1096,7 @@ function createBlocksRevealPhase() {
                             x: () => (labelX - measure())
                         },
                         ease: 'none',
-                        duration: 0.22
+                        duration: SECTION2_TIMINGS.highlightExpand
                     },
                     pos + 0.02
                 );
@@ -1106,15 +1106,15 @@ function createBlocksRevealPhase() {
                     {
                         attr: { width: () => measure() },
                         ease: 'none',
-                        duration: 0.22
+                        duration: SECTION2_TIMINGS.highlightExpand
                     },
                     pos + 0.02
                 );
             }
 
             // 2) Make label visible once fully covered
-            tl.to(labelEl, { opacity: 0.5, duration: 0.05, ease: 'none' }, 
-                 pos + 0.02 + 0.22);
+            tl.to(labelEl, { opacity: 0.5, duration: SECTION2_TIMINGS.labelReveal, ease: 'none' }, 
+                 pos + 0.02 + SECTION2_TIMINGS.highlightExpand);
 
             // 3) Disappear highlight left-to-right
             if (anchor === 'end') {
@@ -1124,9 +1124,9 @@ function createBlocksRevealPhase() {
                     {
                         attr: { width: 0, x: () => labelX },
                         ease: 'none',
-                        duration: 0.22
+                        duration: SECTION2_TIMINGS.highlightShrink
                     },
-                    pos + 0.02 + 0.22 + 0.05
+                    pos + 0.02 + SECTION2_TIMINGS.highlightExpand + SECTION2_TIMINGS.labelReveal
                 );
             } else {
                 // Move left edge right while shrinking to 0
@@ -1135,9 +1135,9 @@ function createBlocksRevealPhase() {
                     {
                         attr: { width: 0, x: () => (labelX + measure()) },
                         ease: 'none',
-                        duration: 0.22
+                        duration: SECTION2_TIMINGS.highlightShrink
                     },
-                    pos + 0.02 + 0.22 + 0.05
+                    pos + 0.02 + SECTION2_TIMINGS.highlightExpand + SECTION2_TIMINGS.labelReveal
                 );
             }
         }
@@ -1163,13 +1163,13 @@ function createBlocksRevealPhase() {
 
                 // Timings
                 const expandStart = pos + 0.02;
-                const expandDur = 0.22;
-                const labelRevealDur = 0.05;
+                const expandDur = SECTION2_TIMINGS.highlightExpand;
+                const labelRevealDur = SECTION2_TIMINGS.labelReveal;
                 const labelRevealEnd = expandStart + expandDur + labelRevealDur;
 
                 // Appear amount right after label is fully visible
-                const amountAppearStart = labelRevealEnd + 0.5;
-                const amountAppearDur = 0.15;
+                const amountAppearStart = labelRevealEnd + SECTION2_TIMINGS.amountDelayAfterLabel;
+                const amountAppearDur = SECTION2_TIMINGS.amountAppear;
                 tl.to(amountEl, { opacity: 1, duration: amountAppearDur, ease: 'power1.out' }, amountAppearStart);
 
                 // Initialize display at 0
@@ -1179,7 +1179,7 @@ function createBlocksRevealPhase() {
                 const countStart = amountAppearStart + amountAppearDur;
                 tl.to(counter, {
                     value: target,
-                    duration: 2,
+                    duration: SECTION2_TIMINGS.amountCount,
                     ease: 'power2.out',
                     onUpdate: () => {
                         amountEl.textContent = prefix + formatter.format(counter.value) + suffix;
