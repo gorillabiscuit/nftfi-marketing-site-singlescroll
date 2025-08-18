@@ -376,10 +376,11 @@ function setupSection2Pinning() {
             const titleEl = document.querySelector('.key-metrics-title');
             if (titleEl) {
                 const cs = getComputedStyle(titleEl);
-                const color = cs.color || '#FFFFFF';
+                // Force highlight color to pure white regardless of title computed color
+                const color = '#FFFFFF';
                 const fontSizePx = parseFloat(cs.fontSize) || 16;
                 const padX = 4;
-                const padY = 2;
+                const padY = 20;
 
                 // Ensure positioned context and initial invisibility
                 gsap.set(titleEl, { opacity: 0, position: cs.position === 'static' ? 'relative' : cs.position });
@@ -411,9 +412,9 @@ function setupSection2Pinning() {
                     ease: 'none'
                 }, 'title');
 
-                // 2) Title visible (match labels opacity)
+                // 2) Title visible (full opacity for title, unlike labels)
                 section2Timeline.to(titleEl, {
-                    opacity: 0.5,
+                    opacity: 1,
                     duration: SECTION2_TIMINGS.labelReveal,
                     ease: 'none'
                 }, `title+=${SECTION2_TIMINGS.highlightExpand}`);
