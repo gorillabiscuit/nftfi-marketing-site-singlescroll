@@ -542,6 +542,8 @@ function createDrawingPhase() {
     const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     gsap.set(gridGroup, { attr: { id: 'grid-lines' } });
     svg.appendChild(gridGroup);
+    // Ensure grid starts axis-aligned (no residual transforms)
+    gsap.set(gridGroup, { rotation: 0, x: 0, y: 0, transformOrigin: '50% 50%' });
     
     // Calculate center point - now (0,0) in our centered coordinate system
     const center = 0; // In centered viewBox, (0,0) is the center
@@ -629,7 +631,7 @@ function createDrawingPhase() {
  
      // Initialize lines to undrawn state; drawing is handled by dedicated draw timelines
      lineGroups.all.forEach((line) => {
-         gsap.set(line, { drawSVG: "50% 50%" });
+         gsap.set(line, { drawSVG: "50% 50%", x: 0, y: 0, rotation: 0, transformOrigin: '50% 50%' });
      });
  
      console.log('Phase 1: Grid built and initial states set (drawing handled by dedicated timelines)');
