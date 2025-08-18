@@ -309,13 +309,19 @@ export const ANIMATION_CONFIG = {
         base: 0.2,
         modulation: 0.15,
         frequency: 0.1,
-        mouseInfluence: 0.05
+        mouseInfluence: 0.55,
+        // Directional overrides (up/down). If set, they override mouseInfluence for that sign
+        mouseInfluenceUp: 0.55,
+        mouseInfluenceDown: 0.55
     },
     yRotationRate: {
         base: 0.3,
         modulation: 0.2,
         frequency: 0.08,
-        mouseInfluence: 0.05
+        mouseInfluence: 0.55,
+        // Directional overrides (left/right). If set, they override mouseInfluence for that sign
+        mouseInfluenceLeft: 0.55,
+        mouseInfluenceRight: 0.55
     },
     zRotationRate: {
         base: 0.15,

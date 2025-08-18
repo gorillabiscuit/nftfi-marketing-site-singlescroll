@@ -13,8 +13,6 @@ import { startPerformanceFrame, recordScrollEvent } from '../controls/scrollSync
 // Global references (will be set by main.js)
 let mesh, wrapper, isModelReady;
 let startTime;
-// Continuous base angles for smooth deterministic spin
-let baseAngles = { x: 0, y: 0, z: 0 };
 
 // Initialize animation loop
 export function initializeAnimationLoop(meshInstance, wrapperInstance, isModelReadyFlag) {
@@ -41,26 +39,26 @@ export function animate() {
             window.mouseInfluence.y *= ANIMATION_CONFIG.mouseDecayRate;
         }
         
-        // Compute continuous base spin for each axis
+        // Apply rotation to wrapper (parent) with varying rates and mouse influence
+        // X-axis: varying rate with sine wave modulation + mouse Y influence (up/down mouse = tilt)
         const xRate = ANIMATION_CONFIG.xRotationRate.base + Math.sin(time * ANIMATION_CONFIG.xRotationRate.frequency) * ANIMATION_CONFIG.xRotationRate.modulation;
-        const yRate = ANIMATION_CONFIG.yRotationRate.base + Math.cos(time * ANIMATION_CONFIG.yRotationRate.frequency) * ANIMATION_CONFIG.yRotationRate.modulation;
-        const zRate = ANIMATION_CONFIG.zRotationRate.base + Math.sin(time * ANIMATION_CONFIG.zRotationRate.frequency) * ANIMATION_CONFIG.zRotationRate.modulation;
-        baseAngles.x += xRate * 0.02;
-        baseAngles.y += yRate * 0.02;
-        baseAngles.z += zRate * 0.02;
-
-        // Mouse-driven target offsets (symmetric influence)
-        const mouseX = window.mouseInfluence ? window.mouseInfluence.x : 0;
         const mouseY = window.mouseInfluence ? window.mouseInfluence.y : 0;
-        const targetX = baseAngles.x + mouseY * ANIMATION_CONFIG.xRotationRate.mouseInfluence;
-        const targetY = baseAngles.y + mouseX * ANIMATION_CONFIG.yRotationRate.mouseInfluence;
-        const targetZ = baseAngles.z; // no mouse control on Z
-
-        // Lerp current rotation toward targets for smoothness and symmetry
-        const lerpFactor = 0.15; // responsiveness
-        wrapper.rotation.x += (targetX - wrapper.rotation.x) * lerpFactor;
-        wrapper.rotation.y += (targetY - wrapper.rotation.y) * lerpFactor;
-        wrapper.rotation.z += (targetZ - wrapper.rotation.z) * lerpFactor;
+        const xMouseGain = mouseY >= 0
+            ? (ANIMATION_CONFIG.xRotationRate.mouseInfluenceDown != null ? ANIMATION_CONFIG.xRotationRate.mouseInfluenceDown : ANIMATION_CONFIG.xRotationRate.mouseInfluence)
+            : (ANIMATION_CONFIG.xRotationRate.mouseInfluenceUp != null ? ANIMATION_CONFIG.xRotationRate.mouseInfluenceUp : ANIMATION_CONFIG.xRotationRate.mouseInfluence);
+        wrapper.rotation.x += xRate * 0.02 + mouseY * xMouseGain;
+        
+        // Y-axis: varying rate with cosine wave modulation + mouse X influence (left/right mouse = turn)
+        const yRate = ANIMATION_CONFIG.yRotationRate.base + Math.cos(time * ANIMATION_CONFIG.yRotationRate.frequency) * ANIMATION_CONFIG.yRotationRate.modulation;
+        const mouseX = window.mouseInfluence ? window.mouseInfluence.x : 0;
+        const yMouseGain = mouseX >= 0
+            ? (ANIMATION_CONFIG.yRotationRate.mouseInfluenceRight != null ? ANIMATION_CONFIG.yRotationRate.mouseInfluenceRight : ANIMATION_CONFIG.yRotationRate.mouseInfluence)
+            : (ANIMATION_CONFIG.yRotationRate.mouseInfluenceLeft != null ? ANIMATION_CONFIG.yRotationRate.mouseInfluenceLeft : ANIMATION_CONFIG.yRotationRate.mouseInfluence);
+        wrapper.rotation.y += yRate * 0.02 + mouseX * yMouseGain;
+        
+        // Z-axis: varying rate with sine wave modulation at different frequency (no mouse control)
+        const zRate = ANIMATION_CONFIG.zRotationRate.base + Math.sin(time * ANIMATION_CONFIG.zRotationRate.frequency) * ANIMATION_CONFIG.zRotationRate.modulation;
+        wrapper.rotation.z += zRate * 0.02;
         
         // Add scroll spin to Y rotation (upward spin) only after texture/model reveal
         if (window.textureReady === true && wrapper.visible === true) {
