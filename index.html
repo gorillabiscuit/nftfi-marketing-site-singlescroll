@@ -260,21 +260,71 @@
     <script type="module" src="app.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
+          const hero = document.querySelector('.hero');
           const title = document.getElementById('hero-title');
           const subtitle = document.getElementById('hero-subtitle');
           const heroActions = document.querySelector('.hero-actions');
-      
-          if (title && subtitle && heroActions) {
-            // Check if we're on mobile breakpoint
-            const isMobile = window.innerWidth < 768;
-            
-            const titleWidth = title.offsetWidth;
-            subtitle.style.width = titleWidth + 'px';
-            
-            // Only set hero-actions width if NOT on mobile
-            if (!isMobile) {
-              heroActions.style.width = titleWidth + 'px';
-            }
+          const heroText = document.querySelector('.hero-text');
+          const actionCards = document.querySelectorAll('.hero-actions .card');
+
+          if (!hero || !title || !subtitle || !heroActions) return;
+
+          // 1) Lock hero height immediately to prevent initial bounce
+          const initialHeroHeight = hero.getBoundingClientRect().height;
+          if (initialHeroHeight > 0) {
+            hero.style.minHeight = initialHeroHeight + 'px';
+          }
+
+          // 1b) Freeze transitions and lock actions height to prevent button jiggle
+          const previousTransitions = new Map();
+          const freezeTransitions = (el) => {
+            if (!el) return;
+            previousTransitions.set(el, el.style.transition);
+            el.style.transition = 'none';
+          };
+          const unfreezeTransitions = (el) => {
+            if (!el) return;
+            el.style.transition = previousTransitions.get(el) ?? '';
+          };
+
+          freezeTransitions(hero);
+          freezeTransitions(heroText);
+          freezeTransitions(heroActions);
+          actionCards.forEach(freezeTransitions);
+
+          const initialActionsHeight = heroActions.getBoundingClientRect().height;
+          if (initialActionsHeight > 0) {
+            heroActions.style.minHeight = initialActionsHeight + 'px';
+          }
+
+          const applyFinalLayout = () => {
+            // 2) Apply final widths in a single frame
+            requestAnimationFrame(() => {
+              const isMobile = window.innerWidth < 768;
+              const titleWidth = title.offsetWidth;
+              subtitle.style.width = titleWidth + 'px';
+              if (!isMobile) {
+                heroActions.style.width = titleWidth + 'px';
+              }
+
+              // 3) Release the height lock in the next frame
+              requestAnimationFrame(() => {
+                hero.style.minHeight = '';
+                heroActions.style.minHeight = '';
+                // Re-enable transitions after layout is stable
+                unfreezeTransitions(hero);
+                unfreezeTransitions(heroText);
+                unfreezeTransitions(heroActions);
+                actionCards.forEach(unfreezeTransitions);
+              });
+            });
+          };
+
+          // Wait for fonts so measurements reflect actual typography
+          if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+            document.fonts.ready.then(applyFinalLayout);
+          } else {
+            applyFinalLayout();
           }
         });
       </script>

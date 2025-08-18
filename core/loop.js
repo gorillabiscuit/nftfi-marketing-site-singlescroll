@@ -54,8 +54,10 @@ export function animate() {
         const zRate = ANIMATION_CONFIG.zRotationRate.base + Math.sin(time * ANIMATION_CONFIG.zRotationRate.frequency) * ANIMATION_CONFIG.zRotationRate.modulation;
         wrapper.rotation.z += zRate * 0.02;
         
-        // Add scroll spin to Y rotation (upward spin)
-        wrapper.rotation.y += getScrollSpinVelocity();
+        // Add scroll spin to Y rotation (upward spin) only after texture/model reveal
+        if (window.textureReady === true && wrapper.visible === true) {
+            wrapper.rotation.y += getScrollSpinVelocity();
+        }
         
         // Floating animation - gentle up and down movement
         // Scale amplitude based on current mesh scale for consistent visual effect

@@ -77,6 +77,8 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
         
         // Set initial scale - nearly invisible to start (will be animated by GSAP)
         wrapper.scale.setScalar(0.0001); // Start tiny, GSAP will animate to correct scale
+        // Keep model hidden until hero capture/texture is ready to avoid visual pop
+        wrapper.visible = false;
         
         // Flag to track if texture is ready
         window.textureReady = false;

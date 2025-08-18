@@ -80,8 +80,8 @@ export function captureHeroAsTexture() {
             return;
         }
         
-        // Wait for any pending layout calculations
-        requestAnimationFrame(() => {
+        // Wait for fonts and layout to settle before capture to avoid reflow pop
+        const doCapture = () => {
             // Capture the hero div using html2canvas
             html2canvas(heroElement, { 
                 backgroundColor: null, // Transparent background
@@ -120,6 +120,15 @@ export function captureHeroAsTexture() {
                             ease: "power2.out",
                             onStart: () => {
                                 console.log('Initial scale animation started with scroll-adjusted scale:', targetScale);
+                                // Reveal model and crossfade in plane texture to avoid pop
+                                if (window.wrapper && window.backgroundPlane) {
+                                    window.wrapper.visible = true;
+                                    const mat = window.backgroundPlane.material;
+                                    const startOpacity = typeof mat.opacity === 'number' ? mat.opacity : 0.0;
+                                    mat.opacity = 0.0;
+                                    window.backgroundPlane.visible = true;
+                                    gsap.to(mat, { opacity: startOpacity || 0.8, duration: 0.6, ease: 'power1.out' });
+                                }
                             },
                             onUpdate: () => {
                                 // Ensure scale is applied
@@ -161,7 +170,12 @@ export function captureHeroAsTexture() {
                 
                 reject(error);
             });
-        });
+        };
+        if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+            document.fonts.ready.then(() => requestAnimationFrame(doCapture));
+        } else {
+            requestAnimationFrame(doCapture);
+        }
     });
 }
 
@@ -203,21 +217,19 @@ export function createBackgroundPlane(scene, uniforms) {
     // Set global reference
     window.backgroundPlane = plane;
     
-    // Capture hero and apply as texture with delay to ensure DOM is ready
-    setTimeout(() => {
-        captureHeroAsTexture().then(texture => {
-            plane.material.map = texture;
-            plane.material.needsUpdate = true;
-            // console.log('Dynamic texture applied to plane');
-        }).catch(error => {
-            console.error('Failed to apply dynamic texture, using fallback:', error);
-            // Fallback to static texture if capture fails
-            const textureLoader = new THREE.TextureLoader();
-            const headerTexture = textureLoader.load('/images/header.png');
-            plane.material.map = headerTexture;
-            plane.material.needsUpdate = true;
-        });
-    }, 100); // Small delay to ensure DOM is fully rendered
+    // Capture hero and apply as texture once fonts/layout are stable
+    captureHeroAsTexture().then(texture => {
+        plane.material.map = texture;
+        plane.material.needsUpdate = true;
+        // console.log('Dynamic texture applied to plane');
+    }).catch(error => {
+        console.error('Failed to apply dynamic texture, using fallback:', error);
+        // Fallback to static texture if capture fails
+        const textureLoader = new THREE.TextureLoader();
+        const headerTexture = textureLoader.load('/images/header.png');
+        plane.material.map = headerTexture;
+        plane.material.needsUpdate = true;
+    });
     
     // Safety timeout to ensure mesh scales up even if html2canvas takes too long
     setTimeout(() => {
