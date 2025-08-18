@@ -794,7 +794,11 @@ body.scroll-disabled {
     /* Smooth transitions for text sizing */
     transition: 
         width 0.3s ease-out,
-        padding-bottom 0.3s ease-out;
+        padding-bottom 0.3s ease-out,
+        opacity 0.25s ease-out;
+
+    /* Opacity reveal to avoid jarring redraw */
+    opacity: 0;
 }
 
 /* Shared base styles for hero headings */

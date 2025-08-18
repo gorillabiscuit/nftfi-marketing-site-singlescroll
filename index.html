@@ -289,6 +289,8 @@
 
           freezeTransitions(hero);
           freezeTransitions(heroText);
+          // Keep text hidden until layout is finalized
+          heroText.style.opacity = '0';
           freezeTransitions(heroActions);
           actionCards.forEach(freezeTransitions);
 
@@ -316,6 +318,9 @@
                 unfreezeTransitions(heroText);
                 unfreezeTransitions(heroActions);
                 actionCards.forEach(unfreezeTransitions);
+
+                // Fade text in now that sizes are stable
+                heroText.style.opacity = '1';
               });
             });
           };
