@@ -352,27 +352,58 @@ function setupSection2Pinning() {
         const postRotateOffset = Math.max(SECTION2_TIMINGS.rotateStep, SECTION2_TIMINGS.microRotate);
         section2Timeline.addLabel('title', `rotate+=${postRotateOffset + SECTION2_TIMINGS.titleDelayAfterRotate}`);
 
-        // Phase 1: lines drawing (also rebuilds SVG and sets globals)
-        const drawingPhase = createDrawingPhase();
-        section2Timeline.add(drawingPhase, 'draw');
+        // Rebuild SVG & globals and create separate vertical/horizontal draw timelines
+        const initialBuildTL = createDrawingPhase();
+        section2Timeline.add(initialBuildTL, 0);
 
-        // Static cells (builds cell nodes but no animation yet) and prep strokes
+        const verticalDrawTL = gsap.timeline();
+        const horizontalDrawTL = gsap.timeline();
+        // Target lines by axis
+        const vLines = () => (window.lineGroups?.vertical || []);
+        const hLines = () => (window.lineGroups?.horizontal || []);
+        // Vertical draw
+        verticalDrawTL.addLabel('start', 0);
+        verticalDrawTL.add(() => {
+            vLines().forEach((line, index) => {
+                verticalDrawTL.to(line, {
+                    drawSVG: '0% 100%',
+                    ease: 'none',
+                    duration: SECTION2_TIMINGS.draw
+                }, index * SECTION2_TIMINGS.lineStagger);
+            });
+        }, 'start');
+        section2Timeline.add(verticalDrawTL, ">");
+
+        // Horizontal draw starts overlapping relative to vertical draw duration
+        const horizOverlap = Math.max(0, (SECTION2_TIMINGS.horizontalStartOverlapRatio || 0) * (SECTION2_TIMINGS.draw));
+        section2Timeline.add(horizontalDrawTL, `>-=${horizOverlap}`);
+        horizontalDrawTL.add(() => {
+            hLines().forEach((line, index) => {
+                horizontalDrawTL.to(line, {
+                    drawSVG: '0% 100%',
+                    ease: 'none',
+                    duration: SECTION2_TIMINGS.draw
+                }, index * SECTION2_TIMINGS.lineStagger);
+            });
+        }, 0);
+
+        // Build cells and prep strokes immediately after drawing starts
         const staticCellsPhase = createStaticCellsPhase();
-        section2Timeline.add(staticCellsPhase, 'draw');
+        section2Timeline.add(staticCellsPhase, ">-");
         const cellsStrokePrep = prepareCellsStrokeDraw();
-        section2Timeline.add(cellsStrokePrep, 'draw');
+        section2Timeline.add(cellsStrokePrep, ">-");
 
-        // Phase 2: outward + rotation 45
+        // Outward expansion after drawing completes with configurable delay
         const outwardExpansionPhase = createOutwardExpansionPhase();
-        section2Timeline.add(outwardExpansionPhase, 'outward');
+        section2Timeline.add(outwardExpansionPhase, `>+=${SECTION2_TIMINGS.delayAfterDrawing + SECTION2_TIMINGS.delayBeforeOutward}`);
 
-        // Phase 3: additional rotation
+        // Additional rotation after outward using explicit rotateStartDelay
         const rotationPhase = createRotationPhase();
-        section2Timeline.add(rotationPhase, 'rotate');
+        section2Timeline.add(rotationPhase, `>+=${SECTION2_TIMINGS.rotateStartDelay}`);
 
-        // Phase 4: final expansion
+        // Final expansion after rotation
         const expansionPhase = createExpansionPhase();
-        section2Timeline.add(expansionPhase, 'expand');
+        section2Timeline.add(expansionPhase, ">");
 
         // Title reveal (Key Metrics) with label-like wipe effect
         try {
@@ -408,19 +439,19 @@ function setupSection2Pinning() {
                     return Math.max(padX * 2, rect.width + padX * 2);
                 };
 
-                // 1) Wipe expand
+                // 1) Wipe expand (schedule after rotation)
                 section2Timeline.to(hl, {
                     width: () => measure(),
                     duration: SECTION2_TIMINGS.highlightExpand,
                     ease: 'none'
-                }, 'title');
+                }, ">+=${SECTION2_TIMINGS.titleDelayAfterRotate}");
 
                 // 2) Title visible (full opacity for title, unlike labels)
                 section2Timeline.to(titleEl, {
                     opacity: 1,
                     duration: SECTION2_TIMINGS.labelReveal,
                     ease: 'none'
-                }, `title+=${SECTION2_TIMINGS.highlightExpand}`);
+                }, ">");
 
                 // 3) Wipe shrink left-to-right (move left edge right while width goes to 0)
                 section2Timeline.to(hl, {
@@ -428,13 +459,16 @@ function setupSection2Pinning() {
                     left: () => `${-padX + measure()}px`,
                     duration: SECTION2_TIMINGS.highlightShrink,
                     ease: 'none'
-                }, `title+=${SECTION2_TIMINGS.highlightExpand + SECTION2_TIMINGS.labelReveal}`);
+                }, ">");
             }
         } catch (_) {}
 
-        // Blocks (labels + amounts) reveal phase – starts after title
-        const blocksRevealPhase = createBlocksRevealPhase();
-        section2Timeline.add(blocksRevealPhase, `title+=${SECTION2_TIMINGS.blocksStartAfterTitle}`);
+        // Blocks: add each visible block as its own TL sequentially after title using blockGap
+        const blocksTL = createBlocksRevealPhase();
+        // Instead of adding the entire phase at once, we reuse its internal per-node logic by
+        // constructing a per-node TL chain using the same timings and stagger parameters.
+        // For minimal code change, keep existing function but add as a group right after title delay.
+        section2Timeline.add(blocksTL, `>+=${SECTION2_TIMINGS.blocksStartAfterTitle}`);
 
         console.log('Master timeline with 4-phase animation created successfully');
         try { ScrollTrigger.refresh(); } catch (_) {}

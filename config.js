@@ -110,7 +110,11 @@ export const SECTION2_TIMINGS = {
     // Title timings (Key Metrics)
     titleAppear: 0.35,           // duration for title fade-in
     titleDelayAfterRotate: 0.0,   // extra delay after rotation completes before showing title
-    blocksStartAfterTitle: 0.5    // delay after title before blocks start revealing
+    blocksStartAfterTitle: 0.5,   // delay after title before blocks start revealing
+
+    // Relative sequencing controls
+    horizontalStartOverlapRatio: 0.5, // fraction of vertical draw duration after which horizontal starts
+    blockGap: 0.25                   // gap between consecutive block reveals in the master timeline
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
