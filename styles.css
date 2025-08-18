@@ -1280,3 +1280,9 @@ h2 {
     vector-effect: non-scaling-stroke;
     opacity: var(--grid-line-opacity, 0.8);
 }
+
+.key-metrics-title {
+    display: inline-block;
+    transform: translate(20px, -100px) rotate(45deg);
+    transform-origin: center center;
+}
