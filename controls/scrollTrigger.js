@@ -340,8 +340,8 @@ function setupSection2Pinning() {
             }
         });
 
-        // No absolute labels; rely on relative sequencing and single-offset constants per step
-
+        // No absolute labels; use relative sequencing only
+ 
         // Rebuild SVG & globals and create separate vertical/horizontal draw timelines
         const initialBuildTL = createDrawingPhase();
         section2Timeline.add(initialBuildTL, 0);
@@ -351,13 +351,14 @@ function setupSection2Pinning() {
         // Target lines by axis
         const vLines = () => (window.lineGroups?.vertical || []);
         const hLines = () => (window.lineGroups?.horizontal || []);
-        // Vertical draw using total and offset
+        // Vertical draw using totals if provided
         verticalDrawTL.addLabel('start', 0);
         verticalDrawTL.add(() => {
             const vCountLocal = vLines().length || 1;
-            const total = SECTION2_TIMINGS.drawVerticalLinesTotal;
-            const vEach = total / vCountLocal;
-            const vStagger = vEach;
+            const vEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
+            const vStagger = vCountLocal > 1
+                ? Math.max(0, ((SECTION2_TIMINGS.drawVerticalLinesTotal ?? (vEach + (vCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - vEach) / (vCountLocal - 1))
+                : 0;
             vLines().forEach((line, index) => {
                 verticalDrawTL.to(line, {
                     drawSVG: '0% 100%',
@@ -368,13 +369,14 @@ function setupSection2Pinning() {
         }, 'start');
         section2Timeline.add(verticalDrawTL, `+=${SECTION2_TIMINGS.drawVerticalLinesOffset}`);
 
-        // Horizontal draw using total and offset; allow negative offset to overlap
+        // Horizontal draw using totals and offset; allow negative offset to overlap
         section2Timeline.add(horizontalDrawTL, `>+=${SECTION2_TIMINGS.drawHorizontalLinesOffset}`);
         horizontalDrawTL.add(() => {
             const hCountLocal = hLines().length || 1;
-            const total = SECTION2_TIMINGS.drawHorizontalLinesTotal;
-            const hEach = total / hCountLocal;
-            const hStagger = hEach;
+            const hEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
+            const hStagger = hCountLocal > 1
+                ? Math.max(0, ((SECTION2_TIMINGS.drawHorizontalLinesTotal ?? (hEach + (hCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - hEach) / (hCountLocal - 1))
+                : 0;
             hLines().forEach((line, index) => {
                 horizontalDrawTL.to(line, {
                     drawSVG: '0% 100%',
@@ -394,11 +396,11 @@ function setupSection2Pinning() {
         const outwardExpansionPhase = createOutwardExpansionPhase();
         section2Timeline.add(outwardExpansionPhase, `>+=${SECTION2_TIMINGS.outwardOffset}`);
 
-        // Additional rotation after outward using explicit rotateOffset
+        // Additional rotation after outward using explicit offset
         const rotationPhase = createRotationPhase();
         section2Timeline.add(rotationPhase, `>+=${SECTION2_TIMINGS.rotateOffset}`);
 
-        // Final expansion after rotation with explicit expandOffset
+        // Final expansion after rotation with optional offset
         const expansionPhase = createExpansionPhase();
         section2Timeline.add(expansionPhase, `>+=${SECTION2_TIMINGS.expandOffset}`);
 
@@ -740,18 +742,18 @@ function createRotationPhase() {
     
     console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
     
-    // Add square rotation to the rotation timeline
+    // Add group rotation to the rotation timeline
     rotationTimeline.to(gridGroup, {
         rotation: 45,
         ease: "none",
-        duration: SECTION2_TIMINGS.outward
+        duration: SECTION2_TIMINGS.rotateStep
     }, 0);
     
     // Rotate the whole grid group to preserve relative ordering and spacing
     rotationTimeline.to(gridGroup, {
         rotation: 90, // Rotate to 90° total relative to initial (Phase 2 adds first 45° over group too)
         ease: "none",
-        duration: SECTION2_TIMINGS.outward
+        duration: SECTION2_TIMINGS.rotateStep
     }, 0);
 
     // Subtle per-line micro-rotation with stagger for organic feel (does not affect final angle)
@@ -797,7 +799,7 @@ function createExpansionPhase() {
         expansionTimeline.to(line, {
             y: targetY,
             ease: "none",
-            duration: 0.25
+            duration: SECTION2_TIMINGS.expand
         }, 0);
     });
 
@@ -807,7 +809,7 @@ function createExpansionPhase() {
         expansionTimeline.to(line, {
             x: targetX,
             ease: "none",
-            duration: 0.25
+            duration: SECTION2_TIMINGS.expand
         }, 0);
     });
     
