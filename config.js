@@ -81,12 +81,13 @@ export const SECTION2_TIMINGS = {
     draw: 0.75,              // duration per line draw tween
     outward: 0.75,           // outward expansion + initial rotation
     rotateStep: 0.75,        // additional rotation step
-    microRotate: 5.75,       // subtle per-line micro-rotation
+    microRotate: 0.75,       // subtle per-line micro-rotation
     expand: 0.25,            // final grid expansion
 
     // Inter-phase delays
     delayBeforeOutward: 0.5,     // wait after drawing finishes before starting outward/rotation
     delayBeforeRotateStep: 0.3,  // wait after outward before additional rotation phase
+    delayAfterDrawing: 0.5,      // additional delay after drawing timeline completes before outward starts
 
     // Staggers and inter-block delays
     lineStagger: 0.02,       // stagger between line draw tweens
