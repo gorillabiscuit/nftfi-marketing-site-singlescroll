@@ -77,39 +77,41 @@ export const GRID_STATES = {
 
 // Exposed timings for Section 2 animation (tweak as needed)
 export const SECTION2_TIMINGS = {
-    // Draw (lines)
-    draw: 0.75,                 // per-line draw duration
-    lineStagger: 0.02,          // per-line stagger
-    horizontalStartOverlapRatio: 0.5, // horizontal starts when vertical is this fraction complete (0..1)
+    // DRAWING STEPS (total durations and offsets)
+    // Each "total" is the time from the start of the first line to the end of the last line for that axis.
+    // Offsets are relative to the END of the previous step: positive = delay, negative = overlap.
+    lineDrawSingle: 0.25,                 // duration for a single line to draw (used to compute stagger)
+    drawVerticalLinesTotal: 2.0,          // total time to complete vertical lines
+    drawVerticalLinesOffset: 0.0,         // offset relative to start (first step)
+    drawHorizontalLinesTotal: 2.0,        // total time to complete horizontal lines
+    drawHorizontalLinesOffset: -1.0,      // start 1s before vertical finishes (overlap)
 
-    // Transforms (grid motion)
-    outward: 0.75,              // outward expansion + initial rotation duration
-    rotateStep: 0.75,           // additional rotation duration
-    microRotate: 0.75,          // subtle per-line micro-rotation duration
-    expand: 0.25,               // final grid expansion duration
+    // TRANSFORM STEPS (durations and offsets)
+    outwardDuration: 0.75,
+    outwardOffset: 0.5,                   // after drawing finishes
+    rotateDuration: 0.75,
+    rotateOffset: 0.3,                    // after outward finishes
+    microRotateDuration: 0.75,            // subtle per-line micro-rotation during rotate step
+    expandDuration: 0.25,
+    expandOffset: 0.0,
 
-    // Phase spacing
-    delayAfterDrawing: 0.5,     // pause after drawing completes
-    delayBeforeOutward: 2.5,    // extra delay before outward begins
-    rotateStartDelay: 0.0,      // delay after outward before rotation starts
+    // TITLE STEP
+    titleDuration: 0.35,                  // used for title wipe/reveal
+    titleOffset: 0.0,                     // after rotate finishes
 
-    // Title
-    titleAppear: 0.35,          // title fade duration (with wipe)
-    titleDelayAfterRotate: 0.0,  // delay after rotation before title starts
+    // BLOCKS SEQUENCE (master-level)
+    blocksFirstOffset: 0.5,               // delay after title before first block
+    blockGap: 0.25,                       // gap between blocks in the master sequence
 
-    // Blocks (sequence-level)
-    blocksStartAfterTitle: 0.5, // delay after title before first block
-    blockGap: 0.25,             // gap between block i and block i+1 in the master sequence
-
-    // Block internals (per-block TL)
-    rectDraw: 0.25,             // cell stroke draw duration
-    rectFillFade: 0.10,         // cell fill fade-in
-    highlightExpand: 0.22,      // label/title wipe expand
-    labelReveal: 0.05,          // label/title reveal after wipe
-    highlightShrink: 0.22,      // wipe shrink
-    amountDelayAfterLabel: 0.5, // delay after label before amount appears
-    amountAppear: 0.15,         // amount fade-in
-    amountCount: 2.0            // count-up duration
+    // BLOCK INTERNALS (per-block TL)
+    rectDraw: 0.25,                       // cell stroke draw duration
+    rectFillFade: 0.10,                   // cell fill fade-in
+    highlightExpand: 0.22,                // label/title wipe expand
+    labelReveal: 0.05,                    // label/title reveal after wipe
+    highlightShrink: 0.22,                // wipe shrink
+    amountDelayAfterLabel: 0.5,           // delay after label before amount appears
+    amountAppear: 0.15,                   // amount fade-in
+    amountCount: 2.0                      // count-up duration
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)

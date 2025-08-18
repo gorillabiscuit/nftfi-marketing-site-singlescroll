@@ -363,32 +363,32 @@ function setupSection2Pinning() {
         const hLines = () => (window.lineGroups?.horizontal || []);
         // Vertical draw
         verticalDrawTL.addLabel('start', 0);
+        const vCount = vLines().length || 1;
+        const vEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle);
+        const vStagger = vCount > 1 ? (SECTION2_TIMINGS.drawVerticalLinesTotal - vEach) / (vCount - 1) : 0;
         verticalDrawTL.add(() => {
             vLines().forEach((line, index) => {
                 verticalDrawTL.to(line, {
                     drawSVG: '0% 100%',
                     ease: 'none',
-                    duration: SECTION2_TIMINGS.draw
-                }, index * SECTION2_TIMINGS.lineStagger);
+                    duration: vEach
+                }, index * vStagger);
             });
         }, 'start');
-        section2Timeline.add(verticalDrawTL, ">");
+        section2Timeline.add(verticalDrawTL, `+=${SECTION2_TIMINGS.drawVerticalLinesOffset}`);
 
-        // Horizontal draw starts overlapping relative to vertical draw total duration (including stagger)
-        const vCount = vLines().length || 1;
-        const verticalTotal = SECTION2_TIMINGS.draw + Math.max(0, (vCount - 1)) * SECTION2_TIMINGS.lineStagger;
-        const ratio = Math.max(0, Math.min(1, SECTION2_TIMINGS.horizontalStartOverlapRatio || 0));
-        // desired horizontal start time from the start of vertical: t = verticalTotal * ratio
-        // overlap relative to the end of vertical is: overlapSec = verticalTotal - t
-        const overlapSec = Math.max(0, verticalTotal - (verticalTotal * ratio));
-        section2Timeline.add(horizontalDrawTL, `>-=${overlapSec}`);
+        // Horizontal draw with relative offset (can be negative to overlap)
+        const hCount = hLines().length || 1;
+        const hEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle);
+        const hStagger = hCount > 1 ? (SECTION2_TIMINGS.drawHorizontalLinesTotal - hEach) / (hCount - 1) : 0;
+        section2Timeline.add(horizontalDrawTL, `>+=${SECTION2_TIMINGS.drawHorizontalLinesOffset}`);
         horizontalDrawTL.add(() => {
             hLines().forEach((line, index) => {
                 horizontalDrawTL.to(line, {
                     drawSVG: '0% 100%',
                     ease: 'none',
-                    duration: SECTION2_TIMINGS.draw
-                }, index * SECTION2_TIMINGS.lineStagger);
+                    duration: hEach
+                }, index * hStagger);
             });
         }, 0);
 
@@ -400,15 +400,15 @@ function setupSection2Pinning() {
 
         // Outward expansion after drawing completes with configurable delay
         const outwardExpansionPhase = createOutwardExpansionPhase();
-        section2Timeline.add(outwardExpansionPhase, `>+=${SECTION2_TIMINGS.delayAfterDrawing + SECTION2_TIMINGS.delayBeforeOutward}`);
+        section2Timeline.add(outwardExpansionPhase, `>+=${SECTION2_TIMINGS.delayAfterDrawing + SECTION2_TIMINGS.outwardOffset}`);
 
         // Additional rotation after outward using explicit rotateStartDelay
         const rotationPhase = createRotationPhase();
-        section2Timeline.add(rotationPhase, `>+=${SECTION2_TIMINGS.rotateStartDelay}`);
+        section2Timeline.add(rotationPhase, `>+=${SECTION2_TIMINGS.rotateOffset}`);
 
         // Final expansion after rotation
         const expansionPhase = createExpansionPhase();
-        section2Timeline.add(expansionPhase, ">");
+        section2Timeline.add(expansionPhase, `>+=${SECTION2_TIMINGS.expandOffset}`);
 
         // Title reveal (Key Metrics) with label-like wipe effect
         try {
@@ -449,7 +449,7 @@ function setupSection2Pinning() {
                     width: () => measure(),
                     duration: SECTION2_TIMINGS.highlightExpand,
                     ease: 'none'
-                }, ">+=${SECTION2_TIMINGS.titleDelayAfterRotate}");
+                }, `>+=${SECTION2_TIMINGS.titleOffset}`);
 
                 // 2) Title visible (full opacity for title, unlike labels)
                 section2Timeline.to(titleEl, {
@@ -468,12 +468,9 @@ function setupSection2Pinning() {
             }
         } catch (_) {}
 
-        // Blocks: add each visible block as its own TL sequentially after title using blockGap
+        // Blocks: add entire reveal phase after title; internal per-block stagger remains
         const blocksTL = createBlocksRevealPhase();
-        // Instead of adding the entire phase at once, we reuse its internal per-node logic by
-        // constructing a per-node TL chain using the same timings and stagger parameters.
-        // For minimal code change, keep existing function but add as a group right after title delay.
-        section2Timeline.add(blocksTL, `>+=${SECTION2_TIMINGS.blocksStartAfterTitle}`);
+        section2Timeline.add(blocksTL, `>+=${SECTION2_TIMINGS.blocksFirstOffset}`);
 
         console.log('Master timeline with 4-phase animation created successfully');
         try { ScrollTrigger.refresh(); } catch (_) {}
