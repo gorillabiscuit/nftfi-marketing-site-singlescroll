@@ -1166,9 +1166,8 @@ function createBlocksRevealPhase() {
         const rect = node.querySelector('rect.cell-rect');
         const highlight = node.querySelector('rect.label-highlight');
         const labelEl = node.querySelector('text[data-role="label"]');
-        const extraBetweenBlocks = SECTION2_TIMINGS.blockExtraDelay;
-        const baseStagger = SECTION2_TIMINGS.blockBaseStagger;
-        const pos = index * (baseStagger + extraBetweenBlocks);
+        const gap = (SECTION2_TIMINGS.blockGap != null) ? SECTION2_TIMINGS.blockGap : 0.25;
+        const pos = index * gap;
         // Reveal entire node (text + rect)
         tl.to(node, { opacity: 1, duration: 0.01 }, pos);
         if (rect) {
