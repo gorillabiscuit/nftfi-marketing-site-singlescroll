@@ -87,10 +87,10 @@ export const SECTION2_TIMINGS = {
     drawHorizontalLinesOffset: -1.0,
 
     // Transforms (grid motion)
-    rotationDuration: 5.75,              // outward expansion + initial rotation duration
-    rotateStep: 0.75,           // additional rotation duration
+    outward: 5000.75,              // outward expansion + initial 45° rotation duration
+    rotateStep: 500.75,           // additional rotation duration
     microRotate: 0.75,          // subtle per-line micro-rotation duration
-    expand: 0.25,               // final grid expansion duration
+    expand: 10000.25,               // final grid expansion duration
 
     // Phase spacing (explicit offsets before each phase)
     delayAfterGridDraw: 3,    // delay before outward begins (relative to end of drawing)
@@ -119,7 +119,7 @@ export const SECTION2_TIMINGS = {
 
 // Scroll scaling for Section 2: pixels of scroll per second of timeline duration
 export const SECTION2_SCROLL = {
-    pxPerSecond: 600
+    pxPerSecond: 100
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
