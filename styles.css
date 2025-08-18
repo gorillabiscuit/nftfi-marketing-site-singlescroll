@@ -716,13 +716,13 @@ body.scroll-disabled {
     isolation: isolate;
     box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
     
-    /* Smooth transitions for size changes when scrollbars appear */
-    transition: 
-        max-width 0.3s ease-out,
-        width 0.3s ease-out,
-        margin-left 0.3s ease-out,
-        margin-right 0.3s ease-out,
-        padding 0.3s ease-out;
+    /* Smooth, non-layout transitions to avoid jank */
+    transition:
+        opacity 0.25s ease-out,
+        transform 0.3s ease-out,
+        box-shadow 0.3s ease-out,
+        background 0.3s ease-out,
+        filter 0.3s ease-out;
 }
 
 /* SVG Background - Top Right Copy */

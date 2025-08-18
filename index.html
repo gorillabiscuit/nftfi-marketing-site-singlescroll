@@ -265,6 +265,7 @@
           const subtitle = document.getElementById('hero-subtitle');
           const heroActions = document.querySelector('.hero-actions');
           const heroText = document.querySelector('.hero-text');
+          const heroContent = document.querySelector('.hero-content');
           const actionCards = document.querySelectorAll('.hero-actions .card');
 
           if (!hero || !title || !subtitle || !heroActions) return;
@@ -289,6 +290,7 @@
 
           freezeTransitions(hero);
           freezeTransitions(heroText);
+          freezeTransitions(heroContent);
           // Keep text hidden until layout is finalized
           heroText.style.opacity = '0';
           freezeTransitions(heroActions);
@@ -309,13 +311,29 @@
                 heroActions.style.width = titleWidth + 'px';
               }
 
+              // Compute final hero height using an off-DOM clone to avoid visible jump
+              const heroClone = hero.cloneNode(true);
+              heroClone.style.position = 'absolute';
+              heroClone.style.visibility = 'hidden';
+              heroClone.style.left = '-10000px';
+              heroClone.style.minHeight = '';
+              heroClone.style.width = hero.offsetWidth + 'px';
+              document.body.appendChild(heroClone);
+              const finalHeroHeight = heroClone.getBoundingClientRect().height;
+              document.body.removeChild(heroClone);
+              if (finalHeroHeight > 0) {
+                hero.style.minHeight = finalHeroHeight + 'px';
+              }
+
               // 3) Release the height lock in the next frame
               requestAnimationFrame(() => {
-                hero.style.minHeight = '';
+                // Keep min-heights briefly to avoid a visible snap, then release
+                setTimeout(() => { hero.style.minHeight = ''; }, 300);
                 heroActions.style.minHeight = '';
                 // Re-enable transitions after layout is stable
                 unfreezeTransitions(hero);
                 unfreezeTransitions(heroText);
+                unfreezeTransitions(heroContent);
                 unfreezeTransitions(heroActions);
                 actionCards.forEach(unfreezeTransitions);
 
