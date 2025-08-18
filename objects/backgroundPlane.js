@@ -120,14 +120,9 @@ export function captureHeroAsTexture() {
                             ease: "power2.out",
                             onStart: () => {
                                 console.log('Initial scale animation started with scroll-adjusted scale:', targetScale);
-                                // Reveal model and crossfade in plane texture to avoid pop
-                                if (window.wrapper && window.backgroundPlane) {
+                                // Reveal model only; avoid manipulating plane visibility/opacity to prevent black frames
+                                if (window.wrapper) {
                                     window.wrapper.visible = true;
-                                    const mat = window.backgroundPlane.material;
-                                    const startOpacity = typeof mat.opacity === 'number' ? mat.opacity : 0.0;
-                                    mat.opacity = 0.0;
-                                    window.backgroundPlane.visible = true;
-                                    gsap.to(mat, { opacity: startOpacity || 0.8, duration: 0.6, ease: 'power1.out' });
                                 }
                             },
                             onUpdate: () => {
@@ -227,6 +222,8 @@ export function createBackgroundPlane(scene, uniforms) {
     captureHeroAsTexture().then(texture => {
         plane.material.map = texture;
         plane.material.needsUpdate = true;
+        // Ensure plane uses the texture without opacity manipulation
+        plane.visible = true; // keep as-is; shader samples map regardless of mesh visibility
         // console.log('Dynamic texture applied to plane');
     }).catch(error => {
         console.error('Failed to apply dynamic texture, using fallback:', error);
