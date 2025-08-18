@@ -624,16 +624,9 @@ function createDrawingPhase() {
     lineGroups.all.forEach((line, index) => {
         // Start with lines invisible (center point only)
         gsap.set(line, { drawSVG: "50% 50%" });
-        
-        // Add to drawing timeline with staggered start for visual interest
-        drawingTimeline.to(line, {
-            drawSVG: "0% 100%",   // End: fully drawn from center outward
-            ease: "none", // Linear animation for smooth scrub
-            duration: SECTION2_TIMINGS.draw
-        }, index * SECTION2_TIMINGS.lineStagger);
     });
     
-    console.log('Phase 1: Drawing phase timeline created successfully');
+    console.log('Phase 1: Grid built and initial states set (no draw animation here)');
     // Force ST to re-measure after dynamic SVG rebuild
     try { ScrollTrigger.refresh(); } catch (_) {}
     return drawingTimeline;
