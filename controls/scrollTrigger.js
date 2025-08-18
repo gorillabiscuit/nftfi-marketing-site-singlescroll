@@ -398,7 +398,7 @@ function setupSection2Pinning() {
         const cellsStrokePrep = prepareCellsStrokeDraw();
         section2Timeline.add(cellsStrokePrep, ">-");
 
-        // Outward expansion after drawing completes with configurable delay
+        // Outward expansion after BOTH vertical and horizontal complete
         const outwardExpansionPhase = createOutwardExpansionPhase();
         section2Timeline.add(outwardExpansionPhase, `>+=${SECTION2_TIMINGS.delayAfterDrawing + SECTION2_TIMINGS.outwardOffset}`);
 
@@ -1152,8 +1152,8 @@ function createBlocksRevealPhase() {
         const rect = node.querySelector('rect.cell-rect');
         const highlight = node.querySelector('rect.label-highlight');
         const labelEl = node.querySelector('text[data-role="label"]');
-        const extraBetweenBlocks = SECTION2_TIMINGS.blockExtraDelay;
-        const baseStagger = SECTION2_TIMINGS.blockBaseStagger;
+        const extraBetweenBlocks = SECTION2_TIMINGS.blockGap; // extra delay between blocks (seconds)
+        const baseStagger = SECTION2_TIMINGS.blockGap;
         const pos = index * (baseStagger + extraBetweenBlocks);
         // Reveal entire node (text + rect)
         tl.to(node, { opacity: 1, duration: 0.01 }, pos);
