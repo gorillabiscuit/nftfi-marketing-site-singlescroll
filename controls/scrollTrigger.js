@@ -340,17 +340,7 @@ function setupSection2Pinning() {
             }
         });
 
-        // Labels to control overlaps between phases
-        section2Timeline.addLabel('draw', 0);
-        section2Timeline.addLabel('outward', 0.25 + SECTION2_TIMINGS.delayBeforeOutward + SECTION2_TIMINGS.delayAfterDrawing);
-        const rotateDelay = (SECTION2_TIMINGS.rotateStartDelay != null)
-            ? SECTION2_TIMINGS.rotateStartDelay
-            : (SECTION2_TIMINGS.delayBeforeOutward + SECTION2_TIMINGS.delayBeforeRotateStep);
-        section2Timeline.addLabel('rotate', 0.5 + rotateDelay);
-        section2Timeline.addLabel('expand', 0.55);
-        // Compute a 'title' point after rotation completes (max of rotateStep and microRotate)
-        const postRotateOffset = Math.max(SECTION2_TIMINGS.rotateStep, SECTION2_TIMINGS.microRotate);
-        section2Timeline.addLabel('title', `rotate+=${postRotateOffset + SECTION2_TIMINGS.titleDelayAfterRotate}`);
+        // No absolute labels; rely on relative sequencing and single-offset constants per step
 
         // Rebuild SVG & globals and create separate vertical/horizontal draw timelines
         const initialBuildTL = createDrawingPhase();
@@ -361,14 +351,13 @@ function setupSection2Pinning() {
         // Target lines by axis
         const vLines = () => (window.lineGroups?.vertical || []);
         const hLines = () => (window.lineGroups?.horizontal || []);
-        // Vertical draw using totals if provided
+        // Vertical draw using total and offset
         verticalDrawTL.addLabel('start', 0);
         verticalDrawTL.add(() => {
             const vCountLocal = vLines().length || 1;
-            const vEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
-            const vStagger = vCountLocal > 1
-                ? Math.max(0, ((SECTION2_TIMINGS.drawVerticalLinesTotal ?? (vEach + (vCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - vEach) / (vCountLocal - 1))
-                : 0;
+            const total = SECTION2_TIMINGS.drawVerticalLinesTotal;
+            const vEach = total / vCountLocal;
+            const vStagger = vEach;
             vLines().forEach((line, index) => {
                 verticalDrawTL.to(line, {
                     drawSVG: '0% 100%',
@@ -377,16 +366,15 @@ function setupSection2Pinning() {
                 }, index * vStagger);
             });
         }, 'start');
-        section2Timeline.add(verticalDrawTL, `+=${SECTION2_TIMINGS.drawVerticalLinesOffset || 0}`);
+        section2Timeline.add(verticalDrawTL, `+=${SECTION2_TIMINGS.drawVerticalLinesOffset}`);
 
-        // Horizontal draw using totals and offset; allow negative offset to overlap
-        section2Timeline.add(horizontalDrawTL, `>+=${SECTION2_TIMINGS.drawHorizontalLinesOffset || 0}`);
+        // Horizontal draw using total and offset; allow negative offset to overlap
+        section2Timeline.add(horizontalDrawTL, `>+=${SECTION2_TIMINGS.drawHorizontalLinesOffset}`);
         horizontalDrawTL.add(() => {
             const hCountLocal = hLines().length || 1;
-            const hEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
-            const hStagger = hCountLocal > 1
-                ? Math.max(0, ((SECTION2_TIMINGS.drawHorizontalLinesTotal ?? (hEach + (hCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - hEach) / (hCountLocal - 1))
-                : 0;
+            const total = SECTION2_TIMINGS.drawHorizontalLinesTotal;
+            const hEach = total / hCountLocal;
+            const hStagger = hEach;
             hLines().forEach((line, index) => {
                 horizontalDrawTL.to(line, {
                     drawSVG: '0% 100%',
@@ -402,17 +390,17 @@ function setupSection2Pinning() {
         const cellsStrokePrep = prepareCellsStrokeDraw();
         section2Timeline.add(cellsStrokePrep, ">-");
 
-        // Outward expansion after drawing completes using explicit offset if set
+        // Outward expansion after drawing completes using explicit offset
         const outwardExpansionPhase = createOutwardExpansionPhase();
-        section2Timeline.add(outwardExpansionPhase, `>+=${(SECTION2_TIMINGS.outwardOffset ?? (SECTION2_TIMINGS.delayAfterDrawing + SECTION2_TIMINGS.delayBeforeOutward))}`);
+        section2Timeline.add(outwardExpansionPhase, `>+=${SECTION2_TIMINGS.outwardOffset}`);
 
-        // Additional rotation after outward using explicit rotateOffset/rotateStartDelay
+        // Additional rotation after outward using explicit rotateOffset
         const rotationPhase = createRotationPhase();
-        section2Timeline.add(rotationPhase, `>+=${((SECTION2_TIMINGS.rotateOffset ?? SECTION2_TIMINGS.rotateStartDelay) || 0)}`);
+        section2Timeline.add(rotationPhase, `>+=${SECTION2_TIMINGS.rotateOffset}`);
 
-        // Final expansion after rotation with optional expandOffset
+        // Final expansion after rotation with explicit expandOffset
         const expansionPhase = createExpansionPhase();
-        section2Timeline.add(expansionPhase, `>+=${(SECTION2_TIMINGS.expandOffset || 0)}`);
+        section2Timeline.add(expansionPhase, `>+=${SECTION2_TIMINGS.expandOffset}`);
 
         // Title reveal (Key Metrics) with label-like wipe effect
         try {
@@ -453,7 +441,7 @@ function setupSection2Pinning() {
                     width: () => measure(),
                     duration: SECTION2_TIMINGS.highlightExpand,
                     ease: 'none'
-                }, `>+=${((SECTION2_TIMINGS.titleOffset ?? SECTION2_TIMINGS.titleDelayAfterRotate) || 0)}`);
+                }, `>+=${SECTION2_TIMINGS.titleOffset}`);
 
                 // 2) Title visible (full opacity for title, unlike labels)
                 section2Timeline.to(titleEl, {
@@ -477,7 +465,7 @@ function setupSection2Pinning() {
         // Instead of adding the entire phase at once, we reuse its internal per-node logic by
         // constructing a per-node TL chain using the same timings and stagger parameters.
         // For minimal code change, keep existing function but add as a group right after title delay.
-        section2Timeline.add(blocksTL, `>+=${((SECTION2_TIMINGS.blocksFirstOffset ?? SECTION2_TIMINGS.blocksStartAfterTitle) || 0)}`);
+        section2Timeline.add(blocksTL, `>+=${SECTION2_TIMINGS.blocksFirstOffset}`);
 
         console.log('Master timeline with 4-phase animation created successfully');
         try { ScrollTrigger.refresh(); } catch (_) {}
