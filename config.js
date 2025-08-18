@@ -81,7 +81,7 @@ export const SECTION2_TIMINGS = {
     draw: 0.75,              // duration per line draw tween
     outward: 0.75,           // outward expansion + initial rotation
     rotateStep: 0.75,        // additional rotation step
-    microRotate: 0.75,       // subtle per-line micro-rotation
+    microRotate: 5.75,       // subtle per-line micro-rotation
     expand: 0.25,            // final grid expansion
 
     // Staggers and inter-block delays
@@ -99,7 +99,12 @@ export const SECTION2_TIMINGS = {
     // Amount timings
     amountDelayAfterLabel: 0.5, // delay after label reveal before amount appears
     amountAppear: 0.15,         // amount fade-in
-    amountCount: 2.0            // count-up duration
+    amountCount: 2.0,           // count-up duration
+
+    // Title timings (Key Metrics)
+    titleAppear: 0.35,           // duration for title fade-in
+    titleDelayAfterRotate: 0.0,   // extra delay after rotation completes before showing title
+    blocksStartAfterTitle: 0.1    // delay after title before blocks start revealing
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)

@@ -345,6 +345,9 @@ function setupSection2Pinning() {
         section2Timeline.addLabel('outward', 0.25);
         section2Timeline.addLabel('rotate', 0.5);
         section2Timeline.addLabel('expand', 0.55);
+        // Compute a 'title' point after rotation completes (max of rotateStep and microRotate)
+        const postRotateOffset = Math.max(SECTION2_TIMINGS.rotateStep, SECTION2_TIMINGS.microRotate);
+        section2Timeline.addLabel('title', `rotate+=${postRotateOffset + SECTION2_TIMINGS.titleDelayAfterRotate}`);
 
         // Phase 1: lines drawing (also rebuilds SVG and sets globals)
         const drawingPhase = createDrawingPhase();
@@ -368,9 +371,18 @@ function setupSection2Pinning() {
         const expansionPhase = createExpansionPhase();
         section2Timeline.add(expansionPhase, 'expand');
 
-        // Blocks (labels + amounts) reveal phase – starts around rotation
+        // Title reveal (Key Metrics)
+        try {
+            const titleEl = document.querySelector('.key-metrics-title');
+            if (titleEl) {
+                gsap.set(titleEl, { opacity: 0 });
+                section2Timeline.to(titleEl, { opacity: 1, duration: SECTION2_TIMINGS.titleAppear, ease: 'power1.out' }, 'title');
+            }
+        } catch (_) {}
+
+        // Blocks (labels + amounts) reveal phase – starts after title
         const blocksRevealPhase = createBlocksRevealPhase();
-        section2Timeline.add(blocksRevealPhase, 'rotate');
+        section2Timeline.add(blocksRevealPhase, `title+=${SECTION2_TIMINGS.blocksStartAfterTitle}`);
 
         console.log('Master timeline with 4-phase animation created successfully');
         try { ScrollTrigger.refresh(); } catch (_) {}
