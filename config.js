@@ -87,7 +87,7 @@ export const SECTION2_TIMINGS = {
     drawHorizontalLinesOffset: -1.0,
 
     // Transforms (grid motion)
-    rotationDuration: 2.75,              // outward expansion + initial rotation duration
+    rotationDuration: 5.75,              // outward expansion + initial rotation duration
     rotateStep: 0.75,           // additional rotation duration
     microRotate: 0.75,          // subtle per-line micro-rotation duration
     expand: 0.25,               // final grid expansion duration
@@ -99,22 +99,22 @@ export const SECTION2_TIMINGS = {
 
     // Title
     delayBeforeTitle: 0.0,       // delay before title wipe begins (relative to end of expand)
-    titleWipeDuration: .75,     // duration of the title highlight wipe
+    titleWipeDuration: 1.75,     // duration of the title highlight wipe
 
     // Blocks (sequence-level)
-    delayBeforeFirstBlock: 1,  // delay after title before first block
-    blockGap: 2.25,             // gap between block i and block i+1 in the master sequence
+    delayBeforeFirstBlock: 6,  // delay after title before first block
+    blockGap: 20.25,             // gap between block i and block i+1 in the master sequence
     delayBeforeUnpin: 10.0,      // delay after the last block finishes before unpinning
 
     // Block internals (per-block TL)
-    rectDraw: 0.25,             // cell stroke draw duration
-    rectFillFade: 0.10,         // cell fill fade-in
-    highlightExpand: 0.22,      // label/title wipe expand
-    labelReveal: 0.05,          // label/title reveal after wipe
-    highlightShrink: 0.22,      // wipe shrink
-    amountDelayAfterLabel: 0.5, // delay after label before amount appears
-    amountAppear: 0.15,         // amount fade-in
-    amountCount: 2.0            // count-up duration
+    rectDraw: 2.25,             // cell stroke draw duration
+    rectFillFade: 0.70,         // cell fill fade-in
+    highlightExpand: 1.22,      // label/title wipe expand
+    labelReveal: 1.05,          // label/title reveal after wipe
+    highlightShrink: 1.22,      // wipe shrink
+    amountDelayAfterLabel: 2.5, // delay after label before amount appears
+    amountAppear: 2.15,         // amount fade-in
+    amountCount: 14.0            // count-up duration
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
