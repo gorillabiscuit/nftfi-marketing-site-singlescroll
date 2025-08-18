@@ -85,13 +85,13 @@ export const SECTION2_TIMINGS = {
     expand: 0.25,            // final grid expansion
 
     // Inter-phase delays
-    delayBeforeOutward: 0.5,     // wait after drawing finishes before starting outward/rotation
+    delayBeforeOutward: 2.5,     // wait after drawing finishes before starting outward/rotation
     delayBeforeRotateStep: 0.3,  // wait after outward before additional rotation phase
     delayAfterDrawing: 0.5,      // additional delay after drawing timeline completes before outward starts
     rotateStartDelay: 0.0,       // additional delay after outward completes before rotation starts (overrides generic delay if set)
 
     // Staggers and inter-block delays
-    lineStagger: 10.02,       // stagger between line draw tweens
+    lineStagger: 0.02,       // stagger between line draw tweens
     blockBaseStagger: 0.15,  // base per-block stagger
     blockExtraDelay: 1.0,    // extra seconds between blocks
 
