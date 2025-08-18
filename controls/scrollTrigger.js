@@ -342,8 +342,9 @@ function setupSection2Pinning() {
 
         // Labels to control overlaps between phases
         section2Timeline.addLabel('draw', 0);
-        section2Timeline.addLabel('outward', 0.25);
-        section2Timeline.addLabel('rotate', 0.5);
+        // Add offsets based on configured delays
+        section2Timeline.addLabel('outward', 0.25 + SECTION2_TIMINGS.rotateDelayAfterDraw);
+        section2Timeline.addLabel('rotate', 0.5 + SECTION2_TIMINGS.rotateDelayAfterDraw);
         section2Timeline.addLabel('expand', 0.55);
         // Compute a 'title' point after rotation completes (max of rotateStep and microRotate)
         const postRotateOffset = Math.max(SECTION2_TIMINGS.rotateStep, SECTION2_TIMINGS.microRotate);
@@ -907,379 +908,279 @@ function createStaticCellsPhase() {
                 svg.insertBefore(defs, svg.firstChild);
             }
             const gradId = `rect-grad-${blockIndex}`;
-            let grad = svg.querySelector(`#${gradId}`);
-            if (!grad) {
-                grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-                grad.setAttribute('id', gradId);
-                const angle = Number(rectCfg.gradientAngle ?? 135);
-                grad.setAttribute('gradientTransform', `rotate(${angle})`);
-                const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-                stop1.setAttribute('offset', '0%');
-                stop1.setAttribute('stop-color', rectCfg.gradientStart ?? '#000000');
-                const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-                stop2.setAttribute('offset', '97.66%');
-                // Support rgba end colors: if provided, split color/opacity; otherwise set color only
-                const end = rectCfg.gradientEnd ?? 'rgba(0,0,0,0.5)';
-                if (/rgba\(/i.test(end)) {
-                    const m = end.match(/rgba\(([^)]+)\)/i);
-                    if (m) {
-                        const parts = m[1].split(',').map(s => s.trim());
-                        const [r,g,b,a] = parts;
-                        stop2.setAttribute('stop-color', `rgb(${r}, ${g}, ${b})`);
-                        if (a != null) stop2.setAttribute('stop-opacity', `${a}`);
-                    }
-                } else {
-                    stop2.setAttribute('stop-color', end);
-                }
-                grad.appendChild(stop1);
-                grad.appendChild(stop2);
-                defs.appendChild(grad);
-            } else {
-                // Update stops if gradient exists
-                const stops = grad.querySelectorAll('stop');
-                const startStop = stops[0];
-                const endStop = stops[1];
-                if (startStop) startStop.setAttribute('stop-color', rectCfg.gradientStart ?? '#000000');
-                if (endStop) {
-                    const end = rectCfg.gradientEnd ?? 'rgba(0,0,0,0.5)';
-                    if (/rgba\(/i.test(end)) {
-                        const m = end.match(/rgba\(([^)]+)\)/i);
-                        if (m) {
-                            const parts = m[1].split(',').map(s => s.trim());
-                            const [r,g,b,a] = parts;
-                            endStop.setAttribute('stop-color', `rgb(${r}, ${g}, ${b})`);
-                            if (a != null) endStop.setAttribute('stop-opacity', `${a}`);
-                        }
-                    } else {
-                        endStop.setAttribute('stop-color', end);
-                        endStop.removeAttribute('stop-opacity');
-                    }
-                }
-            }
+            const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            grad.setAttribute('id', gradId);
+            grad.setAttribute('x1', '0%');
+            grad.setAttribute('y1', '0%');
+            grad.setAttribute('x2', '0%');
+            grad.setAttribute('y2', '100%');
+            defs.appendChild(grad);
 
-            const rxOverride = Number(rectCfg.rxOverride ?? NaN);
-            const rxFinal = Number.isFinite(rxOverride) ? rxOverride : rx;
-            gsap.set(rect, { attr: { rx: rxFinal, ry: rxFinal, fill: `url(#${gradId})`, stroke: (rectCfg.strokeColor ?? '#FFFFFF'), 'stroke-opacity': (rectCfg.strokeOpacity ?? 0.38), 'stroke-width': (rectCfg.strokeWidth ?? 1) } });
+            // Add stop elements for gradient
+            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop1.setAttribute('offset', '0%');
+            stop1.setAttribute('stop-color', rectCfg.startColor ?? '#FFFFFF');
+            stop1.setAttribute('stop-opacity', rectCfg.startOpacity ?? 1);
+            grad.appendChild(stop1);
 
-            // If there is text config for this block, render amount/label
-            if (amtCfg || lblCfg) {
-                if (amtCfg) {
-                    const amount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    amount.textContent = (amtCfg.text ?? '$700M+');
-                    amount.setAttribute('fill', (amtCfg.color ?? 'rgba(255, 255, 255, 0.90)'));
-                    amount.setAttribute('font-family', (amtCfg.fontFamily ?? 'Roboto Mono, monospace'));
-                    amount.setAttribute('font-weight', (amtCfg.fontWeight ?? '300'));
-                    amount.setAttribute('font-size', String(amtCfg.fontSize ?? 36));
-                    if (amtCfg.letterSpacing != null) amount.setAttribute('letter-spacing', String(amtCfg.letterSpacing));
-                    amount.setAttribute('data-role', 'amount');
+            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop2.setAttribute('offset', '100%');
+            stop2.setAttribute('stop-color', rectCfg.endColor ?? '#FFFFFF');
+            stop2.setAttribute('stop-opacity', rectCfg.endOpacity ?? 1);
+            grad.appendChild(stop2);
 
-                    const fontSize = Number(amtCfg.fontSize ?? 36);
-                    const centerMode = (amtCfg.anchor === 'middle') || (amtCfg.center === true);
-                    let ax, ay;
-                    let anchorVal = (amtCfg.anchor != null) ? amtCfg.anchor : (centerMode ? 'middle' : 'start');
-                    let baselineVal = (amtCfg.baseline != null) ? amtCfg.baseline : (centerMode ? 'middle' : 'alphabetic');
-                    if (centerMode) {
-                        const offX = Number(amtCfg.centerOffsetX ?? 0);
-                        const offY = Number(amtCfg.centerOffsetY ?? 0);
-                        ax = size / 2 + offX;
-                        ay = size / 2 + offY;
-                    } else {
-                        const amtPadLeft = Number(amtCfg.padLeft ?? 8);
-                        const amtPadTop = Number(amtCfg.padTop ?? 18);
-                        ax = amtPadLeft;
-                        ay = amtPadTop + fontSize;
-                    }
-
-                    amount.setAttribute('x', String(ax));
-                    amount.setAttribute('y', String(ay));
-                    amount.setAttribute('text-anchor', anchorVal);
-                    amount.setAttribute('dominant-baseline', baselineVal);
-                    const amtRot = (amtCfg.rotateDeg != null) ? Number(amtCfg.rotateDeg) : null;
-                    if (amtRot != null) {
-                        amount.setAttribute('transform', `rotate(${amtRot} ${ax} ${ay})`);
-                    }
-
-                    cellNode.appendChild(amount);
-                    // Start hidden; will appear after label reveal completes
-                    gsap.set(amount, { opacity: 0 });
-                }
-
-                if (lblCfg) {
-                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    label.textContent = (lblCfg.text ?? 'LOAN VOLUME');
-                    label.setAttribute('fill', (lblCfg.color ?? '#FFFFFF'));
-                    if (lblCfg.opacity != null) label.setAttribute('opacity', String(lblCfg.opacity));
-                    label.setAttribute('font-family', (lblCfg.fontFamily ?? 'Satoshi Variable, sans-serif'));
-                    label.setAttribute('font-weight', (lblCfg.fontWeight ?? '500'));
-                    label.setAttribute('font-size', String(lblCfg.fontSize ?? 16));
-                    label.setAttribute('data-role', 'label');
-
-                    const lblPadLeft = Number(lblCfg.padLeft ?? 8);
-                    const lblPadBottom = Number(lblCfg.padBottom ?? 8);
-                    const lblPadRight = (lblCfg.padRight != null) ? Number(lblCfg.padRight) : null;
-                    const lblPadTop = (lblCfg.padTop != null) ? Number(lblCfg.padTop) : null;
-
-                    let lx = lblPadLeft;
-                    let ly = size - lblPadBottom;
-                    let anchor = (lblCfg.anchor ?? 'start');
-                    let baseline = (lblCfg.baseline ?? 'alphabetic');
-
-                    if (lblPadRight != null) {
-                        lx = size - lblPadRight;
-                        ly = size - (lblCfg.padBottom ?? 8);
-                        anchor = 'end';
-                        baseline = 'alphabetic';
-                    } else if (lblPadTop != null) {
-                        lx = lblPadLeft;
-                        ly = lblPadTop + (lblCfg.fontSize ?? 16);
-                        anchor = 'start';
-                        baseline = 'alphabetic';
-                    }
-
-                    label.setAttribute('x', String(lx));
-                    label.setAttribute('y', String(ly));
-                    label.setAttribute('text-anchor', anchor);
-                    label.setAttribute('dominant-baseline', baseline);
-
-                    const rot = (lblCfg.rotateDeg != null) ? Number(lblCfg.rotateDeg) : null;
-                    if (rot != null) {
-                        label.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
-                    }
-
-                    // Insert a highlight wipe rect (above the text): append after label so it sits on top visually
-                    const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    const fontSize = Number(lblCfg.fontSize ?? 16);
-                    const padX = 4;
-                    const padY = 2;
-                    const hlTop = ly - fontSize - padY;
-                    const hlLeft = lx - (anchor === 'end' ? 0 : padX);
-                    const hlHeight = fontSize + padY * 2;
-                    const labelFill = (lblCfg.color ?? '#FFFFFF');
-                    gsap.set(highlight, { attr: { x: hlLeft, y: hlTop, width: 0, height: hlHeight, fill: labelFill, 'fill-opacity': 1 } });
-                    highlight.setAttribute('class', 'label-highlight');
-                    if (rot != null) {
-                        highlight.setAttribute('transform', `rotate(${rot} ${lx} ${ly})`);
-                    }
-
-                    // Append label first (below), then highlight (above)
-                    cellNode.appendChild(label);
-                    cellNode.appendChild(highlight);
-
-                    // Make label initially invisible; will reveal after highlight expansion
-                    gsap.set(label, { opacity: 0 });
-
-                    // Defer width measurement to reveal phase via function-based values
-                }
-            }
-
-            cellsGroup.appendChild(cellNode);
-            visibleIdx++;
+            // Apply gradient to the rect
+            gsap.set(rect, { fill: `url(#${gradId})` });
         }
+        visibleIdx++;
     }
 
-    // Expose ordered cell nodes for reveal phase
-    window.visibleCellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
-
+    console.log('Phase 1: Static cells phase timeline created successfully');
     return cellsTimeline;
 }
 
-// Prep: set initial stroke draw state (no tweens). Actual draw happens during reveal.
+// Phase 2: Prepare cells for stroke drawing (no animation, just data)
 function prepareCellsStrokeDraw() {
-    const tl = gsap.timeline();
-    const cellsGroup = document.getElementById('grid-cells');
-    if (!cellsGroup) return tl;
-    const rects = Array.from(cellsGroup.querySelectorAll('rect.cell-rect'));
-    rects.forEach((rect) => {
-        gsap.set(rect, { drawSVG: "50% 50%" });
-        gsap.set(rect, { attr: { 'fill-opacity': 0 } });
-    });
-    const highlights = Array.from(cellsGroup.querySelectorAll('rect.label-highlight'));
-    highlights.forEach((hl) => {
-        const y = hl.getAttribute('y');
-        const h = hl.getAttribute('height');
-        // ensure width starts at 0
-        gsap.set(hl, { attr: { width: 0 } });
-        // keep fully opaque to mimic wipe
-        gsap.set(hl, { attr: { 'fill-opacity': 1 } });
-    });
-    return tl;
+    const cellsTimeline = gsap.timeline();
+
+    if (!window.lineGroups || !window.gridState || !window.gridInitialSpacing || !window.gridGroup) {
+        console.warn('Cells: prerequisites not met, skipping');
+        return cellsTimeline;
+    }
+
+    const rectState = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || { enabled: false };
+    if (!rectState.enabled) {
+        return cellsTimeline;
+    }
+
+    const { horizontal, vertical } = window.lineGroups;
+    const levels = new Set([...horizontal, ...vertical].map(el => Number(el.dataset.level)));
+    const maxLevel = Math.max(...levels);
+    const minLevel = Math.min(...levels);
+
+    const baseSpacing = Number(window.gridInitialSpacing) || 50;
+    const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
+    const rx = size * (rectState.cornerRadiusFactor ?? 0.15);
+    const group = window.gridGroup;
+    const rectDefaults = rectState.rectDefaults || {};
+
+    // Remove previous cells group if exists
+    const old = document.getElementById('grid-cells');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    // Reset primary-cell flag for fresh build
+    window._primaryCellPlaced = false;
+
+    const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gsap.set(cellsGroup, { attr: { id: 'grid-cells' } });
+    group.appendChild(cellsGroup);
+    gsap.set(cellsGroup, { transformOrigin: '50% 50%' }); // inherit rotation with gridGroup
+
+    // Build rects for each inner cell (between grid lines)
+    const explicit = Array.isArray(rectState.cells) ? rectState.cells : [];
+    const hasExplicit = explicit.length > 0;
+    const blocksCfg = Array.isArray(rectState.blocks) ? rectState.blocks : null;
+    let visibleIdx = 0;
+    for (let i = minLevel; i <= maxLevel - 1; i++) {
+        for (let j = minLevel; j <= maxLevel - 1; j++) {
+            let include = false;
+            if (hasExplicit) {
+                include = explicit.some(([ci, cj]) => ci === i && cj === j);
+            } else {
+                include = rectState.pattern === 'all' ? true : rectState.pattern === 'checker' ? ((i + j) % 2 === 0) : false;
+            }
+            if (!include) continue;
+
+            const cx = i * baseSpacing + baseSpacing / 2;
+            const cy = j * baseSpacing + baseSpacing / 2;
+            const x = cx - size / 2;
+            const y = cy - size / 2;
+
+            const cellNode = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            cellNode.setAttribute('class', 'cell-node');
+            cellNode.dataset.i = String(i);
+            cellNode.dataset.j = String(j);
+            cellNode.setAttribute('transform', `translate(${x} ${y})`);
+            // Start hidden; reveal during reveal phase
+            gsap.set(cellNode, { opacity: 0 });
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            gsap.set(rect, { attr: { x: 0, y: 0, width: size, height: size, rx, ry: rx, class: 'cell-rect' } });
+            gsap.set(rect, { transformOrigin: '50% 50%', transformBox: 'fill-box' });
+
+            // Append rect first so that subsequent text elements render on top
+            cellNode.appendChild(rect);
+
+            const blockIndex = visibleIdx;
+            const state = RECT_STATES[getCurrentAnimationState()] || RECT_STATES.desktop || {};
+            const baseAmt = state.amount || {};
+            const baseLbl = state.label || {};
+            const bCfg = (blocksCfg && blocksCfg[blockIndex]) ? blocksCfg[blockIndex] : null;
+            const amtCfg = bCfg && bCfg.amount ? { ...baseAmt, ...bCfg.amount } : baseAmt;
+            const lblCfg = bCfg && bCfg.label ? { ...baseLbl, ...bCfg.label } : baseLbl;
+
+            // Apply gradient/stroke per block (overriding defaults if provided)
+            const rectCfg = (bCfg && bCfg.rect) ? { ...rectDefaults, ...bCfg.rect } : rectDefaults;
+            const svg = document.getElementById('lines-svg');
+            let defs = svg.querySelector('defs');
+            if (!defs) {
+                defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                svg.insertBefore(defs, svg.firstChild);
+            }
+            const gradId = `rect-grad-${blockIndex}`;
+            const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            grad.setAttribute('id', gradId);
+            grad.setAttribute('x1', '0%');
+            grad.setAttribute('y1', '0%');
+            grad.setAttribute('x2', '0%');
+            grad.setAttribute('y2', '100%');
+            defs.appendChild(grad);
+
+            // Add stop elements for gradient
+            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop1.setAttribute('offset', '0%');
+            stop1.setAttribute('stop-color', rectCfg.startColor ?? '#FFFFFF');
+            stop1.setAttribute('stop-opacity', rectCfg.startOpacity ?? 1);
+            grad.appendChild(stop1);
+
+            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop2.setAttribute('offset', '100%');
+            stop2.setAttribute('stop-color', rectCfg.endColor ?? '#FFFFFF');
+            stop2.setAttribute('stop-opacity', rectCfg.endOpacity ?? 1);
+            grad.appendChild(stop2);
+
+            // Apply gradient to the rect
+            gsap.set(rect, { fill: `url(#${gradId})` });
+        }
+        visibleIdx++;
+    }
+
+    console.log('Phase 2: Prepared cells for stroke drawing');
+    return cellsTimeline;
 }
 
-// Blocks Reveal Phase: sequentially fade in visible blocks
+// Phase 3: Create blocks reveal phase (labels + amounts)
 function createBlocksRevealPhase() {
-    const tl = gsap.timeline();
-    const nodes = (window.visibleCellNodes && window.visibleCellNodes.length)
-        ? window.visibleCellNodes
-        : Array.from((document.getElementById('grid-cells') || { querySelectorAll: () => [] }).querySelectorAll('.cell-node'));
-    if (!nodes || nodes.length === 0) {
-        console.warn('Reveal phase: no cell nodes to reveal');
-        return tl;
+    const blocksTimeline = gsap.timeline();
+
+    if (!window.lineGroups || !window.gridState || !window.gridInitialSpacing || !window.gridGroup) {
+        console.warn('Blocks: prerequisites not met, skipping');
+        return blocksTimeline;
     }
-    // For each node, reveal node and draw its rect stroke, then fade in fill
-    nodes.forEach((node, index) => {
-        const rect = node.querySelector('rect.cell-rect');
-        const highlight = node.querySelector('rect.label-highlight');
-        const labelEl = node.querySelector('text[data-role="label"]');
-        const extraBetweenBlocks = SECTION2_TIMINGS.blockExtraDelay;
-        const baseStagger = SECTION2_TIMINGS.blockBaseStagger;
-        const pos = index * (baseStagger + extraBetweenBlocks);
-        // Reveal entire node (text + rect)
-        tl.to(node, { opacity: 1, duration: 0.01 }, pos);
-        if (rect) {
-            tl.to(rect, { drawSVG: "0% 100%", ease: "none", duration: SECTION2_TIMINGS.rectDraw }, pos);
-            tl.to(rect, { attr: { 'fill-opacity': 1 }, duration: SECTION2_TIMINGS.rectFillFade, ease: 'power1.out' }, pos + (SECTION2_TIMINGS.rectDraw - 0.03));
-        }
-        if (highlight && labelEl) {
-            const padding = 8;
-            const anchor = (labelEl.getAttribute('text-anchor')) || 'start';
-            const labelXAttr = labelEl.getAttribute('x');
-            const labelX = labelXAttr != null ? Number(labelXAttr) : 0;
 
-            const measure = () => {
-                let width = 0;
-                if (typeof labelEl.getComputedTextLength === 'function') {
-                    try { width = labelEl.getComputedTextLength(); } catch (_) {}
-                }
-                if (!width || width <= 0) {
-                    try { width = labelEl.getBBox().width; } catch (_) { width = 0; }
-                }
-                // Include padding on start-anchor; end-anchor handled via x shift
-                return Math.max(padding, width + (anchor === 'end' ? 0 : padding));
-            };
-
-            // 1) Expand highlight to cover text
-            if (anchor === 'end') {
-                tl.to(
-                    highlight,
-                    {
-                        attr: {
-                            width: () => measure(),
-                            x: () => (labelX - measure())
-                        },
-                        ease: 'none',
-                        duration: SECTION2_TIMINGS.highlightExpand
-                    },
-                    pos + 0.02
-                );
-            } else {
-                tl.to(
-                    highlight,
-                    {
-                        attr: { width: () => measure() },
-                        ease: 'none',
-                        duration: SECTION2_TIMINGS.highlightExpand
-                    },
-                    pos + 0.02
-                );
-            }
-
-            // 2) Make label visible once fully covered
-            tl.to(labelEl, { opacity: 0.5, duration: SECTION2_TIMINGS.labelReveal, ease: 'none' }, 
-                 pos + 0.02 + SECTION2_TIMINGS.highlightExpand);
-
-            // 3) Disappear highlight left-to-right
-            if (anchor === 'end') {
-                // Keep right edge at labelX; left edge moves right
-                tl.to(
-                    highlight,
-                    {
-                        attr: { width: 0, x: () => labelX },
-                        ease: 'none',
-                        duration: SECTION2_TIMINGS.highlightShrink
-                    },
-                    pos + 0.02 + SECTION2_TIMINGS.highlightExpand + SECTION2_TIMINGS.labelReveal
-                );
-            } else {
-                // Move left edge right while shrinking to 0
-                tl.to(
-                    highlight,
-                    {
-                        attr: { width: 0, x: () => (labelX + measure()) },
-                        ease: 'none',
-                        duration: SECTION2_TIMINGS.highlightShrink
-                    },
-                    pos + 0.02 + SECTION2_TIMINGS.highlightExpand + SECTION2_TIMINGS.labelReveal
-                );
-            }
-        }
-
-        // 4) Amount number-only counting effect (e.g., "$700M+" => count 0 -> 700)
-        const amountEl = node.querySelector('text[data-role="amount"]');
-        if (amountEl) {
-            const original = amountEl.textContent || '';
-            const m = original.match(/(-?[\d,]+(?:\.[\d]+)?)/);
-            if (m && m.index != null) {
-                const numStr = m[1];
-                const prefix = original.slice(0, m.index);
-                const suffix = original.slice(m.index + numStr.length);
-                const decimals = (numStr.split('.')[1] || '').length;
-                const target = parseFloat(numStr.replace(/,/g, '')) || 0;
-                const monthLike = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(prefix + suffix);
-                const formatter = new Intl.NumberFormat('en-US', {
-                    minimumFractionDigits: decimals,
-                    maximumFractionDigits: decimals,
-                    useGrouping: monthLike ? false : true
-                });
-                const counter = { value: 0 };
-
-                // Timings
-                const expandStart = pos + 0.02;
-                const expandDur = SECTION2_TIMINGS.highlightExpand;
-                const labelRevealDur = SECTION2_TIMINGS.labelReveal;
-                const labelRevealEnd = expandStart + expandDur + labelRevealDur;
-
-                // Appear amount right after label is fully visible
-                const amountAppearStart = labelRevealEnd + SECTION2_TIMINGS.amountDelayAfterLabel;
-                const amountAppearDur = SECTION2_TIMINGS.amountAppear;
-                tl.to(amountEl, { opacity: 1, duration: amountAppearDur, ease: 'power1.out' }, amountAppearStart);
-
-                // Initialize display at 0
-                amountEl.textContent = prefix + formatter.format(0) + suffix;
-
-                // Start counting immediately after it appears
-                const countStart = amountAppearStart + amountAppearDur;
-                tl.to(counter, {
-                    value: target,
-                    duration: SECTION2_TIMINGS.amountCount,
-                    ease: 'power2.out',
-                    onUpdate: () => {
-                        amountEl.textContent = prefix + formatter.format(counter.value) + suffix;
-                    },
-                    onComplete: () => {
-                        amountEl.textContent = prefix + formatter.format(target) + suffix;
-                    }
-                }, countStart);
-            }
-        }
-    });
-    return tl;
-}
-
-// Ensure ScrollTrigger refreshes once fonts are ready so text metrics are stable
-try {
-    if (document && document.fonts && typeof document.fonts.ready?.then === 'function') {
-        document.fonts.ready.then(() => {
-            if (typeof ScrollTrigger !== 'undefined' && ScrollTrigger?.refresh) {
-                ScrollTrigger.refresh();
-            }
-        }).catch(() => {});
+    const rectState = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || { enabled: false };
+    if (!rectState.enabled) {
+        return blocksTimeline;
     }
-} catch (_) {}
 
-// Calculate dynamic line length that extends beyond any screen size
-function calculateLineLength() {
-    // Get viewport dimensions
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    // Calculate the diagonal distance from center to corner (hypotenuse)
-    const diagonalDistance = Math.sqrt(viewportWidth * viewportWidth + viewportHeight * viewportHeight);
-    
-    // Add extra padding to ensure lines extend beyond screen edges
-    const extraPadding = Math.max(viewportWidth, viewportHeight) * 0.5;
-    
-    // Return the total line length (diagonal + padding)
-    return Math.ceil(diagonalDistance + extraPadding);
+    const { horizontal, vertical } = window.lineGroups;
+    const levels = new Set([...horizontal, ...vertical].map(el => Number(el.dataset.level)));
+    const maxLevel = Math.max(...levels);
+    const minLevel = Math.min(...levels);
+
+    const baseSpacing = Number(window.gridInitialSpacing) || 50;
+    const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
+    const rx = size * (rectState.cornerRadiusFactor ?? 0.15);
+    const group = window.gridGroup;
+    const rectDefaults = rectState.rectDefaults || {};
+
+    // Remove previous blocks group if exists
+    const old = document.getElementById('grid-blocks');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    // Reset primary-block flag for fresh build
+    window._primaryBlockPlaced = false;
+
+    const blocksGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gsap.set(blocksGroup, { attr: { id: 'grid-blocks' } });
+    group.appendChild(blocksGroup);
+    gsap.set(blocksGroup, { transformOrigin: '50% 50%' }); // inherit rotation with gridGroup
+
+    // Build labels and amounts for each inner cell (between grid lines)
+    const explicit = Array.isArray(rectState.cells) ? rectState.cells : [];
+    const hasExplicit = explicit.length > 0;
+    const blocksCfg = Array.isArray(rectState.blocks) ? rectState.blocks : null;
+    let visibleIdx = 0;
+    for (let i = minLevel; i <= maxLevel - 1; i++) {
+        for (let j = minLevel; j <= maxLevel - 1; j++) {
+            let include = false;
+            if (hasExplicit) {
+                include = explicit.some(([ci, cj]) => ci === i && cj === j);
+            } else {
+                include = rectState.pattern === 'all' ? true : rectState.pattern === 'checker' ? ((i + j) % 2 === 0) : false;
+            }
+            if (!include) continue;
+
+            const cx = i * baseSpacing + baseSpacing / 2;
+            const cy = j * baseSpacing + baseSpacing / 2;
+            const x = cx - size / 2;
+            const y = cy - size / 2;
+
+            const blockNode = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            blockNode.setAttribute('class', 'block-node');
+            blockNode.dataset.i = String(i);
+            blockNode.dataset.j = String(j);
+            blockNode.setAttribute('transform', `translate(${x} ${y})`);
+            // Start hidden; reveal during reveal phase
+            gsap.set(blockNode, { opacity: 0 });
+
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            gsap.set(label, {
+                attr: {
+                    class: 'block-label',
+                    'text-anchor': 'middle',
+                    'dominant-baseline': 'middle'
+                },
+                x: 0,
+                y: 0,
+                text: '',
+                fill: rectState.labelColor ?? '#FFFFFF',
+                'font-size': `${size * 0.4}px`,
+                'font-weight': 'bold',
+                'font-family': 'inherit',
+                'pointer-events': 'none'
+            });
+            blockNode.appendChild(label);
+
+            const amount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            gsap.set(amount, {
+                attr: {
+                    class: 'block-amount',
+                    'text-anchor': 'middle',
+                    'dominant-baseline': 'middle'
+                },
+                x: 0,
+                y: 0,
+                text: '',
+                fill: rectState.amountColor ?? '#FFFFFF',
+                'font-size': `${size * 0.6}px`,
+                'font-weight': 'bold',
+                'font-family': 'inherit',
+                'pointer-events': 'none'
+            });
+            blockNode.appendChild(amount);
+
+            const blockIndex = visibleIdx;
+            const state = RECT_STATES[getCurrentAnimationState()] || RECT_STATES.desktop || {};
+            const baseAmt = state.amount || {};
+            const baseLbl = state.label || {};
+            const bCfg = (blocksCfg && blocksCfg[blockIndex]) ? blocksCfg[blockIndex] : null;
+            const amtCfg = bCfg && bCfg.amount ? { ...baseAmt, ...bCfg.amount } : baseAmt;
+            const lblCfg = bCfg && bCfg.label ? { ...baseLbl, ...bCfg.label } : baseLbl;
+
+            // Apply text per block (overriding defaults if provided)
+            const textCfg = (bCfg && bCfg.text) ? { ...rectDefaults, ...bCfg.text } : rectDefaults;
+            const text = lblCfg.text || amtCfg.text || '';
+            const fontSize = lblCfg.fontSize || amtCfg.fontSize || `${size * 0.4}px`;
+            const fontWeight = lblCfg.fontWeight || amtCfg.fontWeight || 'bold';
+            const fontFamily = lblCfg.fontFamily || amtCfg.fontFamily || 'inherit';
+            const textColor = lblCfg.color || amtCfg.color || '#FFFFFF';
+            const textOpacity = lblCfg.opacity || amtCfg.opacity || 1;
+
+            gsap.set(label, { text: text, 'font-size': fontSize, 'font-weight': fontWeight, 'font-family': fontFamily, fill: textColor, opacity: textOpacity });
+            gsap.set(amount, { text: amtCfg.text || '', 'font-size': amtCfg.fontSize || `${size * 0.6}px`, 'font-weight': amtCfg.fontWeight || 'bold', 'font-family': amtCfg.fontFamily || 'inherit', fill: amtCfg.color || '#FFFFFF', opacity: amtCfg.opacity || 1 });
+        }
+        visibleIdx++;
+    }
+
+    console.log('Phase 3: Blocks reveal phase timeline created successfully');
+    return blocksTimeline;
 }
-
- 
