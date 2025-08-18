@@ -78,10 +78,8 @@ export const GRID_STATES = {
 // Exposed timings for Section 2 animation (tweak as needed)
 export const SECTION2_TIMINGS = {
     // Draw (lines)
-    draw: 0.75,                 // per-line draw duration (legacy)
-    lineStagger: 0.02,          // per-line stagger (legacy)
-    horizontalStartOverlapRatio: 0.5, // legacy (not used when totals below are set)
-    lineDrawSingle: 0.25,       // duration for a single line draw when computing totals
+    lineStagger: 0.02,          // per-line stagger
+    lineDrawSingle: 4.25,       // duration for a single line draw when computing totals
     // Totals & offsets per step (offsets relative to END of previous step; negative = overlap)
     drawVerticalLinesTotal: 2.0,
     drawVerticalLinesOffset: 0.0,
@@ -89,28 +87,24 @@ export const SECTION2_TIMINGS = {
     drawHorizontalLinesOffset: -1.0,
 
     // Transforms (grid motion)
-    outward: 0.75,              // outward expansion + initial rotation duration
+    rotationDuration: 2.75,              // outward expansion + initial rotation duration
     rotateStep: 0.75,           // additional rotation duration
     microRotate: 0.75,          // subtle per-line micro-rotation duration
     expand: 0.25,               // final grid expansion duration
 
-    // Phase spacing
-    delayAfterDrawing: 0.5,     // pause after drawing completes
-    delayBeforeOutward: 2.5,    // extra delay before outward begins
-    rotateStartDelay: 0.0,      // delay after outward before rotation starts (alias below)
-    outwardOffset: 0.5,         // alias for additional delay before outward (used if applied)
-    rotateOffset: 0.3,          // alias for rotation start delay
-    expandOffset: 0.0,          // alias for expansion start delay
+    // Phase spacing (explicit offsets before each phase)
+    delayAfterGridDraw: 3,    // delay before outward begins (relative to end of drawing)
+    delayAfterRotation: 2,   // delay before rotation begins (relative to end of outward)
+    delayAfterRotationOLDNOW: 0.0,    // delay after rotation finishes, before expand begins
 
     // Title
-    titleAppear: 0.35,          // title fade duration (with wipe)
-    titleDelayAfterRotate: 0.0,  // delay after rotation before title starts
-    titleOffset: 0.0,            // alias for title delay
+    delayBeforeTitle: 0.0,       // delay before title wipe begins (relative to end of expand)
+    titleWipeDuration: .75,     // duration of the title highlight wipe
 
     // Blocks (sequence-level)
-    blocksStartAfterTitle: 0.5, // delay after title before first block
-    blocksFirstOffset: 0.5,     // alias for first block delay
-    blockGap: 0.25,             // gap between block i and block i+1 in the master sequence
+    delayBeforeFirstBlock: 1,  // delay after title before first block
+    blockGap: 2.25,             // gap between block i and block i+1 in the master sequence
+    delayBeforeUnpin: 10.0,      // delay after the last block finishes before unpinning
 
     // Block internals (per-block TL)
     rectDraw: 0.25,             // cell stroke draw duration

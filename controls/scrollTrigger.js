@@ -137,7 +137,7 @@ function createScrollTimeline() {
                     const progress = self.progress;
                     
                     // Track scroll direction for spin animation
-                    const scrollDirection = self.direction || 0;
+                    const scrollDirection = self.direction;
                     updateScrollSpin(scrollDirection);
                     
                     // Calculate dynamic target position based on current viewport and state
@@ -349,15 +349,20 @@ function setupSection2Pinning() {
         const verticalDrawTL = gsap.timeline();
         const horizontalDrawTL = gsap.timeline();
         // Target lines by axis
-        const vLines = () => (window.lineGroups?.vertical || []);
-        const hLines = () => (window.lineGroups?.horizontal || []);
+        const vLines = () => (window.lineGroups?.vertical ?? []);
+        const hLines = () => (window.lineGroups?.horizontal ?? []);
         // Vertical draw using totals if provided
         verticalDrawTL.addLabel('start', 0);
         verticalDrawTL.add(() => {
-            const vCountLocal = vLines().length || 1;
-            const vEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
+            const vCountLocal = vLines().length;
+            if (!vCountLocal) return;
+            if (typeof SECTION2_TIMINGS.lineDrawSingle !== 'number') {
+                console.error('Missing SECTION2_TIMINGS.lineDrawSingle');
+                return;
+            }
+            const vEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle);
             const vStagger = vCountLocal > 1
-                ? Math.max(0, ((SECTION2_TIMINGS.drawVerticalLinesTotal ?? (vEach + (vCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - vEach) / (vCountLocal - 1))
+                ? Math.max(0, ((SECTION2_TIMINGS.drawVerticalLinesTotal ?? (vEach + (vCountLocal - 1) * (SECTION2_TIMINGS.lineStagger))) - vEach) / (vCountLocal - 1))
                 : 0;
             vLines().forEach((line, index) => {
                 verticalDrawTL.to(line, {
@@ -372,10 +377,15 @@ function setupSection2Pinning() {
         // Horizontal draw using totals and offset; allow negative offset to overlap
         section2Timeline.add(horizontalDrawTL, `>+=${SECTION2_TIMINGS.drawHorizontalLinesOffset}`);
         horizontalDrawTL.add(() => {
-            const hCountLocal = hLines().length || 1;
-            const hEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
+            const hCountLocal = hLines().length;
+            if (!hCountLocal) return;
+            if (typeof SECTION2_TIMINGS.lineDrawSingle !== 'number') {
+                console.error('Missing SECTION2_TIMINGS.lineDrawSingle');
+                return;
+            }
+            const hEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle);
             const hStagger = hCountLocal > 1
-                ? Math.max(0, ((SECTION2_TIMINGS.drawHorizontalLinesTotal ?? (hEach + (hCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - hEach) / (hCountLocal - 1))
+                ? Math.max(0, ((SECTION2_TIMINGS.drawHorizontalLinesTotal ?? (hEach + (hCountLocal - 1) * (SECTION2_TIMINGS.lineStagger))) - hEach) / (hCountLocal - 1))
                 : 0;
             hLines().forEach((line, index) => {
                 horizontalDrawTL.to(line, {
@@ -394,15 +404,15 @@ function setupSection2Pinning() {
 
         // Outward expansion after drawing completes using explicit offset
         const outwardExpansionPhase = createOutwardExpansionPhase();
-        section2Timeline.add(outwardExpansionPhase, `>+=${SECTION2_TIMINGS.outwardOffset}`);
+        section2Timeline.add(outwardExpansionPhase, `>+=${SECTION2_TIMINGS.delayAfterGridDraw}`);
 
         // Additional rotation after outward using explicit offset
         const rotationPhase = createRotationPhase();
-        section2Timeline.add(rotationPhase, `>+=${SECTION2_TIMINGS.rotateOffset}`);
+        section2Timeline.add(rotationPhase, `>+=${SECTION2_TIMINGS.delayAfterRotation}`);
 
         // Final expansion after rotation with optional offset
         const expansionPhase = createExpansionPhase();
-        section2Timeline.add(expansionPhase, `>+=${SECTION2_TIMINGS.expandOffset}`);
+        section2Timeline.add(expansionPhase, `>+=${SECTION2_TIMINGS.delayAfterRotationOLDNOW}`);
 
         // Title reveal (Key Metrics) with label-like wipe effect
         try {
@@ -411,7 +421,7 @@ function setupSection2Pinning() {
                 const cs = getComputedStyle(titleEl);
                 // Force highlight color to pure white regardless of title computed color
                 const color = '#FFFFFF';
-                const fontSizePx = parseFloat(cs.fontSize) || 16;
+                const fontSizePx = parseFloat(cs.fontSize);
                 const padX = 4;
                 const padY = 20;
 
@@ -441,9 +451,9 @@ function setupSection2Pinning() {
                 // 1) Wipe expand (schedule after rotation)
                 section2Timeline.to(hl, {
                     width: () => measure(),
-                    duration: SECTION2_TIMINGS.highlightExpand,
+                    duration: SECTION2_TIMINGS.titleWipeDuration,
                     ease: 'none'
-                }, `>+=${SECTION2_TIMINGS.titleOffset}`);
+                }, `>+=${SECTION2_TIMINGS.delayBeforeTitle}`);
 
                 // 2) Title visible (full opacity for title, unlike labels)
                 section2Timeline.to(titleEl, {
@@ -456,7 +466,7 @@ function setupSection2Pinning() {
                 section2Timeline.to(hl, {
                     width: 0,
                     left: () => `${-padX + measure()}px`,
-                    duration: SECTION2_TIMINGS.highlightShrink,
+                    duration: SECTION2_TIMINGS.titleWipeDuration,
                     ease: 'none'
                 }, ">");
             }
@@ -467,7 +477,9 @@ function setupSection2Pinning() {
         // Instead of adding the entire phase at once, we reuse its internal per-node logic by
         // constructing a per-node TL chain using the same timings and stagger parameters.
         // For minimal code change, keep existing function but add as a group right after title delay.
-        section2Timeline.add(blocksTL, `>+=${SECTION2_TIMINGS.blocksFirstOffset}`);
+        section2Timeline.add(blocksTL, `>+=${SECTION2_TIMINGS.delayBeforeFirstBlock}`);
+        // Add an explicit tail gap before unpinning
+        section2Timeline.add(gsap.timeline().to({}, { duration: SECTION2_TIMINGS.delayBeforeUnpin }), ">");
 
         console.log('Master timeline with 4-phase animation created successfully');
         try { ScrollTrigger.refresh(); } catch (_) {}
@@ -496,7 +508,12 @@ function createDrawingPhase() {
     
     // Calculate dynamic SVG dimensions based on breakpoint-aware grid settings
     const lineLength = calculateLineLength();
-    const gridState = (GRID_STATES && GRID_STATES[getCurrentAnimationState()]) || GRID_STATES?.desktop || {};
+    const gridStateKey = getCurrentAnimationState();
+    const gridState = GRID_STATES[gridStateKey];
+    if (!gridState) {
+        console.error('Grid state missing for', gridStateKey);
+        return drawingTimeline;
+    }
     const svgSizeMultiplier = typeof gridState.svgSizeMultiplier === 'number' ? gridState.svgSizeMultiplier : 1.5;
     const svgSize = Math.max(window.innerWidth, window.innerHeight) * svgSizeMultiplier;
     
@@ -657,22 +674,22 @@ function createOutwardExpansionPhase() {
     
     // Canonical transforms: move lines using x/y transforms instead of mutating SVG path data
     horizontalLines.forEach((line) => {
-        const level = Number(line.dataset.level || 0);
+        const level = Number(line.dataset.level);
         const targetY = level * newSpacing; // map by logical level
         outwardExpansionTimeline.to(line, {
             y: targetY,
             ease: "none",
-            duration: SECTION2_TIMINGS.outward
+            duration: SECTION2_TIMINGS.rotationDuration
         }, 0); // simultaneous with rotation
     });
 
     verticalLines.forEach((line) => {
-        const level = Number(line.dataset.level || 0);
+        const level = Number(line.dataset.level);
         const targetX = level * newSpacing; // map by logical level
         outwardExpansionTimeline.to(line, {
             x: targetX,
             ease: "none",
-            duration: SECTION2_TIMINGS.outward
+            duration: SECTION2_TIMINGS.rotationDuration
         }, 0); // simultaneous with rotation
     });
     
@@ -680,14 +697,19 @@ function createOutwardExpansionPhase() {
     outwardExpansionTimeline.to(gridGroup, {
         rotation: 45,
         ease: "none",
-        duration: SECTION2_TIMINGS.outward
+        duration: SECTION2_TIMINGS.rotationDuration
     }, 0);
     
     // Move and resize cells in lockstep with spacing over this phase (update group transform)
     const cellsGroup = document.getElementById('grid-cells');
     if (cellsGroup) {
         const cellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
-        const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
+        const rectStateKey1 = getCurrentAnimationState();
+        const rectStateCfg = RECT_STATES[rectStateKey1];
+        if (!rectStateCfg) {
+            console.error('Rect state missing for', rectStateKey1);
+            return outwardExpansionTimeline;
+        }
         const sfStart = (typeof rectStateCfg.sizeFactorOutStart === 'number') ? rectStateCfg.sizeFactorOutStart : (rectStateCfg.sizeFactor ?? 0.5);
         const sfEnd = (typeof rectStateCfg.sizeFactorOutEnd === 'number') ? rectStateCfg.sizeFactorOutEnd : (rectStateCfg.sizeFactor ?? 0.5);
         const pmStart = (typeof rectStateCfg.positionOutMultiplierStart === 'number') ? rectStateCfg.positionOutMultiplierStart : 1;
@@ -701,8 +723,8 @@ function createOutwardExpansionPhase() {
             const size = Math.max(2, spacingBase * sizeF);
             const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
             cellNodes.forEach((node) => {
-                const i = Number(node.dataset.i || 0);
-                const j = Number(node.dataset.j || 0);
+                const i = Number(node.dataset.i);
+                const j = Number(node.dataset.j);
                 const cx = i * (spacingBase * posMult) + (spacingBase * posMult) / 2;
                 const cy = j * (spacingBase * posMult) + (spacingBase * posMult) / 2;
                 const x = cx - size / 2;
@@ -794,7 +816,7 @@ function createExpansionPhase() {
     
     // Canonical transforms: continue expanding via x/y, avoid mutating path data
     horizontalLines.forEach((line) => {
-        const level = Number(line.dataset.level || 0);
+        const level = Number(line.dataset.level);
         const targetY = level * newSpacing; // keep symmetry via logical level
         expansionTimeline.to(line, {
             y: targetY,
@@ -804,7 +826,7 @@ function createExpansionPhase() {
     });
 
     verticalLines.forEach((line) => {
-        const level = Number(line.dataset.level || 0);
+        const level = Number(line.dataset.level);
         const targetX = level * newSpacing;
         expansionTimeline.to(line, {
             x: targetX,
@@ -817,11 +839,16 @@ function createExpansionPhase() {
     const cellsGroup = document.getElementById('grid-cells');
     if (cellsGroup) {
         const cellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
-        const rectStateCfg = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || {};
-        const sfStart = (typeof rectStateCfg.sizeFactorFinalStart === 'number') ? rectStateCfg.sizeFactorFinalStart : (rectStateCfg.sizeFactor ?? 0.5);
-        const sfEnd = (typeof rectStateCfg.sizeFactorFinalEnd === 'number') ? rectStateCfg.sizeFactorFinalEnd : (rectStateCfg.sizeFactor ?? 0.5);
-        const pmStart = (typeof rectStateCfg.positionFinalMultiplierStart === 'number') ? rectStateCfg.positionFinalMultiplierStart : 1;
-        const pmEnd = (typeof rectStateCfg.positionFinalMultiplierEnd === 'number') ? rectStateCfg.positionFinalMultiplierEnd : 1;
+        const rectStateKey2 = getCurrentAnimationState();
+        const rectStateCfg2 = RECT_STATES[rectStateKey2];
+        if (!rectStateCfg2) {
+            console.error('Rect state missing for', rectStateKey2);
+            return expansionTimeline;
+        }
+        const sfStart = (typeof rectStateCfg2.sizeFactorFinalStart === 'number') ? rectStateCfg2.sizeFactorFinalStart : (rectStateCfg2.sizeFactor ?? 0.5);
+        const sfEnd = (typeof rectStateCfg2.sizeFactorFinalEnd === 'number') ? rectStateCfg2.sizeFactorFinalEnd : (rectStateCfg2.sizeFactor ?? 0.5);
+        const pmStart = (typeof rectStateCfg2.positionFinalMultiplierStart === 'number') ? rectStateCfg2.positionFinalMultiplierStart : 1;
+        const pmEnd = (typeof rectStateCfg2.positionFinalMultiplierEnd === 'number') ? rectStateCfg2.positionFinalMultiplierEnd : 1;
         expansionTimeline.eventCallback('onUpdate', () => {
             const tl = expansionTimeline;
             const t = tl.totalProgress();
@@ -829,10 +856,10 @@ function createExpansionPhase() {
             const sizeF = gsap.utils.interpolate(sfStart, sfEnd, t);
             const posMult = gsap.utils.interpolate(pmStart, pmEnd, t);
             const size = Math.max(2, spacingBase * sizeF);
-            const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+            const rx = size * (rectStateCfg2.cornerRadiusFactor ?? 0.15);
             cellNodes.forEach((node) => {
-                const i = Number(node.dataset.i || 0);
-                const j = Number(node.dataset.j || 0);
+                const i = Number(node.dataset.i);
+                const j = Number(node.dataset.j);
                 const cx = i * (spacingBase * posMult) + (spacingBase * posMult) / 2;
                 const cy = j * (spacingBase * posMult) + (spacingBase * posMult) / 2;
                 const x = cx - size / 2;
@@ -857,7 +884,12 @@ function createStaticCellsPhase() {
         return cellsTimeline;
     }
 
-    const rectState = (RECT_STATES && RECT_STATES[getCurrentAnimationState()]) || RECT_STATES?.desktop || { enabled: false };
+    const rectStateKey = getCurrentAnimationState();
+    const rectState = RECT_STATES[rectStateKey];
+    if (!rectState) {
+        console.error('Rect state missing for', rectStateKey);
+        return cellsTimeline;
+    }
     if (!rectState.enabled) {
         return cellsTimeline;
     }
@@ -867,11 +899,15 @@ function createStaticCellsPhase() {
     const maxLevel = Math.max(...levels);
     const minLevel = Math.min(...levels);
 
-    const baseSpacing = Number(window.gridInitialSpacing) || 50;
+    if (typeof window.gridInitialSpacing !== 'number') {
+        console.error('gridInitialSpacing missing');
+        return cellsTimeline;
+    }
+    const baseSpacing = window.gridInitialSpacing;
     const size = Math.max(2, baseSpacing * (rectState.sizeFactor ?? 0.5));
     const rx = size * (rectState.cornerRadiusFactor ?? 0.15);
     const group = window.gridGroup;
-    const rectDefaults = rectState.rectDefaults || {};
+    const rectDefaults = rectState.rectDefaults;
 
     // Remove previous cells group if exists
     const old = document.getElementById('grid-cells');
@@ -1137,10 +1173,14 @@ function prepareCellsStrokeDraw() {
 // Blocks Reveal Phase: sequentially fade in visible blocks
 function createBlocksRevealPhase() {
     const tl = gsap.timeline();
-    const nodes = (window.visibleCellNodes && window.visibleCellNodes.length)
-        ? window.visibleCellNodes
-        : Array.from((document.getElementById('grid-cells') || { querySelectorAll: () => [] }).querySelectorAll('.cell-node'));
-    if (!nodes || nodes.length === 0) {
+    let nodes = [];
+    if (window.visibleCellNodes && window.visibleCellNodes.length) {
+        nodes = window.visibleCellNodes;
+    } else {
+        const grp = document.getElementById('grid-cells');
+        if (grp) nodes = Array.from(grp.querySelectorAll('.cell-node'));
+    }
+    if (!nodes.length) {
         console.warn('Reveal phase: no cell nodes to reveal');
         return tl;
     }
@@ -1159,7 +1199,7 @@ function createBlocksRevealPhase() {
         }
         if (highlight && labelEl) {
             const padding = 8;
-            const anchor = (labelEl.getAttribute('text-anchor')) || 'start';
+            const anchor = labelEl.getAttribute('text-anchor');
             const labelXAttr = labelEl.getAttribute('x');
             const labelX = labelXAttr != null ? Number(labelXAttr) : 0;
 
@@ -1234,14 +1274,14 @@ function createBlocksRevealPhase() {
         // 4) Amount number-only counting effect (e.g., "$700M+" => count 0 -> 700)
         const amountEl = node.querySelector('text[data-role="amount"]');
         if (amountEl) {
-            const original = amountEl.textContent || '';
+            const original = amountEl.textContent ?? '';
             const m = original.match(/(-?[\d,]+(?:\.[\d]+)?)/);
             if (m && m.index != null) {
                 const numStr = m[1];
                 const prefix = original.slice(0, m.index);
                 const suffix = original.slice(m.index + numStr.length);
-                const decimals = (numStr.split('.')[1] || '').length;
-                const target = parseFloat(numStr.replace(/,/g, '')) || 0;
+                const decimals = (numStr.split('.')[1] ?? '').length;
+                const target = parseFloat(numStr.replace(/,/g, ''));
                 const monthLike = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(prefix + suffix);
                 const formatter = new Intl.NumberFormat('en-US', {
                     minimumFractionDigits: decimals,
