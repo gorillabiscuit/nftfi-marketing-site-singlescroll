@@ -371,12 +371,60 @@ function setupSection2Pinning() {
         const expansionPhase = createExpansionPhase();
         section2Timeline.add(expansionPhase, 'expand');
 
-        // Title reveal (Key Metrics)
+        // Title reveal (Key Metrics) with label-like wipe effect
         try {
             const titleEl = document.querySelector('.key-metrics-title');
             if (titleEl) {
-                gsap.set(titleEl, { opacity: 0 });
-                section2Timeline.to(titleEl, { opacity: 1, duration: SECTION2_TIMINGS.titleAppear, ease: 'power1.out' }, 'title');
+                const cs = getComputedStyle(titleEl);
+                const color = cs.color || '#FFFFFF';
+                const fontSizePx = parseFloat(cs.fontSize) || 16;
+                const padX = 4;
+                const padY = 2;
+
+                // Ensure positioned context and initial invisibility
+                gsap.set(titleEl, { opacity: 0, position: cs.position === 'static' ? 'relative' : cs.position });
+
+                // Create highlight overlay on top of the title
+                const hl = document.createElement('div');
+                hl.className = 'key-metrics-highlight';
+                titleEl.appendChild(hl);
+                gsap.set(hl, {
+                    position: 'absolute',
+                    left: `${-padX}px`,
+                    top: `${-padY}px`,
+                    height: `${fontSizePx + padY * 2}px`,
+                    width: 0,
+                    backgroundColor: color,
+                    zIndex: 1,
+                    pointerEvents: 'none'
+                });
+
+                const measure = () => {
+                    const rect = titleEl.getBoundingClientRect();
+                    return Math.max(padX * 2, rect.width + padX * 2);
+                };
+
+                // 1) Wipe expand
+                section2Timeline.to(hl, {
+                    width: () => measure(),
+                    duration: SECTION2_TIMINGS.highlightExpand,
+                    ease: 'none'
+                }, 'title');
+
+                // 2) Title visible (match labels opacity)
+                section2Timeline.to(titleEl, {
+                    opacity: 0.5,
+                    duration: SECTION2_TIMINGS.labelReveal,
+                    ease: 'none'
+                }, `title+=${SECTION2_TIMINGS.highlightExpand}`);
+
+                // 3) Wipe shrink left-to-right (move left edge right while width goes to 0)
+                section2Timeline.to(hl, {
+                    width: 0,
+                    left: () => `${-padX + measure()}px`,
+                    duration: SECTION2_TIMINGS.highlightShrink,
+                    ease: 'none'
+                }, `title+=${SECTION2_TIMINGS.highlightExpand + SECTION2_TIMINGS.labelReveal}`);
             }
         } catch (_) {}
 
