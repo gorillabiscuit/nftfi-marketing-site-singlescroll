@@ -365,9 +365,10 @@ function setupSection2Pinning() {
         verticalDrawTL.addLabel('start', 0);
         verticalDrawTL.add(() => {
             const vCountLocal = vLines().length || 1;
-            const total = Math.max(0.01, SECTION2_TIMINGS.drawVerticalLinesTotal || (SECTION2_TIMINGS.draw * vCountLocal));
-            const vEach = total / vCountLocal;
-            const vStagger = vEach; // sequential, total equals vEach * count
+            const vEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
+            const vStagger = vCountLocal > 1
+                ? Math.max(0, ((SECTION2_TIMINGS.drawVerticalLinesTotal ?? (vEach + (vCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - vEach) / (vCountLocal - 1))
+                : 0;
             vLines().forEach((line, index) => {
                 verticalDrawTL.to(line, {
                     drawSVG: '0% 100%',
@@ -382,9 +383,10 @@ function setupSection2Pinning() {
         section2Timeline.add(horizontalDrawTL, `>+=${SECTION2_TIMINGS.drawHorizontalLinesOffset || 0}`);
         horizontalDrawTL.add(() => {
             const hCountLocal = hLines().length || 1;
-            const total = Math.max(0.01, SECTION2_TIMINGS.drawHorizontalLinesTotal || (SECTION2_TIMINGS.draw * hCountLocal));
-            const hEach = total / hCountLocal;
-            const hStagger = hEach;
+            const hEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
+            const hStagger = hCountLocal > 1
+                ? Math.max(0, ((SECTION2_TIMINGS.drawHorizontalLinesTotal ?? (hEach + (hCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - hEach) / (hCountLocal - 1))
+                : 0;
             hLines().forEach((line, index) => {
                 horizontalDrawTL.to(line, {
                     drawSVG: '0% 100%',
@@ -540,11 +542,9 @@ function createDrawingPhase() {
     const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     gsap.set(gridGroup, { attr: { id: 'grid-lines' } });
     svg.appendChild(gridGroup);
-    // Ensure grid starts axis-aligned (no residual transforms)
-    gsap.set(gridGroup, { rotation: 0, x: 0, y: 0, transformOrigin: '50% 50%' });
- 
+    
     // Calculate center point - now (0,0) in our centered coordinate system
-    const center = 0; // In centered viewBox, center is always (0,0)
+    const center = 0; // In centered viewBox, (0,0) is the center
     
     console.log(`Center point is now at (0,0) in centered coordinate system`);
     console.log(`SVG viewBox: -${svgSize/2} -${svgSize/2} ${svgSize} ${svgSize}`);
@@ -626,13 +626,14 @@ function createDrawingPhase() {
 
     // Ensure group rotates around center
     gsap.set(gridGroup, { transformOrigin: "50% 50%" });
-
-    // Initialize lines to undrawn state; actual drawing handled by vertical/horizontal draw timelines
-    lineGroups.all.forEach((line) => {
-        gsap.set(line, { drawSVG: "50% 50%", x: 0, y: 0, rotation: 0, transformOrigin: '50% 50%' });
+    
+    // Set up each line with the world-class center-out drawSVG pattern
+    lineGroups.all.forEach((line, index) => {
+        // Start with lines invisible (center point only)
+        gsap.set(line, { drawSVG: "50% 50%" });
     });
     
-    console.log('Phase 1: Grid built and initial states set (drawing handled by dedicated timelines)');
+    console.log('Phase 1: Grid built and initial draw state set (actual drawing handled by vertical/horizontal timelines)');
     // Force ST to re-measure after dynamic SVG rebuild
     try { ScrollTrigger.refresh(); } catch (_) {}
     return drawingTimeline;
