@@ -374,9 +374,14 @@ function setupSection2Pinning() {
         }, 'start');
         section2Timeline.add(verticalDrawTL, ">");
 
-        // Horizontal draw starts overlapping relative to vertical draw duration
-        const horizOverlap = Math.max(0, (SECTION2_TIMINGS.horizontalStartOverlapRatio || 0) * (SECTION2_TIMINGS.draw));
-        section2Timeline.add(horizontalDrawTL, `>-=${horizOverlap}`);
+        // Horizontal draw starts overlapping relative to vertical draw total duration (including stagger)
+        const vCount = vLines().length || 1;
+        const verticalTotal = SECTION2_TIMINGS.draw + Math.max(0, (vCount - 1)) * SECTION2_TIMINGS.lineStagger;
+        const ratio = Math.max(0, Math.min(1, SECTION2_TIMINGS.horizontalStartOverlapRatio || 0));
+        // desired horizontal start time from the start of vertical: t = verticalTotal * ratio
+        // overlap relative to the end of vertical is: overlapSec = verticalTotal - t
+        const overlapSec = Math.max(0, verticalTotal - (verticalTotal * ratio));
+        section2Timeline.add(horizontalDrawTL, `>-=${overlapSec}`);
         horizontalDrawTL.add(() => {
             hLines().forEach((line, index) => {
                 horizontalDrawTL.to(line, {

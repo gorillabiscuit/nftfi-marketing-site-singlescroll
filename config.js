@@ -77,44 +77,39 @@ export const GRID_STATES = {
 
 // Exposed timings for Section 2 animation (tweak as needed)
 export const SECTION2_TIMINGS = {
-    // Phase durations
-    draw: 0.75,              // duration per line draw tween
-    outward: 0.75,           // outward expansion + initial rotation
-    rotateStep: 0.75,        // additional rotation step
-    microRotate: 0.75,       // subtle per-line micro-rotation
-    expand: 0.25,            // final grid expansion
+    // Draw (lines)
+    draw: 0.75,                 // per-line draw duration
+    lineStagger: 0.02,          // per-line stagger
+    horizontalStartOverlapRatio: 0.5, // horizontal starts when vertical is this fraction complete (0..1)
 
-    // Inter-phase delays
-    delayBeforeOutward: 2.5,     // wait after drawing finishes before starting outward/rotation
-    delayBeforeRotateStep: 0.3,  // wait after outward before additional rotation phase
-    delayAfterDrawing: 0.5,      // additional delay after drawing timeline completes before outward starts
-    rotateStartDelay: 0.0,       // additional delay after outward completes before rotation starts (overrides generic delay if set)
+    // Transforms (grid motion)
+    outward: 0.75,              // outward expansion + initial rotation duration
+    rotateStep: 0.75,           // additional rotation duration
+    microRotate: 0.75,          // subtle per-line micro-rotation duration
+    expand: 0.25,               // final grid expansion duration
 
-    // Staggers and inter-block delays
-    lineStagger: 0.02,       // stagger between line draw tweens
-    blockBaseStagger: 0.15,  // base per-block stagger
-    blockExtraDelay: 1.0,    // extra seconds between blocks
+    // Phase spacing
+    delayAfterDrawing: 0.5,     // pause after drawing completes
+    delayBeforeOutward: 2.5,    // extra delay before outward begins
+    rotateStartDelay: 0.0,      // delay after outward before rotation starts
 
-    // Rect/label highlight timings
-    rectDraw: 0.25,          // cell stroke draw duration
-    rectFillFade: 0.10,      // cell fill fade-in
-    highlightExpand: 0.22,   // highlight wipe expand
-    labelReveal: 0.05,       // label fade-in after wipe
-    highlightShrink: 0.22,   // highlight wipe shrink
+    // Title
+    titleAppear: 0.35,          // title fade duration (with wipe)
+    titleDelayAfterRotate: 0.0,  // delay after rotation before title starts
 
-    // Amount timings
-    amountDelayAfterLabel: 0.5, // delay after label reveal before amount appears
+    // Blocks (sequence-level)
+    blocksStartAfterTitle: 0.5, // delay after title before first block
+    blockGap: 0.25,             // gap between block i and block i+1 in the master sequence
+
+    // Block internals (per-block TL)
+    rectDraw: 0.25,             // cell stroke draw duration
+    rectFillFade: 0.10,         // cell fill fade-in
+    highlightExpand: 0.22,      // label/title wipe expand
+    labelReveal: 0.05,          // label/title reveal after wipe
+    highlightShrink: 0.22,      // wipe shrink
+    amountDelayAfterLabel: 0.5, // delay after label before amount appears
     amountAppear: 0.15,         // amount fade-in
-    amountCount: 2.0,           // count-up duration
-
-    // Title timings (Key Metrics)
-    titleAppear: 0.35,           // duration for title fade-in
-    titleDelayAfterRotate: 0.0,   // extra delay after rotation completes before showing title
-    blocksStartAfterTitle: 0.5,   // delay after title before blocks start revealing
-
-    // Relative sequencing controls
-    horizontalStartOverlapRatio: 0.5, // fraction of vertical draw duration after which horizontal starts
-    blockGap: 0.25                   // gap between consecutive block reveals in the master timeline
+    amountCount: 2.0            // count-up duration
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
