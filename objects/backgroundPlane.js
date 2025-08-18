@@ -171,11 +171,17 @@ export function captureHeroAsTexture() {
                 reject(error);
             });
         };
-        if (document.fonts && typeof document.fonts.ready?.then === 'function') {
-            document.fonts.ready.then(() => requestAnimationFrame(doCapture));
-        } else {
-            requestAnimationFrame(doCapture);
-        }
+        const waitForHeroReady = () => {
+            // Prefer global heroReady if available; fallback to fonts.ready
+            if (window.heroReady && typeof window.heroReady.then === 'function') {
+                window.heroReady.then(() => requestAnimationFrame(doCapture));
+            } else if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+                document.fonts.ready.then(() => requestAnimationFrame(doCapture));
+            } else {
+                requestAnimationFrame(doCapture);
+            }
+        };
+        waitForHeroReady();
     });
 }
 

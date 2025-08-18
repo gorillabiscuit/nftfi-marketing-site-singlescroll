@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="is-prep">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -259,6 +259,9 @@
     <!-- Main Application Script -->
     <script type="module" src="app.js"></script>
     <script>
+        // Global heroReady promise to coordinate capture and reveal
+        window.heroReady = new Promise((resolve) => { window.__resolveHeroReady = resolve; });
+
         window.addEventListener('DOMContentLoaded', () => {
           const hero = document.querySelector('.hero');
           const title = document.getElementById('hero-title');
@@ -276,25 +279,7 @@
             hero.style.minHeight = initialHeroHeight + 'px';
           }
 
-          // 1b) Freeze transitions and lock actions height to prevent button jiggle
-          const previousTransitions = new Map();
-          const freezeTransitions = (el) => {
-            if (!el) return;
-            previousTransitions.set(el, el.style.transition);
-            el.style.transition = 'none';
-          };
-          const unfreezeTransitions = (el) => {
-            if (!el) return;
-            el.style.transition = previousTransitions.get(el) ?? '';
-          };
-
-          freezeTransitions(hero);
-          freezeTransitions(heroText);
-          freezeTransitions(heroContent);
-          // Keep text hidden until layout is finalized
-          heroText.style.opacity = '0';
-          freezeTransitions(heroActions);
-          actionCards.forEach(freezeTransitions);
+          // Prep: keep text hidden via CSS class; lock actions height to prevent jiggle
 
           const initialActionsHeight = heroActions.getBoundingClientRect().height;
           if (initialActionsHeight > 0) {
@@ -325,19 +310,18 @@
                 hero.style.minHeight = finalHeroHeight + 'px';
               }
 
-              // 3) Release the height lock in the next frame
+              // 3) One more frame to ensure layout settles, then signal readiness and reveal
               requestAnimationFrame(() => {
-                // Keep min-heights briefly to avoid a visible snap, then release
-                setTimeout(() => { hero.style.minHeight = ''; }, 300);
+                // Signal global readiness for capture
+                if (typeof window.__resolveHeroReady === 'function') {
+                  window.__resolveHeroReady();
+                }
+                // Remove prep class to enable transitions
+                document.documentElement.classList.remove('is-prep');
+                // Release locks
+                setTimeout(() => { hero.style.minHeight = ''; }, 150);
                 heroActions.style.minHeight = '';
-                // Re-enable transitions after layout is stable
-                unfreezeTransitions(hero);
-                unfreezeTransitions(heroText);
-                unfreezeTransitions(heroContent);
-                unfreezeTransitions(heroActions);
-                actionCards.forEach(unfreezeTransitions);
-
-                // Fade text in now that sizes are stable
+                // Reveal text (CSS transition now active)
                 heroText.style.opacity = '1';
               });
             });

@@ -725,6 +725,16 @@ body.scroll-disabled {
         filter 0.3s ease-out;
 }
 
+/* Prep state to disable transitions and keep text hidden until layout is ready */
+html.is-prep .hero,
+html.is-prep .hero-text,
+html.is-prep .hero-actions {
+    transition: none !important;
+}
+html.is-prep .hero-text {
+    opacity: 0;
+}
+
 /* SVG Background - Top Right Copy */
 .hero::before {
     content: '';
