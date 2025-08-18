@@ -84,6 +84,10 @@ export const SECTION2_TIMINGS = {
     microRotate: 5.75,       // subtle per-line micro-rotation
     expand: 0.25,            // final grid expansion
 
+    // Inter-phase delays
+    delayBeforeOutward: 0.5,     // wait after drawing finishes before starting outward/rotation
+    delayBeforeRotateStep: 0.3,  // wait after outward before additional rotation phase
+
     // Staggers and inter-block delays
     lineStagger: 0.02,       // stagger between line draw tweens
     blockBaseStagger: 0.15,  // base per-block stagger
@@ -104,7 +108,7 @@ export const SECTION2_TIMINGS = {
     // Title timings (Key Metrics)
     titleAppear: 0.35,           // duration for title fade-in
     titleDelayAfterRotate: 0.0,   // extra delay after rotation completes before showing title
-    blocksStartAfterTitle: 0.1    // delay after title before blocks start revealing
+    blocksStartAfterTitle: 0.5    // delay after title before blocks start revealing
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
