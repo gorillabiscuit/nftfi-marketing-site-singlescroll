@@ -343,7 +343,10 @@ function setupSection2Pinning() {
         // Labels to control overlaps between phases
         section2Timeline.addLabel('draw', 0);
         section2Timeline.addLabel('outward', 0.25 + SECTION2_TIMINGS.delayBeforeOutward + SECTION2_TIMINGS.delayAfterDrawing);
-        section2Timeline.addLabel('rotate', 0.5 + SECTION2_TIMINGS.delayBeforeOutward + SECTION2_TIMINGS.delayBeforeRotateStep);
+        const rotateDelay = (SECTION2_TIMINGS.rotateStartDelay != null)
+            ? SECTION2_TIMINGS.rotateStartDelay
+            : (SECTION2_TIMINGS.delayBeforeOutward + SECTION2_TIMINGS.delayBeforeRotateStep);
+        section2Timeline.addLabel('rotate', 0.5 + rotateDelay);
         section2Timeline.addLabel('expand', 0.55);
         // Compute a 'title' point after rotation completes (max of rotateStep and microRotate)
         const postRotateOffset = Math.max(SECTION2_TIMINGS.rotateStep, SECTION2_TIMINGS.microRotate);
