@@ -365,10 +365,9 @@ function setupSection2Pinning() {
         verticalDrawTL.addLabel('start', 0);
         verticalDrawTL.add(() => {
             const vCountLocal = vLines().length || 1;
-            const vEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
-            const vStagger = vCountLocal > 1
-                ? Math.max(0, ((SECTION2_TIMINGS.drawVerticalLinesTotal ?? (vEach + (vCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - vEach) / (vCountLocal - 1))
-                : 0;
+            const total = Math.max(0.01, SECTION2_TIMINGS.drawVerticalLinesTotal || (SECTION2_TIMINGS.draw * vCountLocal));
+            const vEach = total / vCountLocal;
+            const vStagger = vEach; // sequential, total equals vEach * count
             vLines().forEach((line, index) => {
                 verticalDrawTL.to(line, {
                     drawSVG: '0% 100%',
@@ -383,10 +382,9 @@ function setupSection2Pinning() {
         section2Timeline.add(horizontalDrawTL, `>+=${SECTION2_TIMINGS.drawHorizontalLinesOffset || 0}`);
         horizontalDrawTL.add(() => {
             const hCountLocal = hLines().length || 1;
-            const hEach = Math.max(0.01, SECTION2_TIMINGS.lineDrawSingle || SECTION2_TIMINGS.draw);
-            const hStagger = hCountLocal > 1
-                ? Math.max(0, ((SECTION2_TIMINGS.drawHorizontalLinesTotal ?? (hEach + (hCountLocal - 1) * (SECTION2_TIMINGS.lineStagger || 0))) - hEach) / (hCountLocal - 1))
-                : 0;
+            const total = Math.max(0.01, SECTION2_TIMINGS.drawHorizontalLinesTotal || (SECTION2_TIMINGS.draw * hCountLocal));
+            const hEach = total / hCountLocal;
+            const hStagger = hEach;
             hLines().forEach((line, index) => {
                 horizontalDrawTL.to(line, {
                     drawSVG: '0% 100%',
@@ -544,9 +542,9 @@ function createDrawingPhase() {
     svg.appendChild(gridGroup);
     // Ensure grid starts axis-aligned (no residual transforms)
     gsap.set(gridGroup, { rotation: 0, x: 0, y: 0, transformOrigin: '50% 50%' });
-    
+ 
     // Calculate center point - now (0,0) in our centered coordinate system
-    const center = 0; // In centered viewBox, (0,0) is the center
+    const center = 0; // In centered viewBox, center is always (0,0)
     
     console.log(`Center point is now at (0,0) in centered coordinate system`);
     console.log(`SVG viewBox: -${svgSize/2} -${svgSize/2} ${svgSize} ${svgSize}`);
@@ -555,90 +553,90 @@ function createDrawingPhase() {
     const initialSpacing = typeof gridState.initialSpacing === 'number' ? gridState.initialSpacing : 50;
     const levels = Number.isInteger(gridState.levels) ? gridState.levels : 3; // levels per axis -> total lines = (2*levels+1)
     console.log(`Center point is now at (0,0) in centered coordinate system`);
- 
-     // Create all lines and organize into groups
-     const lineGroups = {
-         horizontal: [],
-         vertical: [],
-         all: []
-     };
- 
-     // Add horizontal lines (levels -N..N, increasing order)
-     for (let level = -levels; level <= levels; level++) {
-         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-         // Horizontal lines go from left edge to right edge of SVG in centered coordinate system
-         const leftEdge = -svgSize / 2;
-         const rightEdge = svgSize / 2;
-         const y = center + level * initialSpacing;
-         gsap.set(path, {
-             attr: {
-                 class: `line horizontal`,
-                 d: `M${leftEdge} ${y} L${rightEdge} ${y}`,
-                 'vector-effect': 'non-scaling-stroke',
-                 fill: 'none',
-                 stroke: gridState.lineColor ?? '#FFFFFF',
-                 'stroke-opacity': gridState.lineOpacity ?? 0.8
-             },
-             strokeWidth: (gridState.lineWidth ?? 1)
-         });
-         // Store logical position for future transforms
-         path.dataset.axis = 'h';
-         path.dataset.level = String(level);
-         gridGroup.appendChild(path);
-         lineGroups.horizontal.push(path);
-         lineGroups.all.push(path);
-     }
- 
-     // Add vertical lines (levels -N..N, increasing order)
-     for (let level = -levels; level <= levels; level++) {
-         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-         // Vertical lines go from top edge to bottom edge of SVG in centered coordinate system
-         const topEdge = -svgSize / 2;
-         const bottomEdge = svgSize / 2;
-         const x = center + level * initialSpacing;
-         gsap.set(path, {
-             attr: {
-                 class: `line vertical`,
-                 d: `M${x} ${topEdge} L${x} ${bottomEdge}`,
-                 'vector-effect': 'non-scaling-stroke',
-                 fill: 'none',
-                 stroke: gridState.lineColor ?? '#FFFFFF',
-                 'stroke-opacity': gridState.lineOpacity ?? 0.8
-             },
-             strokeWidth: (gridState.lineWidth ?? 1)
-         });
-         // Store logical position for future transforms
-         path.dataset.axis = 'v';
-         path.dataset.level = String(level);
-         gridGroup.appendChild(path);
-         lineGroups.vertical.push(path);
-         lineGroups.all.push(path);
-     }
- 
-     console.log(`Phase 1: Created ${lineGroups.all.length} SVG path elements`);
-     console.log('DrawSVGPlugin available:', typeof DrawSVGPlugin !== 'undefined');
- 
-     // Store line groups and group container globally for use in later phases
-     window.lineGroups = lineGroups;
-     window.svgSize = svgSize;
-     window.svgCenter = 0; // In centered coordinate system, center is always (0,0)
-     window.gridGroup = gridGroup;
-     window.gridInitialSpacing = initialSpacing;
-     window.gridState = gridState;
- 
-     // Ensure group rotates around center
-     gsap.set(gridGroup, { transformOrigin: "50% 50%" });
- 
-     // Initialize lines to undrawn state; drawing is handled by dedicated draw timelines
-     lineGroups.all.forEach((line) => {
-         gsap.set(line, { drawSVG: "50% 50%", x: 0, y: 0, rotation: 0, transformOrigin: '50% 50%' });
-     });
- 
-     console.log('Phase 1: Grid built and initial states set (drawing handled by dedicated timelines)');
-     // Force ST to re-measure after dynamic SVG rebuild
-     try { ScrollTrigger.refresh(); } catch (_) {}
-     return drawingTimeline;
- }
+    
+    // Create all lines and organize into groups
+    const lineGroups = {
+        horizontal: [],
+        vertical: [],
+        all: []
+    };
+    
+    // Add horizontal lines (levels -N..N, increasing order)
+    for (let level = -levels; level <= levels; level++) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        // Horizontal lines go from left edge to right edge of SVG in centered coordinate system
+        const leftEdge = -svgSize / 2;
+        const rightEdge = svgSize / 2;
+        const y = center + level * initialSpacing;
+        gsap.set(path, {
+            attr: {
+                class: `line horizontal`,
+                d: `M${leftEdge} ${y} L${rightEdge} ${y}`,
+                'vector-effect': 'non-scaling-stroke',
+                fill: 'none',
+                stroke: gridState.lineColor ?? '#FFFFFF',
+                'stroke-opacity': gridState.lineOpacity ?? 0.8
+            },
+            strokeWidth: (gridState.lineWidth ?? 1)
+        });
+        // Store logical position for future transforms
+        path.dataset.axis = 'h';
+        path.dataset.level = String(level);
+        gridGroup.appendChild(path);
+        lineGroups.horizontal.push(path);
+        lineGroups.all.push(path);
+    }
+    
+    // Add vertical lines (levels -N..N, increasing order)
+    for (let level = -levels; level <= levels; level++) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        // Vertical lines go from top edge to bottom edge of SVG in centered coordinate system
+        const topEdge = -svgSize / 2;
+        const bottomEdge = svgSize / 2;
+        const x = center + level * initialSpacing;
+        gsap.set(path, {
+            attr: {
+                class: `line vertical`,
+                d: `M${x} ${topEdge} L${x} ${bottomEdge}`,
+                'vector-effect': 'non-scaling-stroke',
+                fill: 'none',
+                stroke: gridState.lineColor ?? '#FFFFFF',
+                'stroke-opacity': gridState.lineOpacity ?? 0.8
+            },
+            strokeWidth: (gridState.lineWidth ?? 1)
+        });
+        // Store logical position for future transforms
+        path.dataset.axis = 'v';
+        path.dataset.level = String(level);
+        gridGroup.appendChild(path);
+        lineGroups.vertical.push(path);
+        lineGroups.all.push(path);
+    }
+    
+    console.log(`Phase 1: Created ${lineGroups.all.length} SVG path elements`);
+    console.log('DrawSVGPlugin available:', typeof DrawSVGPlugin !== 'undefined');
+    
+    // Store line groups and group container globally for use in later phases
+    window.lineGroups = lineGroups;
+    window.svgSize = svgSize;
+    window.svgCenter = 0; // In centered coordinate system, center is always (0,0)
+    window.gridGroup = gridGroup;
+    window.gridInitialSpacing = initialSpacing;
+    window.gridState = gridState;
+
+    // Ensure group rotates around center
+    gsap.set(gridGroup, { transformOrigin: "50% 50%" });
+
+    // Initialize lines to undrawn state; actual drawing handled by vertical/horizontal draw timelines
+    lineGroups.all.forEach((line) => {
+        gsap.set(line, { drawSVG: "50% 50%", x: 0, y: 0, rotation: 0, transformOrigin: '50% 50%' });
+    });
+    
+    console.log('Phase 1: Grid built and initial states set (drawing handled by dedicated timelines)');
+    // Force ST to re-measure after dynamic SVG rebuild
+    try { ScrollTrigger.refresh(); } catch (_) {}
+    return drawingTimeline;
+}
 
 // Phase 2: Create outward expansion phase with simultaneous rotation (lines travel outwards from center + grid rotates 45°)
 function createOutwardExpansionPhase() {
