@@ -117,6 +117,11 @@ export const SECTION2_TIMINGS = {
     amountCount: 14.0            // count-up duration
 };
 
+// Scroll scaling for Section 2: pixels of scroll per second of timeline duration
+export const SECTION2_SCROLL = {
+    pxPerSecond: 600
+};
+
 // Rectangle cell states for Section 2 (breakpoint-aware)
 // Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern
 export const RECT_STATES = {
@@ -311,8 +316,8 @@ export const ANIMATION_CONFIG = {
         frequency: 0.1,
         mouseInfluence: 0.55,
         // Directional overrides (up/down). If set, they override mouseInfluence for that sign
-        mouseInfluenceUp: 0.55,
-        mouseInfluenceDown: 0.55
+        mouseInfluenceUp: 0.15,
+        mouseInfluenceDown: 0.1
     },
     yRotationRate: {
         base: 0.3,
@@ -320,8 +325,8 @@ export const ANIMATION_CONFIG = {
         frequency: 0.08,
         mouseInfluence: 0.55,
         // Directional overrides (left/right). If set, they override mouseInfluence for that sign
-        mouseInfluenceLeft: 0.55,
-        mouseInfluenceRight: 0.55
+        mouseInfluenceLeft: 0.2,
+        mouseInfluenceRight: 0.15
     },
     zRotationRate: {
         base: 0.15,

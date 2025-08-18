@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS } from '../config.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 
 // Register GSAP plugins
@@ -332,7 +332,8 @@ function setupSection2Pinning() {
             scrollTrigger: {
                 trigger: triggerEl || "section[data-section='2']",
                 start: 'top top',
-                end: '+=2500',
+                // Scale scroll distance in proportion to the timeline's total duration
+                end: () => '+=' + Math.round((section2Timeline ? section2Timeline.totalDuration() : 4) * (SECTION2_SCROLL?.pxPerSecond || 600)),
                 pin: true,
                 anticipatePin: 1,
                 invalidateOnRefresh: true,
@@ -451,7 +452,7 @@ function setupSection2Pinning() {
                 // 1) Wipe expand (schedule after rotation)
                 section2Timeline.to(hl, {
                     width: () => measure(),
-                    duration: SECTION2_TIMINGS.titleWipeDuration,
+                    duration: SECTION2_TIMINGS.highlightExpand,
                     ease: 'none'
                 }, `>+=${SECTION2_TIMINGS.delayBeforeTitle}`);
 
@@ -466,7 +467,7 @@ function setupSection2Pinning() {
                 section2Timeline.to(hl, {
                     width: 0,
                     left: () => `${-padX + measure()}px`,
-                    duration: SECTION2_TIMINGS.titleWipeDuration,
+                    duration: SECTION2_TIMINGS.highlightShrink,
                     ease: 'none'
                 }, ">");
             }
@@ -679,7 +680,7 @@ function createOutwardExpansionPhase() {
         outwardExpansionTimeline.to(line, {
             y: targetY,
             ease: "none",
-            duration: SECTION2_TIMINGS.rotationDuration
+            duration: SECTION2_TIMINGS.outward
         }, 0); // simultaneous with rotation
     });
 
@@ -689,7 +690,7 @@ function createOutwardExpansionPhase() {
         outwardExpansionTimeline.to(line, {
             x: targetX,
             ease: "none",
-            duration: SECTION2_TIMINGS.rotationDuration
+            duration: SECTION2_TIMINGS.outward
         }, 0); // simultaneous with rotation
     });
     
@@ -697,7 +698,7 @@ function createOutwardExpansionPhase() {
     outwardExpansionTimeline.to(gridGroup, {
         rotation: 45,
         ease: "none",
-        duration: SECTION2_TIMINGS.rotationDuration
+        duration: SECTION2_TIMINGS.outward
     }, 0);
     
     // Move and resize cells in lockstep with spacing over this phase (update group transform)
