@@ -79,6 +79,9 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
         wrapper.scale.setScalar(0.0001); // Start tiny, GSAP will animate to correct scale
         // Keep model hidden until hero capture/texture is ready to avoid visual pop
         wrapper.visible = false;
+        // Ensure canvas starts hidden (CSS sets opacity:0)
+        const canvasEl = document.getElementById('three-canvas');
+        if (canvasEl) canvasEl.style.opacity = '0';
         
         // Flag to track if texture is ready
         window.textureReady = false;

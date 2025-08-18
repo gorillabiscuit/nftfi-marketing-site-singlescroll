@@ -313,6 +313,7 @@ body.scroll-disabled {
     height: 100%;
     display: block;
     object-fit: contain;
+    opacity: 0; /* Will fade in when model is ready */
 }
 
 /* Logo */

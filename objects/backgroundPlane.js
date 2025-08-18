@@ -120,10 +120,12 @@ export function captureHeroAsTexture() {
                             ease: "power2.out",
                             onStart: () => {
                                 console.log('Initial scale animation started with scroll-adjusted scale:', targetScale);
-                                // Reveal model only; avoid manipulating plane visibility/opacity to prevent black frames
-                                if (window.wrapper) {
-                                    window.wrapper.visible = true;
+                                // Fade in canvas and reveal model together to avoid pop
+                                const canvasEl = document.getElementById('three-canvas');
+                                if (canvasEl) {
+                                    gsap.to(canvasEl, { opacity: 1, duration: 0.4, ease: 'power1.out' });
                                 }
+                                if (window.wrapper) window.wrapper.visible = true;
                             },
                             onUpdate: () => {
                                 // Ensure scale is applied
