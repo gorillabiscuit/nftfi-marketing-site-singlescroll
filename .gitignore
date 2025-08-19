@@ -26,3 +26,7 @@ node_modules/
 .DS_Store
 temp-original/
 temp-liquid-glass/
+
+# Task files
+# tasks.json
+# tasks/ 

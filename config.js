@@ -87,10 +87,7 @@ export const SECTION2_TIMINGS = {
     drawHorizontalLinesOffset: -1.0,
 
     // Transforms (grid motion)
-    outward: 5000.75,              // outward expansion + initial 45° rotation duration
-    rotateStep: 500.75,           // additional rotation duration
-    microRotate: 0.75,          // subtle per-line micro-rotation duration
-    expand: 10000.25,               // final grid expansion duration
+    outward: 5.75,              // outward expansion + initial 45° rotation duration
 
     // Phase spacing (explicit offsets before each phase)
     delayAfterGridDraw: 3,    // delay before outward begins (relative to end of drawing)
@@ -103,7 +100,7 @@ export const SECTION2_TIMINGS = {
 
     // Blocks (sequence-level)
     delayBeforeFirstBlock: 6,  // delay after title before first block
-    blockGap: 20.25,             // gap between block i and block i+1 in the master sequence
+    blockGap: 10.25,             // gap between block i and block i+1 in the master sequence
     delayBeforeUnpin: 10.0,      // delay after the last block finishes before unpinning
 
     // Block internals (per-block TL)
@@ -114,12 +111,17 @@ export const SECTION2_TIMINGS = {
     highlightShrink: 1.22,      // wipe shrink
     amountDelayAfterLabel: 2.5, // delay after label before amount appears
     amountAppear: 2.15,         // amount fade-in
-    amountCount: 14.0            // count-up duration
+    amountCount: 7.0            // count-up duration
 };
 
 // Scroll scaling for Section 2: pixels of scroll per second of timeline duration
 export const SECTION2_SCROLL = {
     pxPerSecond: 100
+};
+
+// Scroll scaling for Section 3: pixels of scroll per second of timeline duration
+export const SECTION3_SCROLL = {
+    pxPerSecond: 600
 };
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
@@ -224,6 +226,16 @@ export const RECT_STATES = {
             { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { gradientStart: 'rgba(72, 55, 65, 0.10)', gradientEnd: 'rgba(72, 55, 65, 0.80)', gradientAngle: 45 } },
             { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
         ]
+    }
+};
+
+// Section 3 (Dashboard SVG) positioning/scaling per breakpoint
+// Controls initial inline SVG transform before any GSAP timeline animations
+export const SECTION3 = {
+    svg: {
+        mobile:  { x: -1500, scale: 0.5, transformOrigin: '0% 0%' },
+        tablet:  { x: -1500, scale: 0.5, transformOrigin: '0% 0%' },
+        desktop: { x: -400, scale: 0.325, transformOrigin: '0% 8%' }
     }
 };
 

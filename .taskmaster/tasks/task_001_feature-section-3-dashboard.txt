@@ -1,0 +1,147 @@
+# Task ID: 1
+# Title: Implement Dashboard SVG Scroll Animation
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Create an interactive ScrollTrigger-based animation for the dashboard SVG in Section 3, featuring multi-layer animations triggered by scroll position with pinned timeline functionality.
+# Details:
+1. Clear Section 3 and set up container:
+- Remove existing content
+- Create container div with appropriate class/id
+- Import and embed dashboard.svg
+- Add error handling for SVG load failures
+
+2. Initialize GSAP components:
+```javascript
+const dashboardTimeline = gsap.timeline({
+  scrollTrigger: {
+    trigger: "#section3",
+    pin: true,
+    scrub: 1,
+    start: "top top",
+    end: "+=200%"
+  }
+});
+```
+
+3. Structure SVG animations:
+- Group SVG elements with 'animate*' prefixes
+- Create sequential animations for each group:
+  ```javascript
+  dashboardTimeline
+    .from('[data-animate="group1"]', {y: 50, opacity: 0})
+    .to('[data-animate="group1"]', {highlight: true})
+    .from('[data-animate="group2"]', {y: 30, opacity: 0})
+    // ... continue for all groups
+  ```
+
+4. Implement responsive handling:
+- Add breakpoint-specific timeline adjustments
+- Set up mobile fallback animations if needed
+- Ensure smooth performance across devices
+
+5. Add cleanup/teardown:
+```javascript
+ScrollTrigger.create({
+  trigger: "#section3",
+  onLeave: () => timeline.progress(1),
+  onLeaveBack: () => timeline.progress(0),
+  onKill: () => timeline.kill()
+});
+```
+
+6. Feature flag implementation:
+```javascript
+const DASHBOARD_ENABLED = 'dashboard_animation_enabled';
+if (!document.querySelector('#dashboard-svg')) {
+  return;
+}
+```
+
+# Test Strategy:
+1. Scroll behavior verification:
+- Test smooth scrolling triggers animation
+- Verify pin/unpin points work correctly
+- Check scrubbing behavior in both directions
+
+2. Animation sequence testing:
+- Verify all SVG groups animate in correct order
+- Confirm proper timing of highlights/transitions
+- Test return-to-rest positions
+
+3. Responsive testing:
+- Test on multiple desktop resolutions
+- Verify mobile breakpoint behavior
+- Check tablet/intermediate sizes
+- Validate performance metrics (FPS, paint times)
+
+4. Error handling:
+- Test with missing SVG
+- Verify feature flag functionality
+- Check console for errors
+
+5. Integration testing:
+- Verify ScrollTrigger cleanup on route change
+- Test memory usage during rapid scrolling
+- Validate interaction with other page animations
+
+6. Cross-browser testing:
+- Test in Chrome, Firefox, Safari
+- Verify IE11/Edge compatibility
+- Check mobile browsers (iOS Safari, Chrome Android)
+
+# Subtasks:
+## 1. Audit Section 3 structure and clear content to empty container [pending]
+### Dependencies: None
+### Description: Identify the Section 3 container markup and JS hooks; remove or disable existing content so only an empty div remains, preserving IDs/classes/hooks for later use.
+### Details:
+
+
+## 2. Embed `images/dashboard.svg` in Section 3 container [pending]
+### Dependencies: None
+### Description: Load the complex dashboard SVG into the Section 3 container (inline or via object/embed) ensuring accessibility and sizing. Provide a feature guard if SVG fails to load.
+### Details:
+
+
+## 3. Select SVG groups/layers with `animate*` prefix [pending]
+### Dependencies: None
+### Description: Within the embedded SVG, collect references to groups and layers whose IDs/classes start with `animate` (e.g., `#animate...`, `.animate-...`). Verify presence and produce a map of targets.
+### Details:
+
+
+## 4. Create GSAP timeline with ScrollTrigger pin and scrub for Section 3 [pending]
+### Dependencies: None
+### Description: Instantiate a GSAP timeline with ScrollTrigger to pin Section 3 and scrub across the section. Configure start/end, anticipatePin, markers for dev, and kill on teardown.
+### Details:
+
+
+## 5. Define per-group Y translation sequences (in, highlight, out) [pending]
+### Dependencies: None
+### Description: For each `animate*` target, add GSAP tweens to move into a highlighted Y position during the mid-scroll, then animate out toward the end. Use timeline labels for sequencing.
+### Details:
+
+
+## 6. Ensure responsive scaling and performance [pending]
+### Dependencies: None
+### Description: Verify the SVG scales correctly across breakpoints; prefer transforms over layout changes. Optimize selectors, avoid layout thrash, and set will-change where useful.
+### Details:
+
+
+## 7. Integrate with existing controls module structure [pending]
+### Dependencies: None
+### Description: Add a dedicated controller in `controls/` for Section 3 that mirrors Section 2’s patterns (init, setup, teardown). Wire it in `app.js` or relevant orchestrator without side effects.
+### Details:
+
+
+## 8. Teardown, state resets, and ScrollTrigger cleanup [pending]
+### Dependencies: None
+### Description: On route/section change or destroy, ensure ScrollTrigger and timelines are killed, transforms reset, and event listeners removed. Avoid memory leaks.
+### Details:
+
+
+## 9. QA checklist and acceptance validation [pending]
+### Dependencies: None
+### Description: Verify pinning, scrub behavior, layer sequencing, return to rest, and unpin. Test across breakpoints and throttled devices. Confirm no console errors and lint passes.
+### Details:
+
+

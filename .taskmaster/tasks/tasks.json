@@ -288,5 +288,107 @@
       "updated": "2025-07-29T14:54:17.891Z",
       "description": "Tasks for master context"
     }
+  },
+  "feature-section-3-dashboard": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Implement Dashboard SVG Scroll Animation",
+        "description": "Create an interactive ScrollTrigger-based animation for the dashboard SVG in Section 3, featuring multi-layer animations triggered by scroll position with pinned timeline functionality.",
+        "details": "1. Clear Section 3 and set up container:\n- Remove existing content\n- Create container div with appropriate class/id\n- Import and embed dashboard.svg\n- Add error handling for SVG load failures\n\n2. Initialize GSAP components:\n```javascript\nconst dashboardTimeline = gsap.timeline({\n  scrollTrigger: {\n    trigger: \"#section3\",\n    pin: true,\n    scrub: 1,\n    start: \"top top\",\n    end: \"+=200%\"\n  }\n});\n```\n\n3. Structure SVG animations:\n- Group SVG elements with 'animate*' prefixes\n- Create sequential animations for each group:\n  ```javascript\n  dashboardTimeline\n    .from('[data-animate=\"group1\"]', {y: 50, opacity: 0})\n    .to('[data-animate=\"group1\"]', {highlight: true})\n    .from('[data-animate=\"group2\"]', {y: 30, opacity: 0})\n    // ... continue for all groups\n  ```\n\n4. Implement responsive handling:\n- Add breakpoint-specific timeline adjustments\n- Set up mobile fallback animations if needed\n- Ensure smooth performance across devices\n\n5. Add cleanup/teardown:\n```javascript\nScrollTrigger.create({\n  trigger: \"#section3\",\n  onLeave: () => timeline.progress(1),\n  onLeaveBack: () => timeline.progress(0),\n  onKill: () => timeline.kill()\n});\n```\n\n6. Feature flag implementation:\n```javascript\nconst DASHBOARD_ENABLED = 'dashboard_animation_enabled';\nif (!document.querySelector('#dashboard-svg')) {\n  return;\n}\n```",
+        "testStrategy": "1. Scroll behavior verification:\n- Test smooth scrolling triggers animation\n- Verify pin/unpin points work correctly\n- Check scrubbing behavior in both directions\n\n2. Animation sequence testing:\n- Verify all SVG groups animate in correct order\n- Confirm proper timing of highlights/transitions\n- Test return-to-rest positions\n\n3. Responsive testing:\n- Test on multiple desktop resolutions\n- Verify mobile breakpoint behavior\n- Check tablet/intermediate sizes\n- Validate performance metrics (FPS, paint times)\n\n4. Error handling:\n- Test with missing SVG\n- Verify feature flag functionality\n- Check console for errors\n\n5. Integration testing:\n- Verify ScrollTrigger cleanup on route change\n- Test memory usage during rapid scrolling\n- Validate interaction with other page animations\n\n6. Cross-browser testing:\n- Test in Chrome, Firefox, Safari\n- Verify IE11/Edge compatibility\n- Check mobile browsers (iOS Safari, Chrome Android)",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Audit Section 3 structure and clear content to empty container",
+            "description": "Identify the Section 3 container markup and JS hooks; remove or disable existing content so only an empty div remains, preserving IDs/classes/hooks for later use.",
+            "details": "<info added on 2025-08-19T12:42:19.882Z>\nSection 3 container has been prepared with the following structure:\n- Container element: `<div id=\"dashboard-svg-container\"></div>`\n- Parent wrapper: `<section class=\"section\" data-section=\"3\">`\n- Container is empty and ready for SVG injection\n- Previous content (headings, buttons, social proof elements) has been removed\n\nTechnical considerations for SVG embedding:\n- Container ID provides unique selector for JavaScript/GSAP targeting\n- Clean mount point established for SVG injection\n- Section wrapper preserved for scroll trigger functionality\n- Container placement maintains original document flow and section hierarchy\n\nRequired implementation guards:\n- Verify SVG file exists at `images/dashboard.svg` before embedding\n- Add fallback/error handling for failed SVG loads\n- Ensure SVG maintains aspect ratio within container\n- Check SVG namespace and compatibility with GSAP selectors\n</info added on 2025-08-19T12:42:19.882Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 2,
+            "title": "Embed `images/dashboard.svg` in Section 3 container",
+            "description": "Load the complex dashboard SVG into the Section 3 container (inline or via object/embed) ensuring accessibility and sizing. Provide a feature guard if SVG fails to load.",
+            "details": "<info added on 2025-08-19T12:45:19.926Z>\nImplemented SVG embedding functionality in Section 3 dashboard container:\n\nCreated controls/section3Dashboard.js with initSection3Dashboard() function that:\n- Performs strict validation of #dashboard-svg-container presence\n- Fetches images/dashboard.svg with cache disabled\n- Validates response status, content type, and SVG structure\n- Inlines valid SVG into container with data-dashboard-loaded attribute\n- Includes duplicate embedding prevention\n- Returns boolean success status with error logging\n\nIntegration in app.js:\n- Added initSection3Dashboard import\n- Executes after text effects initialization\n- Logs embedding status (success/skipped)\n\nImplementation focuses solely on SVG embedding and container preparation, setting up for subsequent animation selection and GSAP integration. Includes defensive programming with explicit error states and status tracking to prevent runtime issues if asset paths change.\n</info added on 2025-08-19T12:45:19.926Z>\n<info added on 2025-08-19T12:49:55.378Z>\nUpdated SVG positioning after successful embedding:\n\nApplied initial GSAP positioning to shift embedded SVG left by 1500px, preparing for entrance animation:\n- Added GSAP feature detection in initSection3Dashboard\n- Used gsap.set() to position SVG: { x: -1500 }\n- Implemented fallback warning if GSAP unavailable\n- Verified SVG remains properly contained and aligned within Section 3\n- Confirmed SVG visibility only affects horizontal position, maintaining vertical alignment and scale\n\nTesting confirmed SVG is correctly positioned off-screen and ready for subsequent animation sequences. No visual artifacts or container overflow issues observed.\n</info added on 2025-08-19T12:49:55.378Z>\n<info added on 2025-08-19T12:56:39.523Z>\nImplemented responsive positioning using GSAP matchMedia for dashboard SVG:\n\nCreated breakpoint-specific transform configurations using gsap.matchMedia():\n- Desktop (min-width: 1024px): { x: -1500, scale: 0.5, transformOrigin: '0% 0%' }\n- Tablet (min-width: 768px and max-width: 1023px): { x: -1500, scale: 0.5, transformOrigin: '0% 0%' }\n- Mobile (max-width: 767px): { x: -1500, scale: 0.5, transformOrigin: '0% 0%' }\n\nImplementation in initSection3Dashboard:\n- Wrapped transform logic in matchMedia context\n- Added breakpoint listeners for responsive updates\n- Implemented fallback to direct gsap.set() if matchMedia unavailable\n- Verified transform origin maintains consistent alignment across breakpoints\n- Confirmed scale and position values properly apply on viewport resize\n\nAll breakpoints currently use identical values, ready for breakpoint-specific tuning in subsequent iterations. Transform origin ensures consistent scaling behavior relative to container edges.\n</info added on 2025-08-19T12:56:39.523Z>\n<info added on 2025-08-19T13:01:06.606Z>\nFixed GSAP import and transform application in controls/section3Dashboard.js:\n\nAdded explicit GSAP import statement at module top level to ensure transform methods are available. Removed global GSAP dependency check and warning fallback. Verified transforms now correctly apply across all breakpoints:\n- Desktop: initial position x: -1500, scale: 0.5 with top-left origin\n- Tablet: maintains consistent transform values through resize\n- Mobile: proper scaling and positioning confirmed\n\nTransform application confirmed working on both initial load and dynamic viewport changes. No visual regressions or positioning issues observed after removing global GSAP dependency.\n</info added on 2025-08-19T13:01:06.606Z>",
+            "status": "review",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 3,
+            "title": "Select SVG groups/layers with `animate*` prefix",
+            "description": "Within the embedded SVG, collect references to groups and layers whose IDs/classes start with `animate` (e.g., `#animate...`, `.animate-...`). Verify presence and produce a map of targets.",
+            "details": "<info added on 2025-08-19T13:35:54.297Z>\nImplemented target discovery and validation for Section 3 SVG animation elements:\n\n- Created strict config accessor `getSvgConfigFor(breakpoint)` that validates presence and types of all required configuration values\n- Implemented `getSvgRootStrict()` to ensure inline SVG root element exists before operations\n- Added comprehensive target discovery system that finds animation elements via:\n  - ID selectors (elements with 'animate' prefix)\n  - Class tokens (elements with 'animate-' classes)\n  - data-animate attributes\n- Cached discovered targets in optimized structure: { all: Element[], byId: Map<string, Element>, byClass: Map<string, Element[]> }\n- Exposed `getSection3Targets()` method to provide validated target access for animation setup\n\nValidation points:\n- SVG positioning and scaling responds correctly to SECTION3.svg.* configuration values\n- Target discovery results are logged to console on load\n- getSection3Targets() returns populated maps for all three collection methods (all, byId, byClass)\n</info added on 2025-08-19T13:35:54.297Z>",
+            "status": "review",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 4,
+            "title": "Create GSAP timeline with ScrollTrigger pin and scrub for Section 3",
+            "description": "Instantiate a GSAP timeline with ScrollTrigger to pin Section 3 and scrub across the section. Configure start/end, anticipatePin, markers for dev, and kill on teardown.",
+            "details": "<info added on 2025-08-19T13:42:57.868Z>\nScrollTrigger timeline implementation completed in `controls/section3Dashboard.js`:\n\nConfiguration added to `config.js`:\n- `SECTION3_SCROLL` constant with `pxPerSecond: 600` to control scroll-to-animation ratio\n\nTimeline setup in `initSection3Scroll()`:\n- Creates GSAP timeline with ScrollTrigger\n- Pins to section[data-section='3']\n- Enables smooth scrubbing with `scrub: true`\n- Uses `anticipatePin: 1` for smoother pin transitions\n- Ensures responsive behavior with `invalidateOnRefresh: true`\n- Establishes timeline structure with labels:\n  - 'intro' for entry animations\n  - 'highlight' for focus state\n  - 'outro' for exit animations\n- Includes minimal duration placeholder tween\n\nIntegration:\n- Function called in `app.js` after SVG load\n- ScrollTrigger.refresh() executed after setup\n\nCurrent functionality:\n- Section 3 pins correctly during scroll\n- Timeline scrubs with scroll position\n- Basic structure ready for animation tweens\n- Console confirms timeline initialization\n\nNote: `pxPerSecond` value (600) may need adjustment based on testing pin/unpin feel\n</info added on 2025-08-19T13:42:57.868Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 5,
+            "title": "Define per-group Y translation sequences (in, highlight, out)",
+            "description": "For each `animate*` target, add GSAP tweens to move into a highlighted Y position during the mid-scroll, then animate out toward the end. Use timeline labels for sequencing.",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 6,
+            "title": "Ensure responsive scaling and performance",
+            "description": "Verify the SVG scales correctly across breakpoints; prefer transforms over layout changes. Optimize selectors, avoid layout thrash, and set will-change where useful.",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 7,
+            "title": "Integrate with existing controls module structure",
+            "description": "Add a dedicated controller in `controls/` for Section 3 that mirrors Section 2’s patterns (init, setup, teardown). Wire it in `app.js` or relevant orchestrator without side effects.",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 8,
+            "title": "Teardown, state resets, and ScrollTrigger cleanup",
+            "description": "On route/section change or destroy, ensure ScrollTrigger and timelines are killed, transforms reset, and event listeners removed. Avoid memory leaks.",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 9,
+            "title": "QA checklist and acceptance validation",
+            "description": "Verify pinning, scrub behavior, layer sequencing, return to rest, and unpin. Test across breakpoints and throttled devices. Confirm no console errors and lint passes.",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-19T12:33:51.792Z",
+      "updated": "2025-08-19T13:47:20.037Z",
+      "description": "Implement Section 3 dashboard scrub animation with GSAP/ScrollTrigger; isolate planning and tasks for this feature."
+    }
   }
 }

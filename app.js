@@ -22,6 +22,8 @@ import {
     testScrollSmoother,
     emergencyDisable 
 } from './controls/scrollSynchronizer.js';
+// NEW: Section 3 dashboard embed + scroll
+import { initSection3Dashboard, initSection3Scroll } from './controls/section3Dashboard.js';
 
 // Main initialization function
 function init() {
@@ -75,6 +77,13 @@ function init() {
     // Initialize text effects
     initStatsScrambleReveal();
     initHeadingReveal();
+    // Embed Section 3 dashboard SVG, then initialize pin+scrub timeline
+    initSection3Dashboard().then((ok) => {
+        console.log('Section 3 dashboard embed:', ok ? 'success' : 'skipped');
+        if (ok) {
+            try { initSection3Scroll(); } catch (e) { console.error(e); }
+        }
+    });
     
     // Initialize animation loop when model is ready
     const checkModelReady = () => {
