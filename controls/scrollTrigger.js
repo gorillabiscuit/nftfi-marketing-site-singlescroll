@@ -765,31 +765,9 @@ function createRotationPhase() {
     
     console.log('Transform origin set to "50% 50%" using GSAP canonical approach');
     
-    // Add group rotation to the rotation timeline
-    rotationTimeline.to(gridGroup, {
-        rotation: 45,
-        ease: "none",
-        duration: SECTION2_TIMINGS.rotateStep
-    }, 0);
-    
-    // Rotate the whole grid group to preserve relative ordering and spacing
-    rotationTimeline.to(gridGroup, {
-        rotation: 90, // Rotate to 90° total relative to initial (Phase 2 adds first 45° over group too)
-        ease: "none",
-        duration: SECTION2_TIMINGS.rotateStep
-    }, 0);
 
-    // Subtle per-line micro-rotation with stagger for organic feel (does not affect final angle)
-    // Keeps gridGroup rotation as the authoritative rotation to preserve alignment
-    rotationTimeline.fromTo(allLines, {
-        rotation: -2 // degrees
-    }, {
-        rotation: 0,
-        ease: "none",
-        duration: SECTION2_TIMINGS.microRotate,
-        stagger: { each: 0.01, from: "center" }
-    }, 0);
-    
+
+
     console.log('Phase 3: Rotation phase timeline created successfully');
     return rotationTimeline;
 }
@@ -815,26 +793,7 @@ function createExpansionPhase() {
     const expansionFactor = (window.gridState && typeof window.gridState.finalFactor === 'number') ? window.gridState.finalFactor : 2.5;
     const newSpacing = baseSpacing * expansionFactor;
     
-    // Canonical transforms: continue expanding via x/y, avoid mutating path data
-    horizontalLines.forEach((line) => {
-        const level = Number(line.dataset.level);
-        const targetY = level * newSpacing; // keep symmetry via logical level
-        expansionTimeline.to(line, {
-            y: targetY,
-            ease: "none",
-            duration: SECTION2_TIMINGS.expand
-        }, 0);
-    });
 
-    verticalLines.forEach((line) => {
-        const level = Number(line.dataset.level);
-        const targetX = level * newSpacing;
-        expansionTimeline.to(line, {
-            x: targetX,
-            ease: "none",
-            duration: SECTION2_TIMINGS.expand
-        }, 0);
-    });
     
     // Move and resize cells in lockstep with spacing over this phase (update group transform)
     const cellsGroup = document.getElementById('grid-cells');

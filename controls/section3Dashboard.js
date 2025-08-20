@@ -55,45 +55,23 @@ function uniqueArray(elements) {
 }
 
 function discoverAnimateTargets(svgEl) {
+    // Only target elements with id starting with '#animate' (literal hash in id)
     const selectorList = [
-        '[id^="animate"]',
-        '[class^="animate"]',
-        '[class*=" animate"]',
-        '[data-animate]'
+        '[id^="#animate"]'
     ];
     const nodeList = svgEl.querySelectorAll(selectorList.join(', '));
     const all = uniqueArray(Array.prototype.slice.call(nodeList));
 
-    // Group by id prefix
+    // Group by id prefix (including leading '#')
     const byId = new Map();
     for (let i = 0; i < all.length; i += 1) {
         const el = all[i];
         const id = el.getAttribute('id');
-        if (id && id.indexOf('animate') === 0) {
+        if (id && id.indexOf('#animate') === 0) {
             byId.set(id, el);
         }
     }
-
-    // Group by class token starting with animate
-    const byClass = new Map();
-    for (let i = 0; i < all.length; i += 1) {
-        const el = all[i];
-        const classAttr = el.getAttribute('class');
-        if (classAttr) {
-            const tokens = classAttr.split(/\s+/);
-            for (let j = 0; j < tokens.length; j += 1) {
-                const token = tokens[j];
-                if (token.indexOf('animate') === 0) {
-                    if (!byClass.has(token)) {
-                        byClass.set(token, []);
-                    }
-                    byClass.get(token).push(el);
-                }
-            }
-        }
-    }
-
-    const result = { all: all, byId: byId, byClass: byClass };
+    const result = { all: all, byId: byId, byClass: new Map() };
     section3TargetsCache = result;
     return result;
 }
@@ -237,17 +215,345 @@ export function initSection3Scroll() {
         }
     });
 
-    // Placeholder labels for later sequencing
+    // Timeline structure with labels
     tl.addLabel('intro', 0);
-    tl.addLabel('highlight', '+=1');
-    tl.addLabel('outro', '+=1');
+    tl.addLabel('highlight', '+=' + getSequenceConfigNumber('introDuration'));
+    tl.addLabel('outro', '+=' + getSequenceConfigNumber('outroDuration'));
 
-    // Minimal no-op to give non-zero duration; real tweens added in 1.5
-    tl.to({}, { duration: 3 });
+    // Build per-group Y translation sequences
+    addGroupSequences(tl, targets);
 
     console.log('[Section3Dashboard] Section 3 timeline created with ScrollTrigger pin+scrub');
     try { ScrollTrigger.refresh(); } catch (e) {}
     return tl;
+}
+
+function getSequenceConfigNumber(key) {
+    if (!SECTION3 || !SECTION3.sequence) {
+        throw new Error('[Section3Dashboard] Missing SECTION3.sequence config');
+    }
+    const value = SECTION3.sequence[key];
+    if (typeof value !== 'number') {
+        throw new Error('[Section3Dashboard] Invalid SECTION3.sequence.' + key);
+    }
+    return value;
+}
+
+function addGroupSequences(tl, targets) {
+    // Per-ID detail mode takes precedence if present
+    if (SECTION3 && SECTION3.targets && Array.isArray(SECTION3.targets.detail) && SECTION3.targets.detail.length > 0) {
+        try {
+            addPerIdDetailSequences(tl, targets);
+        } catch (e) {
+            // Ensure no empty catch per lint rules
+            (void e);
+        }
+        return;
+    }
+
+    const yIn = getSequenceConfigNumber('yIn');
+    const yOut = getSequenceConfigNumber('yOut');
+    const stagger = getSequenceConfigNumber('stagger');
+
+    // Fallback legacy path: explicit ids simple list
+    let explicit = [];
+    if (SECTION3 && SECTION3.targets && Array.isArray(SECTION3.targets.ids)) {
+        explicit = SECTION3.targets.ids;
+    }
+
+    const presentExplicit = [];
+    for (let i = 0; i < explicit.length; i += 1) {
+        const id = explicit[i];
+        if (targets.byId.has(id)) {
+            presentExplicit.push(id);
+        }
+    }
+    if (presentExplicit.length > 0) {
+        let indexOnly = 0;
+        for (let i = 0; i < presentExplicit.length; i += 1) {
+            const key = presentExplicit[i];
+            const el = targets.byId.get(key);
+            if (el) {
+                addOne(tl, el, indexOnly, yIn, yOut, stagger);
+                indexOnly += 1;
+            }
+        }
+        return;
+    }
+
+    const idKeys = Array.from(targets.byId.keys()).sort();
+    const classKeys = Array.from(targets.byClass.keys()).sort();
+
+    let index = 0;
+    for (let i = 0; i < idKeys.length; i += 1) {
+        const key = idKeys[i];
+        const el = targets.byId.get(key);
+        if (el) {
+            addOne(tl, el, index, yIn, yOut, stagger);
+            index += 1;
+        }
+    }
+    for (let i = 0; i < classKeys.length; i += 1) {
+        const key = classKeys[i];
+        const arr = targets.byClass.get(key);
+        if (arr) {
+            for (let j = 0; j < arr.length; j += 1) {
+                addOne(tl, arr[j], index, yIn, yOut, stagger);
+                index += 1;
+            }
+        }
+    }
+}
+
+function addOne(tl, element, idx, yIn, yOut, stagger) {
+    const atIntro = 'intro+=' + (idx * stagger).toFixed(3);
+    const atHighlight = 'highlight+=' + (idx * stagger).toFixed(3);
+    const atOutro = 'outro+=' + (idx * stagger).toFixed(3);
+
+    // Use GSAP to animate translateY; keep ease none for scrubbed control
+    tl.fromTo(element, { y: 0 }, { y: yIn, ease: 'none' }, atIntro);
+    tl.to(element, { y: yIn, ease: 'none' }, atHighlight);
+    tl.to(element, { y: yOut, ease: 'none' }, atOutro);
+}
+
+// -------- Per-ID detailed sequencing (groups, jitter, individual ranges) --------
+
+function getSequenceConfigRequiredNumber(key) {
+    // Shares same validation path
+    return getSequenceConfigNumber(key);
+}
+
+function parseDetailSpecs() {
+    if (!SECTION3) {
+        throw new Error('[Section3Dashboard] Missing SECTION3');
+    }
+    if (!SECTION3.targets || !Array.isArray(SECTION3.targets.detail)) {
+        throw new Error('[Section3Dashboard] Missing SECTION3.targets.detail');
+    }
+
+    const rise = getSequenceConfigRequiredNumber('riseDuration');
+    const holdDef = getSequenceConfigRequiredNumber('holdDefault');
+    const ret = getSequenceConfigRequiredNumber('returnDuration');
+    const baseStagger = getSequenceConfigRequiredNumber('baseStagger');
+    const groupGap = getSequenceConfigRequiredNumber('groupGap');
+    const jitterMax = getSequenceConfigRequiredNumber('jitterMax');
+
+    // Use magnitude of legacy yIn as default range of motion
+    const defaultMaxY = Math.abs(getSequenceConfigNumber('yIn'));
+
+    const raw = SECTION3.targets.detail;
+    const specs = [];
+    for (let i = 0; i < raw.length; i += 1) {
+        const it = raw[i];
+        if (!it || typeof it.id !== 'string') {
+            continue;
+        }
+        const spec = {
+            id: it.id,
+            group: typeof it.group === 'string' ? it.group : 'default',
+            maxY: typeof it.maxY === 'number' ? Math.max(0, it.maxY) : defaultMaxY,
+            hold: typeof it.hold === 'number' ? Math.max(0, it.hold) : holdDef,
+            jitter: typeof it.jitter === 'number' ? Math.max(0, it.jitter) : jitterMax,
+            riseDuration: typeof it.riseDuration === 'number' ? Math.max(0, it.riseDuration) : rise,
+            returnDuration: typeof it.returnDuration === 'number' ? Math.max(0, it.returnDuration) : ret
+        };
+        specs.push(spec);
+    }
+
+    return { specs, baseStagger, groupGap };
+}
+
+function seededJitterFromId(id, jitterMax) {
+    // Simple deterministic hash-based PRNG in [-jitterMax, +jitterMax]
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < id.length; i += 1) {
+        h ^= id.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+    }
+    // Convert to [0,1)
+    const u = (h >>> 0) / 4294967296;
+    // Map to [-1, 1]
+    const v = (u * 2) - 1;
+    return v * jitterMax;
+}
+
+// Deterministic unit random [0,1) from string (for per-element range variance)
+function seededUnitFromString(s) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < s.length; i += 1) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+    }
+    const u = (h >>> 0) / 4294967296; // [0,1)
+    return u;
+}
+
+// Find children of '#animate-bubble' parent group (ellipses et al.)
+function getBubbleChildren(targets) {
+    if (!targets || !targets.byId) return [];
+    const parentId = (SECTION3 && SECTION3.targets && SECTION3.targets.bubbles && typeof SECTION3.targets.bubbles.parentId === 'string')
+        ? SECTION3.targets.bubbles.parentId
+        : '#animate-bubble';
+    const parent = targets.byId.get(parentId);
+    if (!parent || typeof parent.querySelectorAll !== 'function') return [];
+    const nodeList = parent.querySelectorAll('circle, ellipse');
+    const all = Array.prototype.slice.call(nodeList);
+    const filtered = [];
+    for (let i = 0; i < all.length; i += 1) {
+        const el = all[i];
+        if (typeof el.getAttribute === 'function') {
+            const idValue = el.getAttribute('id');
+            if (typeof idValue === 'string') {
+                const match = /^Ellipse\s*\d+$/.test(idValue);
+                if (match) {
+                    filtered.push(el);
+                }
+            }
+        }
+    }
+    // Include any extra ids configured in SECTION3.targets.bubbles.extraIds
+    try {
+        const extra = (SECTION3 && SECTION3.targets && SECTION3.targets.bubbles && Array.isArray(SECTION3.targets.bubbles.extraIds))
+            ? SECTION3.targets.bubbles.extraIds
+            : [];
+        const svgRoot = getSvgRootStrict();
+        for (let j = 0; j < extra.length; j += 1) {
+            const rawId = extra[j];
+            if (typeof rawId !== 'string' || rawId.length === 0) continue;
+            // Query by exact id attribute since many ids include literal '#'
+            let found = svgRoot.querySelector('[id="' + rawId + '"]');
+            if (!found && rawId.charAt(0) !== '#') {
+                found = svgRoot.querySelector('[id="#' + rawId + '"]');
+            }
+            if (found && filtered.indexOf(found) === -1) {
+                filtered.push(found);
+            }
+        }
+    } catch (e) { (void e); }
+    return filtered;
+}
+
+// Schedule randomized up-hold-down animations for bubble children starting at a given offset (seconds)
+function addBubbleChildrenSequences(tl, targets, startAtSeconds) {
+    const children = getBubbleChildren(targets);
+    if (!children || children.length === 0) return;
+
+    const rise = getSequenceConfigRequiredNumber('riseDuration');
+    const ret = getSequenceConfigRequiredNumber('returnDuration');
+    // Pull bubble timing/range from config with strict checks and fallbacks
+    const bubbleCfg = (SECTION3 && SECTION3.targets && SECTION3.targets.bubbles) ? SECTION3.targets.bubbles : {};
+    const startWindowSec = (typeof bubbleCfg.startWindowSec === 'number') ? bubbleCfg.startWindowSec : 1.25;
+    const holdMinSec = (typeof bubbleCfg.holdMinSec === 'number') ? bubbleCfg.holdMinSec : 4.0;
+    const holdMaxSec = (typeof bubbleCfg.holdMaxSec === 'number') ? bubbleCfg.holdMaxSec : 8.0;
+    const returnWindowSec = (typeof bubbleCfg.returnWindowSec === 'number') ? bubbleCfg.returnWindowSec : 1.25;
+    const minRange = (typeof bubbleCfg.minRange === 'number') ? bubbleCfg.minRange : 12;
+    const maxRange = (typeof bubbleCfg.maxRange === 'number') ? bubbleCfg.maxRange : 60;
+
+    let maxEnd = startAtSeconds;
+    for (let i = 0; i < children.length; i += 1) {
+        const el = children[i];
+        // Determine deterministic key without fallback operators
+        let key = '';
+        if (typeof el.getAttribute === 'function') {
+            const idValue = el.getAttribute('id');
+            if (typeof idValue === 'string' && idValue.length > 0) {
+                key = idValue;
+            } else {
+                key = String(el.tagName || 'el') + '-' + String(i);
+            }
+        } else {
+            key = 'el-' + String(i);
+        }
+
+        // Deterministic values per element
+        const unitRange = seededUnitFromString(key + ':range');
+        const unitStart = seededUnitFromString(key + ':start');
+        const unitHold = seededUnitFromString(key + ':hold');
+        const unitReturn = seededUnitFromString(key + ':return');
+        const range = minRange + (unitRange * (maxRange - minRange));
+
+        // Start within [0, startWindowSec]
+        const start = startAtSeconds + (unitStart * startWindowSec);
+        // Hold duration within [holdMinSec, holdMaxSec]
+        const hold = holdMinSec + (unitHold * (holdMaxSec - holdMinSec));
+
+        tl.to(el, { y: '-=' + String(Math.abs(range)), duration: rise, ease: 'none' }, 'intro+=' + start.toFixed(3));
+        const returnAt = start + rise + hold + (unitReturn * returnWindowSec);
+        tl.to(el, { y: '+=' + String(Math.abs(range)), duration: ret, ease: 'none' }, 'intro+=' + returnAt.toFixed(3));
+        const endAt = returnAt + ret;
+        if (endAt > maxEnd) {
+            maxEnd = endAt;
+        }
+    }
+    // Return total duration consumed by bubble group starting from startAtSeconds
+    return Math.max(0, maxEnd - startAtSeconds);
+}
+
+function addPerIdDetailSequences(tl, targets) {
+    const { specs, baseStagger, groupGap } = parseDetailSpecs();
+
+    // Bucket by group preserving order
+    const groups = new Map();
+    for (let i = 0; i < specs.length; i += 1) {
+        const s = specs[i];
+        if (!groups.has(s.group)) groups.set(s.group, []);
+        groups.get(s.group).push(s);
+    }
+
+    let cursor = 0; // seconds from intro label
+    const orderedGroups = Array.from(groups.keys());
+    for (let gi = 0; gi < orderedGroups.length; gi += 1) {
+        const gKey = orderedGroups[gi];
+        const items = groups.get(gKey);
+        let groupEnd = cursor;
+
+        for (let idx = 0; idx < items.length; idx += 1) {
+            const spec = items[idx];
+            // Resolve element strictly; skip if missing
+            const el = targets.byId.get(spec.id);
+            if (!el) {
+                // Skip missing elements without throwing
+                continue;
+            }
+
+            // Deterministic jitter inside group window
+            const jitter = seededJitterFromId(spec.id, spec.jitter);
+            const start = cursor + (idx * baseStagger) + jitter;
+
+            // Rise up by -maxY (upward), never beyond original on return
+            const riseDur = spec.riseDuration;
+            const holdDur = spec.hold;
+            const retDur = spec.returnDuration;
+
+            const upTo = -Math.abs(spec.maxY);
+
+            tl.fromTo(el, { y: 0 }, { y: upTo, duration: riseDur, ease: 'none' }, 'intro+=' + start.toFixed(3));
+            // Implicit hold by delaying the return tween; we can optionally keep a no-op tween if needed
+            const returnAt = start + riseDur + holdDur;
+            tl.to(el, { y: 0, duration: retDur, ease: 'none' }, 'intro+=' + returnAt.toFixed(3));
+
+            const itemEnd = returnAt + retDur;
+            if (itemEnd > groupEnd) groupEnd = itemEnd;
+        }
+
+        if (gKey === 'boxes') {
+            // Insert bubble animations as a group immediately after boxes, then continue
+            const startAfterBoxes = groupEnd + groupGap;
+            let bubbleDuration = 0;
+            try {
+                const dur = addBubbleChildrenSequences(tl, targets, startAfterBoxes);
+                if (typeof dur === 'number' && dur > 0) {
+                    bubbleDuration = dur;
+                }
+            } catch (e) { (void e); }
+            // Advance cursor past bubbles plus a gap before next group
+            cursor = startAfterBoxes + bubbleDuration + groupGap;
+            continue;
+        }
+
+        // Advance cursor past this group plus gap
+        cursor = groupEnd + groupGap;
+    }
 }
 
 

@@ -231,11 +231,109 @@ export const RECT_STATES = {
 
 // Section 3 (Dashboard SVG) positioning/scaling per breakpoint
 // Controls initial inline SVG transform before any GSAP timeline animations
+export const GROUP_BASE_HEIGHT = 20;
 export const SECTION3 = {
     svg: {
         mobile:  { x: -1500, scale: 0.5, transformOrigin: '0% 0%' },
         tablet:  { x: -1500, scale: 0.5, transformOrigin: '0% 0%' },
-        desktop: { x: -400, scale: 0.325, transformOrigin: '0% 8%' }
+        desktop: { x: 0, scale: 0.325, transformOrigin: '0% 0%' }
+    },
+    // Sequence defaults for Section 3 SVG groups
+    sequence: {
+        // Legacy fields (still read for fallback-only mode)
+        // Move up to highlight position (negative Y moves up)
+        yIn: -800,
+        // Not used in per-id mode (return always to y:0)
+        yOut: 0,
+        // Per-id stagger when no groups are used
+        stagger: 3.12,
+        // Base durations used by legacy label mode
+        introDuration: 10.5,
+        outroDuration: 10.5,
+
+        // Per-ID mode (new):
+        riseDuration: 2.0,     // seconds to move up
+        holdDefault: 6.0,      // seconds to stay up if item has no hold override
+        returnDuration: 2.0,   // seconds to return to y:0
+        baseStagger: 0.35,     // stagger between ids in the same group
+        groupGap: 1.0,         // gap between groups after all ids in a group finish
+        jitterMax: 0.25        // max random +/- seconds applied within group window
+    },
+    // Explicit targets (IDs) to animate in order. If provided, code will use these instead of auto-discovery.
+    targets: {
+        // Preferred detailed specification (order preserved):
+        // Each item can override maxY (positive magnitude), hold (seconds), jitter (seconds), group label
+        groupBaseHeight: GROUP_BASE_HEIGHT,
+        detail: [
+            { id: '#animate-1stbox', group: 'boxes', maxY: GROUP_BASE_HEIGHT + 50 },
+            { id: '#animate-2ndbox', group: 'boxes', maxY: GROUP_BASE_HEIGHT + 70 },
+            { id: '#animate-2ndbox-button', group: 'boxes', maxY:  40 },
+            { id: '#animate-3rdbox', group: 'boxes', maxY: GROUP_BASE_HEIGHT + 45 },
+            { id: '#animate-3rdbox-button', group: 'boxes', maxY:  30 },
+            { id: '#animate-4thbox', group: 'boxes', maxY: GROUP_BASE_HEIGHT + 40 },
+            { id: '#animate-5thbox', group: 'boxes', maxY: GROUP_BASE_HEIGHT + 50 },
+            { id: '#animate-6thbox', group: 'boxes', maxY: GROUP_BASE_HEIGHT + 20 },
+            { id: '#animate-primary-btn', group: 'table', maxY:  20 },
+            { id: '#animate-1st-row', group: 'table', maxY:  50 },
+            { id: '#animate-2nd-row', group: 'table', maxY:  40 },
+            { id: '#animate-3rd-row', group: 'table', maxY:  30 },
+            { id: '#animate-4th-row', group: 'table', maxY:  20 },
+            { id: '#animate-Collateral-distribution', group: 'donut', maxY:  30 },
+            { id: '#animate-Currency-distribution', group: 'donut', maxY:  50 },
+            { id: '#animate-Protocol-distribution', group: 'donut', maxY:  70 },
+            { id: '#animate-pie1-animate-Collateral-distribution', group: 'donut', maxY:  20 },
+            { id: '#animate-pie2-animate-Collateral-distribution', group: 'donut', maxY:  40 },
+            { id: '#animate-pie3-animate-Collateral-distribution', group: 'donut', maxY:  60 },
+            { id: '#animate-pie4-animate-Collateral-distribution', group: 'donut', maxY:  80 },
+            { id: '#animate-pie5-animate-Collateral-distribution', group: 'donut', maxY:  100 },
+            { id: '#animate-pie1-animate-Currency-distribution', group: 'donut', maxY:  80 },
+            { id: '#animate-pie2-animate-Currency-distribution', group: 'donut', maxY:  120 },
+            { id: '#animate-pie3-animate-Currency-distribution', group: 'donut', maxY:  60 },
+            { id: '#animate-pie1-Protocol-distribution', group: 'donut', maxY:  10 },
+            { id: '#animate-pie2-Protocol-distribution', group: 'donut', maxY:  30 },
+            { id: '#animate-pie3-Protocol-distribution', group: 'donut', maxY:  50 },
+            { id: '#animate-pie4-Protocol-distribution', group: 'donut', maxY:  70 },
+            { id: '#animate-pie5-Protocol-distribution', group: 'donut', maxY:  90 },
+            
+        ],
+        // Legacy simple list (still supported). If provided and detail is empty, code uses these.
+        ids: [
+            '#animate-1stbox',
+            '#animate-2ndbox',
+            '#animate-3rdbox',
+            '#animate-4thbox',
+            '#animate-5thbox',
+            '#animate-6thbox'
+        ]
+        ,
+        // Bubble animation configuration
+        bubbles: {
+            // Parent group id containing the circles/ellipses
+            parentId: '#animate-bubble',
+            // Timing windows (seconds)
+            startWindowSec: 1.25,
+            holdMinSec: 4.0,
+            holdMaxSec: 8.0,
+            returnWindowSec: 1.25,
+            // Vertical travel range per element (pixels)
+            minRange: 12,
+            maxRange: 120,
+            // Optional additional element ids to include with the bubble animation
+            // Use raw SVG ids, e.g., 'Ellipse 66' or '#animate-foo'.
+            extraIds: ["#animate-Chart/Legend/Item1","#animate-Chart/Legend/Item2","#animate-Chart/Legend/Item3","#animate-Chart/Legend/Item4","#bubble-chart-all","#animate-legend2"]
+        }
+        // Future groups to consider (names from design/inspector; keep for planning):
+        // '#animate-Currency distribution',
+        // '#animate-Protocol distribution',
+        // '#animate-Collateral-distribution',
+        // '#animate-CHART_SVG',
+        // '#animate-pie1-animate-Currency distribution',
+        // '#animate-pie2-animate-Currency distribution',
+        // '#animate-pie3-animate-Currency distribution',
+        // '#animate-pie1-Protocol distribution',
+        // '#animate-pie2-Protocol distribution',
+        // '#animate-pie3-Protocol distribution',
+        // '#animate-legend', '#animate-legend2', '#animate-chart', '#animate-piechart'
     }
 };
 
