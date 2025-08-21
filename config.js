@@ -262,6 +262,67 @@ export const LOOPER_BG = {
     }
 };
 
+// Section 3 arrows mapping (simplified): absolute coordinates per breakpoint
+// Use 'to' coordinates (required). Optionally provide 'from' coords; otherwise we use the feature block center.
+export const SECTION3_ARROWS = [
+    {
+        fromSelector: '.section3-features .feature-1',
+        from: {
+            mobile:  { x: 680, y: 320 },
+            tablet:  { x: 820, y: 360 },
+            desktop: { x: 760, y: 275 }
+        },
+        // from: { mobile: { x: 260, y: 220 }, tablet: { x: 300, y: 240 }, desktop: { x: 340, y: 260 } },
+        to: {
+            mobile:  { x: 680, y: 150 },
+            tablet:  { x: 820, y: 360 },
+            desktop: { x: 500, y: 230 }
+        }
+    },
+    {
+        fromSelector: '.section3-features .feature-2',
+        from: {
+            mobile:  { x: 680, y: 340 },
+            tablet:  { x: 820, y: 360 },
+            desktop: { x: 810, y: 372 }
+        },
+        to: {
+            mobile:  { x: 640, y: 360 },
+            tablet:  { x: 800, y: 400 },
+            desktop: { x: 450, y: 360 }
+        }
+    },
+    {
+        fromSelector: '.section3-features .feature-3',
+        from: {
+            mobile:  { x: 680, y: 320 },
+            tablet:  { x: 820, y: 360 },
+            desktop: { x: 862, y: 463 }
+        },
+        to: {
+            mobile:  { x: 600, y: 400 },
+            tablet:  { x: 760, y: 440 },
+            desktop: { x: 773, y: 440 }
+        }
+    },
+    {
+        fromSelector: '.section3-features .feature-4',
+        from: {
+            mobile:  { x: 680, y: 320 },
+            tablet:  { x: 820, y: 360 },
+            desktop: { x: 917, y: 557 }
+        },
+        to: {
+            mobile:  { x: 560, y: 440 },
+            tablet:  { x: 720, y: 480 },
+            desktop: { x: 630, y: 610 }
+        }
+    }
+];
+
+// Debug: when true, arrows are always visible (no dash animation) to validate geometry quickly
+export const SECTION3_ARROWS_DEBUG = true;
+
 // Rectangle cell states for Section 2 (breakpoint-aware)
 // Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern
 

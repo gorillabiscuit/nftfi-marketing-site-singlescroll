@@ -5,6 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SECTION3 } from '../config.js';
 import { SECTION3_SCROLL } from '../config.js';
 import { LOOPER_BG } from '../config.js';
+import { SECTION3_ARROWS } from '../config.js';
+import { SECTION3_ARROWS_DEBUG } from '../config.js';
 
 // Cache for discovered targets
 let section3TargetsCache = null;
@@ -222,7 +224,13 @@ export function initSection3Scroll() {
             pinSpacing: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-            scrub: true
+            scrub: true,
+            onUpdate: (self) => {
+                try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
+            },
+            onRefresh: () => {
+                try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
+            }
         }
     });
 
@@ -242,6 +250,17 @@ export function initSection3Scroll() {
 
     // Build per-group Y translation sequences
     addGroupSequences(tl, targets);
+
+    // Initialize arrows overlay and set initial hidden state
+    try {
+        ensureArrowsOverlay(sectionEl);
+        if (SECTION3_ARROWS_DEBUG === true) {
+            prepareArrowsVisible();
+        } else {
+            prepareArrowsHidden();
+        }
+        updateArrowsGeometry(sectionEl);
+    } catch (e) { (void e); }
 
     console.log('[Section3Dashboard] Section 3 timeline created with ScrollTrigger pin+scrub');
     try { ScrollTrigger.refresh(); } catch (e) {}
@@ -559,11 +578,17 @@ function addPerIdDetailSequences(tl, targets) {
         const items = groups.get(gKey);
         let groupEnd = cursor;
 
-        // Reveal next feature block at the start of this group window
+        // Reveal next feature block at the start of this group window and draw matching arrow
         if (revealIndex < featureSelectors.length) {
             const sel = featureSelectors[revealIndex];
             try {
                 tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + cursor.toFixed(3));
+                // arrow index matches reveal index
+                const arrowIdx = revealIndex;
+                const arrowSel = '#section3-arrows path[data-arrow-index="' + String(arrowIdx) + '"]';
+                tl.add(() => { try { prepareOneArrowDash(arrowIdx); } catch (_) {} }, 'intro+=' + cursor.toFixed(3));
+                tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + cursor.toFixed(3));
+                tl.to(arrowSel, { strokeDashoffset: 0, duration: 0.6, ease: 'none' }, 'intro+=' + (cursor + 0.05).toFixed(3));
                 revealIndex += 1;
             } catch (_) {}
         }
@@ -613,6 +638,11 @@ function addPerIdDetailSequences(tl, targets) {
                 const sel = featureSelectors[revealIndex];
                 try {
                     tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startAfterBoxes.toFixed(3));
+                    const arrowIdx = revealIndex;
+                    const arrowSel = '#section3-arrows path[data-arrow-index="' + String(arrowIdx) + '"]';
+                    tl.add(() => { try { prepareOneArrowDash(arrowIdx); } catch (_) {} }, 'intro+=' + startAfterBoxes.toFixed(3));
+                    tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startAfterBoxes.toFixed(3));
+                    tl.to(arrowSel, { strokeDashoffset: 0, duration: 0.6, ease: 'none' }, 'intro+=' + (startAfterBoxes + 0.05).toFixed(3));
                     revealIndex += 1;
                 } catch (_) {}
             }
@@ -626,5 +656,169 @@ function addPerIdDetailSequences(tl, targets) {
         cursor = groupEnd + groupGap;
     }
 }
+// ------------------- ARROWS OVERLAY (feature -> svg target) -------------------
+
+function ensureArrowsOverlay(sectionEl) {
+    const existing = sectionEl.querySelector('#section3-arrows');
+    if (existing) return existing;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('id', 'section3-arrows');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.style.position = 'absolute';
+    svg.style.inset = '0';
+    svg.style.zIndex = '6';
+    svg.style.pointerEvents = 'none';
+
+    // defs with arrow marker
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    marker.setAttribute('id', 'arrowhead');
+    marker.setAttribute('markerWidth', '6');
+    marker.setAttribute('markerHeight', '6');
+    marker.setAttribute('refX', '5');
+    marker.setAttribute('refY', '3');
+    marker.setAttribute('orient', 'auto');
+    const tip = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    tip.setAttribute('d', 'M0,0 L6,3 L0,6 Z');
+    tip.setAttribute('fill', 'rgba(255,255,255,0.8)');
+    marker.appendChild(tip);
+    defs.appendChild(marker);
+    svg.appendChild(defs);
+
+    // create one path per config item
+    for (let i = 0; i < SECTION3_ARROWS.length; i += 1) {
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('data-arrow-index', String(i));
+        p.setAttribute('d', 'M0 0 L0 0');
+        p.setAttribute('fill', 'none');
+        p.setAttribute('stroke', 'rgba(255,255,255,0.8)');
+        p.setAttribute('stroke-width', '1.5');
+        p.setAttribute('marker-end', 'url(#arrowhead)');
+        p.setAttribute('opacity', '0');
+        svg.appendChild(p);
+    }
+
+    sectionEl.appendChild(svg);
+    return svg;
+}
+
+function getBreakpointKey() {
+    const w = window.innerWidth;
+    if (w >= 1024) return 'desktop';
+    if (w >= 768) return 'tablet';
+    return 'mobile';
+}
+
+function getFeatureAnchorRect(sectionEl, selector) {
+    const el = sectionEl.querySelector(selector);
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    const sectionRect = sectionEl.getBoundingClientRect();
+    return { x: rect.left - sectionRect.left + (rect.width / 2), y: rect.top - sectionRect.top + (rect.height / 2) };
+}
+
+// simplified absolute coordinate source for arrows
+function getArrowEndpoints(sectionEl, cfg) {
+    const bp = getBreakpointKey();
+    const sectionRect = sectionEl.getBoundingClientRect();
+    // from
+    let fromX = null; let fromY = null;
+    if (cfg.from && cfg.from[bp] && typeof cfg.from[bp].x === 'number' && typeof cfg.from[bp].y === 'number') {
+        fromX = cfg.from[bp].x; fromY = cfg.from[bp].y;
+    } else {
+        const anchor = getFeatureAnchorRect(sectionEl, cfg.fromSelector);
+        if (anchor) { fromX = anchor.x; fromY = anchor.y; }
+    }
+    // to (required)
+    if (!cfg.to || !cfg.to[bp] || typeof cfg.to[bp].x !== 'number' || typeof cfg.to[bp].y !== 'number') {
+        return null;
+    }
+    const toX = cfg.to[bp].x; const toY = cfg.to[bp].y;
+    if (fromX == null || fromY == null) return null;
+    // clamp to section bounds for safety
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    return {
+        x1: clamp(fromX, 0, sectionRect.width),
+        y1: clamp(fromY, 0, sectionRect.height),
+        x2: clamp(toX, 0, sectionRect.width),
+        y2: clamp(toY, 0, sectionRect.height)
+    };
+}
+
+function updateArrowsGeometry(sectionEl) {
+    const overlay = sectionEl.querySelector('#section3-arrows');
+    if (!overlay) return;
+    const bp = getBreakpointKey();
+    const sectionRect = sectionEl.getBoundingClientRect();
+    const width = sectionRect.width;
+    const height = sectionRect.height;
+    overlay.setAttribute('viewBox', '0 0 ' + String(width) + ' ' + String(height));
+
+    for (let i = 0; i < SECTION3_ARROWS.length; i += 1) {
+        const cfg = SECTION3_ARROWS[i];
+        const path = overlay.querySelector('path[data-arrow-index="' + String(i) + '"]');
+        if (!cfg || !path) continue;
+
+        const pts = getArrowEndpoints(sectionEl, cfg);
+        if (!pts) continue;
+        path.setAttribute('d', 'M' + String(pts.x1) + ' ' + String(pts.y1) + ' L' + String(pts.x2) + ' ' + String(pts.y2));
+
+        // Ensure dash metrics match new geometry; otherwise stroke may appear to disappear
+        try {
+            const len = path.getTotalLength();
+            const isVisible = path.getAttribute('data-visible') === '1' || SECTION3_ARROWS_DEBUG === true;
+            if (isVisible) {
+                gsap.set(path, { strokeDasharray: len, strokeDashoffset: 0, opacity: 1 });
+            } else {
+                gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
+            }
+        } catch (e) { (void e); }
+    }
+}
+
+function prepareArrowsHidden() {
+    const overlay = document.getElementById('section3-arrows');
+    if (!overlay) return;
+    const paths = overlay.querySelectorAll('path[data-arrow-index]');
+    for (let i = 0; i < paths.length; i += 1) {
+        const p = paths[i];
+        p.setAttribute('opacity', '0');
+        p.removeAttribute('data-visible');
+        try {
+            const len = p.getTotalLength();
+            gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+        } catch (e) { (void e); }
+    }
+}
+
+function prepareArrowsVisible() {
+    const overlay = document.getElementById('section3-arrows');
+    if (!overlay) return;
+    const paths = overlay.querySelectorAll('path[data-arrow-index]');
+    for (let i = 0; i < paths.length; i += 1) {
+        const p = paths[i];
+        p.setAttribute('opacity', '1');
+        p.setAttribute('data-visible', '1');
+        try {
+            const len = p.getTotalLength();
+            gsap.set(p, { strokeDasharray: len, strokeDashoffset: 0 });
+        } catch (e) { (void e); }
+    }
+}
+
+function prepareOneArrowDash(index) {
+    const overlay = document.getElementById('section3-arrows');
+    if (!overlay) return;
+    const p = overlay.querySelector('path[data-arrow-index="' + String(index) + '"]');
+    if (!p) return;
+    try {
+        const len = p.getTotalLength();
+        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+    } catch (e) { (void e); }
+}
+
 
 
