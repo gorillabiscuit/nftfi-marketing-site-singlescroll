@@ -101,7 +101,11 @@ export const SECTION2_TIMINGS = {
     // Blocks (sequence-level)
     delayBeforeFirstBlock: 6,  // delay after title before first block
     blockGap: 10.25,             // gap between block i and block i+1 in the master sequence
-    delayBeforeUnpin: 10.0,      // delay after the last block finishes before unpinning
+    delayBeforeUnpin: 1.0,      // delay after the last block finishes before unpinning
+
+    // Grid fade-out as we transition to Section 3
+    fadeOutDelay: 4.0,           // delay after last block before fade starts
+    fadeOutDuration: 5.0,        // duration of grid fade-out
 
     // Block internals (per-block TL)
     rectDraw: 2.25,             // cell stroke draw duration
@@ -114,18 +118,6 @@ export const SECTION2_TIMINGS = {
     amountCount: 7.0            // count-up duration
 };
 
-// Scroll scaling for Section 2: pixels of scroll per second of timeline duration
-export const SECTION2_SCROLL = {
-    pxPerSecond: 100
-};
-
-// Scroll scaling for Section 3: pixels of scroll per second of timeline duration
-export const SECTION3_SCROLL = {
-    pxPerSecond: 600
-};
-
-// Rectangle cell states for Section 2 (breakpoint-aware)
-// Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern
 export const RECT_STATES = {
     mobile: {
         enabled: false,
@@ -229,6 +221,49 @@ export const RECT_STATES = {
     }
 };
 
+// Scroll scaling for Section 2: pixels of scroll per second of timeline duration
+export const SECTION2_SCROLL = {
+    pxPerSecond: 100
+};
+
+// Scroll scaling for Section 3: pixels of scroll per second of timeline duration
+export const SECTION3_SCROLL = {
+    pxPerSecond: 600
+};
+
+// Section 3 Looper background (hero--looper) sizing and positioning per breakpoint
+// Width/height are in pixels. Positioning is absolute; by default centered via 50%/50% with -50% translate.
+export const LOOPER_BG = {
+    mobile: {
+        width: 600,
+        height: 560,
+        left: '50%',
+        top: '50%',
+        xPercent: -50,
+        yPercent: -50
+    },
+    tablet: {
+        width: 740,
+        height: 700,
+        left: '50%',
+        top: '50%',
+        xPercent: -50,
+        yPercent: -50
+    },
+    desktop: {
+        width: 680,
+        height: 620,
+        left: '50%',
+        top: '50%',
+        xPercent: -20,
+        yPercent: -43
+    }
+};
+
+// Rectangle cell states for Section 2 (breakpoint-aware)
+// Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern
+
+
 // Section 3 (Dashboard SVG) positioning/scaling per breakpoint
 // Controls initial inline SVG transform before any GSAP timeline animations
 export const GROUP_BASE_HEIGHT = 20;
@@ -236,7 +271,7 @@ export const SECTION3 = {
     svg: {
         mobile:  { x: -1500, scale: 0.5, transformOrigin: '0% 0%' },
         tablet:  { x: -1500, scale: 0.5, transformOrigin: '0% 0%' },
-        desktop: { x: 0, scale: 0.325, transformOrigin: '0% 0%' }
+        desktop: { x: 0, scale: 0.325, transformOrigin: '-4% 3%' }
     },
     // Sequence defaults for Section 3 SVG groups
     sequence: {
@@ -322,18 +357,7 @@ export const SECTION3 = {
             // Use raw SVG ids, e.g., 'Ellipse 66' or '#animate-foo'.
             extraIds: ["#animate-Chart/Legend/Item1","#animate-Chart/Legend/Item2","#animate-Chart/Legend/Item3","#animate-Chart/Legend/Item4","#bubble-chart-all","#animate-legend2"]
         }
-        // Future groups to consider (names from design/inspector; keep for planning):
-        // '#animate-Currency distribution',
-        // '#animate-Protocol distribution',
-        // '#animate-Collateral-distribution',
-        // '#animate-CHART_SVG',
-        // '#animate-pie1-animate-Currency distribution',
-        // '#animate-pie2-animate-Currency distribution',
-        // '#animate-pie3-animate-Currency distribution',
-        // '#animate-pie1-Protocol distribution',
-        // '#animate-pie2-Protocol distribution',
-        // '#animate-pie3-Protocol distribution',
-        // '#animate-legend', '#animate-legend2', '#animate-chart', '#animate-piechart'
+    
     }
 };
 

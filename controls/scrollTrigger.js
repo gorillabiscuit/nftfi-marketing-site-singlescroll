@@ -479,6 +479,27 @@ function setupSection2Pinning() {
         // constructing a per-node TL chain using the same timings and stagger parameters.
         // For minimal code change, keep existing function but add as a group right after title delay.
         section2Timeline.add(blocksTL, `>+=${SECTION2_TIMINGS.delayBeforeFirstBlock}`);
+
+        // Fade out only the grid lines (not rectangles or title) as we transition toward Section 3
+        try {
+            let lineNodes = [];
+            if (window.lineGroups && window.lineGroups.all && typeof window.lineGroups.all.length === 'number' && window.lineGroups.all.length > 0) {
+                lineNodes = window.lineGroups.all;
+            } else {
+                const svgEl = document.getElementById('lines-svg');
+                if (svgEl && typeof svgEl.querySelectorAll === 'function') {
+                    const nodeList = svgEl.querySelectorAll('path.line');
+                    lineNodes = Array.prototype.slice.call(nodeList);
+                }
+            }
+            if (lineNodes && typeof lineNodes.length === 'number' && lineNodes.length > 0) {
+                section2Timeline.to(lineNodes, {
+                    attr: { 'stroke-opacity': 0 },
+                    duration: (typeof SECTION2_TIMINGS.fadeOutDuration === 'number') ? SECTION2_TIMINGS.fadeOutDuration : 2.0,
+                    ease: 'power1.out'
+                }, `>+=${(typeof SECTION2_TIMINGS.fadeOutDelay === 'number') ? SECTION2_TIMINGS.fadeOutDelay : 0}`);
+            }
+        } catch (e) { (void e); }
         // Add an explicit tail gap before unpinning
         section2Timeline.add(gsap.timeline().to({}, { duration: SECTION2_TIMINGS.delayBeforeUnpin }), ">");
 

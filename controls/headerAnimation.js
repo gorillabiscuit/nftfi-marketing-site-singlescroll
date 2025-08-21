@@ -9,9 +9,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Header animation variables
 let header = null;
-let lastY = 0;
-let ticking = false;
 let hideDelay;
+let watcher; // global ScrollTrigger watcher
+let isVisible = true; // track state to avoid redundant tweens
 
 /**
  * Initialize header hide/show animation
@@ -37,54 +37,34 @@ export function initHeaderAnimation() {
     // Target only the desktop navigation wrapper
     header = document.querySelector(".desktop-nav-wrapper");
 
-    // Get ScrollSmoother instance
-    const smoother = window.smoother;
-    
-    if (!smoother) {
-        console.warn('ScrollSmoother not available, header animation disabled');
-        return;
+    // Create a single global watcher that tracks scroller velocity
+    // Works across pinned regions and with ScrollSmoother
+    const hide = () => {
+        clearTimeout(hideDelay);
+        if (!isVisible) return;
+        isVisible = false;
+        gsap.to(header, { y: -100, duration: 0.3, overwrite: true, ease: 'power2.out' });
+    };
+    const show = () => {
+        clearTimeout(hideDelay);
+        if (isVisible) return;
+        isVisible = true;
+        gsap.to(header, { y: 0, duration: 0.3, overwrite: true, ease: 'power2.out' });
+    };
+
+    if (watcher && watcher.kill) {
+        try { watcher.kill(); } catch (_) {}
+        watcher = null;
     }
 
-    // Initialize last scroll position
-    lastY = smoother.scrollTop();
-
-    // Create ScrollTrigger for header animation
-    ScrollTrigger.create({
-        onUpdate: () => {
-            if (!ticking) {
-                requestAnimationFrame(() => {
-                    const currentY = smoother.scrollTop();
-                    const direction = currentY > lastY ? "down" : "up";
-                    lastY = currentY;
-
-                    clearTimeout(hideDelay);
-
-                    if (direction === "down") {
-                        // Hide header by sliding up - use absolute Y value
-                        gsap.to(header, { 
-                            y: -100, // Move 100px up (adjust this value as needed)
-                            duration: 0.3, 
-                            overwrite: true,
-                            ease: "power2.out"
-                        });
-                    } else {
-                        // Show header by sliding down
-                        gsap.to(header, { 
-                            y: 0, // Return to original position
-                            duration: 0.3, 
-                            overwrite: true,
-                            ease: "power2.out"
-                        });
-                    }
-
-                    // Debounce so tiny scroll jiggles don't trigger toggling
-                    hideDelay = setTimeout(() => {
-                        ticking = false;
-                    }, 100);
-
-                    ticking = true;
-                });
-            }
+    watcher = ScrollTrigger.create({
+        start: 0,
+        end: 'max',
+        onUpdate: (self) => {
+            const v = self.getVelocity(); // >0 down, <0 up
+            // Lower threshold to account for ScrollSmoother easing
+            if (v > 1) hide();
+            else if (v < -1) show();
         }
     });
 
@@ -98,7 +78,10 @@ export function cleanupHeaderAnimation() {
     if (hideDelay) {
         clearTimeout(hideDelay);
     }
-    
+    if (watcher && watcher.kill) {
+        try { watcher.kill(); } catch (_) {}
+        watcher = null;
+    }
     // Reset header position
     if (header) {
         gsap.set(header, { y: 0 });

@@ -4,6 +4,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SECTION3 } from '../config.js';
 import { SECTION3_SCROLL } from '../config.js';
+import { LOOPER_BG } from '../config.js';
 
 // Cache for discovered targets
 let section3TargetsCache = null;
@@ -200,6 +201,7 @@ export function initSection3Scroll() {
         console.error('[Section3Dashboard] Section 3 element not found for ScrollTrigger');
         return null;
     }
+    const looperEl = sectionEl.querySelector('.hero.hero--looper');
     const svgEl = getSvgRootStrict();
     const targets = getSection3Targets();
 
@@ -207,8 +209,9 @@ export function initSection3Scroll() {
         scrollTrigger: {
             trigger: sectionEl,
             start: 'top top',
-            end: () => '+=' + Math.round((tl ? tl.totalDuration() : 4) * (SECTION3_SCROLL && typeof SECTION3_SCROLL.pxPerSecond === 'number' ? SECTION3_SCROLL.pxPerSecond : 600)),
+            end: '+=100%', // keep Section 3 pinned for exactly one viewport height
             pin: true,
+            pinSpacing: false,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             scrub: true
@@ -225,6 +228,30 @@ export function initSection3Scroll() {
 
     console.log('[Section3Dashboard] Section 3 timeline created with ScrollTrigger pin+scrub');
     try { ScrollTrigger.refresh(); } catch (e) {}
+
+    // Apply config-driven size/position for the Looper background per breakpoint
+    try {
+        if (looperEl && typeof gsap.matchMedia === 'function') {
+            const mm = gsap.matchMedia();
+            const apply = (bpKey) => () => {
+                const cfg = LOOPER_BG && LOOPER_BG[bpKey] ? LOOPER_BG[bpKey] : null;
+                if (!cfg) return;
+                const w = (typeof cfg.width === 'number') ? cfg.width : null;
+                const h = (typeof cfg.height === 'number') ? cfg.height : null;
+                const left = (typeof cfg.left === 'string') ? cfg.left : '50%';
+                const top = (typeof cfg.top === 'string') ? cfg.top : '50%';
+                const xPct = (typeof cfg.xPercent === 'number') ? cfg.xPercent : -50;
+                const yPct = (typeof cfg.yPercent === 'number') ? cfg.yPercent : -50;
+                const setObj = { position: 'absolute', zIndex: 1, pointerEvents: 'none', left, top, xPercent: xPct, yPercent: yPct };
+                if (w != null) setObj.width = w;
+                if (h != null) setObj.height = h;
+                gsap.set(looperEl, setObj);
+            };
+            mm.add('(max-width: 767px)', apply('mobile'));
+            mm.add('(min-width: 768px) and (max-width: 1023px)', apply('tablet'));
+            mm.add('(min-width: 1024px)', apply('desktop'));
+        }
+    } catch (e) { (void e); }
     return tl;
 }
 
