@@ -764,7 +764,7 @@ body.scroll-disabled {
     font-size: 42px;
     line-height: 1.2;
     color: rgba(255,255,255,0.85);
-    margin: 0 0 24px 0;
+    margin: 0 0 8px 0;
 
     padding-top: 56px;
 }
@@ -773,8 +773,8 @@ body.scroll-disabled {
     font-family: 'Satoshi Variable';
     font-style: normal;
     font-weight: 400;
-    font-size: 24px;
-    line-height: 31px; /* 129% */
+    font-size: 20px;
+    line-height: 25px; /* 129% */
     color: rgba(255, 255, 255, 0.8);
     margin: 0 0 8px 0;
 
@@ -784,11 +784,11 @@ body.scroll-disabled {
     width: 303px;
     font-family: 'Satoshi Variable';
     font-style: normal;
-    font-weight: 400;
+    font-weight: 300;
     font-size: 14px;
     line-height: 22px; /* 157% */
     color: rgba(255, 255, 255, 0.8);
-    margin: 0 0 24px 0;
+    margin: 0 0 16px 0;
     
 }
 
@@ -798,7 +798,7 @@ body.scroll-disabled {
 .feature-3 { padding-left: 664px; padding-top: 16px; }
 .feature-4 { padding-left: 64px; padding-top: 16px; } */
 
-.section3-features .feature-cta { padding-left: 64px; padding-top: 24px; }
+.section3-features .feature-cta { padding-left: 334px; padding-top: 24px; padding-right: 60px; }
 .section3-features .feature-cta .cta-button { pointer-events: auto; }
 
 @media (min-width: 1025px) {
@@ -832,6 +832,7 @@ body.scroll-disabled {
     inset: 0;
     z-index: 2;
     overflow: hidden;
+    pointer-events: none; /* allow interactions to pass through */
 }
 
 /* Prep state to disable transitions and keep text hidden until layout is ready */
@@ -1199,6 +1200,17 @@ h2 {
     
     /* Transitions */
     transition: all 0.2s ease;
+}
+
+/* Ensure anchor-based cards match Section 1 buttons */
+a.card,
+a.card:link,
+a.card:visited,
+a.card:hover,
+a.card:active,
+a.card:focus {
+    text-decoration: none;
+    color: #E2DCDA;
 }
 
 
