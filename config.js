@@ -228,7 +228,9 @@ export const SECTION2_SCROLL = {
 
 // Scroll scaling for Section 3: pixels of scroll per second of timeline duration
 export const SECTION3_SCROLL = {
-    pxPerSecond: 600
+    pxPerSecond: 100,
+    // Scroll distance for pinned Section 3 in viewport heights (percent). Higher = slower.
+    durationVh: 600
 };
 
 // Section 3 Looper background (hero--looper) sizing and positioning per breakpoint

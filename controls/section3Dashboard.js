@@ -205,23 +205,40 @@ export function initSection3Scroll() {
     const svgEl = getSvgRootStrict();
     const targets = getSection3Targets();
 
+    // Determine scroll distance from config (in % of viewport height)
+    let endPercent = 100;
+    try {
+        if (SECTION3_SCROLL && typeof SECTION3_SCROLL.durationVh === 'number') {
+            endPercent = Math.max(1, SECTION3_SCROLL.durationVh);
+        }
+    } catch (_) {}
+
     const tl = gsap.timeline({
         scrollTrigger: {
             trigger: sectionEl,
             start: 'top top',
-            end: '+=100%', // keep Section 3 pinned for exactly one viewport height
+            end: '+=' + String(endPercent) + '%',
             pin: true,
-            pinSpacing: false,
+            pinSpacing: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             scrub: true
         }
     });
 
+    // Prepare UI elements for reveal
+    try {
+        gsap.set('.section3-features .features-title', { opacity: 0 });
+        gsap.set('.section3-features .feature-block', { opacity: 0 });
+    } catch (_) {}
+
     // Timeline structure with labels
     tl.addLabel('intro', 0);
     tl.addLabel('highlight', '+=' + getSequenceConfigNumber('introDuration'));
     tl.addLabel('outro', '+=' + getSequenceConfigNumber('outroDuration'));
+
+    // Fade in title early in the intro phase
+    tl.to('.section3-features .features-title', { opacity: 1, duration: 0.35, ease: 'power1.out' }, 'intro+=0.05');
 
     // Build per-group Y translation sequences
     addGroupSequences(tl, targets);
@@ -528,11 +545,28 @@ function addPerIdDetailSequences(tl, targets) {
     }
 
     let cursor = 0; // seconds from intro label
+    // Sequentially reveal mapped feature blocks as groups start
+    const featureSelectors = [
+        '.section3-features .feature-1',
+        '.section3-features .feature-2',
+        '.section3-features .feature-3',
+        '.section3-features .feature-4'
+    ];
+    let revealIndex = 0;
     const orderedGroups = Array.from(groups.keys());
     for (let gi = 0; gi < orderedGroups.length; gi += 1) {
         const gKey = orderedGroups[gi];
         const items = groups.get(gKey);
         let groupEnd = cursor;
+
+        // Reveal next feature block at the start of this group window
+        if (revealIndex < featureSelectors.length) {
+            const sel = featureSelectors[revealIndex];
+            try {
+                tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + cursor.toFixed(3));
+                revealIndex += 1;
+            } catch (_) {}
+        }
 
         for (let idx = 0; idx < items.length; idx += 1) {
             const spec = items[idx];
@@ -573,6 +607,16 @@ function addPerIdDetailSequences(tl, targets) {
                     bubbleDuration = dur;
                 }
             } catch (e) { (void e); }
+
+            // Tie the 4th feature reveal to the bubble phase start (if not revealed yet)
+            if (revealIndex < featureSelectors.length) {
+                const sel = featureSelectors[revealIndex];
+                try {
+                    tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startAfterBoxes.toFixed(3));
+                    revealIndex += 1;
+                } catch (_) {}
+            }
+
             // Advance cursor past bubbles plus a gap before next group
             cursor = startAfterBoxes + bubbleDuration + groupGap;
             continue;
