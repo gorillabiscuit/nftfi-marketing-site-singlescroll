@@ -321,7 +321,7 @@ export const SECTION3_ARROWS = [
 ];
 
 // Debug: when true, arrows are always visible (no dash animation) to validate geometry quickly
-export const SECTION3_ARROWS_DEBUG = true;
+export const SECTION3_ARROWS_DEBUG = false;
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
 // Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern

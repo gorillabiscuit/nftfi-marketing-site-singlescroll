@@ -260,6 +260,17 @@ export function initSection3Scroll() {
             prepareArrowsHidden();
         }
         updateArrowsGeometry(sectionEl);
+
+        // Wire test CTA: draw arrow 0 from 0% to 100%, then reveal arrowhead
+        try {
+            const cta = sectionEl.querySelector('.section3-features .cta-button');
+            if (cta) {
+                cta.addEventListener('click', function (ev) {
+                    if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+                    try { animateArrowDraw(0, 700); } catch (e) { (void e); }
+                });
+            }
+        } catch (e) { (void e); }
     } catch (e) { (void e); }
 
     console.log('[Section3Dashboard] Section 3 timeline created with ScrollTrigger pin+scrub');
@@ -578,6 +589,20 @@ function addPerIdDetailSequences(tl, targets) {
         const items = groups.get(gKey);
         let groupEnd = cursor;
 
+        // Log phase entry at the moment the phase starts and trigger non-scrub arrow draw like the CTA
+        try {
+            tl.add(function () {
+                try { console.log('[Section3Dashboard] Phase start:', gKey); } catch (e) { (void e); }
+                try {
+                    let idx = -1;
+                    if (gKey === 'boxes') idx = 0;
+                    else if (gKey === 'table') idx = 1;
+                    else if (gKey === 'donut') idx = 2;
+                    if (idx >= 0) { animateArrowDraw(idx, 700); }
+                } catch (e) { (void e); }
+            }, 'intro+=' + cursor.toFixed(3));
+        } catch (e) { (void e); }
+
         // Reveal next feature block at the start of this group window and draw matching arrow
         if (revealIndex < featureSelectors.length) {
             const sel = featureSelectors[revealIndex];
@@ -631,6 +656,14 @@ function addPerIdDetailSequences(tl, targets) {
                 if (typeof dur === 'number' && dur > 0) {
                     bubbleDuration = dur;
                 }
+            } catch (e) { (void e); }
+
+            // Log bubbles phase entry when it begins and trigger arrow 4th draw (index 3)
+            try {
+                tl.add(function () {
+                    try { console.log('[Section3Dashboard] Phase start: bubbles'); } catch (e) { (void e); }
+                    try { animateArrowDraw(3, 700); } catch (e) { (void e); }
+                }, 'intro+=' + startAfterBoxes.toFixed(3));
             } catch (e) { (void e); }
 
             // Tie the 4th feature reveal to the bubble phase start (if not revealed yet)
@@ -769,11 +802,13 @@ function updateArrowsGeometry(sectionEl) {
         // Ensure dash metrics match new geometry; otherwise stroke may appear to disappear
         try {
             const len = path.getTotalLength();
+            const isAnimating = path.getAttribute('data-animating') === '1';
             const isVisible = path.getAttribute('data-visible') === '1' || SECTION3_ARROWS_DEBUG === true;
-            if (isVisible) {
-                gsap.set(path, { strokeDasharray: len, strokeDashoffset: 0, opacity: 1 });
-            } else {
-                gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
+            // Always keep strokeDasharray in sync with path length
+            gsap.set(path, { strokeDasharray: len });
+            if (!isAnimating) {
+                // Only adjust offset when not animating
+                gsap.set(path, { strokeDashoffset: isVisible ? 0 : len, opacity: isVisible ? 1 : 0 });
             }
         } catch (e) { (void e); }
     }
@@ -817,6 +852,34 @@ function prepareOneArrowDash(index) {
     try {
         const len = p.getTotalLength();
         gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+    } catch (e) { (void e); }
+}
+
+// Draw one arrow from 0% to 100% and show arrowhead only at completion
+function animateArrowDraw(index, durationMs) {
+    const overlay = document.getElementById('section3-arrows');
+    if (!overlay) return;
+    const p = overlay.querySelector('path[data-arrow-index="' + String(index) + '"]');
+    if (!p) return;
+    // Ensure geometry is current
+    try { updateArrowsGeometry(document.querySelector("section[data-section='3']")); } catch (e) { (void e); }
+    try {
+        const len = p.getTotalLength();
+        p.setAttribute('opacity', '1');
+        p.setAttribute('data-visible', '1');
+        // Hide arrowhead during draw
+        try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
+        p.setAttribute('data-animating', '1');
+        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+        gsap.to(p, {
+            strokeDashoffset: 0,
+            duration: (typeof durationMs === 'number' ? durationMs : 700) / 1000,
+            ease: 'none',
+            onComplete: function () {
+                p.removeAttribute('data-animating');
+                try { p.setAttribute('marker-end', 'url(#arrowhead)'); } catch (e) { (void e); }
+            }
+        });
     } catch (e) { (void e); }
 }
 
