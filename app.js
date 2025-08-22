@@ -27,12 +27,10 @@ import { initSection3Dashboard, initSection3Scroll } from './controls/section3Da
 
 // Main initialization function
 function init() {
-    // Reset scroll position to top to prevent animation conflicts
+    try { if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } } catch (e) {}
+    // Robust scroll-to-top: initial, next tick, after Section 3 embed, and on pageshow (bfcache)
     window.scrollTo(0, 0);
-    // Also reset on next tick to ensure it takes effect
-    setTimeout(() => {
-        window.scrollTo(0, 0);
-    }, 0);
+    setTimeout(() => { window.scrollTo(0, 0); }, 0);
     
     // ScrollSmoother will handle scrolling prevention during initial animation
     console.log('App initialized - ScrollSmoother will manage scrolling during animation');
@@ -82,6 +80,7 @@ function init() {
         console.log('Section 3 dashboard embed:', ok ? 'success' : 'skipped');
         if (ok) {
             try { initSection3Scroll(); } catch (e) { console.error(e); }
+            try { window.scrollTo(0, 0); } catch (e) {}
         }
     });
     
@@ -154,6 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
             window.DEBUG.updatePlaneTexture();
         }
     }, 500);
+    try {
+        window.addEventListener('pageshow', function (e) {
+            try { if (e && e.persisted) { window.scrollTo(0, 0); } else { window.scrollTo(0, 0); } } catch (err) {}
+        });
+    } catch (e) {}
     
 
 }); 

@@ -74,7 +74,7 @@ export let backgroundPlane = null;
  */
 export function captureHeroAsTexture() {
     return new Promise((resolve, reject) => {
-        const heroElement = document.querySelector('.hero');
+        const heroElement = document.querySelector('.section[data-section="1"] .hero');
         if (!heroElement) {
             reject(new Error('Hero element not found'));
             return;

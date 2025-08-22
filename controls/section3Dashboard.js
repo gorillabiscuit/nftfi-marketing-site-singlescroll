@@ -584,6 +584,9 @@ function addPerIdDetailSequences(tl, targets) {
     ];
     let revealIndex = 0;
     const orderedGroups = Array.from(groups.keys());
+    // We'll schedule bubbles after all main groups to ensure arrow order 1,2,3,4
+    let scheduleBubblesAfterAll = false;
+    let bubblesDurationCaptured = 0;
     for (let gi = 0; gi < orderedGroups.length; gi += 1) {
         const gKey = orderedGroups[gi];
         const items = groups.get(gKey);
@@ -648,45 +651,49 @@ function addPerIdDetailSequences(tl, targets) {
         }
 
         if (gKey === 'boxes') {
-            // Insert bubble animations as a group immediately after boxes, then continue
-            const startAfterBoxes = groupEnd + groupGap;
-            let bubbleDuration = 0;
-            try {
-                const dur = addBubbleChildrenSequences(tl, targets, startAfterBoxes);
-                if (typeof dur === 'number' && dur > 0) {
-                    bubbleDuration = dur;
-                }
-            } catch (e) { (void e); }
-
-            // Log bubbles phase entry when it begins and trigger arrow 4th draw (index 3)
-            try {
-                tl.add(function () {
-                    try { console.log('[Section3Dashboard] Phase start: bubbles'); } catch (e) { (void e); }
-                    try { animateArrowDraw(3, 700); } catch (e) { (void e); }
-                }, 'intro+=' + startAfterBoxes.toFixed(3));
-            } catch (e) { (void e); }
-
-            // Tie the 4th feature reveal to the bubble phase start (if not revealed yet)
-            if (revealIndex < featureSelectors.length) {
-                const sel = featureSelectors[revealIndex];
-                try {
-                    tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startAfterBoxes.toFixed(3));
-                    const arrowIdx = revealIndex;
-                    const arrowSel = '#section3-arrows path[data-arrow-index="' + String(arrowIdx) + '"]';
-                    tl.add(() => { try { prepareOneArrowDash(arrowIdx); } catch (_) {} }, 'intro+=' + startAfterBoxes.toFixed(3));
-                    tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startAfterBoxes.toFixed(3));
-                    tl.to(arrowSel, { strokeDashoffset: 0, duration: 0.6, ease: 'none' }, 'intro+=' + (startAfterBoxes + 0.05).toFixed(3));
-                    revealIndex += 1;
-                } catch (_) {}
-            }
-
-            // Advance cursor past bubbles plus a gap before next group
-            cursor = startAfterBoxes + bubbleDuration + groupGap;
-            continue;
+            // Note: schedule bubbles after all groups instead of immediately after boxes
+            scheduleBubblesAfterAll = true;
         }
 
         // Advance cursor past this group plus gap
         cursor = groupEnd + groupGap;
+    }
+
+    // After iterating main groups, schedule bubbles (4th) to ensure proper order
+    if (scheduleBubblesAfterAll) {
+        const startBubbles = cursor; // start right after last group's gap
+        try {
+            const dur = addBubbleChildrenSequences(tl, targets, startBubbles);
+            if (typeof dur === 'number' && dur > 0) {
+                bubblesDurationCaptured = dur;
+            }
+        } catch (e) { (void e); }
+
+        // Log and trigger 4th arrow draw at bubbles start
+        try {
+            tl.add(function () {
+                try { console.log('[Section3Dashboard] Phase start: bubbles'); } catch (e) { (void e); }
+                try { animateArrowDraw(3, 700); } catch (e) { (void e); }
+            }, 'intro+=' + startBubbles.toFixed(3));
+        } catch (e) { (void e); }
+
+        // Reveal feature-4 text at bubbles start if not already revealed
+        const featureSelectors = [
+            '.section3-features .feature-1',
+            '.section3-features .feature-2',
+            '.section3-features .feature-3',
+            '.section3-features .feature-4'
+        ];
+        try {
+            const sel = featureSelectors[3];
+            const arrowSel = '#section3-arrows path[data-arrow-index="3"]';
+            tl.add(() => { try { prepareOneArrowDash(3); } catch (_) {} }, 'intro+=' + startBubbles.toFixed(3));
+            tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
+            tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startBubbles.toFixed(3));
+            tl.to(arrowSel, { strokeDashoffset: 0, duration: 0.6, ease: 'none' }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
+        } catch (_) {}
+
+        cursor = startBubbles + bubblesDurationCaptured + getSequenceConfigRequiredNumber('groupGap');
     }
 }
 // ------------------- ARROWS OVERLAY (feature -> svg target) -------------------
