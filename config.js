@@ -321,7 +321,12 @@ export const SECTION3_ARROWS = [
 ];
 
 // Debug: when true, arrows are always visible (no dash animation) to validate geometry quickly
-export const SECTION3_ARROWS_DEBUG = false;
+export const SECTION3_ARROWS_DEBUG = true;
+
+// When true, keep arrows visible at all times but with zero-length stroke
+// (strokeDashoffset = totalLength) until animated. Useful to avoid pop-in on
+// downward scroll while still allowing draw animation.
+export const SECTION3_ARROWS_VISIBLE_ZERO = true;
 
 // Rectangle cell states for Section 2 (breakpoint-aware)
 // Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern

@@ -7,6 +7,7 @@ import { SECTION3_SCROLL } from '../config.js';
 import { LOOPER_BG } from '../config.js';
 import { SECTION3_ARROWS } from '../config.js';
 import { SECTION3_ARROWS_DEBUG } from '../config.js';
+import { SECTION3_ARROWS_VISIBLE_ZERO } from '../config.js';
 
 // Cache for discovered targets
 let section3TargetsCache = null;
@@ -584,9 +585,6 @@ function addPerIdDetailSequences(tl, targets) {
     ];
     let revealIndex = 0;
     const orderedGroups = Array.from(groups.keys());
-    // We'll schedule bubbles after all main groups to ensure arrow order 1,2,3,4
-    let scheduleBubblesAfterAll = false;
-    let bubblesDurationCaptured = 0;
     for (let gi = 0; gi < orderedGroups.length; gi += 1) {
         const gKey = orderedGroups[gi];
         const items = groups.get(gKey);
@@ -599,8 +597,8 @@ function addPerIdDetailSequences(tl, targets) {
                 try {
                     let idx = -1;
                     if (gKey === 'boxes') idx = 0;
-                    else if (gKey === 'table') idx = 1;
-                    else if (gKey === 'donut') idx = 2;
+                    else if (gKey === 'table') idx = 2;
+                    else if (gKey === 'donut') idx = 3;
                     if (idx >= 0) { animateArrowDraw(idx, 700); }
                 } catch (e) { (void e); }
             }, 'intro+=' + cursor.toFixed(3));
@@ -616,7 +614,7 @@ function addPerIdDetailSequences(tl, targets) {
                 const arrowSel = '#section3-arrows path[data-arrow-index="' + String(arrowIdx) + '"]';
                 tl.add(() => { try { prepareOneArrowDash(arrowIdx); } catch (_) {} }, 'intro+=' + cursor.toFixed(3));
                 tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + cursor.toFixed(3));
-                tl.to(arrowSel, { strokeDashoffset: 0, duration: 0.6, ease: 'none' }, 'intro+=' + (cursor + 0.05).toFixed(3));
+                tl.to(arrowSel, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.out' }, 'intro+=' + (cursor + 0.05).toFixed(3));
                 revealIndex += 1;
             } catch (_) {}
         }
@@ -651,50 +649,42 @@ function addPerIdDetailSequences(tl, targets) {
         }
 
         if (gKey === 'boxes') {
-            // Note: schedule bubbles after all groups instead of immediately after boxes
-            scheduleBubblesAfterAll = true;
+            // Schedule chart (bubbles) immediately after boxes group
+            const startBubbles = groupEnd + groupGap;
+            try {
+                tl.add(function () {
+                    try { console.log('[Section3Dashboard] Phase start: chart'); } catch (e) { (void e); }
+                    try { animateArrowDraw(1, 700); } catch (e) { (void e); }
+                }, 'intro+=' + startBubbles.toFixed(3));
+            } catch (e) { (void e); }
+
+            // Reveal next feature (feature-2) and corresponding arrow dash
+            if (revealIndex < featureSelectors.length) {
+                const sel2 = featureSelectors[revealIndex];
+                try {
+                    const arrowIdx2 = revealIndex;
+                    const arrowSel2 = '#section3-arrows path[data-arrow-index="' + String(arrowIdx2) + '"]';
+                    tl.add(() => { try { prepareOneArrowDash(arrowIdx2); } catch (_) {} }, 'intro+=' + startBubbles.toFixed(3));
+                    tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
+                    tl.to(arrowSel2, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startBubbles.toFixed(3));
+                    tl.to(arrowSel2, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.out' }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
+                    revealIndex += 1;
+                } catch (_) {}
+            }
+
+            // Schedule bubble chart elements
+            try {
+                const dur = addBubbleChildrenSequences(tl, targets, startBubbles);
+                const endBubbles = (typeof dur === 'number' && dur > 0) ? (startBubbles + dur) : startBubbles;
+                if (endBubbles > groupEnd) groupEnd = endBubbles;
+            } catch (e) { (void e); }
         }
 
         // Advance cursor past this group plus gap
         cursor = groupEnd + groupGap;
     }
 
-    // After iterating main groups, schedule bubbles (4th) to ensure proper order
-    if (scheduleBubblesAfterAll) {
-        const startBubbles = cursor; // start right after last group's gap
-        try {
-            const dur = addBubbleChildrenSequences(tl, targets, startBubbles);
-            if (typeof dur === 'number' && dur > 0) {
-                bubblesDurationCaptured = dur;
-            }
-        } catch (e) { (void e); }
-
-        // Log and trigger 4th arrow draw at bubbles start
-        try {
-            tl.add(function () {
-                try { console.log('[Section3Dashboard] Phase start: bubbles'); } catch (e) { (void e); }
-                try { animateArrowDraw(3, 700); } catch (e) { (void e); }
-            }, 'intro+=' + startBubbles.toFixed(3));
-        } catch (e) { (void e); }
-
-        // Reveal feature-4 text at bubbles start if not already revealed
-        const featureSelectors = [
-            '.section3-features .feature-1',
-            '.section3-features .feature-2',
-            '.section3-features .feature-3',
-            '.section3-features .feature-4'
-        ];
-        try {
-            const sel = featureSelectors[3];
-            const arrowSel = '#section3-arrows path[data-arrow-index="3"]';
-            tl.add(() => { try { prepareOneArrowDash(3); } catch (_) {} }, 'intro+=' + startBubbles.toFixed(3));
-            tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
-            tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startBubbles.toFixed(3));
-            tl.to(arrowSel, { strokeDashoffset: 0, duration: 0.6, ease: 'none' }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
-        } catch (_) {}
-
-        cursor = startBubbles + bubblesDurationCaptured + getSequenceConfigRequiredNumber('groupGap');
-    }
+    // Bubbles were scheduled immediately after boxes; nothing to do here
 }
 // ------------------- ARROWS OVERLAY (feature -> svg target) -------------------
 
@@ -811,11 +801,17 @@ function updateArrowsGeometry(sectionEl) {
             const len = path.getTotalLength();
             const isAnimating = path.getAttribute('data-animating') === '1';
             const isVisible = path.getAttribute('data-visible') === '1' || SECTION3_ARROWS_DEBUG === true;
+            const isDrawn = path.getAttribute('data-drawn') === '1';
+            const forceZeroLengthVisible = SECTION3_ARROWS_VISIBLE_ZERO === true;
             // Always keep strokeDasharray in sync with path length
             gsap.set(path, { strokeDasharray: len });
             if (!isAnimating) {
                 // Only adjust offset when not animating
-                gsap.set(path, { strokeDashoffset: isVisible ? 0 : len, opacity: isVisible ? 1 : 0 });
+                if (forceZeroLengthVisible) {
+                    gsap.set(path, { strokeDashoffset: isDrawn ? 0 : len, opacity: 1 });
+                } else {
+                    gsap.set(path, { strokeDashoffset: isVisible ? 0 : len, opacity: isVisible ? 1 : 0 });
+                }
             }
         } catch (e) { (void e); }
     }
@@ -829,6 +825,7 @@ function prepareArrowsHidden() {
         const p = paths[i];
         p.setAttribute('opacity', '0');
         p.removeAttribute('data-visible');
+        p.removeAttribute('data-drawn');
         try {
             const len = p.getTotalLength();
             gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
@@ -844,9 +841,14 @@ function prepareArrowsVisible() {
         const p = paths[i];
         p.setAttribute('opacity', '1');
         p.setAttribute('data-visible', '1');
+        // Do not mark as drawn here; only animation should set data-drawn
         try {
             const len = p.getTotalLength();
-            gsap.set(p, { strokeDasharray: len, strokeDashoffset: 0 });
+            if (SECTION3_ARROWS_VISIBLE_ZERO === true) {
+                gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+            } else {
+                gsap.set(p, { strokeDasharray: len, strokeDashoffset: 0 });
+            }
         } catch (e) { (void e); }
     }
 }
@@ -881,10 +883,11 @@ function animateArrowDraw(index, durationMs) {
         gsap.to(p, {
             strokeDashoffset: 0,
             duration: (typeof durationMs === 'number' ? durationMs : 700) / 1000,
-            ease: 'none',
+            ease: 'power2.out',
             onComplete: function () {
                 p.removeAttribute('data-animating');
                 try { p.setAttribute('marker-end', 'url(#arrowhead)'); } catch (e) { (void e); }
+                try { p.setAttribute('data-drawn', '1'); } catch (e) { (void e); }
             }
         });
     } catch (e) { (void e); }
