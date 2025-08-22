@@ -8,6 +8,8 @@ import { LOOPER_BG } from '../config.js';
 import { SECTION3_ARROWS } from '../config.js';
 import { SECTION3_ARROWS_DEBUG } from '../config.js';
 import { SECTION3_ARROWS_VISIBLE_ZERO } from '../config.js';
+// Bundle the dashboard SVG at build time to ensure availability in production
+import dashboardSvg from '../images/dashboard.svg?raw';
 
 // Cache for discovered targets
 let section3TargetsCache = null;
@@ -99,25 +101,12 @@ export async function initSection3Dashboard() {
             return true;
         }
 
-        // Fetch SVG text and inline to allow GSAP to target internal groups later
-        const response = await fetch('images/dashboard.svg', { cache: 'no-store' });
-        if (!response || !response.ok) {
-            console.error('[Section3Dashboard] Failed to fetch images/dashboard.svg. Response not OK.');
+        // Inline the bundled SVG text (avoids runtime fetch/404 in production)
+        if (typeof dashboardSvg !== 'string' || dashboardSvg.indexOf('<svg') === -1) {
+            console.error('[Section3Dashboard] Bundled dashboard SVG missing or invalid.');
             return false;
         }
-
-        const svgText = await response.text();
-        if (typeof svgText !== 'string') {
-            console.error('[Section3Dashboard] SVG response is not text.');
-            return false;
-        }
-        if (svgText.indexOf('<svg') === -1) {
-            console.error('[Section3Dashboard] SVG content missing <svg> root element.');
-            return false;
-        }
-
-        // Insert SVG inline
-        container.innerHTML = svgText;
+        container.innerHTML = dashboardSvg;
         container.setAttribute('data-dashboard-loaded', 'true');
 
         // Position SVG so it's properly visible; use GSAP canonical setter
@@ -249,10 +238,7 @@ export function initSection3Scroll() {
     // Fade in title early in the intro phase
     tl.to('.section3-features .features-title', { opacity: 1, duration: 0.35, ease: 'power1.out' }, 'intro+=0.05');
 
-    // Build per-group Y translation sequences
-    addGroupSequences(tl, targets);
-
-    // Initialize arrows overlay and set initial hidden state
+    // Initialize arrows overlay BEFORE building sequences that reference it
     try {
         ensureArrowsOverlay(sectionEl);
         if (SECTION3_ARROWS_DEBUG === true) {
@@ -273,6 +259,9 @@ export function initSection3Scroll() {
             }
         } catch (e) { (void e); }
     } catch (e) { (void e); }
+
+    // Build per-group Y translation sequences (safe: arrows overlay exists)
+    addGroupSequences(tl, targets);
 
     console.log('[Section3Dashboard] Section 3 timeline created with ScrollTrigger pin+scrub');
     try { ScrollTrigger.refresh(); } catch (e) {}
@@ -706,14 +695,17 @@ function ensureArrowsOverlay(sectionEl) {
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
     marker.setAttribute('id', 'arrowhead');
-    marker.setAttribute('markerWidth', '6');
-    marker.setAttribute('markerHeight', '6');
+    // 25% smaller than previous (6 -> 4.5); keep viewBox so geometry scales
+    marker.setAttribute('markerWidth', '4.5');
+    marker.setAttribute('markerHeight', '4.5');
+    marker.setAttribute('viewBox', '0 0 6 6');
     marker.setAttribute('refX', '5');
     marker.setAttribute('refY', '3');
     marker.setAttribute('orient', 'auto');
     const tip = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     tip.setAttribute('d', 'M0,0 L6,3 L0,6 Z');
-    tip.setAttribute('fill', 'rgba(255,255,255,0.8)');
+    // 50% transparent arrowhead
+    tip.setAttribute('fill', 'rgba(255,255,255,0.5)');
     marker.appendChild(tip);
     defs.appendChild(marker);
     svg.appendChild(defs);
@@ -724,7 +716,8 @@ function ensureArrowsOverlay(sectionEl) {
         p.setAttribute('data-arrow-index', String(i));
         p.setAttribute('d', 'M0 0 L0 0');
         p.setAttribute('fill', 'none');
-        p.setAttribute('stroke', 'rgba(255,255,255,0.8)');
+        // 50% transparent arrow stroke
+        p.setAttribute('stroke', 'rgba(255,255,255,0.5)');
         p.setAttribute('stroke-width', '1.5');
         p.setAttribute('marker-end', 'url(#arrowhead)');
         p.setAttribute('opacity', '0');

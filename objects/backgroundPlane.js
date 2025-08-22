@@ -155,6 +155,14 @@ export function captureHeroAsTexture() {
                             duration: 1.5,
                             ease: "power2.out",
                             onStart: () => {
+                                // Ensure visibility even when capture fails
+                                const canvasEl = document.getElementById('three-canvas');
+                                if (canvasEl) {
+                                    gsap.to(canvasEl, { opacity: 1, duration: 0.4, ease: 'power1.out' });
+                                }
+                                if (window.wrapper) window.wrapper.visible = true;
+                            },
+                            onStart: () => {
                                 console.log('Fallback scale animation started with scroll-adjusted scale:', targetScale);
                             },
                             onComplete: () => {
@@ -231,7 +239,9 @@ export function createBackgroundPlane(scene, uniforms) {
         console.error('Failed to apply dynamic texture, using fallback:', error);
         // Fallback to static texture if capture fails
         const textureLoader = new THREE.TextureLoader();
-        const headerTexture = textureLoader.load('/images/header.png');
+        // Use Vite asset URL to ensure it’s emitted to dist
+        const headerUrl = new URL('../images/header.png', import.meta.url).href;
+        const headerTexture = textureLoader.load(headerUrl);
         plane.material.map = headerTexture;
         plane.material.needsUpdate = true;
     });
@@ -251,6 +261,12 @@ export function createBackgroundPlane(scene, uniforms) {
                     duration: 1.5,
                     ease: "power2.out"
                 });
+                // Ensure visibility if the capture took too long
+                const canvasEl = document.getElementById('three-canvas');
+                if (canvasEl) {
+                    gsap.to(canvasEl, { opacity: 1, duration: 0.4, ease: 'power1.out' });
+                }
+                if (window.wrapper) window.wrapper.visible = true;
             });
         }
     }, 3000); // 3 second safety timeout

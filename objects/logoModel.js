@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from '../libs/GLTFLoader.js';
+// Import model via Vite asset handling to ensure it’s emitted to dist and path resolved
+import nftfiLogoUrl from '../models/nftfi_logo.glb?url';
 import vertexShader from '../shaders/glass.vert.js';
 import fragmentShader from '../shaders/glass.frag.js';
 
@@ -15,7 +17,7 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
     
     const loader = new GLTFLoader();
     
-    loader.load('/models/nftfi_logo.glb', (gltf) => {
+    loader.load(nftfiLogoUrl, (gltf) => {
         
         // Calculate bounding box FIRST (before any geometry modifications)
         const box = new THREE.Box3().setFromObject(gltf.scene);
