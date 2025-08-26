@@ -4,6 +4,7 @@ import { GLTFLoader } from '../libs/GLTFLoader.js';
 import nftfiLogoUrl from '../models/nftfi_logo.glb?url';
 import vertexShader from '../shaders/glass.vert.js';
 import fragmentShader from '../shaders/glass.frag.js';
+import { SHADER_DEFAULTS } from '../config.js';
 
 // Global references
 export let mesh = null;
@@ -43,11 +44,29 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
                     child.geometry.computeVertexNormals();
                 }
                 
-                // Create glass shader material
+                // Create dedicated glass shader uniforms for the LOGO using defaults (restored behavior)
+                const logoUniforms = {
+                    uIorR: { value: SHADER_DEFAULTS.uIorR },
+                    uIorY: { value: SHADER_DEFAULTS.uIorY },
+                    uIorG: { value: SHADER_DEFAULTS.uIorG },
+                    uIorC: { value: SHADER_DEFAULTS.uIorC },
+                    uIorB: { value: SHADER_DEFAULTS.uIorB },
+                    uIorP: { value: SHADER_DEFAULTS.uIorP },
+                    uSaturation: { value: SHADER_DEFAULTS.uSaturation },
+                    uChromaticAberration: { value: SHADER_DEFAULTS.uChromaticAberration },
+                    uRefractPower: { value: SHADER_DEFAULTS.uRefractPower },
+                    uFresnelPower: { value: SHADER_DEFAULTS.uFresnelPower },
+                    uShininess: { value: SHADER_DEFAULTS.uShininess },
+                    uDiffuseness: { value: SHADER_DEFAULTS.uDiffuseness },
+                    uLight: { value: SHADER_DEFAULTS.uLight.clone ? SHADER_DEFAULTS.uLight.clone() : SHADER_DEFAULTS.uLight },
+                    winResolution: { value: SHADER_DEFAULTS.winResolution.clone ? SHADER_DEFAULTS.winResolution.clone() : SHADER_DEFAULTS.winResolution },
+                    uTexture: { value: null }
+                };
+
                 child.material = new THREE.ShaderMaterial({
                     vertexShader: vertexShader,
                     fragmentShader: fragmentShader,
-                    uniforms: uniforms,
+                    uniforms: logoUniforms,
                     side: THREE.DoubleSide
                 });
             
@@ -77,8 +96,8 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
             startPos.z
         );
         
-        // Set initial scale - nearly invisible to start (will be animated by GSAP)
-        wrapper.scale.setScalar(0.0001); // Start tiny, GSAP will animate to correct scale
+        // Set initial scale to the computed start scale (no tiny/zero scale)
+        wrapper.scale.setScalar(startPos.scale || 1);
         // Keep model hidden until hero capture/texture is ready to avoid visual pop
         wrapper.visible = false;
         // Ensure canvas starts hidden (CSS sets opacity:0)

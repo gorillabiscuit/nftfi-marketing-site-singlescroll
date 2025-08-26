@@ -9,6 +9,7 @@ import { calculateStartPosition } from '../utils/viewport.js';
 import { ANIMATION_CONFIG, MODEL_CONFIG } from '../config.js';
 // NEW: Import ScrollSmoother performance monitoring
 import { startPerformanceFrame, recordScrollEvent } from '../controls/scrollSynchronizer.js';
+import { pebbleMesh, pebbleGroup, isPebbleReady } from '../objects/pebbleModel.js';
 
 // Global references (will be set by main.js)
 let mesh, wrapper, isModelReady;
@@ -83,56 +84,79 @@ export function animate() {
         }
     }
     
+    // Pebble rotation animation - gentle multi-axis rotation independent from wrapper
+    if (pebbleGroup && isPebbleReady) {
+        const time = (Date.now() - startTime) * 0.001;
+        const xRatePebble = ANIMATION_CONFIG.xRotationRate.base * 0.6 + Math.sin(time * (ANIMATION_CONFIG.xRotationRate.frequency * 0.8)) * (ANIMATION_CONFIG.xRotationRate.modulation * 0.5);
+        const yRatePebble = ANIMATION_CONFIG.yRotationRate.base * 0.7 + Math.cos(time * (ANIMATION_CONFIG.yRotationRate.frequency * 1.1)) * (ANIMATION_CONFIG.yRotationRate.modulation * 0.6);
+        const zRatePebble = ANIMATION_CONFIG.zRotationRate.base * 0.8 + Math.sin(time * (ANIMATION_CONFIG.zRotationRate.frequency * 1.3)) * (ANIMATION_CONFIG.zRotationRate.modulation * 0.6);
+        pebbleGroup.rotation.x += xRatePebble * 0.02;
+        pebbleGroup.rotation.y += yRatePebble * 0.02;
+        pebbleGroup.rotation.z += zRatePebble * 0.02;
+    }
+    
     // Glass refraction rendering with temporal plane and sphere visibility control
-    if (mesh) {
+    {
+        // Multi-mesh refraction capture: process each refractive mesh
+        const refractiveMeshes = [];
+        if (mesh) refractiveMeshes.push(mesh);
+        if (pebbleMesh) refractiveMeshes.push(pebbleMesh);
         
-        // Temporarily make background plane and sphere visible for render target sampling
-        showBackgroundPlane();
-        
-        // Find sphere in scene for render target sampling
-        let whiteSphere = null;
-        scene.traverse((object) => {
-            if (object.isMesh && object.material && object.material.color && 
-                object.material.color.getHexString() === 'ffffff') {
-                whiteSphere = object;
+        if (refractiveMeshes.length > 0) {
+            // Temporarily make background plane and sphere visible for render target sampling
+            showBackgroundPlane();
+            
+            // Find sphere in scene for render target sampling
+            let whiteSphere = null;
+            scene.traverse((object) => {
+                if (object.isMesh && object.material && object.material.color &&
+                    object.material.color.getHexString() === 'ffffff') {
+                    whiteSphere = object;
+                }
+            });
+            if (whiteSphere) {
+                whiteSphere.visible = true;
             }
-        });
-        
-        if (whiteSphere) {
-            whiteSphere.visible = true;
-            // console.log('Sphere made visible for render target');
-        } else {
-            // console.log('White sphere not found in scene');
+            
+            for (let i = 0; i < refractiveMeshes.length; i += 1) {
+                const m = refractiveMeshes[i];
+                if (!m || !m.material || !m.material.uniforms || !m.material.uniforms.uTexture) {
+                    continue;
+                }
+                
+                // Hide all refractive meshes during back capture
+                for (let j = 0; j < refractiveMeshes.length; j += 1) {
+                    const other = refractiveMeshes[j];
+                    if (other) other.visible = false;
+                }
+                
+                // Back side render
+                renderer.setRenderTarget(backRenderTarget);
+                renderer.render(scene, camera);
+                m.material.uniforms.uTexture.value = backRenderTarget.texture;
+                m.material.side = THREE.BackSide;
+                
+                // Front side render: show only current mesh
+                m.visible = true;
+                renderer.setRenderTarget(mainRenderTarget);
+                renderer.render(scene, camera);
+                m.material.uniforms.uTexture.value = mainRenderTarget.texture;
+                m.material.side = THREE.FrontSide;
+            }
+            
+            // Restore background plane and sphere
+            hideBackgroundPlane();
+            if (whiteSphere) {
+                whiteSphere.visible = false;
+            }
+            renderer.setRenderTarget(null);
+            
+            // Ensure final render has all refractive meshes visible
+            for (let k = 0; k < refractiveMeshes.length; k += 1) {
+                const m = refractiveMeshes[k];
+                if (m) m.visible = true;
+            }
         }
-        
-        mesh.visible = false;
-        
-        // Back side render
-        renderer.setRenderTarget(backRenderTarget);
-        renderer.render(scene, camera);
-        
-        mesh.material.uniforms.uTexture.value = backRenderTarget.texture;
-        mesh.material.side = THREE.BackSide;
-        
-        mesh.visible = true;
-        
-        // Front side render
-        renderer.setRenderTarget(mainRenderTarget);
-        renderer.render(scene, camera);
-        
-        mesh.material.uniforms.uTexture.value = mainRenderTarget.texture;
-        mesh.material.side = THREE.FrontSide;
-        
-        // Hide background plane and sphere again for final render
-        hideBackgroundPlane();
-        
-        // Hide sphere for final render
-        if (whiteSphere) {
-            whiteSphere.visible = false; // Hide sphere but keep it for refraction
-            // console.log('Sphere hidden for final render');
-        }
-        
-        renderer.setRenderTarget(null);
     }
     
     // Render the scene

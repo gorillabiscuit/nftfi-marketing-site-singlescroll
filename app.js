@@ -5,6 +5,8 @@ import { init as initThreeJS, onWindowResize as onThreeJSResize } from './core/i
 import { animate, initializeAnimationLoop } from './core/loop.js';
 import { initializeNavigation } from './controls/navigation.js';
 import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.js';
+import { loadPebbleModel, pebbleGroup } from './objects/pebbleModel.js';
+import { loadRoundPebbleModel } from './objects/roundPebbleModel.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane } from './objects/backgroundPlane.js';
 import { setupScrollAnimation, resetScrollAnimation } from './controls/scrollTrigger.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
@@ -56,6 +58,29 @@ function init() {
     
     // Load GLTF model
     loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
+
+    // Load Pebble model (as-is). Uses shared uniforms for same material/lighting
+    try {
+        loadPebbleModel(scene, uniforms);
+        // Deferred attach of round pebble once pebbleGroup is available
+        const attachRound = () => {
+            try {
+                if (window.PEBBLE && window.PEBBLE.pebbleGroup) {
+                    loadRoundPebbleModel(window.PEBBLE.pebbleGroup, scene);
+                } else if (pebbleGroup) {
+                    loadRoundPebbleModel(pebbleGroup, scene);
+                } else {
+                    setTimeout(attachRound, 100);
+                    return;
+                }
+            } catch (err) {
+                console.error('Failed to attach round pebble:', err);
+            }
+        };
+        attachRound();
+    } catch (e) {
+        console.error('Failed to load Pebble model:', e);
+    }
     
     // Create window resize handler
     const onWindowResize = createWindowResizeHandler(onThreeJSResize, updatePlaneForViewport, updatePlaneTexture);

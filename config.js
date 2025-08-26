@@ -354,6 +354,9 @@ export const SECTION3 = {
         introDuration: 10.5,
         outroDuration: 10.5,
 
+        // Delay between title reveal and first subheader/arrow (seconds)
+        firstFeatureDelay: 6.6,
+
         // Per-ID mode (new):
         riseDuration: 2.0,     // seconds to move up
         holdDefault: 6.0,      // seconds to stay up if item has no hold override

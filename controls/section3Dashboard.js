@@ -14,6 +14,82 @@ import dashboardSvg from '../images/dashboard.svg?raw';
 // Cache for discovered targets
 let section3TargetsCache = null;
 
+// One-time play guards for non-scrubbed arrow animations
+let arrowPlayedFlags = [];
+// Track last known scroll direction for Section 3 (1 = down, -1 = up)
+let section3ScrollDirection = 1;
+function ensureArrowStateSize() {
+    const n = Array.isArray(SECTION3_ARROWS) ? SECTION3_ARROWS.length : 0;
+    if (arrowPlayedFlags.length !== n) {
+        arrowPlayedFlags = new Array(n);
+        for (let i = 0; i < n; i += 1) arrowPlayedFlags[i] = false;
+    }
+}
+function markArrowPlayed(index) {
+    ensureArrowStateSize();
+    if (typeof index === 'number' && index >= 0 && index < arrowPlayedFlags.length) {
+        arrowPlayedFlags[index] = true;
+    }
+}
+function unmarkArrowPlayed(index) {
+    ensureArrowStateSize();
+    if (typeof index === 'number' && index >= 0 && index < arrowPlayedFlags.length) {
+        arrowPlayedFlags[index] = false;
+    }
+}
+function clearArrowPlayed() {
+    ensureArrowStateSize();
+    for (let i = 0; i < arrowPlayedFlags.length; i += 1) {
+        arrowPlayedFlags[i] = false;
+    }
+}
+
+function hideArrowInstant(index) {
+    const overlay = document.getElementById('section3-arrows');
+    if (!overlay) return;
+    const p = overlay.querySelector('path[data-arrow-index="' + String(index) + '"]');
+    if (!p) return;
+    try {
+        const len = p.getTotalLength();
+        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+    } catch (e) { (void e); }
+    try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
+    p.removeAttribute('data-animating');
+    p.removeAttribute('data-visible');
+    p.removeAttribute('data-drawn');
+    if (SECTION3_ARROWS_VISIBLE_ZERO === true) {
+        p.setAttribute('opacity', '1');
+    } else {
+        p.setAttribute('opacity', '0');
+    }
+}
+
+function fadeOutArrow(index, durationMs) {
+    const overlay = document.getElementById('section3-arrows');
+    if (!overlay) return;
+    const p = overlay.querySelector('path[data-arrow-index="' + String(index) + '"]');
+    if (!p) return;
+    try {
+        const len = p.getTotalLength();
+        gsap.to(p, {
+            strokeDashoffset: len,
+            opacity: 0,
+            duration: (typeof durationMs === 'number' ? durationMs : 300) / 1000,
+            ease: 'power1.out',
+            onComplete: function () {
+                try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
+                p.removeAttribute('data-animating');
+                p.removeAttribute('data-visible');
+                p.removeAttribute('data-drawn');
+                // Prepare for next draw: zero length, visible again, and allow re-draw
+                try { gsap.set(p, { strokeDasharray: len, strokeDashoffset: len, opacity: 1 }); } catch (e) { (void e); }
+                try { unmarkArrowPlayed(index); } catch (e) { (void e); }
+            }
+        });
+    } catch (e) { (void e); }
+}
+
+
 function getSvgConfigFor(breakpoint) {
     if (!SECTION3) {
         throw new Error('[Section3Dashboard] Missing SECTION3 config');
@@ -215,12 +291,23 @@ export function initSection3Scroll() {
             anticipatePin: 1,
             invalidateOnRefresh: true,
             scrub: true,
+            markers: true,
+            id: 'section3-timeline',
             onUpdate: (self) => {
                 try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
+                // Store current scroll direction for direction-aware arrow behavior
+                try {
+                    if (typeof self.direction === 'number') {
+                        section3ScrollDirection = self.direction === 1 ? 1 : -1;
+                    }
+                } catch (e) { (void e); }
             },
             onRefresh: () => {
                 try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
-            }
+            },
+            // When leaving Section 3 forward into Section 2, fully reset play-once state
+
+   
         }
     });
 
@@ -289,6 +376,24 @@ export function initSection3Scroll() {
             mm.add('(min-width: 1024px)', apply('desktop'));
         }
     } catch (e) { (void e); }
+
+    // Reset play-once guards when entering Section 2 (both directions)
+    try {
+        const section2El = document.querySelector("section[data-section='2']");
+        if (section2El) {
+            ScrollTrigger.create({
+                trigger: section2El,
+                // Fire when Section 2 is fully aligned with the viewport (fully visible)
+                start: 'top top',
+                end: 'bottom bottom',
+                markers: true,
+                id: 'section2-reset',
+                // Set zero-length on leaving Section 2 backward (up into Section 1)
+                onEnter: () => { try { console.log('[Section3Dashboard] section2 onEnter'); } catch (e) { (void e); } },
+                
+            });
+        }
+    } catch (e) { (void e); }
     return tl;
 }
 
@@ -301,6 +406,17 @@ function getSequenceConfigNumber(key) {
         throw new Error('[Section3Dashboard] Invalid SECTION3.sequence.' + key);
     }
     return value;
+}
+
+function getSequenceConfigNumberOrDefault(key, defaultValue) {
+    try {
+        if (!SECTION3 || !SECTION3.sequence) return defaultValue;
+        const value = SECTION3.sequence[key];
+        if (typeof value === 'number') return value;
+        return defaultValue;
+    } catch (_) {
+        return defaultValue;
+    }
 }
 
 function addGroupSequences(tl, targets) {
@@ -583,13 +699,6 @@ function addPerIdDetailSequences(tl, targets) {
         try {
             tl.add(function () {
                 try { console.log('[Section3Dashboard] Phase start:', gKey); } catch (e) { (void e); }
-                try {
-                    let idx = -1;
-                    if (gKey === 'boxes') idx = 0;
-                    else if (gKey === 'table') idx = 2;
-                    else if (gKey === 'donut') idx = 3;
-                    if (idx >= 0) { animateArrowDraw(idx, 700); }
-                } catch (e) { (void e); }
             }, 'intro+=' + cursor.toFixed(3));
         } catch (e) { (void e); }
 
@@ -597,13 +706,33 @@ function addPerIdDetailSequences(tl, targets) {
         if (revealIndex < featureSelectors.length) {
             const sel = featureSelectors[revealIndex];
             try {
-                tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + cursor.toFixed(3));
+                const firstFeatureExtraDelay = (revealIndex === 0) ? getSequenceConfigNumberOrDefault('firstFeatureDelay', 0.6) : 0;
+                const startAt = (cursor + firstFeatureExtraDelay);
+                tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startAt.toFixed(3));
                 // arrow index matches reveal index
                 const arrowIdx = revealIndex;
                 const arrowSel = '#section3-arrows path[data-arrow-index="' + String(arrowIdx) + '"]';
-                tl.add(() => { try { prepareOneArrowDash(arrowIdx); } catch (_) {} }, 'intro+=' + cursor.toFixed(3));
-                tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + cursor.toFixed(3));
-                tl.to(arrowSel, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.out' }, 'intro+=' + (cursor + 0.05).toFixed(3));
+                tl.add(() => {
+                    try {
+                        prepareOneArrowDash(arrowIdx);
+                        const p = document.querySelector(arrowSel);
+                        if (p) {
+                            p.setAttribute('data-animating', '1');
+                            try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
+                        }
+                    } catch (_) {}
+                }, 'intro+=' + startAt.toFixed(3));
+                tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startAt.toFixed(3));
+                tl.to(arrowSel, { strokeDashoffset: 0, duration: 4.2, ease: 'power2.out', onComplete: function () {
+                    try {
+                        const p = document.querySelector(arrowSel);
+                        if (p) {
+                            p.removeAttribute('data-animating');
+                            p.setAttribute('data-drawn', '1');
+                            p.setAttribute('marker-end', 'url(#arrowhead)');
+                        }
+                    } catch (e) { (void e); }
+                } }, 'intro+=' + (startAt + 0.05).toFixed(3));
                 revealIndex += 1;
             } catch (_) {}
         }
@@ -643,7 +772,6 @@ function addPerIdDetailSequences(tl, targets) {
             try {
                 tl.add(function () {
                     try { console.log('[Section3Dashboard] Phase start: chart'); } catch (e) { (void e); }
-                    try { animateArrowDraw(1, 700); } catch (e) { (void e); }
                 }, 'intro+=' + startBubbles.toFixed(3));
             } catch (e) { (void e); }
 
@@ -653,10 +781,28 @@ function addPerIdDetailSequences(tl, targets) {
                 try {
                     const arrowIdx2 = revealIndex;
                     const arrowSel2 = '#section3-arrows path[data-arrow-index="' + String(arrowIdx2) + '"]';
-                    tl.add(() => { try { prepareOneArrowDash(arrowIdx2); } catch (_) {} }, 'intro+=' + startBubbles.toFixed(3));
+                    tl.add(() => {
+                        try {
+                            prepareOneArrowDash(arrowIdx2);
+                            const p2 = document.querySelector(arrowSel2);
+                            if (p2) {
+                                p2.setAttribute('data-animating', '1');
+                                try { p2.removeAttribute('marker-end'); } catch (e) { (void e); }
+                            }
+                        } catch (_) {}
+                    }, 'intro+=' + startBubbles.toFixed(3));
                     tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
                     tl.to(arrowSel2, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startBubbles.toFixed(3));
-                    tl.to(arrowSel2, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.out' }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
+                    tl.to(arrowSel2, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.out', onComplete: function () {
+                        try {
+                            const p2 = document.querySelector(arrowSel2);
+                            if (p2) {
+                                p2.removeAttribute('data-animating');
+                                p2.setAttribute('data-drawn', '1');
+                                p2.setAttribute('marker-end', 'url(#arrowhead)');
+                            }
+                        } catch (e) { (void e); }
+                    } }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
                     revealIndex += 1;
                 } catch (_) {}
             }
@@ -863,27 +1009,38 @@ function animateArrowDraw(index, durationMs) {
     if (!overlay) return;
     const p = overlay.querySelector('path[data-arrow-index="' + String(index) + '"]');
     if (!p) return;
-    // Ensure geometry is current
-    try { updateArrowsGeometry(document.querySelector("section[data-section='3']")); } catch (e) { (void e); }
-    try {
-        const len = p.getTotalLength();
-        p.setAttribute('opacity', '1');
-        p.setAttribute('data-visible', '1');
-        // Hide arrowhead during draw
-        try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
-        p.setAttribute('data-animating', '1');
-        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
-        gsap.to(p, {
-            strokeDashoffset: 0,
-            duration: (typeof durationMs === 'number' ? durationMs : 700) / 1000,
-            ease: 'power2.out',
-            onComplete: function () {
-                p.removeAttribute('data-animating');
-                try { p.setAttribute('marker-end', 'url(#arrowhead)'); } catch (e) { (void e); }
-                try { p.setAttribute('data-drawn', '1'); } catch (e) { (void e); }
-            }
-        });
-    } catch (e) { (void e); }
+    ensureArrowStateSize();
+    if (typeof index !== 'number' || index < 0 || index >= arrowPlayedFlags.length) return;
+
+    // Direction-aware behavior
+    if (section3ScrollDirection === 1) {
+        // Scrolling down: only draw once
+        if (arrowPlayedFlags[index] === true) return;
+        try { updateArrowsGeometry(document.querySelector("section[data-section='3']")); } catch (e) { (void e); }
+        try {
+            const len = p.getTotalLength();
+            p.setAttribute('opacity', '1');
+            p.setAttribute('data-visible', '1');
+            try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
+            p.setAttribute('data-animating', '1');
+            gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+            gsap.to(p, {
+                strokeDashoffset: 0,
+                duration: (typeof durationMs === 'number' ? durationMs : 1200) / 1000,
+                ease: 'power2.out',
+                onComplete: function () {
+                    p.removeAttribute('data-animating');
+                    try { p.setAttribute('marker-end', 'url(#arrowhead)'); } catch (e) { (void e); }
+                    try { p.setAttribute('data-drawn', '1'); } catch (e) { (void e); }
+                    try { markArrowPlayed(index); } catch (e) { (void e); }
+                }
+            });
+        } catch (e) { (void e); }
+        return;
+    }
+
+    // Scrolling up: fade out arrow and keep flag as-is (do not re-enable playback)
+    try { fadeOutArrow(index, 200); } catch (e) { (void e); }
 }
 
 

@@ -727,6 +727,11 @@ body.scroll-disabled {
         filter 0.3s ease-out;
 }
 
+/* Full-section gradient for Section 4 */
+section[data-section="4"] {
+    background: linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+}
+
 /* Section 3 background hero using LooperGroup.svg, positioned behind the dashboard SVG */
 .hero--looper {
     /* Layered backgrounds; size/position will be set from config via JS */
