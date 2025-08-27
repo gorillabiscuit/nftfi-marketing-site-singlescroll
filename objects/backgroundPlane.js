@@ -190,6 +190,67 @@ export function captureHeroAsTexture() {
     });
 }
 
+// Capture any DOM element as a Three.js CanvasTexture
+export function captureElementAsTexture(element) {
+    return new Promise((resolve, reject) => {
+        if (!element) {
+            reject(new Error('captureElementAsTexture: element is required'));
+            return;
+        }
+        try {
+            const width = element.offsetWidth;
+            const height = element.offsetHeight;
+            html2canvas(element, {
+                backgroundColor: null,
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                width,
+                height,
+                scrollX: window.scrollX,
+                scrollY: window.scrollY
+            }).then((canvas) => {
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.needsUpdate = true;
+                resolve(texture);
+            }).catch((err) => reject(err));
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+// Apply a texture to the background plane safely
+export function applyTextureToPlane(texture) {
+    if (backgroundPlane && texture) {
+        if (backgroundPlane.material && backgroundPlane.material.map) {
+            try { backgroundPlane.material.map.dispose(); } catch (_) { (void 0); }
+        }
+        backgroundPlane.material.map = texture;
+        backgroundPlane.material.needsUpdate = true;
+    }
+}
+
+// Capture the first element that matches the selector and apply it to the plane
+export function captureSelectorToPlane(selector) {
+    return new Promise((resolve, reject) => {
+        if (!selector || typeof selector !== 'string') {
+            reject(new Error('captureSelectorToPlane: selector must be a non-empty string'));
+            return;
+        }
+        const el = document.querySelector(selector);
+        if (!el) {
+            reject(new Error(`captureSelectorToPlane: element not found for selector: ${selector}`));
+            return;
+        }
+        captureElementAsTexture(el).then((texture) => {
+            applyTextureToPlane(texture);
+            resolve(texture);
+        }).catch((err) => reject(err));
+    });
+}
+
 /**
  * Create background plane and white sphere for refraction effects
  */
