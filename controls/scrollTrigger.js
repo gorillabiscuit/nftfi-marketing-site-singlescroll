@@ -122,9 +122,9 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
 export function setupSection4PebbleEntrance(pebbleGroup) {
     if (!pebbleGroup) return;
     try { gsap.killTweensOf(pebbleGroup.position); } catch (_) { (void 0); }
-    // Ensure starting state (offscreen + hidden)
-    gsap.set(pebbleGroup, { visible: false });
-    gsap.set(pebbleGroup.position, { y: pebbleGroup.position?.y ?? -20 });
+    // Debug: keep pebble visible at baseline so it's always visible
+    gsap.set(pebbleGroup, { visible: true });
+    gsap.set(pebbleGroup.position, { y: pebbleGroup.position?.y ?? 0 });
 
     const tl = gsap.timeline({ paused: true });
     // Animate from offscreen bottom to y=0 (adjust later if needed)
@@ -145,7 +145,7 @@ export function setupSection4PebbleEntrance(pebbleGroup) {
             // Drive timeline by progress so motion syncs with scroll
             tl.progress(self.progress);
         },
-        onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
+        onLeaveBack: () => { gsap.set(pebbleGroup, { visible: true }); }
     });
 }
 
@@ -169,11 +169,11 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             }
         }
     });
-    // Prepare materials for fading
-    materials.forEach((m) => { try { m.transparent = true; m.opacity = 0; } catch (_) { (void 0); } });
-    // Ensure starting state: hidden and offscreen
-    gsap.set(pebbleGroup, { visible: false });
-    const startY = (typeof pebbleGroup.position?.y === 'number') ? pebbleGroup.position.y : -20;
+    // Prepare materials: ensure fully opaque for debugging visibility
+    materials.forEach((m) => { try { m.transparent = true; m.opacity = 1; } catch (_) { (void 0); } });
+    // Ensure starting state: visible and baseline Y
+    gsap.set(pebbleGroup, { visible: true });
+    const startY = (typeof pebbleGroup.position?.y === 'number') ? pebbleGroup.position.y : 0;
     gsap.set(pebbleGroup.position, { y: startY });
 
     const tl = gsap.timeline({
@@ -193,27 +193,11 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                 try { updatePlaneTextureForSection(".section[data-section='4']"); } catch (e) { (void 0); }
                 gsap.set(pebbleGroup, { visible: true });
             },
-            onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
+            onLeaveBack: () => { gsap.set(pebbleGroup, { visible: true }); }
         }
     });
-    // Fade in materials via a proxy for reliable onUpdate
-    const proxy = { v: 0 };
-    tl.to(proxy, {
-        v: 1,
-        ease: 'none',
-        onUpdate: () => {
-            const val = proxy.v;
-            for (let i = 0; i < materials.length; i += 1) {
-                const m = materials[i];
-                if (m && typeof m.opacity === 'number') { m.opacity = val; }
-            }
-        }
-    }, 0);
-    // Lift from offscreen to target (0)
-    tl.to(pebbleGroup.position, {
-        y: 0,
-        ease: 'none'
-    }, 0);
+    // Keep a simple Y tween in case we still want vertical motion while pinned
+    tl.to(pebbleGroup.position, { y: 0, ease: 'none' }, 0);
 }
 
 // Create or recreate the scroll timeline
