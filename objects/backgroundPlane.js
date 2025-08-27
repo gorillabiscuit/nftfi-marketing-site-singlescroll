@@ -280,6 +280,7 @@ export function createBackgroundPlane(scene, uniforms) {
     });
     
     const whiteSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    whiteSphere.name = 'whiteLightSphere';
     
     // Set position based on breakpoint
     import('../utils/breakpointManager.js').then(({ getCurrentBreakpoint }) => {
@@ -293,8 +294,8 @@ export function createBackgroundPlane(scene, uniforms) {
     
     whiteSphere.scale.setScalar(1.25); // Make it visible
     
-    // Make sphere invisible to camera but available for shader sampling (like plane)
-    whiteSphere.visible = false; // Visible for positioning reference
+    // Default: keep sphere hidden; the render loop will toggle it during offscreen captures
+    whiteSphere.visible = false;
     whiteSphere.renderOrder = -2; // Render before plane
     
     scene.add(whiteSphere);

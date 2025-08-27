@@ -106,26 +106,25 @@ export function animate() {
             // Temporarily make background plane and sphere visible for render target sampling
             showBackgroundPlane();
             
-            // Find sphere in scene for render target sampling
-            let whiteSphere = null;
-            scene.traverse((object) => {
-                if (object.isMesh && object.material && object.material.color &&
-                    object.material.color.getHexString() === 'ffffff') {
-                    whiteSphere = object;
-                }
-            });
+            // Find sphere by name for render target sampling (more robust than color match)
+            const whiteSphere = scene.getObjectByName('whiteLightSphere');
             if (whiteSphere) {
+                // Enable color contribution only for offscreen captures
                 whiteSphere.visible = true;
+                if (whiteSphere.material) {
+                    whiteSphere.material.colorWrite = true;
+                    whiteSphere.material.depthWrite = true;
+                }
             }
             
-            for (let i = 0; i < refractiveMeshes.length; i += 1) {
+           for (let i = 0; i < refractiveMeshes.length; i += 1) {
                 const m = refractiveMeshes[i];
                 if (!m || !m.material || !m.material.uniforms || !m.material.uniforms.uTexture) {
                     continue;
                 }
                 
                 // Hide all refractive meshes during back capture
-                for (let j = 0; j < refractiveMeshes.length; j += 1) {
+                for (let j = 0; j <  refractiveMeshes.length; j += 1) {
                     const other = refractiveMeshes[j];
                     if (other) other.visible = false;
                 }
@@ -144,10 +143,14 @@ export function animate() {
                 m.material.side = THREE.FrontSide;
             }
             
-            // Restore background plane and sphere
+            // Restore background plane and disable sphere contribution for onscreen render
             hideBackgroundPlane();
             if (whiteSphere) {
                 whiteSphere.visible = false;
+                if (whiteSphere.material) {
+                    whiteSphere.material.colorWrite = false;
+                    whiteSphere.material.depthWrite = true; // keep depth behavior consistent if needed later
+                }
             }
             renderer.setRenderTarget(null);
             
