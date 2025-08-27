@@ -82,7 +82,7 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
             window.isInitialLoadComplete = true;
             // Prevent any other tweens from controlling wrapper.scale from here on
             window.scrollScaleActive = true;
-            try { gsap.killTweensOf(wrapper.scale); } catch (_) {}
+            try { gsap.killTweensOf(wrapper.scale); } catch (_) { (void 0); }
             // Create the ScrollTrigger animation now that initial animation is complete
             createScrollTimeline();
             // Re-enable scrolling by restoring normal ScrollSmoother effects
@@ -114,6 +114,101 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
     console.log('Scroll animation setup complete');
 }
 
+/**
+ * Reveal the pebble (and its child plane) only when Section 4 comes into view.
+ * The pebble should start offscreen and rise from the bottom as Section 4 enters.
+ */
+export function setupSection4PebbleEntrance(pebbleGroup) {
+    if (!pebbleGroup) return;
+    try { gsap.killTweensOf(pebbleGroup.position); } catch (_) { (void 0); }
+    // Ensure starting state (offscreen + hidden)
+    gsap.set(pebbleGroup, { visible: false });
+    gsap.set(pebbleGroup.position, { y: pebbleGroup.position?.y ?? -20 });
+
+    const tl = gsap.timeline({ paused: true });
+    // Animate from offscreen bottom to y=0 (adjust later if needed)
+    tl.to(pebbleGroup.position, {
+        y: 0,
+        ease: 'power2.out'
+    });
+
+    ScrollTrigger.create({
+        trigger: ".section[data-section='4']",
+        start: 'top bottom',      // when S4 top hits bottom of viewport
+        end: 'top center',        // until it reaches center
+        scrub: true,
+        invalidateOnRefresh: true,
+        onEnter: () => { gsap.set(pebbleGroup, { visible: true }); },
+        onEnterBack: () => { gsap.set(pebbleGroup, { visible: true }); },
+        onUpdate: (self) => {
+            // Drive timeline by progress so motion syncs with scroll
+            tl.progress(self.progress);
+        },
+        onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
+    });
+}
+
+/**
+ * Create a pinned, scrubbed Section 4 timeline that fades in the pebble
+ * while lifting it from offscreen. Opacity is applied to all child materials.
+ */
+export function setupSection4PebbleFadePinned(pebbleGroup) {
+    if (!pebbleGroup) return;
+    try { gsap.killTweensOf([pebbleGroup.position]); } catch (_) { (void 0); }
+    // Collect all materials under the group
+    const materials = [];
+    pebbleGroup.traverse((obj) => {
+        if (obj && obj.isMesh && obj.material) {
+            const mat = obj.material;
+            // Support arrays of materials as well
+            if (Array.isArray(mat)) {
+                mat.forEach((m) => { if (m) materials.push(m); });
+            } else {
+                materials.push(mat);
+            }
+        }
+    });
+    // Prepare materials for fading
+    materials.forEach((m) => { try { m.transparent = true; m.opacity = 0; } catch (_) { (void 0); } });
+    // Ensure starting state: hidden and offscreen
+    gsap.set(pebbleGroup, { visible: false });
+    const startY = (typeof pebbleGroup.position?.y === 'number') ? pebbleGroup.position.y : -20;
+    gsap.set(pebbleGroup.position, { y: startY });
+
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section[data-section='4']",
+            start: 'top top',
+            end: '+=100%',
+            pin: true,
+            scrub: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onEnter: () => { gsap.set(pebbleGroup, { visible: true }); },
+            onEnterBack: () => { gsap.set(pebbleGroup, { visible: true }); },
+            onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
+        }
+    });
+    // Fade in materials via a proxy for reliable onUpdate
+    const proxy = { v: 0 };
+    tl.to(proxy, {
+        v: 1,
+        ease: 'none',
+        onUpdate: () => {
+            const val = proxy.v;
+            for (let i = 0; i < materials.length; i += 1) {
+                const m = materials[i];
+                if (m && typeof m.opacity === 'number') { m.opacity = val; }
+            }
+        }
+    }, 0);
+    // Lift from offscreen to target (0)
+    tl.to(pebbleGroup.position, {
+        y: 0,
+        ease: 'none'
+    }, 0);
+}
+
 // Create or recreate the scroll timeline
 function createScrollTimeline() {
     // Kill existing timeline if it exists
@@ -121,7 +216,7 @@ function createScrollTimeline() {
         scrollTimeline.kill();
     }
     // Ensure no competing tweens are acting on wrapper.scale
-    try { gsap.killTweensOf(wrapper?.scale); } catch (_) {}
+    try { gsap.killTweensOf(wrapper?.scale); } catch (_) { (void 0); }
     
     // Create new scroll timeline
     scrollTimeline = gsap.timeline({
@@ -308,7 +403,7 @@ function setupSection2Pinning() {
             startAdvancedAnimationSequence(el, document.getElementById('smooth-content'));
         }
         requestAnimationFrame(() => {
-            try { ScrollTrigger.refresh(); } catch (_) {}
+            try { ScrollTrigger.refresh(); } catch (_) { (void 0); }
             isRebuilding = false;
         });
     };
@@ -322,10 +417,10 @@ function setupSection2Pinning() {
     function startAdvancedAnimationSequence(triggerEl, scrollerEl) {
         // Build the Section 2 master timeline (pinned) without relying on any external anchor element
         if (section2Timeline && section2Timeline.scrollTrigger) {
-            try { section2Timeline.scrollTrigger.kill(); } catch (_) {}
+            try { section2Timeline.scrollTrigger.kill(); } catch (_) { (void 0); }
         }
         if (section2Timeline) {
-            try { section2Timeline.kill(); } catch (_) {}
+            try { section2Timeline.kill(); } catch (_) { (void 0); }
         }
 
         section2Timeline = gsap.timeline({
@@ -471,7 +566,7 @@ function setupSection2Pinning() {
                     ease: 'none'
                 }, ">");
             }
-        } catch (_) {}
+        } catch (_) { (void 0); }
 
         // Blocks: add each visible block as its own TL sequentially after title using blockGap
         const blocksTL = createBlocksRevealPhase();
@@ -504,7 +599,7 @@ function setupSection2Pinning() {
         section2Timeline.add(gsap.timeline().to({}, { duration: SECTION2_TIMINGS.delayBeforeUnpin }), ">");
 
         console.log('Master timeline with 4-phase animation created successfully');
-        try { ScrollTrigger.refresh(); } catch (_) {}
+        try { ScrollTrigger.refresh(); } catch (_) { (void 0); }
     }
     
     // Function to stop animation monitoring (no longer needed with master timeline)
@@ -664,7 +759,7 @@ function createDrawingPhase() {
     
     console.log('Phase 1: Grid built and initial draw state set (actual drawing handled by vertical/horizontal timelines)');
     // Force ST to re-measure after dynamic SVG rebuild
-    try { ScrollTrigger.refresh(); } catch (_) {}
+    try { ScrollTrigger.refresh(); } catch (_) { (void 0); }
     return drawingTimeline;
 }
 
@@ -1187,7 +1282,7 @@ function createBlocksRevealPhase() {
             const measure = () => {
                 let width = 0;
                 if (typeof labelEl.getComputedTextLength === 'function') {
-                    try { width = labelEl.getComputedTextLength(); } catch (_) {}
+                    try { width = labelEl.getComputedTextLength(); } catch (_) { (void 0); }
                 }
                 if (!width || width <= 0) {
                     try { width = labelEl.getBBox().width; } catch (_) { width = 0; }
@@ -1313,7 +1408,7 @@ try {
             }
         }).catch(() => {});
     }
-} catch (_) {}
+} catch (_) { (void 0); }
 
 // Calculate dynamic line length that extends beyond any screen size
 function calculateLineLength() {
