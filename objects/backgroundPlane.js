@@ -252,6 +252,65 @@ export function captureSelectorToPlane(selector) {
 }
 
 /**
+ * Robust: capture the full document, clipped to the Section's rect, so global layers (gradients) are included.
+ */
+export function captureSectionClippedToBody(selector) {
+    return new Promise((resolve, reject) => {
+        if (!selector || typeof selector !== 'string') {
+            reject(new Error('captureSectionClippedToBody: selector must be a non-empty string'));
+            return;
+        }
+        const el = document.querySelector(selector);
+        if (!el) {
+            reject(new Error('captureSectionClippedToBody: element not found for selector: ' + selector));
+            return;
+        }
+        const perform = () => {
+            const rect = el.getBoundingClientRect();
+            const docEl = document.documentElement;
+            const winWidth = docEl ? docEl.scrollWidth : window.innerWidth;
+            const winHeight = docEl ? docEl.scrollHeight : window.innerHeight;
+            try {
+                html2canvas(document.body, {
+                    backgroundColor: null,
+                    scale: Math.min(window.devicePixelRatio || 1, 2),
+                    useCORS: true,
+                    logging: false,
+                    windowWidth: winWidth,
+                    windowHeight: winHeight,
+                    x: rect.left + window.scrollX,
+                    y: rect.top + window.scrollY,
+                    width: rect.width,
+                    height: rect.height,
+                    onclone: (doc) => {
+                        try {
+                            const smootherEl = doc.getElementById('smooth-content');
+                            if (smootherEl && smootherEl.style) {
+                                smootherEl.style.transform = 'none';
+                            }
+                        } catch (_) { (void 0); }
+                    }
+                }).then((canvas) => {
+                    const texture = new THREE.CanvasTexture(canvas);
+                    texture.needsUpdate = true;
+                    applyTextureToPlane(texture);
+                    resolve(texture);
+                }).catch((err) => reject(err));
+            } catch (err) {
+                reject(err);
+            }
+        };
+        try {
+            if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+                document.fonts.ready.then(perform).catch(() => perform());
+            } else {
+                perform();
+            }
+        } catch (_) { perform(); }
+    });
+}
+
+/**
  * Create background plane and white sphere for refraction effects
  */
 export function createBackgroundPlane(scene, uniforms) {
