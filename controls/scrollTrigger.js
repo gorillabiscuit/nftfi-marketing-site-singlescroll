@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
+import { captureSelectorToPlane } from '../objects/backgroundPlane.js';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
@@ -184,11 +185,24 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             scrub: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-            onEnter: () => { gsap.set(pebbleGroup, { visible: true }); },
-            onEnterBack: () => { gsap.set(pebbleGroup, { visible: true }); },
-            onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
+            onEnter: () => { 
+                gsap.set(pebbleGroup, { visible: true }); 
+                try { if (window.PEBBLE && window.PEBBLE.orbitGroup) window.PEBBLE.orbitGroup.visible = true; } catch (_) { (void 0); }
+            },
+            onEnterBack: () => { 
+                gsap.set(pebbleGroup, { visible: true }); 
+                try { if (window.PEBBLE && window.PEBBLE.orbitGroup) window.PEBBLE.orbitGroup.visible = true; } catch (_) { (void 0); }
+            },
+            onLeaveBack: () => { 
+                gsap.set(pebbleGroup, { visible: false }); 
+                try { if (window.PEBBLE && window.PEBBLE.orbitGroup) window.PEBBLE.orbitGroup.visible = false; } catch (_) { (void 0); }
+            }
         }
     });
+    // Pre-capture Section 4 content to the plane when entering the pinned region
+    tl.add(() => {
+        try { captureSelectorToPlane(".section[data-section='4'] .content"); } catch (_) { (void 0); }
+    }, 0);
     // Fade in materials via a proxy for reliable onUpdate
     const proxy = { v: 0 };
     tl.to(proxy, {
