@@ -51,11 +51,11 @@ export function loadPebbleModel(scene, sharedUniforms) {
         gltf.scene.position.set(-center.x, -center.y, -center.z);
         pebbleGroup.add(gltf.scene);
         
-        // Default: keep pebble visible for debugging/verification
-        // Position at baseline; section timelines can still move it
-        pebbleGroup.position.set(0, 0, 0);
+        // Default: keep pebble offscreen and hidden until section 4
+        // Position it well below the viewport; we'll animate it up on section 4
+        pebbleGroup.position.set(0, -20, 0);
         pebbleGroup.scale.setScalar(2.0);
-        pebbleGroup.visible = true;
+        pebbleGroup.visible = false;
         scene.add(pebbleGroup);
 
         isPebbleReady = true;

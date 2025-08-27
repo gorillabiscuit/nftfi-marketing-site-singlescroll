@@ -191,72 +191,6 @@ export function captureHeroAsTexture() {
 }
 
 /**
- * Capture any given DOM element into a Three.js CanvasTexture
- */
-export function captureElementAsTexture(element) {
-    return new Promise((resolve, reject) => {
-        if (!element) {
-            reject(new Error('captureElementAsTexture: element is required'));
-            return;
-        }
-        try {
-            html2canvas(element, {
-                backgroundColor: null,
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                logging: false,
-                width: element.offsetWidth,
-                height: element.offsetHeight,
-                scrollX: window.scrollX,
-                scrollY: window.scrollY
-            }).then((canvas) => {
-                try {
-                    const texture = new THREE.CanvasTexture(canvas);
-                    texture.needsUpdate = true;
-                    resolve(texture);
-                } catch (err) {
-                    reject(err);
-                }
-            }).catch((err) => reject(err));
-        } catch (e) {
-            reject(e);
-        }
-    });
-}
-
-/**
- * Update the background plane's texture using a given DOM element
- */
-export function updatePlaneTextureFromElement(element) {
-    if (!backgroundPlane) return Promise.reject(new Error('Background plane not initialized'));
-    return captureElementAsTexture(element).then((texture) => {
-        try {
-            if (backgroundPlane.material.map) {
-                backgroundPlane.material.map.dispose();
-            }
-        } catch (_) { (void 0); }
-        backgroundPlane.material.map = texture;
-        backgroundPlane.material.needsUpdate = true;
-        return texture;
-    });
-}
-
-/**
- * Convenience: capture a section (by selector) and apply as plane texture
- */
-export function updatePlaneTextureForSection(sectionSelector) {
-    if (!sectionSelector || typeof sectionSelector !== 'string') {
-        return Promise.reject(new Error('updatePlaneTextureForSection: selector string required'));
-    }
-    const sectionEl = document.querySelector(sectionSelector);
-    if (!sectionEl) {
-        return Promise.reject(new Error(`Section not found for selector: ${sectionSelector}`));
-    }
-    return updatePlaneTextureFromElement(sectionEl);
-}
-
-/**
  * Create background plane and white sphere for refraction effects
  */
 export function createBackgroundPlane(scene, uniforms) {
@@ -439,6 +373,47 @@ export function updatePlaneTexture() {
             console.error('Failed to update plane texture:', error);
         });
     }
+}
+
+/**
+ * Capture a specific DOM element into a texture and apply it to the background plane.
+ * Returns a Promise that resolves to the created THREE.CanvasTexture.
+ */
+export function updatePlaneTextureForSection(selector) {
+    return new Promise((resolve, reject) => {
+        try {
+            const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
+            if (!el) {
+                reject(new Error('updatePlaneTextureForSection: element not found'));
+                return;
+            }
+            html2canvas(el, {
+                backgroundColor: null,
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                width: el.offsetWidth,
+                height: el.offsetHeight,
+                scrollX: window.scrollX,
+                scrollY: window.scrollY
+            }).then((canvas) => {
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.needsUpdate = true;
+                if (backgroundPlane && backgroundPlane.material) {
+                    if (backgroundPlane.material.map) {
+                        try { backgroundPlane.material.map.dispose(); } catch (_) { void 0; }
+                    }
+                    backgroundPlane.material.map = texture;
+                    backgroundPlane.material.needsUpdate = true;
+                    backgroundPlane.visible = true;
+                }
+                resolve(texture);
+            }).catch((err) => {
+                reject(err);
+            });
+        } catch (e) { /* noop to satisfy linter */ reject(e); }
+    });
 }
 
 /**

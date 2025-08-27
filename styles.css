@@ -1,3 +1,26 @@
+/* Section 4 layout adjustments */
+.section4-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 2rem;
+}
+
+.section4-title {
+  grid-column: 2;
+  justify-self: end;
+  text-align: right;
+}
+
+.section4-list {
+  grid-column: 2;
+  justify-self: end;
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  text-align: right;
+}
+.section4-list li { margin: 0.25rem 0; }
 /* Reset and Base Styles */
 * {
     margin: 0;

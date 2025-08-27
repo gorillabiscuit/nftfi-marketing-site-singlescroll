@@ -8,7 +8,7 @@ import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.
 import { loadPebbleModel, pebbleGroup } from './objects/pebbleModel.js';
 import { loadRoundPebbleModel } from './objects/roundPebbleModel.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane } from './objects/backgroundPlane.js';
-import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleEntrance, setupSection4PebbleFadePinned } from './controls/scrollTrigger.js';
+import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned } from './controls/scrollTrigger.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
 import { initHeaderAnimation } from './controls/headerAnimation.js';
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
@@ -29,7 +29,7 @@ import { initSection3Dashboard, initSection3Scroll } from './controls/section3Da
 
 // Main initialization function
 function init() {
-    try { if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } } catch (e) { (void 0); }
+    try { if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } } catch (e) { void 0; }
     // Robust scroll-to-top: initial, next tick, after Section 3 embed, and on pageshow (bfcache)
     window.scrollTo(0, 0);
     setTimeout(() => { window.scrollTo(0, 0); }, 0);
@@ -83,8 +83,7 @@ function init() {
             try {
                 const grp = (window.PEBBLE && window.PEBBLE.pebbleGroup) ? window.PEBBLE.pebbleGroup : pebbleGroup;
                 if (grp) {
-                    setupSection4PebbleEntrance(grp);
-                    // Also add the pinned fade-in timeline for S4
+                    // Use only the pinned fade-in timeline for S4
                     setupSection4PebbleFadePinned(grp);
                 } else {
                     setTimeout(hookPebble, 100);
@@ -119,7 +118,7 @@ function init() {
         console.log('Section 3 dashboard embed:', ok ? 'success' : 'skipped');
         if (ok) {
             try { initSection3Scroll(); } catch (e) { console.error(e); }
-            try { window.scrollTo(0, 0); } catch (e) { (void 0); }
+            try { window.scrollTo(0, 0); } catch (e) { void 0; }
         }
     });
     
@@ -194,9 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 500);
     try {
         window.addEventListener('pageshow', function (e) {
-            try { if (e && e.persisted) { window.scrollTo(0, 0); } else { window.scrollTo(0, 0); } } catch (err) { (void 0); }
+            try { if (e && e.persisted) { window.scrollTo(0, 0); } else { window.scrollTo(0, 0); } } catch (err) { void 0; }
         });
-    } catch (e) { (void 0); }
+    } catch (e) { void 0; }
     
 
 }); 
