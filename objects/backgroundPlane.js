@@ -191,6 +191,72 @@ export function captureHeroAsTexture() {
 }
 
 /**
+ * Capture any given DOM element into a Three.js CanvasTexture
+ */
+export function captureElementAsTexture(element) {
+    return new Promise((resolve, reject) => {
+        if (!element) {
+            reject(new Error('captureElementAsTexture: element is required'));
+            return;
+        }
+        try {
+            html2canvas(element, {
+                backgroundColor: null,
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                width: element.offsetWidth,
+                height: element.offsetHeight,
+                scrollX: window.scrollX,
+                scrollY: window.scrollY
+            }).then((canvas) => {
+                try {
+                    const texture = new THREE.CanvasTexture(canvas);
+                    texture.needsUpdate = true;
+                    resolve(texture);
+                } catch (err) {
+                    reject(err);
+                }
+            }).catch((err) => reject(err));
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+
+/**
+ * Update the background plane's texture using a given DOM element
+ */
+export function updatePlaneTextureFromElement(element) {
+    if (!backgroundPlane) return Promise.reject(new Error('Background plane not initialized'));
+    return captureElementAsTexture(element).then((texture) => {
+        try {
+            if (backgroundPlane.material.map) {
+                backgroundPlane.material.map.dispose();
+            }
+        } catch (_) { (void 0); }
+        backgroundPlane.material.map = texture;
+        backgroundPlane.material.needsUpdate = true;
+        return texture;
+    });
+}
+
+/**
+ * Convenience: capture a section (by selector) and apply as plane texture
+ */
+export function updatePlaneTextureForSection(sectionSelector) {
+    if (!sectionSelector || typeof sectionSelector !== 'string') {
+        return Promise.reject(new Error('updatePlaneTextureForSection: selector string required'));
+    }
+    const sectionEl = document.querySelector(sectionSelector);
+    if (!sectionEl) {
+        return Promise.reject(new Error(`Section not found for selector: ${sectionSelector}`));
+    }
+    return updatePlaneTextureFromElement(sectionEl);
+}
+
+/**
  * Create background plane and white sphere for refraction effects
  */
 export function createBackgroundPlane(scene, uniforms) {

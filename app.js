@@ -7,7 +7,7 @@ import { initializeNavigation } from './controls/navigation.js';
 import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.js';
 import { loadPebbleModel, pebbleGroup } from './objects/pebbleModel.js';
 import { loadRoundPebbleModel } from './objects/roundPebbleModel.js';
-import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane, captureSelectorToPlane } from './objects/backgroundPlane.js';
+import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane } from './objects/backgroundPlane.js';
 import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleEntrance, setupSection4PebbleFadePinned } from './controls/scrollTrigger.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
 import { initHeaderAnimation } from './controls/headerAnimation.js';
