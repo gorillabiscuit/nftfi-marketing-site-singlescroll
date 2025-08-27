@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
-import { captureSelectorToPlane, captureSectionClippedToBody } from '../objects/backgroundPlane.js';
+import { captureSelectorToPlane } from '../objects/backgroundPlane.js';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
@@ -185,43 +185,15 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             scrub: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-            onEnter: () => { 
-                gsap.set(pebbleGroup, { visible: true }); 
-                try { if (window.PEBBLE && window.PEBBLE.orbitGroup) window.PEBBLE.orbitGroup.visible = true; } catch (_) { (void 0); }
-            },
-            onEnterBack: () => { 
-                gsap.set(pebbleGroup, { visible: true }); 
-                try { if (window.PEBBLE && window.PEBBLE.orbitGroup) window.PEBBLE.orbitGroup.visible = true; } catch (_) { (void 0); }
-            },
-            onLeaveBack: () => { 
-                gsap.set(pebbleGroup, { visible: false }); 
-                try { if (window.PEBBLE && window.PEBBLE.orbitGroup) window.PEBBLE.orbitGroup.visible = false; } catch (_) { (void 0); }
-            },
-            onRefresh: () => {
-                // Re-capture on refresh to include any layout changes
-                try { captureSectionClippedToBody(".section[data-section='4']"); } catch (_) { (void 0); }
-            }
+            onEnter: () => { gsap.set(pebbleGroup, { visible: true }); },
+            onEnterBack: () => { gsap.set(pebbleGroup, { visible: true }); },
+            onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
         }
     });
-    // Pre-capture Section 4 via body-clipped capture so global gradients are included
+    // Pre-capture Section 4 content to the plane when entering the pinned region
     tl.add(() => {
-        try { captureSectionClippedToBody(".section[data-section='4']"); } catch (_) { (void 0); }
+        try { captureSelectorToPlane(".section[data-section='4'] .content"); } catch (_) { (void 0); }
     }, 0);
-
-    // Debounced resize recapture while pinned
-    try {
-        let _recapTimer = null;
-        const recapture = () => {
-            if (_recapTimer) return;
-            _recapTimer = requestAnimationFrame(() => {
-                _recapTimer = null;
-                try { captureSectionClippedToBody(".section[data-section='4']"); } catch (_) { (void 0); }
-            });
-        };
-        window.addEventListener('resize', recapture);
-        // Clean up when this ScrollTrigger is killed
-        tl.eventCallback('onComplete', () => { try { window.removeEventListener('resize', recapture); } catch (_) { (void 0); } });
-    } catch (_) { (void 0); }
     // Fade in materials via a proxy for reliable onUpdate
     const proxy = { v: 0 };
     tl.to(proxy, {

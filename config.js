@@ -552,13 +552,3 @@ export const PLANE_CONFIG = {
         z: -10
     }
 }; 
-
-// Orbit configuration for duplicated pebbles in Section 4
-export const ORBIT_CONFIG = {
-    count: 5,               // number of clones (in addition to the original)
-    radiusX: 6.0,           // ellipse X radius
-    radiusY: 3.5,           // ellipse Y radius
-    angularSpeed: 0.4,      // radians per second
-    phaseOffset: (2 * Math.PI) / 5,
-    z: 0                    // constant Z plane for orbit
-};

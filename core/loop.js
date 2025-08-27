@@ -9,8 +9,7 @@ import { calculateStartPosition } from '../utils/viewport.js';
 import { ANIMATION_CONFIG, MODEL_CONFIG } from '../config.js';
 // NEW: Import ScrollSmoother performance monitoring
 import { startPerformanceFrame, recordScrollEvent } from '../controls/scrollSynchronizer.js';
-import { pebbleMesh, pebbleGroup, isPebbleReady, orbitGroup, orbitClones } from '../objects/pebbleModel.js';
-import { ORBIT_CONFIG } from '../config.js';
+import { pebbleMesh, pebbleGroup, isPebbleReady } from '../objects/pebbleModel.js';
 
 // Global references (will be set by main.js)
 let mesh, wrapper, isModelReady;
@@ -94,23 +93,6 @@ export function animate() {
         pebbleGroup.rotation.x += xRatePebble * 0.02;
         pebbleGroup.rotation.y += yRatePebble * 0.02;
         pebbleGroup.rotation.z += zRatePebble * 0.02;
-    }
-    
-    // Orbit animation for cloned pebbles (Section 4)
-    if (orbitGroup && Array.isArray(orbitClones) && orbitClones.length > 0) {
-        const t = (Date.now() - startTime) * 0.001;
-        for (let i = 0; i < orbitClones.length; i += 1) {
-            const clone = orbitClones[i];
-            if (!clone) continue;
-            const phase = i * (ORBIT_CONFIG.phaseOffset || 0);
-            const ang = t * (ORBIT_CONFIG.angularSpeed || 0.4) + phase;
-            const x = Math.cos(ang) * (ORBIT_CONFIG.radiusX || 6.0);
-            const y = Math.sin(ang) * (ORBIT_CONFIG.radiusY || 3.5);
-            clone.position.set(x, y, ORBIT_CONFIG.z || 0);
-            // Optional gentle rotation
-            clone.rotation.y = ang;
-            clone.visible = orbitGroup.visible;
-        }
     }
     
     // Glass refraction rendering with temporal plane and sphere visibility control
