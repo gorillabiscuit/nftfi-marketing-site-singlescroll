@@ -9,17 +9,30 @@
 
 .section4-title {
   grid-column: 2;
-  justify-self: end;
-  text-align: right;
+  justify-self: start; /* align block start within column */
+  text-align: left;    /* left-align text */
+  transform: translateX(-15%); /* shift 15% left */
 }
 
 .section4-list {
   grid-column: 2;
-  justify-self: end;
+  justify-self: start; /* align with title's left edge */
   list-style: none;
   margin: 0.5rem 0 0;
   padding: 0;
-  text-align: right;
+  text-align: left;
+  font-family: inherit;
+  transform: translateX(-15%); /* keep aligned with title */
+}
+.section4-list li {
+  width: 303px;
+  height: 31px;
+  font-family: 'Satoshi Variable', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 31px; /* 129% */
+  color: rgba(255, 255, 255, 0.8);
 }
 .section4-list li { margin: 0.25rem 0; }
 /* Reset and Base Styles */

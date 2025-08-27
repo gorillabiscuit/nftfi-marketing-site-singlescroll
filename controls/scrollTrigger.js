@@ -7,6 +7,34 @@ import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection } from '../objects/backgroundPlane.js';
+// Blur plugin registration for GSAP
+(function () {
+    const blurProperty = gsap.utils.checkPrefix("filter"),
+        blurExp = /blur\((.+)?px\)/,
+        getBlurMatch = (target) => (gsap.getProperty(target, blurProperty) || "").match(blurExp) || [];
+    gsap.registerPlugin({
+        name: "blur",
+        get(target) { return Number(getBlurMatch(target)[1]) || 0; },
+        init(target, endValue) {
+            let data = this,
+                filter = gsap.getProperty(target, blurProperty),
+                endBlur = "blur(" + endValue + "px)",
+                match = getBlurMatch(target)[0],
+                index;
+            if (filter === "none") { filter = ""; }
+            if (match) {
+                index = filter.indexOf(match);
+                endValue = filter.substr(0, index) + endBlur + filter.substr(index + match.length);
+            } else {
+                endValue = filter + endBlur;
+                filter += filter ? " blur(0px)" : "blur(0px)";
+            }
+            data.target = target;
+            data.interp = gsap.utils.interpolate(filter, endValue);
+        },
+        render(progress, data) { data.target.style[blurProperty] = data.interp(progress); }
+    });
+})();
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
@@ -169,6 +197,11 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
         }
     });
+    // Tie title blur/opacity/scale into this pinned, scrubbed timeline
+    const title = document.querySelector('.section4-title');
+    if (title) {
+        tl.from(title, { duration: 0.75, blur: 15, alpha: 0.3, scale: 0.95, ease: 'power2.inOut' }, 0);
+    }
     // Fade in materials via a proxy for reliable onUpdate
     const proxy = { v: 0 };
     tl.to(proxy, {
@@ -182,9 +215,28 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             }
         }
     }, 0);
-    // Lift from offscreen and move left; scale up 75%
-    tl.to(pebbleGroup.position, { y: 0, x: -3, ease: 'none' }, 0);
+    // Lift from offscreen and move ~15% left; scale up 75%
+    tl.to(pebbleGroup.position, { y: 0, x: -3.5, ease: 'none' }, 0);
     tl.to(pebbleGroup.scale, { x: '+=0.75', y: '+=0.75', z: '+=0.75', ease: 'none' }, 0);
+
+    // Animate list items character/line reveal effect tied to the same scrub
+    const listItems = Array.from(document.querySelectorAll('.section4-list li'));
+    if (listItems.length) {
+        // Phase 1: reveal all items first (0 -> 60% of the pinned timeline)
+        listItems.forEach((li, i) => {
+            gsap.set(li, { fontWeight: 500, opacity: 0.6, y: 10, filter: 'blur(6px)' });
+            const start = i * (0.6 / Math.max(1, listItems.length));
+            tl.to(li, { opacity: 1, y: 0, filter: 'blur(0px)', ease: 'power2.out' }, start);
+        });
+        // Phase 2: after all have appeared, roll bold highlight from top to bottom
+        const phase2Start = 0.6;
+        const seg = 0.4 / Math.max(1, listItems.length);
+        listItems.forEach((li, i) => {
+            const tStart = phase2Start + i * seg;
+            tl.to(li, { fontWeight: 700 }, tStart);
+            if (i > 0) tl.to(listItems[i - 1], { fontWeight: 500 }, tStart);
+        });
+    }
 }
 
 // Create or recreate the scroll timeline
