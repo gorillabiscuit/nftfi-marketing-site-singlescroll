@@ -196,7 +196,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         }
     } catch (_) { void 0; }
 
-    // Pre-capture Section 4 content before pin
+    // Pre-capture Section 4 content before pin; mark success to skip onEnter capture
     setupSectionPreCapture(".section[data-section='4']", '500px');
 
     // Tie title blur/opacity/scale into this pinned, scrubbed timeline
@@ -281,15 +281,21 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         invalidateOnRefresh: true,
         animation: tl,
         onEnter: () => {
-            try { updatePlaneTextureForSection(".section[data-section='4']"); } catch (_) { void 0; }
+            // Avoid heavy capture onEnter; rely on pre-capture
+            try { if (!window.__s4PreCaptured) { /* fallback disabled */ } } catch (_) { void 0; }
             gsap.set(pebbleGroup, { visible: true });
         },
         onEnterBack: () => {
-            try { updatePlaneTextureForSection(".section[data-section='4']"); } catch (_) { void 0; }
+            try { /* no capture on enterBack */ } catch (_) { void 0; }
             gsap.set(pebbleGroup, { visible: true });
         },
         onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
     });
+
+    // Defensive: refresh ScrollTrigger after layout settles to ensure pin engages
+    try {
+        setTimeout(() => { try { ScrollTrigger.refresh(); } catch (_) { void 0; } }, 100);
+    } catch (_) { void 0; }
 }
 
 // Create or recreate the scroll timeline

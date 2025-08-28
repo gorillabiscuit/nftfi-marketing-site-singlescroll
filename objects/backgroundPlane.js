@@ -429,7 +429,11 @@ export function setupSectionPreCapture(selector, rootMargin) {
                 captured = true;
                 // Split steps across frames to avoid jank
                 requestAnimationFrame(() => {
-                    updatePlaneTextureForSection(selector).catch(() => { void 0; });
+                    try {
+                        updatePlaneTextureForSection(selector)
+                            .then(() => { try { window.__s4PreCaptured = true; } catch (_) { void 0; } })
+                            .catch(() => { void 0; });
+                    } catch (_) { void 0; }
                 });
                 try { obs.disconnect(); } catch (_) { void 0; }
             }
