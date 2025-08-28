@@ -62,8 +62,12 @@ export function loadRoundPebbleModel(parentGroup, scene) {
         roundPebbleGroup = new THREE.Group();
         // Recenter original to origin so it matches parent's origin
         gltf.scene.position.set(-center.x, -center.y, -center.z);
-        // Rotate the video plane by 90 degrees for correct orientation
-        try { gltf.scene.rotation.z = Math.PI / 2; } catch (_) { void 0; }
+        // Rotate the video plane by 90° around X (flip between facing up vs facing camera)
+        // Try X vs Y to correct orientation:
+        //  - rotation.x = ±Math.PI/2 tilts the plane forward/backward
+        //  - rotation.y = ±Math.PI/2 spins it left/right
+        // Use radians; tweak sign (+/-) if mirrored.
+        try { gltf.scene.rotation.x = Math.PI / 2; } catch (_) { void 0; }
         roundPebbleGroup.add(gltf.scene);
         roundPebbleGroup.position.set(0, 0, 0);
         roundPebbleGroup.scale.setScalar(1);
