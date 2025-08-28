@@ -23,7 +23,7 @@ export function loadRoundPebbleModel(parentGroup, scene) {
 
         // Create HTMLVideoElement and THREE.VideoTexture
         const video = document.createElement('video');
-        try { video.src = videoUrl; } catch (_) {}
+        try { video.src = videoUrl; } catch (_) { void 0; }
         video.crossOrigin = 'anonymous';
         video.muted = true; // Required for autoplay on mobile
         video.loop = true;
@@ -62,6 +62,8 @@ export function loadRoundPebbleModel(parentGroup, scene) {
         roundPebbleGroup = new THREE.Group();
         // Recenter original to origin so it matches parent's origin
         gltf.scene.position.set(-center.x, -center.y, -center.z);
+        // Rotate the video plane by 90 degrees for correct orientation
+        try { gltf.scene.rotation.z = Math.PI / 2; } catch (_) { void 0; }
         roundPebbleGroup.add(gltf.scene);
         roundPebbleGroup.position.set(0, 0, 0);
         roundPebbleGroup.scale.setScalar(1);
@@ -78,7 +80,7 @@ export function loadRoundPebbleModel(parentGroup, scene) {
         window.ROUND_PEBBLE = { roundPebbleGroup, roundPebbleMesh, gltf: gltf.scene };
 
         // Attempt autoplay; if blocked, user interaction will be required
-        const tryPlay = () => { try { video.play(); } catch (_) {} };
+        const tryPlay = () => { try { video.play(); } catch (_) { void 0; } };
         if (video.readyState >= 2) { tryPlay(); }
         else { video.addEventListener('canplay', tryPlay, { once: true }); }
     }, undefined, (error) => {
