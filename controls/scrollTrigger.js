@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL } from '../config.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture } from '../objects/backgroundPlane.js';
 // Blur plugin registration for GSAP
