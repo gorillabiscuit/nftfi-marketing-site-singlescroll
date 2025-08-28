@@ -303,43 +303,22 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                 duration: (t.itemTitleIn ?? 1.0),
                 onStart: () => {
                     // Diagnostics to ensure this fires when each item title begins
-                    try {
-                        const titleTxt = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
-                        console.log('[S4] title tween onStart', { idx, title: titleTxt, tlTime: typeof tl.time === 'function' ? tl.time() : null });
-                    } catch (_) { void 0; }
-                    try {
-                        if (!pebbleGroup) { console.log('[S4] kick abort: pebbleGroup missing'); return; }
-                        if (!pebbleGroup.userData) pebbleGroup.userData = {};
-                        const add = (SECTION4_PEBBLE_SPIN?.boostDegPerSecond ?? 180);
-                        pebbleGroup.userData.spinBoostDegPerSec = (pebbleGroup.userData.spinBoostDegPerSec || 0) + add;
-                        const titleTxt2 = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
-                        console.log('[S4] kick fired', {
-                            idx,
-                            title: titleTxt2,
-                            add,
-                            newBoost: pebbleGroup.userData.spinBoostDegPerSec,
-                            tlTime: typeof tl.time === 'function' ? tl.time() : null
-                        });
-                    } catch (_) { void 0; }
-                }
-            }, cursor);
-            // Fallback: also schedule a call right after the title tween start to ensure the kick applies even under scrub
-            tl.call(() => {
-                try {
-                    if (!pebbleGroup) { console.log('[S4] kick fallback abort: pebbleGroup missing'); return; }
+                    const titleTxt = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
+                    console.log('[S4] title tween onStart', { idx, title: titleTxt, tlTime: typeof tl.time === 'function' ? tl.time() : null });
+                    if (!pebbleGroup) { console.log('[S4] kick abort: pebbleGroup missing'); return; }
                     if (!pebbleGroup.userData) pebbleGroup.userData = {};
                     const add = (SECTION4_PEBBLE_SPIN?.boostDegPerSecond ?? 180);
                     pebbleGroup.userData.spinBoostDegPerSec = (pebbleGroup.userData.spinBoostDegPerSec || 0) + add;
-                    const titleTxt3 = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
-                    console.log('[S4] kick fallback fired', {
+                    console.log('[S4] kick fired', {
                         idx,
-                        title: titleTxt3,
+                        title: titleTxt,
                         add,
                         newBoost: pebbleGroup.userData.spinBoostDegPerSec,
                         tlTime: typeof tl.time === 'function' ? tl.time() : null
                     });
-                } catch (_) { void 0; }
-            }, [], cursor + 0.001);
+                }
+            }, cursor);
+            // Kick is applied directly in onStart above
             // body in after title
             tl.to(itemBodyEl, { opacity: 1, y: 0, filter: 'blur(0px)', ease: 'power2.out', duration: (t.itemBodyIn ?? 1.0) }, cursor + (t.itemTitleIn ?? 1.0) * 0.6);
             // hold
