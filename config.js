@@ -594,12 +594,12 @@ export const SECTION4_PEBBLE = {
 // ySpinTurns: number of full 360° spins during the entrance
 // sin: sinusoidal follow-on rotations after entrance (radians are computed from degrees here)
 export const SECTION4_PEBBLE_ROTATION = {
-    ySpinTurns: 1,
+    ySpinTurns: 0,
     sin: {
-        xAmplitudeDeg: 8,   // peak amplitude in degrees for X axis
-        yAmplitudeDeg: 6,   // peak amplitude in degrees for Y axis
-        xFrequency: 1.25,   // cycles across the post-entrance portion of the timeline
-        yFrequency: 0.9,    // cycles across the post-entrance portion of the timeline
+        xAmplitudeDeg: 0,   // peak amplitude in degrees for X axis
+        yAmplitudeDeg: 0,   // peak amplitude in degrees for Y axis
+        xFrequency: 0,   // cycles across the post-entrance portion of the timeline
+        yFrequency: 0,    // cycles across the post-entrance portion of the timeline
         phaseOffset: 0      // radians offset for Y
     }
 };
@@ -608,12 +608,12 @@ export const SECTION4_PEBBLE_ROTATION = {
 export const SECTION4_TIMINGS = {
     // Use normalized fractions of the pinned duration (0..1)
     // Periods between phases
-    periodA: 3, // before h2 fade-in
-    h2FadeIn: 2,
-    h2Show: 5,
-    h2FadeOut: 2,
-    periodB: 2, // after h2 fade-out
-    pebbleIn: 15,
+    periodA: 0.5, // before h2 fade-in
+    h2FadeIn: 0.5,
+    h2Show: 1,
+    h2FadeOut: 0.5,
+    periodB: 1, // after h2 fade-out
+    pebbleIn: 2,
     periodC: 4, // before list begins
     // panel items (title+body per item)
     itemTitleIn: 1.0,
@@ -625,5 +625,5 @@ export const SECTION4_TIMINGS = {
 
 // Section 4 scroll distance scaling (maps timeline duration to scroll length)
 export const SECTION4_SCROLL = {
-    pxPerUnit: 300 // increase to slow down overall scrub speed
+    pxPerUnit: 700 // increase to slow down overall scrub speed
 };
