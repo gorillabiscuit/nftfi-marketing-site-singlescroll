@@ -302,12 +302,18 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                 ease: 'power2.out',
                 duration: (t.itemTitleIn ?? 1.0),
                 onStart: () => {
+                    // Diagnostics to ensure this fires when each item title begins
+                    try {
+                        const titleTxt = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
+                        console.log('[S4] title tween onStart', { idx, title: titleTxt, tlTime: typeof tl.time === 'function' ? tl.time() : null });
+                    } catch (_) { void 0; }
                     try {
                         // middle items only (skip first and last)
                         if (!(idx > 0 && idx < s4Items.length - 1)) {
                             console.log('[S4] kick skipped (first/last item)', { idx });
                             return;
                         }
+                        if (!pebbleGroup) { console.log('[S4] kick abort: pebbleGroup missing'); return; }
                         if (!pebbleGroup.userData) pebbleGroup.userData = {};
                         if (!pebbleGroup.userData.__boosted) pebbleGroup.userData.__boosted = {};
                         if (pebbleGroup.userData.__boosted[idx]) {
