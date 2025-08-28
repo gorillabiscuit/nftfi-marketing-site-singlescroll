@@ -6,7 +6,7 @@ import { scene, camera, renderer, mainRenderTarget, backRenderTarget } from './i
 import { showBackgroundPlane, hideBackgroundPlane } from '../objects/backgroundPlane.js';
 import { getScrollSpinVelocity } from '../controls/scrollTrigger.js';
 import { calculateStartPosition } from '../utils/viewport.js';
-import { ANIMATION_CONFIG, MODEL_CONFIG } from '../config.js';
+import { ANIMATION_CONFIG, MODEL_CONFIG, SECTION4_PEBBLE_SPIN } from '../config.js';
 // NEW: Import ScrollSmoother performance monitoring
 import { startPerformanceFrame, recordScrollEvent } from '../controls/scrollSynchronizer.js';
 import { pebbleMesh, pebbleGroup, isPebbleReady } from '../objects/pebbleModel.js';
@@ -84,7 +84,13 @@ export function animate() {
         }
     }
     
-    // Pebble per-frame rotation disabled (rotation now controlled by Section 4 timeline only)
+    // Pebble per-frame rotation: continuous Y spin independent of scroll (when enabled)
+    if (pebbleGroup && isPebbleReady && SECTION4_PEBBLE_SPIN?.enabled) {
+        const degPerSec = SECTION4_PEBBLE_SPIN.degPerSecond ?? 24;
+        const radPerSec = degPerSec * Math.PI / 180;
+        // approximate delta time using frame-to-frame; small and stable enough for this use
+        pebbleGroup.rotation.y += radPerSec * 0.016; // ~60fps
+    }
     
     // Glass refraction rendering with temporal plane and sphere visibility control
     {

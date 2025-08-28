@@ -590,6 +590,12 @@ export const SECTION4_PEBBLE = {
     }
 };
 
+// Continuous Y spin (degrees per second) independent of scroll
+export const SECTION4_PEBBLE_SPIN = {
+    enabled: true,
+    degPerSecond: 24
+};
+
 // Section 4 pebble rotation behavior
 // ySpinTurns: number of full 360° spins during the entrance
 // sin: sinusoidal follow-on rotations after entrance (radians are computed from degrees here)

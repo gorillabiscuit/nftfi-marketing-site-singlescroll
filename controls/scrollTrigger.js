@@ -304,13 +304,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             cursor += (t.itemFadeOut ?? 0.8) + (t.periodBetweenItems ?? 0.4);
         });
 
-        // Continuous Y spin over the remaining timeline (scrubbed)
-        try {
-            const total = tl.totalDuration();
-            const remain = Math.max(0.001, total - spinStart);
-            // one full revolution across the remaining timeline
-            tl.to(pebbleGroup.rotation, { y: "+=" + (Math.PI * 2), ease: 'none', duration: remain }, spinStart);
-        } catch (_) { void 0; }
+        // Note: continuous spin handled per-frame (not scrubbed) in core/loop.js
     } catch (_) { void 0; }
 
     // Create ScrollTrigger bound to this timeline with end based on timeline totalDuration
