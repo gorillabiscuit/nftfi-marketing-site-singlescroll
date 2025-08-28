@@ -308,25 +308,14 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                         console.log('[S4] title tween onStart', { idx, title: titleTxt, tlTime: typeof tl.time === 'function' ? tl.time() : null });
                     } catch (_) { void 0; }
                     try {
-                        // middle items only (skip first and last)
-                        if (!(idx > 0 && idx < s4Items.length - 1)) {
-                            console.log('[S4] kick skipped (first/last item)', { idx });
-                            return;
-                        }
                         if (!pebbleGroup) { console.log('[S4] kick abort: pebbleGroup missing'); return; }
                         if (!pebbleGroup.userData) pebbleGroup.userData = {};
-                        if (!pebbleGroup.userData.__boosted) pebbleGroup.userData.__boosted = {};
-                        if (pebbleGroup.userData.__boosted[idx]) {
-                            console.log('[S4] kick already applied for item', { idx });
-                            return; // fire once per item index
-                        }
                         const add = (SECTION4_PEBBLE_SPIN?.boostDegPerSecond ?? 180);
                         pebbleGroup.userData.spinBoostDegPerSec = (pebbleGroup.userData.spinBoostDegPerSec || 0) + add;
-                        pebbleGroup.userData.__boosted[idx] = true;
-                        const titleTxt = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
+                        const titleTxt2 = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
                         console.log('[S4] kick fired', {
                             idx,
-                            title: titleTxt,
+                            title: titleTxt2,
                             add,
                             newBoost: pebbleGroup.userData.spinBoostDegPerSec,
                             tlTime: typeof tl.time === 'function' ? tl.time() : null
