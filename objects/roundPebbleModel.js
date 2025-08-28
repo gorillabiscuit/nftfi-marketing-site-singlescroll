@@ -67,7 +67,7 @@ export function loadRoundPebbleModel(parentGroup, scene) {
         //  - rotation.x = ±Math.PI/2 tilts the plane forward/backward
         //  - rotation.y = ±Math.PI/2 spins it left/right
         // Use radians; tweak sign (+/-) if mirrored.
-        try { gltf.scene.rotation.x = Math.PI / 2; } catch (_) { void 0; }
+        try { gltf.scene.rotation.x = -Math.PI / 2; } catch (_) { void 0; }
         roundPebbleGroup.add(gltf.scene);
         roundPebbleGroup.position.set(0, 0, 0);
         roundPebbleGroup.scale.setScalar(1);
