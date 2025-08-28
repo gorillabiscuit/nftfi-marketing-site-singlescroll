@@ -416,6 +416,28 @@ export function updatePlaneTextureForSection(selector) {
     });
 }
 
+// Pre-capture Section 4 content ahead of onEnter using IntersectionObserver
+export function setupSectionPreCapture(selector, rootMargin) {
+    if (typeof rootMargin === 'undefined') { rootMargin = '400px'; }
+    try {
+        const target = typeof selector === 'string' ? document.querySelector(selector) : selector;
+        if (!target || typeof IntersectionObserver === 'undefined') return;
+        let captured = false;
+        const obs = new IntersectionObserver((entries) => {
+            const entry = entries[0];
+            if (!captured && entry && entry.isIntersecting) {
+                captured = true;
+                // Split steps across frames to avoid jank
+                requestAnimationFrame(() => {
+                    updatePlaneTextureForSection(selector).catch(() => { void 0; });
+                });
+                try { obs.disconnect(); } catch (_) { void 0; }
+            }
+        }, { root: null, rootMargin: rootMargin, threshold: 0 });
+        obs.observe(target);
+    } catch (_) { void 0; }
+}
+
 /**
  * Show background plane for render target sampling
  */

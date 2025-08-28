@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
-import { updatePlaneTextureForSection } from '../objects/backgroundPlane.js';
+import { updatePlaneTextureForSection, setupSectionPreCapture } from '../objects/backgroundPlane.js';
 // Blur plugin registration for GSAP
 (function () {
     const blurProperty = gsap.utils.checkPrefix("filter"),
@@ -140,7 +140,7 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
     // Set up section 2 pinning
     setupSection2Pinning();
     
-    console.log('Scroll animation setup complete');
+    // console.log('Scroll animation setup complete');
 }
 
 /**
@@ -176,27 +176,8 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
     const startY = (typeof pebbleGroup.position?.y === 'number') ? pebbleGroup.position.y : -20;
     gsap.set(pebbleGroup.position, { y: startY });
 
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: ".section[data-section='4']",
-            start: 'top top',
-            end: () => '+=' + Math.round((SECTION4_SCROLL?.pxPerUnit ?? 1400)),
-            pin: true,
-            scrub: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            onEnter: () => {
-                // Capture Section 4 to plane as we begin the pinned reveal
-                try { updatePlaneTextureForSection(".section[data-section='4']"); } catch (_) { void 0; }
-                gsap.set(pebbleGroup, { visible: true });
-            },
-            onEnterBack: () => {
-                try { updatePlaneTextureForSection(".section[data-section='4']"); } catch (_) { void 0; }
-                gsap.set(pebbleGroup, { visible: true });
-            },
-            onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
-        }
-    });
+    // Build timeline first (without ScrollTrigger) so we can scale scroll distance to its duration
+    const tl = gsap.timeline();
     // Apply center-anchored offsets from config per breakpoint
     const titleEl = document.getElementById('section4-title');
     const listEl = document.getElementById('section4-list');
@@ -206,12 +187,17 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         if (titleEl) {
             titleEl.style.setProperty('--x', cfg.title.x);
             titleEl.style.setProperty('--y', cfg.title.y);
+            titleEl.style.willChange = 'transform, filter, opacity';
         }
         if (listEl) {
             listEl.style.setProperty('--x', cfg.list.x);
             listEl.style.setProperty('--y', cfg.list.y);
+            listEl.style.willChange = 'transform, filter, opacity';
         }
     } catch (_) { void 0; }
+
+    // Pre-capture Section 4 content before pin
+    setupSectionPreCapture(".section[data-section='4']", '500px');
 
     // Tie title blur/opacity/scale into this pinned, scrubbed timeline
     const title = document.querySelector('.section4-title');
@@ -283,6 +269,27 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
     // Initialize list items pre-state (invisible until their phase begins)
     const listItems = Array.from(document.querySelectorAll('.section4-list li'));
     if (listItems.length) listItems.forEach((li) => { gsap.set(li, { fontWeight: 500, opacity: 0, y: 10, filter: 'blur(6px)' }); });
+
+    // Create ScrollTrigger bound to this timeline with end based on timeline totalDuration
+    ScrollTrigger.create({
+        trigger: ".section[data-section='4']",
+        start: 'top top',
+        end: () => '+=' + Math.round(tl.totalDuration() * (SECTION4_SCROLL?.pxPerUnit ?? 1400)),
+        pin: true,
+        scrub: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        animation: tl,
+        onEnter: () => {
+            try { updatePlaneTextureForSection(".section[data-section='4']"); } catch (_) { void 0; }
+            gsap.set(pebbleGroup, { visible: true });
+        },
+        onEnterBack: () => {
+            try { updatePlaneTextureForSection(".section[data-section='4']"); } catch (_) { void 0; }
+            gsap.set(pebbleGroup, { visible: true });
+        },
+        onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
+    });
 }
 
 // Create or recreate the scroll timeline
@@ -345,14 +352,8 @@ function createScrollTimeline() {
                     );
                     wrapper.scale.setScalar(currentScale);
                     
-                    console.log('S1 scroll debug', {
-                        progress,
-                        startScale: startPos.scale,
-                        targetScale: dynamicTarget.scale,
-                        currentScale,
-                        wrapperScale: wrapper.scale.x,
-                        at: Date.now()
-                    });
+                    // debug (disabled): S1 scroll state
+                    // console.log('S1 scroll debug', { progress, startScale: startPos.scale, targetScale: dynamicTarget.scale, currentScale, wrapperScale: wrapper.scale.x, at: Date.now() });
                 }
             }
         }

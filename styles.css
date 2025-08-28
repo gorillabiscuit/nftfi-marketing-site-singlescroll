@@ -26,6 +26,7 @@
 .section4-title {
   text-align: center;
   font-family: 'Satoshi Variable', sans-serif;
+  will-change: transform, filter, opacity;
 }
 
 .section4-list {
@@ -45,6 +46,8 @@
   line-height: 31px; /* 129% */
   color: rgba(255, 255, 255, 0.8);
 }
+
+.section4-list { will-change: transform, filter, opacity; }
 .section4-list li { margin: 0.25rem 0; }
 /* Reset and Base Styles */
 * {
@@ -775,9 +778,12 @@ body.scroll-disabled {
         filter 0.3s ease-out;
 }
 
-/* Full-section gradient for Section 4 */
+/* Full-section background for Section 4 with top-left SVG */
 section[data-section="4"] {
-    background: linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+    background-image: url('/images/top-left-LooperGroup.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+    background-repeat: no-repeat, no-repeat;
+    background-position: left top, center;
+    background-size: auto, cover;
 }
 
 /* Section 3 background hero using LooperGroup.svg, positioned behind the dashboard SVG */

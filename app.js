@@ -122,6 +122,16 @@ function init() {
         }
     });
     
+    // Warm-up shaders/materials to avoid first-frame compile hitches near Section 4
+    try {
+        // Attempt to compile shaders with current scene/camera
+        if (renderer && scene && camera && typeof renderer.compile === 'function') {
+            renderer.compile(scene, camera);
+        }
+        // Render a quick frame to prime pipelines
+        requestAnimationFrame(() => { try { renderer.render(scene, camera); } catch (e) { void 0; } });
+    } catch (e) { void 0; }
+    
     // Initialize animation loop when model is ready
     const checkModelReady = () => {
         if (isModelReady && mesh && wrapper) {

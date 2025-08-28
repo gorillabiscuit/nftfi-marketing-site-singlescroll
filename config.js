@@ -591,12 +591,12 @@ export const SECTION4_PEBBLE = {
 export const SECTION4_TIMINGS = {
     // Use normalized fractions of the pinned duration (0..1)
     // Periods between phases
-    periodA: 2.05, // before h2 fade-in
+    periodA: 10.05, // before h2 fade-in
     h2FadeIn: 4.15,
     h2Show: 10.15,
     h2FadeOut: 4.10,
     periodB: 2.05, // after h2 fade-out
-    pebbleIn: 5.20,
+    pebbleIn: 15.20,
     periodC: 2.05, // before list begins
     // list items (4 items)
     listItem: 1.08, // each item reveal duration
@@ -608,5 +608,5 @@ export const SECTION4_TIMINGS = {
 
 // Section 4 scroll distance scaling (maps timeline duration to scroll length)
 export const SECTION4_SCROLL = {
-    pxPerUnit: 3500 // increase to slow down overall scrub speed
+    pxPerUnit: 300 // increase to slow down overall scrub speed
 };
