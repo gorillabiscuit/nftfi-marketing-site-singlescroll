@@ -558,17 +558,14 @@ export const PLANE_CONFIG = {
 export const SECTION4_LAYOUT = {
     desktop: {
         title: { x: '0%', y: '0%' },
-        list:  { x: '80%', y: '0%' },
         panel: { x: '80%', y: '0%' }
     },
     tablet: {
         title: { x: '0%', y: '0%' },
-        list:  { x: '-15%', y: '2%' },
         panel: { x: '-15%', y: '2%' }
     },
     mobile: {
         title: { x: '0%', y: '-5%' },
-        list:  { x: '0%',  y: '15%' },
         panel: { x: '0%',  y: '15%' }
     }
 };
@@ -595,28 +592,19 @@ export const SECTION4_PEBBLE_SPIN = {
     enabled: true,
     degPerSecond: 24,
     // Extra spin impulse when middle items appear
-    boostDegPerSecond: 180,
+    boostDegPerSecond: 1080,
     boostDecayPerSecond: 1.2
 };
 
 // Section 4 pebble rotation behavior
 // ySpinTurns: number of full 360° spins during the entrance
 // sin: sinusoidal follow-on rotations after entrance (radians are computed from degrees here)
-export const SECTION4_PEBBLE_ROTATION = {
-    ySpinTurns: 0,
-    sin: {
-        xAmplitudeDeg: 0,   // peak amplitude in degrees for X axis
-        yAmplitudeDeg: 0,   // peak amplitude in degrees for Y axis
-        xFrequency: 0,   // cycles across the post-entrance portion of the timeline
-        yFrequency: 0,    // cycles across the post-entrance portion of the timeline
-        phaseOffset: 0      // radians offset for Y
-    }
-};
+// (Removed SECTION4_PEBBLE_ROTATION: entrance spin and sinusoidal follow-on now unused)
 
 // Continuous X-axis wobble (sinusoidal) to accompany base Y spin
 export const SECTION4_PEBBLE_WOBBLE = {
     enabled: true,
-    xAmplitudeDeg: 3,   // small tilt amplitude in degrees
+    xAmplitudeDeg: 12,   // small tilt amplitude in degrees
     xFrequencyHz: 0.2   // cycles per second
 };
 

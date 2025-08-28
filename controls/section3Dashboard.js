@@ -279,7 +279,7 @@ export function initSection3Scroll() {
         if (SECTION3_SCROLL && typeof SECTION3_SCROLL.durationVh === 'number') {
             endPercent = Math.max(1, SECTION3_SCROLL.durationVh);
         }
-    } catch (_) {}
+    } catch (_) { void 0; }
 
     const tl = gsap.timeline({
         scrollTrigger: {
@@ -291,7 +291,7 @@ export function initSection3Scroll() {
             anticipatePin: 1,
             invalidateOnRefresh: true,
             scrub: true,
-            markers: true,
+            markers: false,
             id: 'section3-timeline',
             onUpdate: (self) => {
                 try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
@@ -306,8 +306,8 @@ export function initSection3Scroll() {
                 try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
             },
             // When leaving Section 3 forward into Section 2, fully reset play-once state
-
-   
+            onLeave: () => { void 0; },
+            onEnterBack: () => { void 0; }
         }
     });
 
@@ -315,7 +315,7 @@ export function initSection3Scroll() {
     try {
         gsap.set('.section3-features .features-title', { opacity: 0 });
         gsap.set('.section3-features .feature-block', { opacity: 0 });
-    } catch (_) {}
+    } catch (_) { void 0; }
 
     // Timeline structure with labels
     tl.addLabel('intro', 0);
@@ -351,7 +351,7 @@ export function initSection3Scroll() {
     addGroupSequences(tl, targets);
 
     console.log('[Section3Dashboard] Section 3 timeline created with ScrollTrigger pin+scrub');
-    try { ScrollTrigger.refresh(); } catch (e) {}
+    try { ScrollTrigger.refresh(); } catch (e) { void 0; }
 
     // Apply config-driven size/position for the Looper background per breakpoint
     try {
@@ -386,11 +386,13 @@ export function initSection3Scroll() {
                 // Fire when Section 2 is fully aligned with the viewport (fully visible)
                 start: 'top top',
                 end: 'bottom bottom',
-                markers: true,
+                markers: false,
                 id: 'section2-reset',
                 // Set zero-length on leaving Section 2 backward (up into Section 1)
-                onEnter: () => { try { console.log('[Section3Dashboard] section2 onEnter'); } catch (e) { (void e); } },
-                
+                onLeaveBack: () => { void 0; },
+                onEnter: () => { void 0; },
+                onEnterBack: () => { void 0; },
+                onLeave: () => { void 0; }
             });
         }
     } catch (e) { (void e); }
@@ -720,7 +722,7 @@ function addPerIdDetailSequences(tl, targets) {
                             p.setAttribute('data-animating', '1');
                             try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
                         }
-                    } catch (_) {}
+                    } catch (_) { void 0; }
                 }, 'intro+=' + startAt.toFixed(3));
                 tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startAt.toFixed(3));
                 tl.to(arrowSel, { strokeDashoffset: 0, duration: 4.2, ease: 'power2.out', onComplete: function () {
@@ -734,7 +736,7 @@ function addPerIdDetailSequences(tl, targets) {
                     } catch (e) { (void e); }
                 } }, 'intro+=' + (startAt + 0.05).toFixed(3));
                 revealIndex += 1;
-            } catch (_) {}
+            } catch (_) { void 0; }
         }
 
         for (let idx = 0; idx < items.length; idx += 1) {
@@ -789,7 +791,7 @@ function addPerIdDetailSequences(tl, targets) {
                                 p2.setAttribute('data-animating', '1');
                                 try { p2.removeAttribute('marker-end'); } catch (e) { (void e); }
                             }
-                        } catch (_) {}
+                        } catch (_) { void 0; }
                     }, 'intro+=' + startBubbles.toFixed(3));
                     tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
                     tl.to(arrowSel2, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startBubbles.toFixed(3));
@@ -804,7 +806,7 @@ function addPerIdDetailSequences(tl, targets) {
                         } catch (e) { (void e); }
                     } }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
                     revealIndex += 1;
-                } catch (_) {}
+                } catch (_) { void 0; }
             }
 
             // Schedule bubble chart elements
