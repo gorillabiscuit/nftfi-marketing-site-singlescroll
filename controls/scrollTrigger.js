@@ -307,38 +307,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             cursor += (t.itemFadeOut ?? 0.8) + (t.periodBetweenItems ?? 0.4);
         });
 
-        // After the first item starts, begin sinusoidal idle rotation that continues during content phases
-        tl.add(() => {
-            try {
-                const cfg = SECTION4_PEBBLE_ROTATION?.sin;
-                if (!cfg) return;
-                const xAmp = (cfg.xAmplitudeDeg ?? 8) * Math.PI / 180;
-                const yAmp = (cfg.yAmplitudeDeg ?? 6) * Math.PI / 180;
-                const xFreq = cfg.xFrequency ?? 1.25;
-                const yFreq = cfg.yFrequency ?? 0.9;
-                const phase = cfg.phaseOffset ?? 0;
-                // Drive via onUpdate proxy tied to rest of timeline
-                const rotProxy = { t: 0 };
-                const remain = Math.max(0.001, tl.totalDuration() - tl.time());
-                tl.to(rotProxy, {
-                    t: 1,
-                    duration: remain,
-                    ease: 'none',
-                    onUpdate: () => {
-                        const p = tl.progress();
-                        // p spans 0..1 over the whole section; use mapped phase for nice motion
-                        const xr = Math.sin(p * Math.PI * 2 * xFreq) * xAmp;
-                        const yr = Math.sin(p * Math.PI * 2 * yFreq + phase) * yAmp;
-                        try {
-                            pebbleGroup.rotation.x = xr;
-                            // preserve cumulative y from spin plus sinusoidal wobble around it
-                            pebbleGroup.rotation.y += (yr - (pebbleGroup.userData.__lastYR || 0));
-                            pebbleGroup.userData.__lastYR = yr;
-                        } catch (_) { void 0; }
-                    }
-                }, cursor);
-            } catch (_) { void 0; }
-        }, cursor);
+        // Note: Idle sinusoidal rotation disabled per request; only a single 360° Y spin on entrance remains
     } catch (_) { void 0; }
 
     // Create ScrollTrigger bound to this timeline with end based on timeline totalDuration
