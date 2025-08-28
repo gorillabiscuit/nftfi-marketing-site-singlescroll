@@ -84,16 +84,7 @@ export function animate() {
         }
     }
     
-    // Pebble rotation animation - gentle multi-axis rotation independent from wrapper
-    if (pebbleGroup && isPebbleReady) {
-        const time = (Date.now() - startTime) * 0.001;
-        const xRatePebble = ANIMATION_CONFIG.xRotationRate.base * 0.6 + Math.sin(time * (ANIMATION_CONFIG.xRotationRate.frequency * 0.8)) * (ANIMATION_CONFIG.xRotationRate.modulation * 0.5);
-        const yRatePebble = ANIMATION_CONFIG.yRotationRate.base * 0.7 + Math.cos(time * (ANIMATION_CONFIG.yRotationRate.frequency * 1.1)) * (ANIMATION_CONFIG.yRotationRate.modulation * 0.6);
-        const zRatePebble = ANIMATION_CONFIG.zRotationRate.base * 0.8 + Math.sin(time * (ANIMATION_CONFIG.zRotationRate.frequency * 1.3)) * (ANIMATION_CONFIG.zRotationRate.modulation * 0.6);
-        pebbleGroup.rotation.x += xRatePebble * 0.02;
-        pebbleGroup.rotation.y += yRatePebble * 0.02;
-        pebbleGroup.rotation.z += zRatePebble * 0.02;
-    }
+    // Pebble per-frame rotation disabled (rotation now controlled by Section 4 timeline only)
     
     // Glass refraction rendering with temporal plane and sphere visibility control
     {
