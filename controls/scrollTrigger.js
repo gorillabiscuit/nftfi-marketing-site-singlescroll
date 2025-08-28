@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL } from '../config.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection } from '../objects/backgroundPlane.js';
 // Blur plugin registration for GSAP
@@ -180,7 +180,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         scrollTrigger: {
             trigger: ".section[data-section='4']",
             start: 'top top',
-            end: '+=100%',
+            end: () => '+=' + Math.round((SECTION4_SCROLL?.pxPerUnit ?? 1400)),
             pin: true,
             scrub: true,
             anticipatePin: 1,
@@ -197,10 +197,40 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
         }
     });
+    // Apply center-anchored offsets from config per breakpoint
+    const titleEl = document.getElementById('section4-title');
+    const listEl = document.getElementById('section4-list');
+    try {
+        const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
+        const cfg = (SECTION4_LAYOUT && SECTION4_LAYOUT[bp]) ? SECTION4_LAYOUT[bp] : SECTION4_LAYOUT.desktop;
+        if (titleEl) {
+            titleEl.style.setProperty('--x', cfg.title.x);
+            titleEl.style.setProperty('--y', cfg.title.y);
+        }
+        if (listEl) {
+            listEl.style.setProperty('--x', cfg.list.x);
+            listEl.style.setProperty('--y', cfg.list.y);
+        }
+    } catch (_) { void 0; }
+
     // Tie title blur/opacity/scale into this pinned, scrubbed timeline
     const title = document.querySelector('.section4-title');
     if (title) {
-        tl.from(title, { duration: 0.75, blur: 15, alpha: 0.3, scale: 0.95, ease: 'power2.inOut' }, 0);
+        const t = SECTION4_TIMINGS;
+        let cursor = 0;
+        // period
+        cursor += (t.periodA ?? 0.05);
+        // h2 fade in
+        tl.from(title, { blur: 15, alpha: 0.0, scale: 0.95, ease: 'power2.inOut', duration: (t.h2FadeIn ?? 0.15) }, cursor);
+        cursor += (t.h2FadeIn ?? 0.15);
+        // h2 show period
+        tl.to(title, { opacity: 1, duration: 0.001 }, cursor);
+        cursor += (t.h2Show ?? 0.15);
+        // h2 fade out
+        tl.to(title, { opacity: 0, ease: 'power2.in', duration: (t.h2FadeOut ?? 0.10) }, cursor);
+        cursor += (t.h2FadeOut ?? 0.10);
+        // store the cursor for later phases
+        title._s4CursorAfterTitle = cursor;
     }
     // Fade in materials via a proxy for reliable onUpdate
     const proxy = { v: 0 };
@@ -215,28 +245,44 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             }
         }
     }, 0);
-    // Lift from offscreen and move ~15% left; scale up 75%
-    tl.to(pebbleGroup.position, { y: 0, x: -3.5, ease: 'none' }, 0);
-    tl.to(pebbleGroup.scale, { x: '+=0.75', y: '+=0.75', z: '+=0.75', ease: 'none' }, 0);
+    // Lift from offscreen and position/scale per breakpoint settings
+    try {
+        const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
+        const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE.desktop;
+        const t = SECTION4_TIMINGS; let cursor = (title && title._s4CursorAfterTitle) ? title._s4CursorAfterTitle : 0.4;
+        cursor += (t.periodB ?? 0.05);
+        // pebble animates in
+        tl.to(pebbleGroup.position, { y: 0 + (pcfg.position?.y ?? 0), x: (pcfg.position?.x ?? -3.5), z: (pcfg.position?.z ?? 0), ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
+        // scale relative: multiply baseline by factor; using additive on each axis
+        const s = (pcfg.scale ?? 1.75) - 1.0;
+        tl.to(pebbleGroup.scale, { x: `+=${s}`, y: `+=${s}`, z: `+=${s}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
+        cursor += (t.pebbleIn ?? 0.20);
+        // before list begins
+        cursor += (t.periodC ?? 0.05);
+        // list items appear sequentially
+        const items = Array.from(document.querySelectorAll('.section4-list li'));
+        if (items.length) {
+            items.forEach((li, i) => {
+                tl.to(li, { opacity: 1, y: 0, filter: 'blur(0px)', ease: 'power2.out', duration: (t.listItem ?? 0.08) }, cursor);
+                cursor += (t.listItem ?? 0.08) + (t.periodBetweenItems ?? 0.04);
+            });
+            // bold cycling
+            items.forEach((li, i) => {
+                tl.to(li, { fontWeight: 700, duration: (t.boldHold ?? 0.06) }, cursor);
+                const prev = items[i - 1];
+                if (prev) tl.to(prev, { fontWeight: 500, duration: 0.001 }, cursor);
+                cursor += (t.boldHold ?? 0.06) + (t.periodBetweenBolds ?? 0.02);
+            });
+        }
+    } catch (_) {
+        tl.to(pebbleGroup.position, { y: 0, x: -3.5, ease: 'none' }, 0.4);
+        tl.to(pebbleGroup.scale, { x: '+=0.75', y: '+=0.75', z: '+=0.75', ease: 'none' }, 0.4);
+    }
 
     // Animate list items character/line reveal effect tied to the same scrub
+    // Initialize list items pre-state (invisible until their phase begins)
     const listItems = Array.from(document.querySelectorAll('.section4-list li'));
-    if (listItems.length) {
-        // Phase 1: reveal all items first (0 -> 60% of the pinned timeline)
-        listItems.forEach((li, i) => {
-            gsap.set(li, { fontWeight: 500, opacity: 0.6, y: 10, filter: 'blur(6px)' });
-            const start = i * (0.6 / Math.max(1, listItems.length));
-            tl.to(li, { opacity: 1, y: 0, filter: 'blur(0px)', ease: 'power2.out' }, start);
-        });
-        // Phase 2: after all have appeared, roll bold highlight from top to bottom
-        const phase2Start = 0.6;
-        const seg = 0.4 / Math.max(1, listItems.length);
-        listItems.forEach((li, i) => {
-            const tStart = phase2Start + i * seg;
-            tl.to(li, { fontWeight: 700 }, tStart);
-            if (i > 0) tl.to(listItems[i - 1], { fontWeight: 500 }, tStart);
-        });
-    }
+    if (listItems.length) listItems.forEach((li) => { gsap.set(li, { fontWeight: 500, opacity: 0, y: 10, filter: 'blur(6px)' }); });
 }
 
 // Create or recreate the scroll timeline

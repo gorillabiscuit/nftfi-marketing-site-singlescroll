@@ -7,22 +7,33 @@
   min-height: 100vh; /* ensure enough scroll distance for pinned ST */
 }
 
+/* Stage container to allow center-anchored absolute positioning */
+.section4-stage {
+  position: relative;
+}
+
+/* Center-anchored utility: position by percent offsets from dead-center */
+.center-anchored {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  --x: 0%;
+  --y: 0%;
+  transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)));
+  transform-origin: center;
+}
+
 .section4-title {
-  grid-column: 2;
-  justify-self: start; /* align block start within column */
-  text-align: left;    /* left-align text */
-  transform: translateX(-15%); /* shift 15% left */
+  text-align: center;
+  font-family: 'Satoshi Variable', sans-serif;
 }
 
 .section4-list {
-  grid-column: 2;
-  justify-self: start; /* align with title's left edge */
   list-style: none;
   margin: 0.5rem 0 0;
   padding: 0;
   text-align: left;
   font-family: inherit;
-  transform: translateX(-15%); /* keep aligned with title */
 }
 .section4-list li {
   width: 303px;

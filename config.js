@@ -552,3 +552,61 @@ export const PLANE_CONFIG = {
         z: -10
     }
 }; 
+
+// Center-anchored layout offsets for Section 4 per breakpoint
+// Values are CSS percentages as strings (e.g., '0%', '15%', '-20%')
+export const SECTION4_LAYOUT = {
+    desktop: {
+        title: { x: '0%', y: '0%' },
+        list:  { x: '80%', y: '0%' }
+    },
+    tablet: {
+        title: { x: '0%', y: '0%' },
+        list:  { x: '-15%', y: '2%' }
+    },
+    mobile: {
+        title: { x: '0%', y: '-5%' },
+        list:  { x: '0%',  y: '15%' }
+    }
+};
+
+// Pebble positioning for Section 4 (Three.js world-space offsets and scale)
+// Units are world units relative to current baseline position/scale
+export const SECTION4_PEBBLE = {
+    desktop: {
+        position: { x: -3.5, y: 0, z: 0 },
+        scale: 1.75
+    },
+    tablet: {
+        position: { x: -3.0, y: 0, z: 0 },
+        scale: 1.6
+    },
+    mobile: {
+        position: { x: -2.2, y: 0.1, z: 0 },
+        scale: 1.4
+    }
+};
+
+// Section 4 timeline timings (fractions of pinned timeline 0..1 or seconds if needed)
+export const SECTION4_TIMINGS = {
+    // Use normalized fractions of the pinned duration (0..1)
+    // Periods between phases
+    periodA: 2.05, // before h2 fade-in
+    h2FadeIn: 4.15,
+    h2Show: 10.15,
+    h2FadeOut: 4.10,
+    periodB: 2.05, // after h2 fade-out
+    pebbleIn: 5.20,
+    periodC: 2.05, // before list begins
+    // list items (4 items)
+    listItem: 1.08, // each item reveal duration
+    periodBetweenItems: 3.04,
+    // bolding sequence
+    boldHold: 2.06, // how long each bold stays before switching
+    periodBetweenBolds: 1.02
+};
+
+// Section 4 scroll distance scaling (maps timeline duration to scroll length)
+export const SECTION4_SCROLL = {
+    pxPerUnit: 3500 // increase to slow down overall scrub speed
+};
