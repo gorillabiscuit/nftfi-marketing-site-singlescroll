@@ -180,7 +180,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
     const tl = gsap.timeline();
     // Apply center-anchored offsets from config per breakpoint
     const titleEl = document.getElementById('section4-title');
-    const listEl = document.getElementById('section4-list');
+    const panelEl = document.getElementById('section4-panel');
     try {
         const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
         const cfg = (SECTION4_LAYOUT && SECTION4_LAYOUT[bp]) ? SECTION4_LAYOUT[bp] : SECTION4_LAYOUT.desktop;
@@ -189,10 +189,10 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             titleEl.style.setProperty('--y', cfg.title.y);
             titleEl.style.willChange = 'transform, filter, opacity';
         }
-        if (listEl) {
-            listEl.style.setProperty('--x', cfg.list.x);
-            listEl.style.setProperty('--y', cfg.list.y);
-            listEl.style.willChange = 'transform, filter, opacity';
+        if (panelEl) {
+            panelEl.style.setProperty('--x', cfg.panel?.x ?? cfg.list?.x ?? '0%');
+            panelEl.style.setProperty('--y', cfg.panel?.y ?? cfg.list?.y ?? '0%');
+            panelEl.style.willChange = 'transform, filter, opacity';
         }
     } catch (_) { void 0; }
 
@@ -265,10 +265,42 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         tl.to(pebbleGroup.scale, { x: '+=0.75', y: '+=0.75', z: '+=0.75', ease: 'none' }, 0.4);
     }
 
-    // Animate list items character/line reveal effect tied to the same scrub
-    // Initialize list items pre-state (invisible until their phase begins)
-    const listItems = Array.from(document.querySelectorAll('.section4-list li'));
-    if (listItems.length) listItems.forEach((li) => { gsap.set(li, { fontWeight: 500, opacity: 0, y: 10, filter: 'blur(6px)' }); });
+    // Initialize single panel pre-state
+    const itemTitleEl = document.getElementById('section4-item-title');
+    const itemBodyEl = document.getElementById('section4-item-body');
+    if (itemTitleEl) gsap.set(itemTitleEl, { opacity: 0, y: 10, filter: 'blur(6px)' });
+    if (itemBodyEl) gsap.set(itemBodyEl, { opacity: 0, y: 10, filter: 'blur(6px)' });
+
+    // Define items (title + body). Placeholder copy per request.
+    const s4Items = [
+        { title: 'Digital Art', body: 'Unique on-chain artworks — provenance, scarcity, and creator royalties baked-in.' },
+        { title: 'PFPs', body: 'Profile-picture collections used for identity, access, and community membership.' },
+        { title: 'Real-World Assets (RWAs)', body: 'Tokenized real-world instruments like invoices, treasuries, and real estate cashflows.' },
+        { title: 'DeFi tokens', body: 'Liquidity positions and protocol tokens, enabling composable, on-chain finance.' }
+    ];
+
+    // For each item: title in (splt-like), body in, hold, fade both out, swap content
+    try {
+        const t = SECTION4_TIMINGS;
+        let cursor = (title && title._s4CursorAfterTitle) ? title._s4CursorAfterTitle : 0.4;
+        cursor += (t.periodC ?? 0.2);
+        s4Items.forEach((it, idx) => {
+            // swap content just before animating in
+            tl.add(() => {
+                if (itemTitleEl) itemTitleEl.textContent = it.title;
+                if (itemBodyEl) itemBodyEl.textContent = it.body;
+            }, cursor - 0.001);
+            // title in
+            tl.to(itemTitleEl, { opacity: 1, y: 0, filter: 'blur(0px)', rotationY: 0, ease: 'power2.out', duration: (t.itemTitleIn ?? 1.0) }, cursor);
+            // body in after title
+            tl.to(itemBodyEl, { opacity: 1, y: 0, filter: 'blur(0px)', ease: 'power2.out', duration: (t.itemBodyIn ?? 1.0) }, cursor + (t.itemTitleIn ?? 1.0) * 0.6);
+            // hold
+            cursor += (t.itemTitleIn ?? 1.0) + (t.itemBodyIn ?? 1.0) + (t.itemHold ?? 2.0);
+            // fade out both
+            tl.to([itemTitleEl, itemBodyEl], { opacity: 0, y: 10, filter: 'blur(6px)', ease: 'power2.in', duration: (t.itemFadeOut ?? 0.8) }, cursor);
+            cursor += (t.itemFadeOut ?? 0.8) + (t.periodBetweenItems ?? 0.4);
+        });
+    } catch (_) { void 0; }
 
     // Create ScrollTrigger bound to this timeline with end based on timeline totalDuration
     ScrollTrigger.create({

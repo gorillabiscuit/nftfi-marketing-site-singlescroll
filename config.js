@@ -558,15 +558,18 @@ export const PLANE_CONFIG = {
 export const SECTION4_LAYOUT = {
     desktop: {
         title: { x: '0%', y: '0%' },
-        list:  { x: '80%', y: '0%' }
+        list:  { x: '80%', y: '0%' },
+        panel: { x: '80%', y: '0%' }
     },
     tablet: {
         title: { x: '0%', y: '0%' },
-        list:  { x: '-15%', y: '2%' }
+        list:  { x: '-15%', y: '2%' },
+        panel: { x: '-15%', y: '2%' }
     },
     mobile: {
         title: { x: '0%', y: '-5%' },
-        list:  { x: '0%',  y: '15%' }
+        list:  { x: '0%',  y: '15%' },
+        panel: { x: '0%',  y: '15%' }
     }
 };
 
@@ -591,19 +594,19 @@ export const SECTION4_PEBBLE = {
 export const SECTION4_TIMINGS = {
     // Use normalized fractions of the pinned duration (0..1)
     // Periods between phases
-    periodA: 10.05, // before h2 fade-in
-    h2FadeIn: 4.15,
-    h2Show: 10.15,
-    h2FadeOut: 4.10,
-    periodB: 2.05, // after h2 fade-out
-    pebbleIn: 15.20,
-    periodC: 2.05, // before list begins
-    // list items (4 items)
-    listItem: 1.08, // each item reveal duration
-    periodBetweenItems: 3.04,
-    // bolding sequence
-    boldHold: 2.06, // how long each bold stays before switching
-    periodBetweenBolds: 1.02
+    periodA: 3, // before h2 fade-in
+    h2FadeIn: 2,
+    h2Show: 5,
+    h2FadeOut: 2,
+    periodB: 2, // after h2 fade-out
+    pebbleIn: 15,
+    periodC: 4, // before list begins
+    // panel items (title+body per item)
+    itemTitleIn: 1.0,
+    itemBodyIn: 1.0,
+    itemHold: 2.2,
+    itemFadeOut: 0.8,
+    periodBetweenItems: 0.6
 };
 
 // Section 4 scroll distance scaling (maps timeline duration to scroll length)

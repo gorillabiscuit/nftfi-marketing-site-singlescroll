@@ -49,6 +49,31 @@
 
 .section4-list { will-change: transform, filter, opacity; }
 .section4-list li { margin: 0.25rem 0; }
+
+/* Section 4 single-panel text */
+.section4-panel {
+  display: grid;
+  grid-auto-rows: min-content;
+  gap: 12px;
+  text-align: left;
+  width: min(520px, 80vw);
+}
+.section4-item-title {
+  font-family: 'Satoshi Variable', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.25;
+  color: rgba(255,255,255,0.9);
+  will-change: transform, filter, opacity;
+}
+.section4-item-body {
+  font-family: 'Satoshi Variable', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.8);
+  will-change: transform, filter, opacity;
+}
 /* Reset and Base Styles */
 * {
     margin: 0;
