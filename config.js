@@ -593,7 +593,10 @@ export const SECTION4_PEBBLE = {
 // Continuous Y spin (degrees per second) independent of scroll
 export const SECTION4_PEBBLE_SPIN = {
     enabled: true,
-    degPerSecond: 24
+    degPerSecond: 24,
+    // Extra spin impulse when middle items appear
+    boostDegPerSecond: 180,
+    boostDecayPerSecond: 1.2
 };
 
 // Section 4 pebble rotation behavior
@@ -608,6 +611,13 @@ export const SECTION4_PEBBLE_ROTATION = {
         yFrequency: 0,    // cycles across the post-entrance portion of the timeline
         phaseOffset: 0      // radians offset for Y
     }
+};
+
+// Continuous X-axis wobble (sinusoidal) to accompany base Y spin
+export const SECTION4_PEBBLE_WOBBLE = {
+    enabled: true,
+    xAmplitudeDeg: 3,   // small tilt amplitude in degrees
+    xFrequencyHz: 0.2   // cycles per second
 };
 
 // Section 4 timeline timings (fractions of pinned timeline 0..1 or seconds if needed)

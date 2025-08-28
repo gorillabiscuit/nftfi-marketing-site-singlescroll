@@ -297,6 +297,16 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             tl.to(itemTitleEl, { opacity: 1, y: 0, filter: 'blur(0px)', rotationY: 0, ease: 'power2.out', duration: (t.itemTitleIn ?? 1.0) }, cursor);
             // body in after title
             tl.to(itemBodyEl, { opacity: 1, y: 0, filter: 'blur(0px)', ease: 'power2.out', duration: (t.itemBodyIn ?? 1.0) }, cursor + (t.itemTitleIn ?? 1.0) * 0.6);
+            // spin boost on middle items only (skip first and last)
+            if (idx > 0 && idx < s4Items.length - 1) {
+                tl.add(() => {
+                    try {
+                        if (!pebbleGroup.userData) pebbleGroup.userData = {};
+                        const add = (SECTION4_PEBBLE_SPIN?.boostDegPerSecond ?? 180);
+                        pebbleGroup.userData.spinBoostDegPerSec = (pebbleGroup.userData.spinBoostDegPerSec || 0) + add;
+                    } catch (_) { void 0; }
+                }, cursor);
+            }
             // hold
             cursor += (t.itemTitleIn ?? 1.0) + (t.itemBodyIn ?? 1.0) + (t.itemHold ?? 2.0);
             // fade out both

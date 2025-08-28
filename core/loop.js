@@ -6,7 +6,7 @@ import { scene, camera, renderer, mainRenderTarget, backRenderTarget } from './i
 import { showBackgroundPlane, hideBackgroundPlane } from '../objects/backgroundPlane.js';
 import { getScrollSpinVelocity } from '../controls/scrollTrigger.js';
 import { calculateStartPosition } from '../utils/viewport.js';
-import { ANIMATION_CONFIG, MODEL_CONFIG, SECTION4_PEBBLE_SPIN } from '../config.js';
+import { ANIMATION_CONFIG, MODEL_CONFIG, SECTION4_PEBBLE_SPIN, SECTION4_PEBBLE_WOBBLE } from '../config.js';
 // NEW: Import ScrollSmoother performance monitoring
 import { startPerformanceFrame, recordScrollEvent } from '../controls/scrollSynchronizer.js';
 import { pebbleMesh, pebbleGroup, isPebbleReady } from '../objects/pebbleModel.js';
@@ -86,10 +86,23 @@ export function animate() {
     
     // Pebble per-frame rotation: continuous Y spin independent of scroll (when enabled)
     if (pebbleGroup && isPebbleReady && SECTION4_PEBBLE_SPIN?.enabled) {
-        const degPerSec = SECTION4_PEBBLE_SPIN.degPerSecond ?? 24;
+        const degPerSecBase = SECTION4_PEBBLE_SPIN.degPerSecond ?? 24;
+        // Allow a transient boost stored on userData that decays over time
+        const now = Date.now() * 0.001;
+        if (pebbleGroup.userData.spinBoostDegPerSec == null) pebbleGroup.userData.spinBoostDegPerSec = 0;
+        const boost = pebbleGroup.userData.spinBoostDegPerSec;
+        const degPerSec = degPerSecBase + boost;
         const radPerSec = degPerSec * Math.PI / 180;
-        // approximate delta time using frame-to-frame; small and stable enough for this use
         pebbleGroup.rotation.y += radPerSec * 0.016; // ~60fps
+        // decay boost
+        const decay = (SECTION4_PEBBLE_SPIN.boostDecayPerSecond ?? 1.2) * 0.016;
+        pebbleGroup.userData.spinBoostDegPerSec = Math.max(0, boost - decay);
+        // optional X wobble
+        if (SECTION4_PEBBLE_WOBBLE?.enabled) {
+            const amp = (SECTION4_PEBBLE_WOBBLE.xAmplitudeDeg ?? 3) * Math.PI / 180;
+            const freq = SECTION4_PEBBLE_WOBBLE.xFrequencyHz ?? 0.2;
+            pebbleGroup.rotation.x = Math.sin(now * Math.PI * 2 * freq) * amp;
+        }
     }
     
     // Glass refraction rendering with temporal plane and sphere visibility control
