@@ -592,8 +592,8 @@ export const SECTION4_PEBBLE_SPIN = {
     enabled: true,
     degPerSecond: 24,
     // Extra spin impulse when middle items appear
-    boostDegPerSecond: 1080,
-    boostDecayPerSecond: 1.2
+    boostDegPerSecond: 1000,
+    boostDecayPerSecond: 750
 };
 
 // Section 4 pebble rotation behavior
