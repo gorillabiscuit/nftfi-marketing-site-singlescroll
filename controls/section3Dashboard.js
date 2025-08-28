@@ -8,6 +8,7 @@ import { LOOPER_BG } from '../config.js';
 import { SECTION3_ARROWS } from '../config.js';
 import { SECTION3_ARROWS_DEBUG } from '../config.js';
 import { SECTION3_ARROWS_VISIBLE_ZERO } from '../config.js';
+import { SECTION3_ARROWS_ENABLED } from '../config.js';
 // Bundle the dashboard SVG at build time to ensure availability in production
 import dashboardSvg from '../images/dashboard.svg?raw';
 
@@ -327,13 +328,18 @@ export function initSection3Scroll() {
 
     // Initialize arrows overlay BEFORE building sequences that reference it
     try {
-        ensureArrowsOverlay(sectionEl);
-        if (SECTION3_ARROWS_DEBUG === true) {
-            prepareArrowsVisible();
+        if (SECTION3_ARROWS_ENABLED === false) {
+            const existing = sectionEl.querySelector('#section3-arrows');
+            if (existing && existing.parentNode) { try { existing.parentNode.removeChild(existing); } catch (e) { (void e); } }
         } else {
-            prepareArrowsHidden();
+            ensureArrowsOverlay(sectionEl);
+            if (SECTION3_ARROWS_DEBUG === true) {
+                prepareArrowsVisible();
+            } else {
+                prepareArrowsHidden();
+            }
+            updateArrowsGeometry(sectionEl);
         }
-        updateArrowsGeometry(sectionEl);
 
         // Wire test CTA: draw arrow 0 from 0% to 100%, then reveal arrowhead
         try {

@@ -328,6 +328,9 @@ export const SECTION3_ARROWS_DEBUG = true;
 // downward scroll while still allowing draw animation.
 export const SECTION3_ARROWS_VISIBLE_ZERO = true;
 
+// Global toggle to enable/disable Section 3 arrows entirely
+export const SECTION3_ARROWS_ENABLED = false;
+
 // Rectangle cell states for Section 2 (breakpoint-aware)
 // Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern
 
@@ -616,7 +619,7 @@ export const SECTION4_TIMINGS = {
     h2FadeIn: 0.5,
     h2Show: 1,
     h2FadeOut: 0.5,
-    periodB: 1, // after h2 fade-out
+    periodB: .25, // after h2 fade-out
     pebbleIn: 2,
     periodC: 4, // before list begins
     // panel items (title+body per item)
