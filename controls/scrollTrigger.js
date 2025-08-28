@@ -236,14 +236,20 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
         const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE.desktop;
         const t = SECTION4_TIMINGS; let cursor = (title && title._s4CursorAfterTitle) ? title._s4CursorAfterTitle : 0.4;
+        // After title fade-out, wait period, then animate pebble in, then another period, then first item
         cursor += (t.periodB ?? 0.05);
         // pebble animates in
         tl.to(pebbleGroup.position, { y: 0 + (pcfg.position?.y ?? 0), x: (pcfg.position?.x ?? -3.5), z: (pcfg.position?.z ?? 0), ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
         // scale relative: multiply baseline by factor; using additive on each axis
         const s = (pcfg.scale ?? 1.75) - 1.0;
         tl.to(pebbleGroup.scale, { x: `+=${s}`, y: `+=${s}`, z: `+=${s}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
+        // Y-axis full spin during entrance
+        try {
+            const spinTurns = (SECTION4_PEBBLE_ROTATION?.ySpinTurns ?? 1);
+            tl.to(pebbleGroup.rotation, { y: `+=${spinTurns * Math.PI * 2}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
+        } catch (_) { void 0; }
         cursor += (t.pebbleIn ?? 0.20);
-        // before list begins
+        // hold after entrance before first item begins
         cursor += (t.periodC ?? 0.05);
         // list items appear sequentially
         const items = Array.from(document.querySelectorAll('.section4-list li'));
@@ -300,6 +306,39 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             tl.to([itemTitleEl, itemBodyEl], { opacity: 0, y: 10, filter: 'blur(6px)', ease: 'power2.in', duration: (t.itemFadeOut ?? 0.8) }, cursor);
             cursor += (t.itemFadeOut ?? 0.8) + (t.periodBetweenItems ?? 0.4);
         });
+
+        // After the first item starts, begin sinusoidal idle rotation that continues during content phases
+        tl.add(() => {
+            try {
+                const cfg = SECTION4_PEBBLE_ROTATION?.sin;
+                if (!cfg) return;
+                const xAmp = (cfg.xAmplitudeDeg ?? 8) * Math.PI / 180;
+                const yAmp = (cfg.yAmplitudeDeg ?? 6) * Math.PI / 180;
+                const xFreq = cfg.xFrequency ?? 1.25;
+                const yFreq = cfg.yFrequency ?? 0.9;
+                const phase = cfg.phaseOffset ?? 0;
+                // Drive via onUpdate proxy tied to rest of timeline
+                const rotProxy = { t: 0 };
+                const remain = Math.max(0.001, tl.totalDuration() - tl.time());
+                tl.to(rotProxy, {
+                    t: 1,
+                    duration: remain,
+                    ease: 'none',
+                    onUpdate: () => {
+                        const p = tl.progress();
+                        // p spans 0..1 over the whole section; use mapped phase for nice motion
+                        const xr = Math.sin(p * Math.PI * 2 * xFreq) * xAmp;
+                        const yr = Math.sin(p * Math.PI * 2 * yFreq + phase) * yAmp;
+                        try {
+                            pebbleGroup.rotation.x = xr;
+                            // preserve cumulative y from spin plus sinusoidal wobble around it
+                            pebbleGroup.rotation.y += (yr - (pebbleGroup.userData.__lastYR || 0));
+                            pebbleGroup.userData.__lastYR = yr;
+                        } catch (_) { void 0; }
+                    }
+                }, cursor);
+            } catch (_) { void 0; }
+        }, cursor);
     } catch (_) { void 0; }
 
     // Create ScrollTrigger bound to this timeline with end based on timeline totalDuration

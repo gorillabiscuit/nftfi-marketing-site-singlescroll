@@ -590,6 +590,20 @@ export const SECTION4_PEBBLE = {
     }
 };
 
+// Section 4 pebble rotation behavior
+// ySpinTurns: number of full 360° spins during the entrance
+// sin: sinusoidal follow-on rotations after entrance (radians are computed from degrees here)
+export const SECTION4_PEBBLE_ROTATION = {
+    ySpinTurns: 1,
+    sin: {
+        xAmplitudeDeg: 8,   // peak amplitude in degrees for X axis
+        yAmplitudeDeg: 6,   // peak amplitude in degrees for Y axis
+        xFrequency: 1.25,   // cycles across the post-entrance portion of the timeline
+        yFrequency: 0.9,    // cycles across the post-entrance portion of the timeline
+        phaseOffset: 0      // radians offset for Y
+    }
+};
+
 // Section 4 timeline timings (fractions of pinned timeline 0..1 or seconds if needed)
 export const SECTION4_TIMINGS = {
     // Use normalized fractions of the pinned duration (0..1)
