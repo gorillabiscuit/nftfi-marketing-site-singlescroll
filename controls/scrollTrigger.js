@@ -304,13 +304,27 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                 onStart: () => {
                     try {
                         // middle items only (skip first and last)
-                        if (!(idx > 0 && idx < s4Items.length - 1)) return;
+                        if (!(idx > 0 && idx < s4Items.length - 1)) {
+                            console.log('[S4] kick skipped (first/last item)', { idx });
+                            return;
+                        }
                         if (!pebbleGroup.userData) pebbleGroup.userData = {};
                         if (!pebbleGroup.userData.__boosted) pebbleGroup.userData.__boosted = {};
-                        if (pebbleGroup.userData.__boosted[idx]) return; // fire once per item index
+                        if (pebbleGroup.userData.__boosted[idx]) {
+                            console.log('[S4] kick already applied for item', { idx });
+                            return; // fire once per item index
+                        }
                         const add = (SECTION4_PEBBLE_SPIN?.boostDegPerSecond ?? 180);
                         pebbleGroup.userData.spinBoostDegPerSec = (pebbleGroup.userData.spinBoostDegPerSec || 0) + add;
                         pebbleGroup.userData.__boosted[idx] = true;
+                        const titleTxt = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
+                        console.log('[S4] kick fired', {
+                            idx,
+                            title: titleTxt,
+                            add,
+                            newBoost: pebbleGroup.userData.spinBoostDegPerSec,
+                            tlTime: typeof tl.time === 'function' ? tl.time() : null
+                        });
                     } catch (_) { void 0; }
                 }
             }, cursor);
