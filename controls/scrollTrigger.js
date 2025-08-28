@@ -243,14 +243,11 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         // scale relative: multiply baseline by factor; using additive on each axis
         const s = (pcfg.scale ?? 1.75) - 1.0;
         tl.to(pebbleGroup.scale, { x: `+=${s}`, y: `+=${s}`, z: `+=${s}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
-        // Y-axis full spin during entrance
-        try {
-            const spinTurns = (SECTION4_PEBBLE_ROTATION?.ySpinTurns ?? 1);
-            tl.to(pebbleGroup.rotation, { y: `+=${spinTurns * Math.PI * 2}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
-        } catch (_) { void 0; }
         cursor += (t.pebbleIn ?? 0.20);
         // hold after entrance before first item begins
         cursor += (t.periodC ?? 0.05);
+        // mark the start time for continuous Y spin
+        const spinStart = cursor;
         // list items appear sequentially
         const items = Array.from(document.querySelectorAll('.section4-list li'));
         if (items.length) {
@@ -307,7 +304,13 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             cursor += (t.itemFadeOut ?? 0.8) + (t.periodBetweenItems ?? 0.4);
         });
 
-        // Note: Idle sinusoidal rotation disabled per request; only a single 360° Y spin on entrance remains
+        // Continuous Y spin over the remaining timeline (scrubbed)
+        try {
+            const total = tl.totalDuration();
+            const remain = Math.max(0.001, total - spinStart);
+            // one full revolution across the remaining timeline
+            tl.to(pebbleGroup.rotation, { y: "+=" + (Math.PI * 2), ease: 'none', duration: remain }, spinStart);
+        } catch (_) { void 0; }
     } catch (_) { void 0; }
 
     // Create ScrollTrigger bound to this timeline with end based on timeline totalDuration
