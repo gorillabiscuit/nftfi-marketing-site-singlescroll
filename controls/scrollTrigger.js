@@ -407,7 +407,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         },
         onLeaveBack: () => { 
             gsap.set(pebbleGroup, { visible: false }); 
-            // Switch back to hero texture when leaving Section 4
+            // Switch back to original pebble video when leaving Section 4
             switchToHeroTexture();
         },
         onLeave: () => {

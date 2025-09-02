@@ -138,8 +138,15 @@ export function initializeVideoTextures() {
  * Switch to video texture for the specified asset category
  */
 export function switchToVideoTexture(category) {
-    if (!isVideoSystemInitialized || !backgroundPlane) {
-        console.warn('[Video] System not initialized or plane not available');
+    if (!isVideoSystemInitialized) {
+        console.warn('[Video] System not initialized');
+        return;
+    }
+    
+    // Target the round pebble mesh (plane inside the glass pebble)
+    const roundPebbleMesh = window.ROUND_PEBBLE?.roundPebbleMesh;
+    if (!roundPebbleMesh || !roundPebbleMesh.material) {
+        console.warn('[Video] Round pebble mesh not available');
         return;
     }
     
@@ -154,13 +161,14 @@ export function switchToVideoTexture(category) {
         currentVideoTexture.video.pause();
     }
     
-    // Switch to new video texture
-    if (backgroundPlane.material.map) {
-        backgroundPlane.material.map.dispose();
+    // Switch to new video texture on the round pebble's material
+    if (roundPebbleMesh.material.map) {
+        // Don't dispose - might be shared
+        // roundPebbleMesh.material.map.dispose();
     }
     
-    backgroundPlane.material.map = videoData.texture;
-    backgroundPlane.material.needsUpdate = true;
+    roundPebbleMesh.material.map = videoData.texture;
+    roundPebbleMesh.material.needsUpdate = true;
     currentVideoTexture = videoData;
     
     // Start playing the video
@@ -172,7 +180,7 @@ export function switchToVideoTexture(category) {
 }
 
 /**
- * Switch back to the original hero texture (stop video playback)
+ * Switch back to the original video (stop category video playback)
  */
 export function switchToHeroTexture() {
     if (currentVideoTexture && currentVideoTexture.video) {
@@ -180,20 +188,56 @@ export function switchToHeroTexture() {
         currentVideoTexture = null;
     }
     
-    // Re-capture hero and apply as texture
-    captureHeroAsTexture().then(texture => {
-        if (backgroundPlane && backgroundPlane.material) {
-            if (backgroundPlane.material.map) {
-                backgroundPlane.material.map.dispose();
-            }
-            backgroundPlane.material.map = texture;
-            backgroundPlane.material.needsUpdate = true;
-        }
-    }).catch(error => {
-        console.error('[Video] Failed to switch back to hero texture:', error);
-    });
+    // Target the round pebble mesh (plane inside the glass pebble)
+    const roundPebbleMesh = window.ROUND_PEBBLE?.roundPebbleMesh;
+    if (!roundPebbleMesh || !roundPebbleMesh.material) {
+        console.warn('[Video] Round pebble mesh not available for texture switch');
+        return;
+    }
     
-    console.log('[Video] Switched back to hero texture');
+    // Switch back to the original video (the social_s_y_l_l_o_g_i_s_m... video)
+    // We need to get the original video texture from the round pebble
+    // For now, let's create a function to get/restore the original video
+    restoreOriginalPebbleVideo();
+    
+    console.log('[Video] Switched back to original pebble video');
+}
+
+/**
+ * Restore the original video texture to the round pebble
+ */
+function restoreOriginalPebbleVideo() {
+    // We'll implement this by accessing the original video from roundPebbleModel
+    // For now, let's create a new video element with the original video
+    const roundPebbleMesh = window.ROUND_PEBBLE?.roundPebbleMesh;
+    if (!roundPebbleMesh || !roundPebbleMesh.material) return;
+    
+    // Create the original video element (same as in roundPebbleModel.js)
+    const video = document.createElement('video');
+    const originalVideoUrl = new URL('../images/social_s_y_l_l_o_g_i_s_m_patek_philip_--ar_11_--video_1_c67a8a65-6a8a-4b42-b03c-07c4069a0eca_2.mp4', import.meta.url).href;
+    video.src = originalVideoUrl;
+    video.crossOrigin = 'anonymous';
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    
+    const originalVideoTexture = new THREE.VideoTexture(video);
+    originalVideoTexture.colorSpace = THREE.SRGBColorSpace;
+    originalVideoTexture.minFilter = THREE.LinearFilter;
+    originalVideoTexture.magFilter = THREE.LinearFilter;
+    originalVideoTexture.generateMipmaps = false;
+    
+    // Apply the original video texture
+    roundPebbleMesh.material.map = originalVideoTexture;
+    roundPebbleMesh.material.needsUpdate = true;
+    
+    // Start playing the original video
+    const tryPlay = () => { try { video.play(); } catch (_) { void 0; } };
+    if (video.readyState >= 2) { 
+        tryPlay(); 
+    } else { 
+        video.addEventListener('canplay', tryPlay, { once: true }); 
+    }
 }
 
 /**
