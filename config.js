@@ -664,7 +664,7 @@ export const SECTION5_CONFIG = {
     initialOffsetMultiplier: 0.5, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
     
     // Exit offset distance control (single value for synchronized unpinning)
-    exitOffsetMultiplier: 1.0, // Controls how far off-screen tiles must travel before unpinning (0.5 = unpin sooner, 2.0 = unpin later)
+    exitOffsetMultiplier: 0.5, // Controls how far off-screen tiles must travel before unpinning (0.5 = unpin sooner, 2.0 = unpin later)
     
     // Travel distance multipliers for fine-tuning synchronization
     travelMultipliers: {
@@ -676,5 +676,13 @@ export const SECTION5_CONFIG = {
     startPositions: {
         topRow: 'right',    // Start off-screen: 'left' or 'right'
         bottomRow: 'left'   // Start off-screen: 'left' or 'right'
+    },
+    
+    // Title animation timings (matches Section 4 pattern)
+    titleTimings: {
+        periodA: 0.5,      // Initial delay before title appears
+        h2FadeIn: 0.5,     // Title fade in duration  
+        h2Show: 1.0,       // How long title stays visible
+        h2FadeOut: 0.5     // Title fade out duration
     }
 };

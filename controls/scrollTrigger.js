@@ -1769,6 +1769,48 @@ export function setupSection5HorizontalScroll() {
     // Create pure scrubbed timeline (no fixed tweens, no function calls)
     const tl = gsap.timeline();
     
+    // Add Section 4-style title animation
+    const title = section5El.querySelector('.section5-title');
+    if (title) {
+        const t = config.titleTimings;
+        let cursor = 0;
+        
+        // Initial period
+        cursor += (t.periodA ?? 0.5);
+        
+        // Title fade in (same as Section 4)
+        tl.from(title, { 
+            blur: 15, 
+            alpha: 0.0, 
+            scale: 0.95, 
+            ease: 'power2.inOut', 
+            duration: (t.h2FadeIn ?? 0.5) 
+        }, cursor);
+        cursor += (t.h2FadeIn ?? 0.5);
+        
+        // Title show period
+        tl.to(title, { opacity: 1, duration: 0.001 }, cursor);
+        cursor += (t.h2Show ?? 1.0);
+        
+        // Title fade out
+        tl.to(title, { 
+            opacity: 0, 
+            ease: 'power2.in', 
+            duration: (t.h2FadeOut ?? 0.5) 
+        }, cursor);
+        cursor += (t.h2FadeOut ?? 0.5);
+        
+        // Store cursor position for tile animations to start after title
+        title._s5CursorAfterTitle = cursor;
+        
+        console.log('[Section5] Title animation added:', {
+            fadeInAt: (t.periodA ?? 0.5),
+            showDuration: (t.h2Show ?? 1.0),
+            fadeOutAt: cursor - (t.h2FadeOut ?? 0.5),
+            tilesStartAt: cursor
+        });
+    }
+    
     // Calculate initial and final positions based on config
     const getPositions = () => {
         const { topTravelDistance, bottomTravelDistance } = calculateTravelDistances();
@@ -1803,18 +1845,21 @@ export function setupSection5HorizontalScroll() {
     // Pure scrubbed animations - no function calls, no fixed tweens
     const positions = getPositions();
     
-    // Top row: scroll-driven horizontal movement
+    // Calculate when tile animations should start (after title sequence)
+    const tilesStartTime = title && title._s5CursorAfterTitle ? title._s5CursorAfterTitle : 0;
+    
+    // Top row: scroll-driven horizontal movement (starts after title)
     tl.fromTo(topRow, 
         { x: () => positions.topStart },
-        { x: () => positions.topEnd, ease: 'none', duration: 1 },
-        0
+        { x: () => positions.topEnd, ease: 'none', duration: 3 }, // Longer duration for smooth scroll
+        tilesStartTime
     );
     
-    // Bottom row: scroll-driven horizontal movement (synchronized)
+    // Bottom row: scroll-driven horizontal movement (synchronized with top row)
     tl.fromTo(bottomRow,
         { x: () => positions.bottomStart },
-        { x: () => positions.bottomEnd, ease: 'none', duration: 1 },
-        0
+        { x: () => positions.bottomEnd, ease: 'none', duration: 3 }, // Same duration for sync
+        tilesStartTime
     );
 
     // Create ScrollTrigger with config-driven scroll speed
