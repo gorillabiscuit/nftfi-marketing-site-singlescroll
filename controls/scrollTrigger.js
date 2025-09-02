@@ -287,12 +287,20 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         const t = SECTION4_TIMINGS;
         let cursor = (title && title._s4CursorAfterTitle) ? title._s4CursorAfterTitle : 0.4;
         cursor += (t.periodC ?? 0.2);
+        
+        // Store timeline positions for progress-based content switching
+        const itemPositions = [];
+        
         s4Items.forEach((it, idx) => {
-            // swap content just before animating in
-            tl.add(() => {
-                if (itemTitleEl) itemTitleEl.textContent = it.title;
-                if (itemBodyEl) itemBodyEl.textContent = it.body;
-            }, cursor - 0.001);
+            // Record the timeline position where this item should be active
+            itemPositions.push({
+                startTime: cursor - 0.001,
+                item: it,
+                index: idx
+            });
+            
+            // Remove the problematic tl.add() function call
+            // Content will be managed by progress-based system instead
             // title in (fire spin boost onStart reliably)
             tl.to(itemTitleEl, {
                 opacity: 1,
@@ -326,6 +334,38 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             // fade out both
             tl.to([itemTitleEl, itemBodyEl], { opacity: 0, y: 10, filter: 'blur(6px)', ease: 'power2.in', duration: (t.itemFadeOut ?? 0.8) }, cursor);
             cursor += (t.itemFadeOut ?? 0.8) + (t.periodBetweenItems ?? 0.4);
+        });
+        
+        // Add progress-based content management to handle bidirectional scrubbing
+        let lastActiveIndex = -1;
+        tl.eventCallback('onUpdate', () => {
+            const currentTime = tl.time();
+            const totalDuration = tl.totalDuration();
+            
+            // Find which item should be active based on timeline progress
+            let activeIndex = -1;
+            for (let i = itemPositions.length - 1; i >= 0; i--) {
+                if (currentTime >= itemPositions[i].startTime) {
+                    activeIndex = i;
+                    break;
+                }
+            }
+            
+            // Only update content when the active item changes
+            if (activeIndex !== lastActiveIndex && activeIndex >= 0) {
+                const activeItem = itemPositions[activeIndex].item;
+                if (itemTitleEl) itemTitleEl.textContent = activeItem.title;
+                if (itemBodyEl) itemBodyEl.textContent = activeItem.body;
+                lastActiveIndex = activeIndex;
+                
+                // Debug logging to track content changes
+                console.log('[S4] Content updated:', {
+                    index: activeIndex,
+                    title: activeItem.title,
+                    time: currentTime.toFixed(3),
+                    progress: (currentTime / totalDuration * 100).toFixed(1) + '%'
+                });
+            }
         });
 
         // Note: continuous spin handled per-frame (not scrubbed) in core/loop.js
