@@ -625,7 +625,7 @@ export const SECTION4_TIMINGS = {
     // panel items (title+body per item)
     itemTitleIn: 1.0,
     itemBodyIn: 1.0,
-    itemHold: 2.2,
+    itemHold: 1.2,
     itemFadeOut: 0.8,
     periodBetweenItems: 0.6
 };
@@ -647,11 +647,11 @@ export const SECTION5_CONFIG = {
     // Row positioning (CSS transform values)
     topRowPosition: {
         x: 0,     // Horizontal offset from center
-        y: '-3rem' // Vertical offset (above center)
+        y: '-1rem' // Vertical offset (above center)
     },
     bottomRowPosition: {
         x: 0,     // Horizontal offset from center  
-        y: '3rem' // Vertical offset (below center)
+        y: '5rem' // Vertical offset (below center)
     },
     
     // Animation behavior
@@ -661,7 +661,10 @@ export const SECTION5_CONFIG = {
     },
     
     // Initial offset distance control (single value for synchronized appearance)
-    initialOffsetMultiplier: 1.0, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
+    initialOffsetMultiplier: 0.5, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
+    
+    // Exit offset distance control (single value for synchronized unpinning)
+    exitOffsetMultiplier: 1.0, // Controls how far off-screen tiles must travel before unpinning (0.5 = unpin sooner, 2.0 = unpin later)
     
     // Travel distance multipliers for fine-tuning synchronization
     travelMultipliers: {

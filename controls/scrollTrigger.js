@@ -1781,16 +1781,20 @@ export function setupSection5HorizontalScroll() {
         const topStart = config.startPositions.topRow === 'right' ? adjustedTopDistance : -adjustedTopDistance;
         const bottomStart = config.startPositions.bottomRow === 'left' ? -adjustedBottomDistance : adjustedBottomDistance;
         
-        // Ending positions based on scroll direction (using full travel distance for complete exit)
-        const topEnd = config.scrollDirection.topRow === 'left' ? -topTravelDistance : topTravelDistance;
-        const bottomEnd = config.scrollDirection.bottomRow === 'right' ? bottomTravelDistance : -bottomTravelDistance;
+        // Ending positions based on scroll direction (using exit offset multiplier)
+        const adjustedTopExitDistance = topTravelDistance * config.exitOffsetMultiplier;
+        const adjustedBottomExitDistance = bottomTravelDistance * config.exitOffsetMultiplier;
+        
+        const topEnd = config.scrollDirection.topRow === 'left' ? -adjustedTopExitDistance : adjustedTopExitDistance;
+        const bottomEnd = config.scrollDirection.bottomRow === 'right' ? adjustedBottomExitDistance : -adjustedBottomExitDistance;
         
         console.log('[Section5] Calculated positions:', {
             topStart: topStart.toFixed(0) + 'px',
             bottomStart: bottomStart.toFixed(0) + 'px',
             topEnd: topEnd.toFixed(0) + 'px',
             bottomEnd: bottomEnd.toFixed(0) + 'px',
-            offsetMultiplier: config.initialOffsetMultiplier
+            initialOffsetMultiplier: config.initialOffsetMultiplier,
+            exitOffsetMultiplier: config.exitOffsetMultiplier
         });
         
         return { topStart, bottomStart, topEnd, bottomEnd };
