@@ -69,6 +69,133 @@ function calculateCorrectScaleForScroll() {
 // Global reference
 export let backgroundPlane = null;
 
+// Video texture system for Section 4 asset categories
+let videoTextures = {};
+let currentVideoTexture = null;
+let isVideoSystemInitialized = false;
+
+/**
+ * Initialize video textures for Section 4 asset categories
+ */
+export function initializeVideoTextures() {
+    if (isVideoSystemInitialized) return Promise.resolve();
+    
+    const videoMap = {
+        'Digital Art': 'Art.mp4',
+        'PFPs': 'PFP.mp4', 
+        'Real-World Assets (RWAs)': 'RWA.mp4',
+        'DeFi tokens': 'token.mp4'
+    };
+    
+    const loadPromises = Object.entries(videoMap).map(([category, filename]) => {
+        return new Promise((resolve, reject) => {
+            const video = document.createElement('video');
+            video.crossOrigin = 'anonymous';
+            video.loop = true;
+            video.muted = true;
+            video.playsInline = true;
+            
+            // Use Vite asset URL to ensure it works in both dev and production
+            const videoUrl = new URL(`../images/${filename}`, import.meta.url).href;
+            video.src = videoUrl;
+            
+            video.onloadeddata = () => {
+                // Create Three.js video texture
+                const texture = new THREE.VideoTexture(video);
+                texture.needsUpdate = true;
+                texture.minFilter = THREE.LinearFilter;
+                texture.magFilter = THREE.LinearFilter;
+                
+                videoTextures[category] = {
+                    video: video,
+                    texture: texture
+                };
+                
+                console.log(`[Video] Loaded texture for ${category}:`, filename);
+                resolve();
+            };
+            
+            video.onerror = (error) => {
+                console.error(`[Video] Failed to load ${filename}:`, error);
+                reject(error);
+            };
+            
+            // Start loading
+            video.load();
+        });
+    });
+    
+    return Promise.all(loadPromises).then(() => {
+        isVideoSystemInitialized = true;
+        console.log('[Video] All video textures initialized:', Object.keys(videoTextures));
+    }).catch(error => {
+        console.error('[Video] Failed to initialize some video textures:', error);
+        isVideoSystemInitialized = true; // Continue anyway
+    });
+}
+
+/**
+ * Switch to video texture for the specified asset category
+ */
+export function switchToVideoTexture(category) {
+    if (!isVideoSystemInitialized || !backgroundPlane) {
+        console.warn('[Video] System not initialized or plane not available');
+        return;
+    }
+    
+    const videoData = videoTextures[category];
+    if (!videoData) {
+        console.warn(`[Video] No video texture found for category: ${category}`);
+        return;
+    }
+    
+    // Stop current video if playing
+    if (currentVideoTexture && currentVideoTexture.video) {
+        currentVideoTexture.video.pause();
+    }
+    
+    // Switch to new video texture
+    if (backgroundPlane.material.map) {
+        backgroundPlane.material.map.dispose();
+    }
+    
+    backgroundPlane.material.map = videoData.texture;
+    backgroundPlane.material.needsUpdate = true;
+    currentVideoTexture = videoData;
+    
+    // Start playing the video
+    videoData.video.play().catch(error => {
+        console.warn(`[Video] Failed to play video for ${category}:`, error);
+    });
+    
+    console.log(`[Video] Switched to video texture: ${category}`);
+}
+
+/**
+ * Switch back to the original hero texture (stop video playback)
+ */
+export function switchToHeroTexture() {
+    if (currentVideoTexture && currentVideoTexture.video) {
+        currentVideoTexture.video.pause();
+        currentVideoTexture = null;
+    }
+    
+    // Re-capture hero and apply as texture
+    captureHeroAsTexture().then(texture => {
+        if (backgroundPlane && backgroundPlane.material) {
+            if (backgroundPlane.material.map) {
+                backgroundPlane.material.map.dispose();
+            }
+            backgroundPlane.material.map = texture;
+            backgroundPlane.material.needsUpdate = true;
+        }
+    }).catch(error => {
+        console.error('[Video] Failed to switch back to hero texture:', error);
+    });
+    
+    console.log('[Video] Switched back to hero texture');
+}
+
 /**
  * Capture hero div and create dynamic texture
  */

@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
-import { updatePlaneTextureForSection, setupSectionPreCapture } from '../objects/backgroundPlane.js';
+import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
 // Blur plugin registration for GSAP
 (function () {
     const blurProperty = gsap.utils.checkPrefix("filter"),
@@ -365,6 +365,12 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                 const activeItem = s4Items[activeIndex];
                 if (itemTitleEl && activeItem) itemTitleEl.textContent = activeItem.title;
                 if (itemBodyEl && activeItem) itemBodyEl.textContent = activeItem.body;
+                
+                // Switch to corresponding video texture when pebble spins fast
+                if (activeItem && activeItem.title) {
+                    switchToVideoTexture(activeItem.title);
+                }
+                
                 lastActiveIndex = activeIndex;
                 
                 // Debug logging to track content changes (can be removed for production)
@@ -399,7 +405,15 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
             try { /* no capture on enterBack */ } catch (_) { void 0; }
             gsap.set(pebbleGroup, { visible: true });
         },
-        onLeaveBack: () => { gsap.set(pebbleGroup, { visible: false }); }
+        onLeaveBack: () => { 
+            gsap.set(pebbleGroup, { visible: false }); 
+            // Switch back to hero texture when leaving Section 4
+            switchToHeroTexture();
+        },
+        onLeave: () => {
+            // Also switch back when leaving forward (going to Section 5)
+            switchToHeroTexture();
+        }
     });
 
     // Defensive: refresh ScrollTrigger after layout settles to ensure pin engages
