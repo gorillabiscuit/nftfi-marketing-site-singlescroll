@@ -446,7 +446,7 @@ function setupPebbleExitAnimation(pebbleGroup) {
             
             // Animate pebble upward with smooth acceleration
             gsap.to(pebbleGroup.position, {
-                y: -25, // Move well above viewport
+                y: 25, // Move well above viewport (positive Y = upward)
                 duration: 1.8,
                 ease: 'power2.in',
                 onComplete: () => {
