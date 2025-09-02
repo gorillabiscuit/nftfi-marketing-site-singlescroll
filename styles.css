@@ -1511,3 +1511,93 @@ a.card:focus {
     transform: translate(20px, -100px) rotate(45deg);
     transform-origin: center center;
 }
+
+/* Section 5 Styles */
+.section[data-section="5"] {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.section5-content {
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 2rem;
+}
+
+.section5-title {
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: #F2F2F2;
+    margin: 0 0 4rem 0;
+    letter-spacing: -0.02em;
+}
+
+.section5-tiles {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+.tiles-row {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.tile {
+    width: 120px;
+    height: 120px;
+    background-color: rgba(242, 242, 242, 0.15);
+    border: 1px solid rgba(242, 242, 242, 0.2);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.tile:hover {
+    background-color: rgba(242, 242, 242, 0.25);
+    border-color: rgba(242, 242, 242, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .section5-title {
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .tile {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .tiles-row {
+        gap: 1rem;
+    }
+    
+    .section5-tiles {
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .section5-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .tile {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .tiles-row {
+        gap: 0.8rem;
+    }
+}
