@@ -1572,6 +1572,14 @@ a.card:focus {
     font-weight: 500;
     color: #F2F2F2;
     font-family: 'Roboto Mono', monospace;
+    flex-shrink: 0; /* Prevent tiles from shrinking during animation */
+}
+
+/* Bottom row tiles are 30% smaller */
+.tiles-row-2 .tile {
+    width: 126px; /* 30% smaller: 180px * 0.7 = 126px */
+    height: 126px;
+    font-size: 1.6rem; /* Proportionally smaller font */
 }
 
 .tile:hover {

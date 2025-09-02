@@ -8,7 +8,7 @@ import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.
 import { loadPebbleModel, pebbleGroup } from './objects/pebbleModel.js';
 import { loadRoundPebbleModel } from './objects/roundPebbleModel.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane, initializeVideoTextures } from './objects/backgroundPlane.js';
-import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned } from './controls/scrollTrigger.js';
+import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned, setupSection5HorizontalScroll } from './controls/scrollTrigger.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
 import { initHeaderAnimation } from './controls/headerAnimation.js';
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
@@ -126,6 +126,13 @@ function init() {
             try { window.scrollTo(0, 0); } catch (e) { void 0; }
         }
     });
+    
+    // Initialize Section 5 horizontal scroll animation
+    try {
+        setupSection5HorizontalScroll();
+    } catch (e) {
+        console.error('Failed to setup Section 5 animation:', e);
+    }
     
     // Warm-up shaders/materials to avoid first-frame compile hitches near Section 4
     try {

@@ -634,3 +634,28 @@ export const SECTION4_TIMINGS = {
 export const SECTION4_SCROLL = {
     pxPerUnit: 700 // increase to slow down overall scrub speed
 };
+
+// Section 5 horizontal scroll animation configuration
+export const SECTION5_CONFIG = {
+    // Scroll scaling for Section 5: pixels of scroll per second of timeline duration
+    pxPerSecond: 150,
+    
+    // Animation timing
+    entranceDuration: 2.0,    // Time for tiles to enter from off-screen
+    scrollDuration: 8.0,      // Time for horizontal scrolling across screen
+    exitDuration: 2.0,        // Time for tiles to exit off-screen
+    
+    // Tile size configuration
+    topRowScale: 1.0,         // Top row uses full tile size (180px)
+    bottomRowScale: 0.7,      // Bottom row 30% smaller (126px)
+    
+    // Travel distance calculation multipliers
+    // Ensures synchronized completion despite different tile sizes
+    topRowTravelMultiplier: 1.0,
+    bottomRowTravelMultiplier: 0.8, // Slightly less distance for smaller tiles
+    
+    // Animation easing
+    entranceEase: 'power2.out',
+    scrollEase: 'none',       // Linear for smooth scrubbing
+    exitEase: 'power2.in'
+};

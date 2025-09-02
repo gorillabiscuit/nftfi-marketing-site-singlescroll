@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN } from '../config.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG } from '../config.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
 // Blur plugin registration for GSAP
@@ -1707,6 +1707,148 @@ function calculateLineLength() {
     
     // Return the total line length (diagonal + padding)
     return Math.ceil(diagonalDistance + extraPadding);
+}
+
+/**
+ * Setup Section 5 pinned horizontal scroll animation
+ * Top row scrolls left, bottom row scrolls right, synchronized completion
+ */
+export function setupSection5HorizontalScroll() {
+    const section5El = document.querySelector(".section[data-section='5']");
+    if (!section5El) {
+        console.warn('[Section5] Section 5 element not found');
+        return;
+    }
+
+    const topRow = section5El.querySelector('.tiles-row-1');
+    const bottomRow = section5El.querySelector('.tiles-row-2');
+    const topTiles = topRow ? Array.from(topRow.querySelectorAll('.tile')) : [];
+    const bottomTiles = bottomRow ? Array.from(bottomRow.querySelectorAll('.tile')) : [];
+
+    if (!topTiles.length || !bottomTiles.length) {
+        console.warn('[Section5] Tile rows not found');
+        return;
+    }
+
+    console.log('[Section5] Setting up horizontal scroll animation');
+
+    // Calculate travel distances based on viewport and tile configuration
+    const calculateTravelDistances = () => {
+        const viewportWidth = window.innerWidth;
+        const config = SECTION5_CONFIG;
+        
+        // Calculate total width of each row (tiles + gaps)
+        const topTileWidth = 180; // From CSS
+        const bottomTileWidth = 126; // 30% smaller
+        const gapWidth = 32; // 2rem gap from CSS
+        
+        const topRowWidth = (topTileWidth * 12) + (gapWidth * 11);
+        const bottomRowWidth = (bottomTileWidth * 12) + (gapWidth * 11);
+        
+        // Travel distance = viewport width + row width (to fully clear screen)
+        const topTravelDistance = (viewportWidth + topRowWidth) * config.topRowTravelMultiplier;
+        const bottomTravelDistance = (viewportWidth + bottomRowWidth) * config.bottomRowTravelMultiplier;
+        
+        return { topTravelDistance, bottomTravelDistance };
+    };
+
+    // Build timeline following project patterns
+    const tl = gsap.timeline();
+    const config = SECTION5_CONFIG;
+
+    // Phase 1: Initial positioning (off-screen)
+    tl.addLabel('start', 0);
+    
+    // Set initial positions: top row off-screen right, bottom row off-screen left
+    tl.add(() => {
+        const { topTravelDistance, bottomTravelDistance } = calculateTravelDistances();
+        
+        // Top row starts off-screen right
+        gsap.set(topRow, { x: topTravelDistance });
+        
+        // Bottom row starts off-screen left  
+        gsap.set(bottomRow, { x: -bottomTravelDistance });
+        
+        console.log('[Section5] Initial positions set:', {
+            topStart: topTravelDistance,
+            bottomStart: -bottomTravelDistance
+        });
+    }, 'start');
+
+    // Phase 2: Entrance animation (tiles enter viewport)
+    tl.addLabel('entrance', '+=' + (config.entranceDuration * 0.1));
+    
+    tl.to(topRow, {
+        x: () => {
+            const { topTravelDistance } = calculateTravelDistances();
+            return topTravelDistance * 0.3; // Enter 30% into viewport
+        },
+        duration: config.entranceDuration,
+        ease: config.entranceEase
+    }, 'entrance');
+    
+    tl.to(bottomRow, {
+        x: () => {
+            const { bottomTravelDistance } = calculateTravelDistances();
+            return -bottomTravelDistance * 0.3; // Enter 30% into viewport
+        },
+        duration: config.entranceDuration,
+        ease: config.entranceEase
+    }, 'entrance');
+
+    // Phase 3: Synchronized horizontal scrolling
+    tl.addLabel('scroll', '+=' + config.entranceDuration);
+    
+    tl.to(topRow, {
+        x: () => {
+            const { topTravelDistance } = calculateTravelDistances();
+            return -topTravelDistance; // Exit off-screen left
+        },
+        duration: config.scrollDuration,
+        ease: config.scrollEase
+    }, 'scroll');
+    
+    tl.to(bottomRow, {
+        x: () => {
+            const { bottomTravelDistance } = calculateTravelDistances();
+            return bottomTravelDistance; // Exit off-screen right
+        },
+        duration: config.scrollDuration,
+        ease: config.scrollEase
+    }, 'scroll');
+
+    // Create ScrollTrigger with calculated end distance
+    ScrollTrigger.create({
+        trigger: section5El,
+        start: 'top top',
+        end: () => '+=' + Math.round(tl.totalDuration() * config.pxPerSecond),
+        pin: true,
+        scrub: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        animation: tl,
+        markers: false,
+        id: 'section5-horizontal-scroll',
+        onEnter: () => {
+            console.log('[Section5] Animation started');
+        },
+        onLeave: () => {
+            console.log('[Section5] Animation completed - section unpinned');
+        },
+        onEnterBack: () => {
+            console.log('[Section5] Re-entered from below');
+        },
+        onLeaveBack: () => {
+            console.log('[Section5] Left backward to Section 4');
+        }
+    });
+
+    // Refresh ScrollTrigger after setup
+    try {
+        setTimeout(() => { ScrollTrigger.refresh(); }, 100);
+    } catch (_) { void 0; }
+
+    console.log('[Section5] Horizontal scroll animation setup complete');
 }
 
  
