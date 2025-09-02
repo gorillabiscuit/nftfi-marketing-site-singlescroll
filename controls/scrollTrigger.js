@@ -482,12 +482,15 @@ function setupPebbleExitAnimation(pebbleGroup) {
                 ease: 'power2.out'
             });
             
-            // Restore scale
-            const targetScale = (pcfg.scale ?? 1.75);
+            // Restore scale (baseline 2.0 + additional scale from config)
+            const baselineScale = 2.0; // From pebbleModel.js initial scale
+            const additionalScale = (pcfg.scale ?? 1.75) - 1.0; // Same calculation as Section 4 entrance
+            const finalScale = baselineScale + additionalScale;
+            
             gsap.to(pebbleGroup.scale, {
-                x: targetScale,
-                y: targetScale,
-                z: targetScale,
+                x: finalScale,
+                y: finalScale,
+                z: finalScale,
                 duration: 1.2,
                 ease: 'power2.out'
             });
