@@ -403,83 +403,11 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         onEnterBack: () => {
             try { /* no capture on enterBack */ } catch (_) { void 0; }
             gsap.set(pebbleGroup, { visible: true });
-            
-            // Reset pebble position and opacity when re-entering from Section 3
-            try {
-                const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
-                const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE.desktop;
-                
-                // Reset position to proper Section 4 position
-                gsap.set(pebbleGroup.position, { 
-                    y: 0 + (pcfg.position?.y ?? 0), 
-                    x: (pcfg.position?.x ?? -3.5), 
-                    z: (pcfg.position?.z ?? 0) 
-                });
-                
-                // Reset materials opacity
-                const materials = [];
-                pebbleGroup.traverse((obj) => {
-                    if (obj && obj.isMesh && obj.material) {
-                        const mat = obj.material;
-                        if (Array.isArray(mat)) {
-                            mat.forEach((m) => { if (m && !m.isShaderMaterial) materials.push(m); });
-                        } else {
-                            if (!mat.isShaderMaterial) materials.push(mat);
-                        }
-                    }
-                });
-                materials.forEach((m) => { try { m.transparent = true; m.opacity = 1; } catch (_) { void 0; } });
-                
-                console.log('[S4] Pebble reset for re-entry from Section 3');
-            } catch (_) { void 0; }
         },
         onLeaveBack: () => { 
-            // Animate pebble upward and fade out when leaving backward (to Section 3)
-            const exitDuration = 1.2;
-            const exitY = 20; // Move up 20 units
-            
-            // Animate position upward
-            gsap.to(pebbleGroup.position, { 
-                y: `+=${exitY}`, 
-                duration: exitDuration, 
-                ease: 'power2.in' 
-            });
-            
-            // Fade out materials
-            const materials = [];
-            pebbleGroup.traverse((obj) => {
-                if (obj && obj.isMesh && obj.material) {
-                    const mat = obj.material;
-                    if (Array.isArray(mat)) {
-                        mat.forEach((m) => { if (m && !m.isShaderMaterial) materials.push(m); });
-                    } else {
-                        if (!mat.isShaderMaterial) materials.push(mat);
-                    }
-                }
-            });
-            
-            // Fade out via proxy for reliable onUpdate
-            const proxy = { v: 1 };
-            gsap.to(proxy, {
-                v: 0,
-                duration: exitDuration,
-                ease: 'power2.in',
-                onUpdate: () => {
-                    const val = proxy.v;
-                    for (let i = 0; i < materials.length; i += 1) {
-                        const m = materials[i];
-                        if (m && typeof m.opacity === 'number') { m.opacity = val; }
-                    }
-                },
-                onComplete: () => {
-                    gsap.set(pebbleGroup, { visible: false });
-                }
-            });
-            
+            gsap.set(pebbleGroup, { visible: false }); 
             // Switch back to Art.mp4 only when leaving backward (going back to Section 3)
             switchToHeroTexture();
-            
-            console.log('[S4] Pebble exit animation started (upward)');
         },
         onLeave: () => {
             // When leaving forward (going to Section 5), keep the last video playing
@@ -491,6 +419,80 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
     try {
         setTimeout(() => { try { ScrollTrigger.refresh(); } catch (_) { void 0; } }, 100);
     } catch (_) { void 0; }
+    
+    // Add separate ScrollTrigger for pebble exit animation when transitioning to Section 5
+    setupPebbleExitAnimation(pebbleGroup);
+}
+
+/**
+ * Create a dedicated ScrollTrigger for animating the pebble upward when transitioning from Section 4 to Section 5
+ * This is separate from the Section 4 pinned timeline to avoid bidirectional scrubbing issues
+ */
+function setupPebbleExitAnimation(pebbleGroup) {
+    if (!pebbleGroup) return;
+    
+    ScrollTrigger.create({
+        trigger: ".section[data-section='5']",
+        start: 'top bottom', // When Section 5 starts entering viewport from bottom
+        end: 'top center',   // Until Section 5 reaches center of viewport
+        markers: false,
+        id: 'pebble-exit-animation',
+        onEnter: () => {
+            // Only animate upward when scrolling forward (not when coming back from Section 5)
+            console.log('[Pebble Exit] Starting upward animation to Section 5');
+            
+            // Kill any existing pebble position tweens to avoid conflicts
+            try { gsap.killTweensOf(pebbleGroup.position); } catch (_) { void 0; }
+            
+            // Animate pebble upward with smooth acceleration
+            gsap.to(pebbleGroup.position, {
+                y: -25, // Move well above viewport
+                duration: 1.8,
+                ease: 'power2.in',
+                onComplete: () => {
+                    console.log('[Pebble Exit] Upward animation completed');
+                }
+            });
+            
+            // Optional: Add slight scale reduction for depth effect
+            gsap.to(pebbleGroup.scale, {
+                x: '-=0.3',
+                y: '-=0.3', 
+                z: '-=0.3',
+                duration: 1.8,
+                ease: 'power2.in'
+            });
+        },
+        onLeaveBack: () => {
+            // When scrolling back from Section 5 to Section 4, restore pebble position
+            console.log('[Pebble Exit] Restoring pebble position from Section 5 back to Section 4');
+            
+            try { gsap.killTweensOf([pebbleGroup.position, pebbleGroup.scale]); } catch (_) { void 0; }
+            
+            // Get current breakpoint configuration for proper restoration
+            const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
+            const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE.desktop;
+            
+            // Restore to Section 4 position smoothly
+            gsap.to(pebbleGroup.position, {
+                y: 0 + (pcfg.position?.y ?? 0),
+                x: (pcfg.position?.x ?? -3.5),
+                z: (pcfg.position?.z ?? 0),
+                duration: 1.2,
+                ease: 'power2.out'
+            });
+            
+            // Restore scale
+            const targetScale = (pcfg.scale ?? 1.75);
+            gsap.to(pebbleGroup.scale, {
+                x: targetScale,
+                y: targetScale,
+                z: targetScale,
+                duration: 1.2,
+                ease: 'power2.out'
+            });
+        }
+    });
 }
 
 // Create or recreate the scroll timeline
