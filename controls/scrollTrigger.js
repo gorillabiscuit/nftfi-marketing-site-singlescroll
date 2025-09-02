@@ -268,12 +268,6 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         tl.to(pebbleGroup.scale, { x: '+=0.75', y: '+=0.75', z: '+=0.75', ease: 'none' }, 0.4);
     }
 
-    // Initialize single panel pre-state
-    const itemTitleEl = document.getElementById('section4-item-title');
-    const itemBodyEl = document.getElementById('section4-item-body');
-    if (itemTitleEl) gsap.set(itemTitleEl, { opacity: 0, y: 10, filter: 'blur(6px)' });
-    if (itemBodyEl) gsap.set(itemBodyEl, { opacity: 0, y: 10, filter: 'blur(6px)' });
-
     // Define items (title + body). Placeholder copy per request.
     const s4Items = [
         { title: 'Digital Art', body: 'Unique on-chain artworks — provenance, scarcity, and creator royalties baked-in.' },
@@ -281,6 +275,16 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         { title: 'Real-World Assets (RWAs)', body: 'Tokenized real-world instruments like invoices, treasuries, and real estate cashflows.' },
         { title: 'DeFi tokens', body: 'Liquidity positions and protocol tokens, enabling composable, on-chain finance.' }
     ];
+
+    // Initialize single panel pre-state
+    const itemTitleEl = document.getElementById('section4-item-title');
+    const itemBodyEl = document.getElementById('section4-item-body');
+    if (itemTitleEl) gsap.set(itemTitleEl, { opacity: 0, y: 10, filter: 'blur(6px)' });
+    if (itemBodyEl) gsap.set(itemBodyEl, { opacity: 0, y: 10, filter: 'blur(6px)' });
+    
+    // Initialize content with first item to ensure proper initial state
+    if (itemTitleEl && s4Items[0]) itemTitleEl.textContent = s4Items[0].title;
+    if (itemBodyEl && s4Items[0]) itemBodyEl.textContent = s4Items[0].body;
 
     // For each item: title in (splt-like), body in, hold, fade both out, swap content
     try {
@@ -351,14 +355,19 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                 }
             }
             
-            // Only update content when the active item changes
-            if (activeIndex !== lastActiveIndex && activeIndex >= 0) {
-                const activeItem = itemPositions[activeIndex].item;
-                if (itemTitleEl) itemTitleEl.textContent = activeItem.title;
-                if (itemBodyEl) itemBodyEl.textContent = activeItem.body;
+            // Edge case: if we're before all items, show the first item
+            if (activeIndex === -1 && itemPositions.length > 0) {
+                activeIndex = 0;
+            }
+            
+            // Only update content when the active item changes and we have a valid index
+            if (activeIndex !== lastActiveIndex && activeIndex >= 0 && activeIndex < s4Items.length) {
+                const activeItem = s4Items[activeIndex];
+                if (itemTitleEl && activeItem) itemTitleEl.textContent = activeItem.title;
+                if (itemBodyEl && activeItem) itemBodyEl.textContent = activeItem.body;
                 lastActiveIndex = activeIndex;
                 
-                // Debug logging to track content changes
+                // Debug logging to track content changes (can be removed for production)
                 console.log('[S4] Content updated:', {
                     index: activeIndex,
                     title: activeItem.title,
