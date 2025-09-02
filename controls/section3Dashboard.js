@@ -316,6 +316,7 @@ export function initSection3Scroll() {
     try {
         gsap.set('.section3-features .features-title', { opacity: 0 });
         gsap.set('.section3-features .feature-block', { opacity: 0 });
+        gsap.set('.section3-features .feature-cta', { opacity: 0, y: 20, scale: 0.9 });
     } catch (_) { void 0; }
 
     // Timeline structure with labels
@@ -826,6 +827,23 @@ function addPerIdDetailSequences(tl, targets) {
         // Advance cursor past this group plus gap
         cursor = groupEnd + groupGap;
     }
+
+    // After all feature blocks have been revealed, show the CTA button
+    try {
+        // Add some delay after the last feature block/arrow animation
+        const ctaDelay = 1.0; // 1 second delay after last feature
+        const ctaStartTime = cursor + ctaDelay;
+        
+        tl.to('.section3-features .feature-cta', {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            ease: 'back.out(1.7)'
+        }, 'intro+=' + ctaStartTime.toFixed(3));
+        
+        console.log('[Section3Dashboard] CTA button scheduled at:', ctaStartTime.toFixed(3));
+    } catch (_) { void 0; }
 
     // Bubbles were scheduled immediately after boxes; nothing to do here
 }
