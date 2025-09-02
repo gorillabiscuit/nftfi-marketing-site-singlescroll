@@ -638,7 +638,7 @@ export const SECTION4_SCROLL = {
 // Section 5 horizontal scroll animation configuration
 export const SECTION5_CONFIG = {
     // Scroll speed control (pixels of scroll per second of timeline duration)
-    scrollSpeed: 200, // Adjustable: higher = faster scroll, lower = slower scroll
+    scrollSpeed: 10000, // Adjustable: higher = faster scroll, lower = slower scroll
     
     // Tile size configuration (base sizes in pixels)
     topRowTileSize: 180,      // Top row tile size
@@ -659,6 +659,9 @@ export const SECTION5_CONFIG = {
         topRow: 'left',    // 'left' or 'right'
         bottomRow: 'right' // 'left' or 'right'
     },
+    
+    // Initial offset distance control (single value for synchronized appearance)
+    initialOffsetMultiplier: 1.0, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
     
     // Travel distance multipliers for fine-tuning synchronization
     travelMultipliers: {

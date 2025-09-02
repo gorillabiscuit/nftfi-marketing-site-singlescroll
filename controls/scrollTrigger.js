@@ -1773,13 +1773,25 @@ export function setupSection5HorizontalScroll() {
     const getPositions = () => {
         const { topTravelDistance, bottomTravelDistance } = calculateTravelDistances();
         
-        // Starting positions based on config
-        const topStart = config.startPositions.topRow === 'right' ? topTravelDistance : -topTravelDistance;
-        const bottomStart = config.startPositions.bottomRow === 'left' ? -bottomTravelDistance : bottomTravelDistance;
+        // Apply synchronized initial offset multiplier to both rows
+        const adjustedTopDistance = topTravelDistance * config.initialOffsetMultiplier;
+        const adjustedBottomDistance = bottomTravelDistance * config.initialOffsetMultiplier;
         
-        // Ending positions based on scroll direction
+        // Starting positions based on config (using synchronized offset)
+        const topStart = config.startPositions.topRow === 'right' ? adjustedTopDistance : -adjustedTopDistance;
+        const bottomStart = config.startPositions.bottomRow === 'left' ? -adjustedBottomDistance : adjustedBottomDistance;
+        
+        // Ending positions based on scroll direction (using full travel distance for complete exit)
         const topEnd = config.scrollDirection.topRow === 'left' ? -topTravelDistance : topTravelDistance;
         const bottomEnd = config.scrollDirection.bottomRow === 'right' ? bottomTravelDistance : -bottomTravelDistance;
+        
+        console.log('[Section5] Calculated positions:', {
+            topStart: topStart.toFixed(0) + 'px',
+            bottomStart: bottomStart.toFixed(0) + 'px',
+            topEnd: topEnd.toFixed(0) + 'px',
+            bottomEnd: bottomEnd.toFixed(0) + 'px',
+            offsetMultiplier: config.initialOffsetMultiplier
+        });
         
         return { topStart, bottomStart, topEnd, bottomEnd };
     };
