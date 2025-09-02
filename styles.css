@@ -1519,6 +1519,7 @@ a.card:focus {
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden; /* Hide overflow to prevent horizontal scrollbars */
 }
 
 .section5-content {
@@ -1553,7 +1554,8 @@ a.card:focus {
     display: flex;
     gap: 2rem; /* Increased gap between tiles */
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Prevent wrapping - keep single row even if off-screen */
+    overflow-x: visible; /* Allow tiles to extend beyond screen edges */
 }
 
 .tile {
