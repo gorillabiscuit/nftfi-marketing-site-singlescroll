@@ -253,7 +253,7 @@ export const LOOPER_BG = {
         yPercent: -50
     },
     desktop: {
-        width: 680,
+        width: 750,
         height: 620,
         left: '50%',
         top: '50%',
@@ -561,7 +561,7 @@ export const PLANE_CONFIG = {
 export const SECTION4_LAYOUT = {
     desktop: {
         title: { x: '0%', y: '0%' },
-        panel: { x: '80%', y: '0%' }
+        panel: { x: '60%', y: '0%' }
     },
     tablet: {
         title: { x: '0%', y: '0%' },

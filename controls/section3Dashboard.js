@@ -834,7 +834,7 @@ function addPerIdDetailSequences(tl, targets) {
         const ctaDelay = 1.0; // 1 second delay after last feature
         const ctaStartTime = cursor + ctaDelay;
         const ctaDuration = 0.6; // Duration of button animation
-        const ctaPause = 2.5; // Pause after button appears (2.5 seconds)
+        const ctaPause = 5.5; // Pause after button appears (2.5 seconds)
         
         tl.to('.section3-features .feature-cta', {
             opacity: 1,
