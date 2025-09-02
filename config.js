@@ -637,25 +637,38 @@ export const SECTION4_SCROLL = {
 
 // Section 5 horizontal scroll animation configuration
 export const SECTION5_CONFIG = {
-    // Scroll scaling for Section 5: pixels of scroll per second of timeline duration
-    pxPerSecond: 150,
+    // Scroll speed control (pixels of scroll per second of timeline duration)
+    scrollSpeed: 200, // Adjustable: higher = faster scroll, lower = slower scroll
     
-    // Animation timing
-    entranceDuration: 2.0,    // Time for tiles to enter from off-screen
-    scrollDuration: 8.0,      // Time for horizontal scrolling across screen
-    exitDuration: 2.0,        // Time for tiles to exit off-screen
+    // Tile size configuration (base sizes in pixels)
+    topRowTileSize: 180,      // Top row tile size
+    bottomRowTileSize: 126,   // Bottom row tile size (30% smaller by default)
     
-    // Tile size configuration
-    topRowScale: 1.0,         // Top row uses full tile size (180px)
-    bottomRowScale: 0.7,      // Bottom row 30% smaller (126px)
+    // Row positioning (CSS transform values)
+    topRowPosition: {
+        x: 0,     // Horizontal offset from center
+        y: '-3rem' // Vertical offset (above center)
+    },
+    bottomRowPosition: {
+        x: 0,     // Horizontal offset from center  
+        y: '3rem' // Vertical offset (below center)
+    },
     
-    // Travel distance calculation multipliers
-    // Ensures synchronized completion despite different tile sizes
-    topRowTravelMultiplier: 1.0,
-    bottomRowTravelMultiplier: 0.8, // Slightly less distance for smaller tiles
+    // Animation behavior
+    scrollDirection: {
+        topRow: 'left',    // 'left' or 'right'
+        bottomRow: 'right' // 'left' or 'right'
+    },
     
-    // Animation easing
-    entranceEase: 'power2.out',
-    scrollEase: 'none',       // Linear for smooth scrubbing
-    exitEase: 'power2.in'
+    // Travel distance multipliers for fine-tuning synchronization
+    travelMultipliers: {
+        topRow: 1.0,    // Multiplier for top row travel distance
+        bottomRow: 1.0  // Multiplier for bottom row travel distance
+    },
+    
+    // Starting positions (where tiles begin off-screen)
+    startPositions: {
+        topRow: 'right',    // Start off-screen: 'left' or 'right'
+        bottomRow: 'left'   // Start off-screen: 'left' or 'right'
+    }
 };
