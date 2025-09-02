@@ -833,16 +833,23 @@ function addPerIdDetailSequences(tl, targets) {
         // Add some delay after the last feature block/arrow animation
         const ctaDelay = 1.0; // 1 second delay after last feature
         const ctaStartTime = cursor + ctaDelay;
+        const ctaDuration = 0.6; // Duration of button animation
+        const ctaPause = 2.5; // Pause after button appears (2.5 seconds)
         
         tl.to('.section3-features .feature-cta', {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.6,
+            duration: ctaDuration,
             ease: 'back.out(1.7)'
         }, 'intro+=' + ctaStartTime.toFixed(3));
         
+        // Add a pause after the button appears to give users time to see/interact with it
+        const pauseStartTime = ctaStartTime + ctaDuration;
+        tl.to({}, { duration: ctaPause }, 'intro+=' + pauseStartTime.toFixed(3));
+        
         console.log('[Section3Dashboard] CTA button scheduled at:', ctaStartTime.toFixed(3));
+        console.log('[Section3Dashboard] CTA pause scheduled at:', pauseStartTime.toFixed(3), 'for', ctaPause, 'seconds');
     } catch (_) { void 0; }
 
     // Bubbles were scheduled immediately after boxes; nothing to do here
