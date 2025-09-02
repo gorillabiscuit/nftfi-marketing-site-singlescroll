@@ -406,12 +406,12 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         },
         onLeaveBack: () => { 
             gsap.set(pebbleGroup, { visible: false }); 
-            // Switch back to original pebble video when leaving Section 4
+            // Switch back to Art.mp4 only when leaving backward (going back to Section 3)
             switchToHeroTexture();
         },
         onLeave: () => {
-            // Also switch back when leaving forward (going to Section 5)
-            switchToHeroTexture();
+            // When leaving forward (going to Section 5), keep the last video playing
+            // Don't call switchToHeroTexture() - maintain current video
         }
     });
 
