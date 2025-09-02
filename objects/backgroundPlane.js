@@ -212,9 +212,9 @@ function restoreOriginalPebbleVideo() {
     const roundPebbleMesh = window.ROUND_PEBBLE?.roundPebbleMesh;
     if (!roundPebbleMesh || !roundPebbleMesh.material) return;
     
-    // Create the original video element (same as in roundPebbleModel.js)
+    // Create the original video element (Art.mp4 - Digital Art category)
     const video = document.createElement('video');
-    const originalVideoUrl = new URL('../images/social_s_y_l_l_o_g_i_s_m_patek_philip_--ar_11_--video_1_c67a8a65-6a8a-4b42-b03c-07c4069a0eca_2.mp4', import.meta.url).href;
+    const originalVideoUrl = new URL('../images/Art.mp4', import.meta.url).href;
     video.src = originalVideoUrl;
     video.crossOrigin = 'anonymous';
     video.muted = true;

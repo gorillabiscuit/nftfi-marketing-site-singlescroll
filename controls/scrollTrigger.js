@@ -313,24 +313,9 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                 rotationY: 0,
                 ease: 'power2.out',
                 duration: (t.itemTitleIn ?? 1.0),
-                onStart: () => {
-                    // Diagnostics to ensure this fires when each item title begins
-                    const titleTxt = (s4Items && s4Items[idx] && s4Items[idx].title) ? s4Items[idx].title : '';
-                    console.log('[S4] title tween onStart', { idx, title: titleTxt, tlTime: typeof tl.time === 'function' ? tl.time() : null });
-                    if (!pebbleGroup) { console.log('[S4] kick abort: pebbleGroup missing'); return; }
-                    if (!pebbleGroup.userData) pebbleGroup.userData = {};
-                    const add = (SECTION4_PEBBLE_SPIN?.boostDegPerSecond ?? 180);
-                    pebbleGroup.userData.spinBoostDegPerSec = (pebbleGroup.userData.spinBoostDegPerSec || 0) + add;
-                    console.log('[S4] kick fired', {
-                        idx,
-                        title: titleTxt,
-                        add,
-                        newBoost: pebbleGroup.userData.spinBoostDegPerSec,
-                        tlTime: typeof tl.time === 'function' ? tl.time() : null
-                    });
-                }
+                // Removed onStart spin boost - now handled in content update callback for bidirectional support
             }, cursor);
-            // Kick is applied directly in onStart above
+            // Pebble spin boost now handled in content update callback for bidirectional support
             // body in after title
             tl.to(itemBodyEl, { opacity: 1, y: 0, filter: 'blur(0px)', ease: 'power2.out', duration: (t.itemBodyIn ?? 1.0) }, cursor + (t.itemTitleIn ?? 1.0) * 0.6);
             // hold
@@ -369,6 +354,20 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
                 // Switch to corresponding video texture when pebble spins fast
                 if (activeItem && activeItem.title) {
                     switchToVideoTexture(activeItem.title);
+                }
+                
+                // Trigger pebble spin boost for EVERY content change (forward AND backward)
+                if (pebbleGroup) {
+                    if (!pebbleGroup.userData) pebbleGroup.userData = {};
+                    const add = (SECTION4_PEBBLE_SPIN?.boostDegPerSecond ?? 180);
+                    pebbleGroup.userData.spinBoostDegPerSec = (pebbleGroup.userData.spinBoostDegPerSec || 0) + add;
+                    console.log('[S4] Pebble spin boost triggered:', {
+                        index: activeIndex,
+                        title: activeItem.title,
+                        direction: activeIndex > lastActiveIndex ? 'forward' : 'backward',
+                        add,
+                        newBoost: pebbleGroup.userData.spinBoostDegPerSec
+                    });
                 }
                 
                 lastActiveIndex = activeIndex;

@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../libs/GLTFLoader.js';
 // Import model via Vite asset handling
 import roundPebbleUrl from '../models/pebble-plane.glb?url';
-// Import video via Vite asset handling (file currently resides in images/)
-import videoUrl from '../images/social_s_y_l_l_o_g_i_s_m_patek_philip_--ar_11_--video_1_c67a8a65-6a8a-4b42-b03c-07c4069a0eca_2.mp4?url';
+// Import default video (Art.mp4 for Digital Art category)
+import videoUrl from '../images/Art.mp4?url';
 
 export let roundPebbleMesh = null;
 export let roundPebbleGroup = null;
