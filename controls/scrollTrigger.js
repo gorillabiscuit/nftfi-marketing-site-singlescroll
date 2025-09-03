@@ -88,48 +88,12 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
     // Force scroll to top to prevent any scroll-based positioning
     window.scrollTo(0, 0);
     
-    // Set flag to prevent ScrollTrigger from updating mesh position until initial GSAP animation is complete
-    window.isInitialLoadComplete = false;
+    // Enable scroll-based positioning immediately (no initial animation blocking)
+    window.isInitialLoadComplete = true;
+    window.scrollScaleActive = true;
     
-    // Create initial animation timeline that ONLY animates mesh scale
-    // This is a regular GSAP animation, NOT a ScrollTrigger animation
-    const initialAnimationTimeline = gsap.timeline()
-        .to(wrapper.scale, {
-            x: () => calculateStartPosition().scale,
-            y: () => calculateStartPosition().scale,
-            z: () => calculateStartPosition().scale,
-            duration: 1.5,
-            ease: "power2.out"
-        })
-        .add(() => {
-            console.log('Initial GSAP scale animation complete - mesh now at START scale', {
-                at: Date.now(),
-                startScale: calculateStartPosition().scale,
-                wrapperScale: wrapper.scale.x
-            });
-            // Enable scroll-based positioning for future scroll interactions
-            window.isInitialLoadComplete = true;
-            // Prevent any other tweens from controlling wrapper.scale from here on
-            window.scrollScaleActive = true;
-            try { gsap.killTweensOf(wrapper.scale); } catch (_) { void 0; }
-            // Create the ScrollTrigger animation now that initial animation is complete
-            createScrollTimeline();
-            // Re-enable scrolling by restoring normal ScrollSmoother effects
-            if (window.smoother) {
-                window.smoother.effects("body", { speed: 1 }); // Normal speed = normal scrolling
-                console.log('ScrollSmoother effects restored - normal scrolling enabled');
-            }
-        });
-    
-    // Prevent scrolling during initial animation while keeping scrollbars visible
-    if (window.smoother) {
-        // Keep scrollbars visible but prevent scrolling
-        window.smoother.effects("body", { speed: 0 }); // Zero speed = no scrolling
-        console.log('ScrollSmoother effects disabled - scrolling prevented during mesh animation');
-    }
-    
-    // Start the initial animation immediately
-    initialAnimationTimeline.play();
+    // Create the ScrollTrigger animation immediately
+    createScrollTimeline();
     
     // Listen for state changes and recreate animation
     onStateChange((newState, oldState) => {

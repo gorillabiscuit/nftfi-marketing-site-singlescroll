@@ -277,38 +277,9 @@ export function captureHeroAsTexture() {
                 //     texture: texture
                 // });
                 
-                // Mark texture as ready and trigger mesh scale animation
+                // Mark texture as ready
                 window.textureReady = true;
-                if (window.wrapper && !window.scrollScaleActive) {
-                    // Calculate correct scale based on current scroll position
-                    calculateCorrectScaleForScroll().then(targetScale => {
-                        // Animate mesh scale from tiny to calculated target scale
-                        gsap.to(window.wrapper.scale, {
-                            x: targetScale,
-                            y: targetScale,
-                            z: targetScale,
-                            duration: 1.5,
-                            ease: "power2.out",
-                            onStart: () => {
-                                console.log('Initial scale animation started with scroll-adjusted scale:', targetScale);
-                                // Fade in canvas and reveal model together to avoid pop
-                                const canvasEl = document.getElementById('three-canvas');
-                                if (canvasEl) {
-                                    gsap.to(canvasEl, { opacity: 1, duration: 0.4, ease: 'power1.out' });
-                                }
-                                if (window.wrapper) window.wrapper.visible = true;
-                            },
-                            onUpdate: () => {
-                                // Ensure scale is applied
-                                window.wrapper.scale.needsUpdate = true;
-                            },
-                            onComplete: () => {
-                                isInitialAnimationComplete = true;
-                                console.log('Initial scale animation completed');
-                            }
-                        });
-                    });
-                }
+                console.log('Texture applied - mesh should be visible');
                 
                 resolve(texture);
             }).catch(error => {
@@ -417,30 +388,7 @@ export function createBackgroundPlane(scene, uniforms) {
         plane.material.needsUpdate = true;
     });
     
-    // Safety timeout to ensure mesh scales up even if html2canvas takes too long
-    setTimeout(() => {
-        if (!window.textureReady && window.wrapper && !window.scrollScaleActive) {
-            window.textureReady = true;
-            import('../utils/viewport.js').then(({ calculateStartPosition }) => {
-                const startPos = calculateStartPosition();
-                const targetScale = startPos.scale || MODEL_CONFIG.startScale;
-                
-                gsap.to(window.wrapper.scale, {
-                    x: targetScale,
-                    y: targetScale,
-                    z: targetScale,
-                    duration: 1.5,
-                    ease: "power2.out"
-                });
-                // Ensure visibility if the capture took too long
-                const canvasEl = document.getElementById('three-canvas');
-                if (canvasEl) {
-                    gsap.to(canvasEl, { opacity: 1, duration: 0.4, ease: 'power1.out' });
-                }
-                if (window.wrapper) window.wrapper.visible = true;
-            });
-        }
-    }, 3000); // 3 second safety timeout
+    // No longer needed - mesh is visible immediately with loading screen
     
     // Add white sphere at the same position as the plane
     const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);

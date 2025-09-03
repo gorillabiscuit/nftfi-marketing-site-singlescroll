@@ -21,14 +21,26 @@ class LoadingManager {
         // Define loading steps
         this.defineLoadingSteps();
         
-        // Prevent scrolling during loading
-        this.preventScrolling();
+        // Initial scroll prevention (body fallback until ScrollSmoother is ready)
+        document.body.style.overflow = 'hidden';
+        document.body.style.height = '100vh';
+        console.log('[Loading] Initial body overflow prevention applied');
         
         // Fallback timeout to ensure loading screen doesn't stay forever
         this.fallbackTimeout = setTimeout(() => {
             console.warn('[Loading] Timeout reached, force completing loading screen');
             this.forceComplete();
-        }, 5000); // 5 second timeout (reduced since we're not waiting for videos)
+        }, 3000); // 3 second timeout - aggressive fallback
+        
+        // Additional immediate fallback for emergencies
+        this.emergencyTimeout = setTimeout(() => {
+            console.error('[Loading] Emergency timeout - forcing scroll capability');
+            this.allowScrolling();
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none';
+            }
+        }, 1500); // 1.5 second emergency timeout
     }
     
     initializeDOMReferences() {
@@ -50,22 +62,50 @@ class LoadingManager {
         this.totalAssets = this.loadingSteps.reduce((sum, step) => sum + step.weight, 0);
     }
     
+    // Switch to ScrollSmoother control once it's initialized
+    switchToScrollSmootherControl() {
+        if (window.smoother && !this.isComplete) {
+            console.log('[Loading] Switching to ScrollSmoother control');
+            // Pause ScrollSmoother to prevent scrolling
+            window.smoother.paused(true);
+            // Restore body since ScrollSmoother is now handling scroll control
+            document.body.style.overflow = '';
+            document.body.style.height = '';
+        }
+    }
+    
     preventScrolling() {
-        document.body.style.overflow = 'hidden';
-        document.body.style.height = '100vh';
+        console.log('[Loading] Preventing scrolling via ScrollSmoother');
+        // Since ScrollSmoother controls scrolling, pause it instead of body overflow
+        if (window.smoother) {
+            window.smoother.paused(true);
+            console.log('[Loading] ScrollSmoother paused');
+        } else {
+            // Fallback: prevent body scrolling if ScrollSmoother isn't available
+            document.body.style.overflow = 'hidden';
+            document.body.style.height = '100vh';
+            console.log('[Loading] Fallback: Body overflow hidden');
+        }
     }
     
     allowScrolling() {
         console.log('[Loading] Restoring scrolling capability');
-        // Remove loading-specific scroll prevention
-        document.body.style.overflow = '';
-        document.body.style.height = '';
-        // Remove any scroll-disabled classes that might be applied
+        
+        // Primary: Restore ScrollSmoother scrolling (the main scroll controller)
+        if (window.smoother) {
+            console.log('[Loading] Unpausing ScrollSmoother to restore scrolling');
+            window.smoother.paused(false);
+        } else {
+            // Fallback: restore body scrolling if ScrollSmoother isn't available
+            console.log('[Loading] Fallback: Restoring body overflow');
+            document.body.style.overflow = '';
+            document.body.style.height = '';
+            document.body.style.overflowY = 'auto';
+        }
+        
+        // Clean up any scroll-disabled classes
         document.body.classList.remove('scroll-disabled');
         document.documentElement.classList.remove('scroll-disabled');
-        // Force scroll capability
-        document.body.style.overflowY = 'auto';
-        document.documentElement.style.overflowY = 'auto';
     }
     
     updateProgress(stepName, progress) {
@@ -121,10 +161,14 @@ class LoadingManager {
         this.isComplete = true;
         this.updateUI('Ready!', 100);
         
-        // Clear fallback timeout
+        // Clear fallback timeouts
         if (this.fallbackTimeout) {
             clearTimeout(this.fallbackTimeout);
             this.fallbackTimeout = null;
+        }
+        if (this.emergencyTimeout) {
+            clearTimeout(this.emergencyTimeout);
+            this.emergencyTimeout = null;
         }
         
         // Wait a moment to show 100%, then fade out
@@ -227,6 +271,10 @@ export function forceCompleteLoading() {
     loadingManager.forceComplete();
 }
 
+export function switchToScrollSmootherControl() {
+    loadingManager.switchToScrollSmootherControl();
+}
+
 export function forceAllowScrolling() {
     console.log('[Loading] Emergency scroll restoration');
     loadingManager.allowScrolling();
@@ -234,6 +282,11 @@ export function forceAllowScrolling() {
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
         loadingScreen.style.display = 'none';
+    }
+    // Force ScrollSmoother restoration as backup
+    if (window.smoother) {
+        console.log('[Loading] Emergency: Unpausing ScrollSmoother');
+        window.smoother.paused(false);
     }
 }
 

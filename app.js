@@ -1,7 +1,7 @@
 // Main Application Entry Point for NFTfi Marketing Site
 // Clean entry point that orchestrates all application components
 
-import { loadingManager, updateLoadingProgress, completeLoadingStep, completeLoading, forceCompleteLoading, forceAllowScrolling } from './utils/loadingManager.js';
+import { loadingManager, updateLoadingProgress, completeLoadingStep, completeLoading, forceCompleteLoading, forceAllowScrolling, switchToScrollSmootherControl } from './utils/loadingManager.js';
 import { init as initThreeJS, onWindowResize as onThreeJSResize } from './core/init.js';
 import { animate, initializeAnimationLoop } from './core/loop.js';
 import { initializeNavigation } from './controls/navigation.js';
@@ -48,6 +48,11 @@ async function init() {
     // NEW: Initialize ScrollSmoother safely (will be paused initially)
     const scrollSmootherStatus = initializeScrollSmoother();
     console.log('ScrollSmoother initialization result:', scrollSmootherStatus ? 'success' : 'skipped');
+    
+    // CRITICAL: Switch loading manager to ScrollSmoother control now that it's initialized
+    if (scrollSmootherStatus) {
+        switchToScrollSmootherControl();
+    }
     
     // Initialize header hide/show animation after ScrollSmoother is ready
     initHeaderAnimation();
@@ -187,6 +192,7 @@ async function init() {
     window.getCurrentAnimationState = getCurrentAnimationState;
     window.forceCompleteLoading = forceCompleteLoading;
     window.forceAllowScrolling = forceAllowScrolling;
+    window.switchToScrollSmootherControl = switchToScrollSmootherControl;
     
 
     

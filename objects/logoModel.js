@@ -98,11 +98,11 @@ export function loadLogoModel(scene, uniforms, calculateStartPosition, updatePla
         
         // Set initial scale to the computed start scale (no tiny/zero scale)
         wrapper.scale.setScalar(startPos.scale || 1);
-        // Keep model hidden until hero capture/texture is ready to avoid visual pop
-        wrapper.visible = false;
-        // Ensure canvas starts hidden (CSS sets opacity:0)
+        // Make model visible immediately since we have loading screen now
+        wrapper.visible = true;
+        // Make canvas visible immediately
         const canvasEl = document.getElementById('three-canvas');
-        if (canvasEl) canvasEl.style.opacity = '0';
+        if (canvasEl) canvasEl.style.opacity = '1';
         
         // Flag to track if texture is ready
         window.textureReady = false;
