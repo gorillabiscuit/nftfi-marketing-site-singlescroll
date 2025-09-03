@@ -1,6 +1,7 @@
 // Main Application Entry Point for NFTfi Marketing Site
 // Clean entry point that orchestrates all application components
 
+import { loadingManager, updateLoadingProgress, completeLoadingStep, completeLoading, forceCompleteLoading, forceAllowScrolling } from './utils/loadingManager.js';
 import { init as initThreeJS, onWindowResize as onThreeJSResize } from './core/init.js';
 import { animate, initializeAnimationLoop } from './core/loop.js';
 import { initializeNavigation } from './controls/navigation.js';
@@ -28,8 +29,12 @@ import {
 import { initSection3Dashboard, initSection3Scroll } from './controls/section3Dashboard.js';
 
 // Main initialization function
-function init() {
+async function init() {
     try { if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } } catch (e) { void 0; }
+    
+    // Start loading process
+    updateLoadingProgress('Initializing Three.js...', 0);
+    
     // Robust scroll-to-top: initial, next tick, after Section 3 embed, and on pageshow (bfcache)
     window.scrollTo(0, 0);
     setTimeout(() => { window.scrollTo(0, 0); }, 0);
@@ -47,7 +52,11 @@ function init() {
     // Initialize header hide/show animation after ScrollSmoother is ready
     initHeaderAnimation();
     
+    // Complete Three.js initialization
+    completeLoadingStep('Initializing Three.js...');
+    
     // Initialize Three.js components using modular structure
+    updateLoadingProgress('Loading 3D models...', 0);
     const { scene, camera, renderer, mainRenderTarget, backRenderTarget, uniforms } = initThreeJS();
     
     // Get canvas reference
@@ -56,19 +65,23 @@ function init() {
     // Create background plane for refraction
     createBackgroundPlane(scene, uniforms);
     
-    // Load GLTF model
+    // Load GLTF model with progress tracking
+    updateLoadingProgress('Loading 3D models...', 20);
     loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
 
     // Load Pebble model (as-is). Uses shared uniforms for same material/lighting
     try {
+        updateLoadingProgress('Loading 3D models...', 60);
         loadPebbleModel(scene, uniforms);
         // Deferred attach of round pebble once pebbleGroup is available
         const attachRound = () => {
             try {
                 if (window.PEBBLE && window.PEBBLE.pebbleGroup) {
                     loadRoundPebbleModel(window.PEBBLE.pebbleGroup, scene);
+                    updateLoadingProgress('Loading 3D models...', 100);
                 } else if (pebbleGroup) {
                     loadRoundPebbleModel(pebbleGroup, scene);
+                    updateLoadingProgress('Loading 3D models...', 100);
                 } else {
                     setTimeout(attachRound, 100);
                     return;
@@ -114,7 +127,7 @@ function init() {
     initStatsScrambleReveal();
     initHeadingReveal();
     
-    // Initialize video textures for Section 4 asset switching
+    // Initialize video textures for Section 4 asset switching (async, non-blocking)
     initializeVideoTextures().catch(error => {
         console.warn('Failed to initialize video textures:', error);
     });
@@ -134,7 +147,12 @@ function init() {
         console.error('Failed to setup Section 5 animation:', e);
     }
     
+    // Start and complete images loading step (most images are loaded via CSS)
+    updateLoadingProgress('Loading images...', 0);
+    completeLoadingStep('Loading images...');
+    
     // Warm-up shaders/materials to avoid first-frame compile hitches near Section 4
+    updateLoadingProgress('Initializing shaders...', 0);
     try {
         // Attempt to compile shaders with current scene/camera
         if (renderer && scene && camera && typeof renderer.compile === 'function') {
@@ -143,11 +161,18 @@ function init() {
         // Render a quick frame to prime pipelines
         requestAnimationFrame(() => { try { renderer.render(scene, camera); } catch (e) { void 0; } });
     } catch (e) { void 0; }
+    completeLoadingStep('Initializing shaders...');
     
     // Initialize animation loop when model is ready
+    updateLoadingProgress('Preparing animations...', 0);
     const checkModelReady = () => {
         if (isModelReady && mesh && wrapper) {
             initializeAnimationLoop(mesh, wrapper, isModelReady);
+            completeLoadingStep('Preparing animations...');
+            // Complete loading after a short delay to ensure everything is ready
+            setTimeout(() => {
+                completeLoading();
+            }, 300);
         } else {
             setTimeout(checkModelReady, 100);
         }
@@ -160,6 +185,8 @@ function init() {
     // Expose debug functions globally
     window.debugSetState = debugSetState;
     window.getCurrentAnimationState = getCurrentAnimationState;
+    window.forceCompleteLoading = forceCompleteLoading;
+    window.forceAllowScrolling = forceAllowScrolling;
     
 
     

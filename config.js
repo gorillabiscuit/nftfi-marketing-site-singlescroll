@@ -641,17 +641,17 @@ export const SECTION5_CONFIG = {
     scrollSpeed: 10000, // Adjustable: higher = faster scroll, lower = slower scroll
     
     // Tile size configuration (base sizes in pixels)
-    topRowTileSize: 180,      // Top row tile size
-    bottomRowTileSize: 126,   // Bottom row tile size (30% smaller by default)
+    topRowTileSize: 320,      // Top row tile size
+    bottomRowTileSize: 140,   // Bottom row tile size (30% smaller by default)
     
     // Row positioning (CSS transform values)
     topRowPosition: {
         x: 0,     // Horizontal offset from center
-        y: '-1rem' // Vertical offset (above center)
+        y: '1rem' // Vertical offset (above center)
     },
     bottomRowPosition: {
         x: 0,     // Horizontal offset from center  
-        y: '5rem' // Vertical offset (below center)
+        y: '2rem' // Vertical offset (below center)
     },
     
     // Animation behavior
@@ -664,7 +664,7 @@ export const SECTION5_CONFIG = {
     initialOffsetMultiplier: 0.5, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
     
     // Exit offset distance control (single value for synchronized unpinning)
-    exitOffsetMultiplier: 0.5, // Controls how far off-screen tiles must travel before unpinning (0.5 = unpin sooner, 2.0 = unpin later)
+    exitOffsetMultiplier: 0.6, // Controls how far off-screen tiles must travel before unpinning (0.5 = unpin sooner, 2.0 = unpin later)
     
     // Travel distance multipliers for fine-tuning synchronization
     travelMultipliers: {

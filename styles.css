@@ -226,7 +226,7 @@ body.scroll-disabled {
     width: 600px;
     height: 600px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 123, 202, 0.4) 0%, rgba(255, 197, 111, 0.1) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 123, 202, 0.4) 0%, rgba(255, 153, 0, 0.1) 50%, transparent 70%);
     animation: morph1 25s ease-in-out infinite;
     filter: blur(40px);
 }
@@ -239,7 +239,7 @@ body.scroll-disabled {
     width: 500px;
     height: 500px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 123, 202, 0.4) 0%, rgba(255, 197, 111, 0.1) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 123, 202, 0.4) 0% , rgba(255, 123, 202, 0.4)  20%, transparent 70%);
     animation: morph2 30s ease-in-out infinite;
     filter: blur(40px);
 }
@@ -252,7 +252,7 @@ body.scroll-disabled {
     width: 700px;
     height: 700px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(224, 29, 146, 0.15) 0%, rgba(255, 197, 111, 0.2) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(224, 146, 29, 0.397) 0%, rgba(255, 197, 111, 0.2) 50%, transparent 70%);
     animation: morph3 35s ease-in-out infinite;
     filter: blur(40px);
     transform: translate(-50%, -50%);
@@ -266,7 +266,7 @@ body.scroll-disabled {
     width: 450px;
     height: 450px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(251, 146, 60, 0.3) 0%, rgba(251, 146, 60, 0.1) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 118, 184, 0.586) 0%, rgba(251, 146, 60, 0.425) 50%, transparent 70%);
     animation: morph4 28s ease-in-out infinite;
     filter: blur(40px);
     transform: translate(-50%, -50%);
@@ -843,7 +843,7 @@ section[data-section="4"] {
 }
 
 .section3-features .features-title {
-    font-family: 'Satoshi Variable';
+    font-family: 'Satoshi Variable', sans-serif;
     font-weight: 300;
     font-size: 42px;
     line-height: 1.2;
@@ -854,7 +854,7 @@ section[data-section="4"] {
 }
 
 .section3-features .feature-block h3 {
-    font-family: 'Satoshi Variable';
+    font-family: 'Satoshi Variable', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 20px;
@@ -866,7 +866,7 @@ section[data-section="4"] {
 
 .section3-features .feature-block p {
     width: 303px;
-    font-family: 'Satoshi Variable';
+    font-family: 'Satoshi Variable', sans-serif;
     font-style: normal;
     font-weight: 300;
     font-size: 14px;
@@ -1008,7 +1008,7 @@ html.is-prep .hero-text {
 /* Shared base styles for hero headings */
 h1,
 h2 {
-    font-family: 'Satoshi Variable';
+    font-family: 'Satoshi Variable', sans-serif;
     font-style: normal;
     font-weight: 300;
     font-size: var(--font-size-3xl);
@@ -1028,7 +1028,7 @@ h2 {
 }
 
 .hero .subtitle {
-    font-family: 'Satoshi Variable';
+    font-family: 'Satoshi Variable', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: var(--font-size-lg);
@@ -1169,7 +1169,7 @@ h2 {
   }
   
   .stats .label {
-    font-family: 'Satoshi Variable';
+    font-family: 'Satoshi Variable', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
@@ -1522,6 +1522,41 @@ a.card:focus {
     overflow: hidden; /* Hide overflow to prevent horizontal scrollbars */
 }
 
+/* Section 5 Circles Background - Top Right */
+.section[data-section="5"]::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -100px;
+    width: 800px;
+    height: 800px;
+    background-image: url('/images/circles.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 1;
+    z-index: 1; /* Lower z-index so it gets distorted by glass tiles */
+    pointer-events: none;
+}
+
+/* Section 5 Circles Background - Bottom Left */
+.section[data-section="5"]::after {
+    content: '';
+    position: absolute;
+    bottom: -300px;
+    left: -150px;
+    width: 700px;
+    height: 700px;
+    background-image: url('/images/circles.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.8;
+    z-index: 1; /* Lower z-index so it gets distorted by glass tiles */
+    pointer-events: none;
+    transform: rotate(45deg); /* Rotate for visual variety */
+}
+
 .section5-content {
     text-align: center;
     width: 100%;
@@ -1562,9 +1597,15 @@ a.card:focus {
     /* Tile sizes now controlled by CSS custom properties set via config */
     width: var(--tile-size, 180px);
     height: var(--tile-size, 180px);
-    background-color: rgba(242, 242, 242, 0.15);
-    border: 1px solid rgba(242, 242, 242, 0.2);
+    
+    /* Glass Effect - matching hero buttons */
+    background: rgba(226, 220, 218, 0.09);
+    border: none;
     border-radius: 12px;
+    filter: drop-shadow(-8px -10px 46px #0000005f);
+    backdrop-filter: blur(3px) url(#displacementFilter);
+    
+    /* Layout and typography */
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -1574,6 +1615,10 @@ a.card:focus {
     color: #F2F2F2;
     font-family: 'Roboto Mono', monospace;
     flex-shrink: 0; /* Prevent tiles from shrinking during animation */
+    
+    /* Positioning for glass effect */
+    position: relative;
+    z-index: 5;
 }
 
 /* Top row uses config-defined size */
@@ -1591,9 +1636,10 @@ a.card:focus {
 }
 
 .tile:hover {
-    background-color: rgba(242, 242, 242, 0.25);
-    border-color: rgba(242, 242, 242, 0.4);
-    transform: translateY(-2px);
+    background: rgba(226, 220, 218, 0.15);
+    filter: drop-shadow(-8px -10px 46px #0000007f);
+    backdrop-filter: blur(4px) url(#displacementFilter);
+    transform: translateY(-2px) scale(1.02);
 }
 
 /* Responsive adjustments */
@@ -1638,6 +1684,117 @@ a.card:focus {
     
     .tiles-row {
         gap: 1.2rem;
+    }
+}
+
+/* Loading Screen Styles */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Match hero background styling */
+    background: linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+    
+    /* Prevent scrolling */
+    overflow: hidden;
+    
+    /* Smooth fade out transition */
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+}
+
+.loading-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    text-align: center;
+}
+
+.loading-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-logo-image {
+    height: 32px;
+    width: auto;
+    opacity: 0.9;
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+}
+
+.loading-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    min-width: 300px;
+}
+
+.loading-text {
+    font-family: 'Satoshi Variable', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+.loading-bar-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.loading-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease-out;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.loading-percentage {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 300;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.05em;
+}
+
+/* Mobile responsive adjustments for loading screen */
+@media (max-width: 768px) {
+    .loading-logo-image {
+        height: 24px;
+    }
+    
+    .loading-progress {
+        min-width: 250px;
+        gap: 0.8rem;
+    }
+    
+    .loading-text {
+        font-size: 16px;
     }
 }
 
