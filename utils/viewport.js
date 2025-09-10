@@ -1,7 +1,7 @@
 // Viewport Utility Module for NFTfi Marketing Site
 // Handles world space coordinate calculations and viewport positioning
 
-import { TARGET_CONFIG, MODEL_CONFIG } from '../config.js';
+import { TARGET_CONFIG, MODEL_CONFIG } from '../config/index.js';
 import { getCurrentAnimationState, getAnimationState } from './breakpointManager.js';
 
 // Global reference to camera (will be set by main.js)
@@ -15,7 +15,10 @@ export function initializeViewport(threeCamera) {
 // Convert world space coordinates to actual world positions
 export function worldToPosition(worldX, worldY) {
     // Convert from -1 to 1 range to actual world coordinates
-    const aspect = window.innerWidth / window.innerHeight;
+    // Clamp effective width to 1400px to match content container max-width
+    // This prevents mesh from moving beyond the visible content area on very wide screens
+    const effectiveWidth = Math.min(window.innerWidth, 1400);
+    const aspect = effectiveWidth / window.innerHeight;
     const fov = camera.fov * Math.PI / 180;
     const distance = Math.abs(camera.position.z);
     

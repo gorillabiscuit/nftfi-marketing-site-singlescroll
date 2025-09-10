@@ -139,8 +139,9 @@
     --spacing-xs: clamp(8px, 2vw, 12px);    /* Micro-spacing: icons, small gaps */
     --spacing-sm: clamp(16px, 3vw, 24px);   /* Small spacing: buttons, cards */
     --spacing-md: clamp(24px, 4vw, 48px);   /* Medium spacing: sections, components */
-    --spacing-lg: clamp(32px, 6vw, 64px);   /* Large spacing: hero sections */
-    --spacing-xl: clamp(48px, 8vw, 97px);   /* Extra large: full-screen sections */
+    --spacing-lg: clamp(32px, 6vw, 50px);   /* Large spacing: hero sections */
+    --spacing-vertical-xl: clamp(48px, 8vw, 8vh);   /* Extra large: full-screen sections */
+    --spacing-horizontal-xl: clamp(48px, 8vw, 4vw);   /* Extra large: full-screen sections */
     
     /* ==========================================================================
        FLUID TYPOGRAPHY SYSTEM
@@ -164,14 +165,16 @@
        - --font-size-xl: Section headings, large buttons
        - --font-size-2xl: Page titles, hero text
        - --font-size-3xl: Main headlines, hero titles
+       - --font-size-4xl: Large hero titles, prominent headings
        ========================================================================== */
     --font-size-xs: clamp(10px, 1.25vw, 12px);   /* Captions, metadata */
     --font-size-sm: clamp(12px, 1.5vw, 14px);    /* Small text, mobile body */
-    --font-size-base: clamp(18px, 2vw, 16px);     /* Primary body text */
+    --font-size-base: clamp(14px, 2vw, 16px);    /* Primary body text */
     --font-size-lg: clamp(16px, 2.25vw, 18px);   /* Subheadings, emphasized */
-    --font-size-xl: clamp(16px, 2.75vw, 20px);   /* Section headings */
-    --font-size-2xl: clamp(32px, 4vw, 40px);     /* Page titles, hero text */
-    --font-size-3xl: clamp(39px, 6vw, 48px);     /* Main headlines */     /* Main headlines */
+    --font-size-xl: clamp(18px, 2.75vw, 22px);   /* Section headings */
+    --font-size-2xl: clamp(24px, 4vw, 32px);     /* Page titles, hero text */
+    --font-size-3xl: clamp(32px, 6vw, 40px);     /* Main headlines */
+    --font-size-4xl: clamp(40px, 8vw, 48px);     /* Large hero titles - MAX SIZE */
     
     /* ==========================================================================
        LAYOUT & COMPONENT VARIABLES
@@ -393,28 +396,15 @@ body.scroll-disabled {
     opacity: 0; /* Will fade in when model is ready */
 }
 
-/* Logo */
-#logo {
-    position: fixed;
-    top: var(--spacing-lg);
-    left: var(--container-padding);
-    z-index: 200; /* Higher z-index to be above canvas */
-    pointer-events: auto; /* Make logo clickable if needed */
-}
-
-#logo svg {
-    width: var(--logo-size);
-    height: var(--logo-height);
-    display: block;
-}
+/* Legacy logo styles - now handled by nav-logo */
 
 /* Top Navigation */
 .custom-navbar {
     position: fixed;
-    top: 69px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 851px;
+    top: 46px;
+    left: 0;
+    right: 0;
+    width: 100%;
     z-index: 200; /* Higher z-index to be above canvas */
     pointer-events: auto; /* Ensure navigation is clickable */
 }
@@ -427,9 +417,37 @@ body.scroll-disabled {
 
 .nav-container {
     display: flex;
-    gap: 48px;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    width: 100%;
+    max-width: 1200px; /* Max width to match hero section */
+    margin: 0 auto; /* Center the container */
+    padding: 0; /* Match hero padding */
+}
+
+/* Logo positioning */
+.nav-logo {
+    flex-shrink: 0;
+}
+
+.nav-logo svg {
+    width: var(--logo-size);
+    height: var(--logo-height);
+    display: block;
+}
+
+/* Center the main navigation items */
+.nav-items-desktop {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    justify-content: center;
+    flex: 1; /* Take up remaining space and center */
+}
+
+/* CTA Button positioning */
+.nav-cta-btn {
+    flex-shrink: 0;
 }
 
 .nav-item {
@@ -529,12 +547,78 @@ body.scroll-disabled {
     transform: rotate(270deg);
 }
 
-/* Mobile Navigation Styles */
-.nav-items-desktop {
+/* Navigation CTA Button */
+.nav-cta-btn {
+    /* Layout matching your specifications */
+    box-sizing: border-box;
     display: flex;
+    flex-direction: row;
+    justify-content: center;
     align-items: center;
-    gap: 32px;
+    padding: 16px 36px 17px;
+    gap: 10px;
+    
+    /* Dimensions from your spec */
+    width: 174px;
+    height: 45px;
+    
+    /* Glass morphism styling matching your spec */
+    border: 1px solid #E2DCDA;
+    backdrop-filter: blur(7px);
+    border-radius: 500px;
+    
+    /* Background and visual effects */
+    background: rgba(226, 220, 218, 0.09);
+    filter: drop-shadow(-8px -10px 46px #0000005f);
+    
+    /* Typography matching nav links */
+    font-family: 'General Sans Variable', 'General Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    color: #E2DCDA;
+    
+    /* Interaction states */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 10;
+    
+    /* Remove default button styles */
+    outline: none;
+    text-decoration: none;
 }
+
+/* Inner glow effect similar to existing glass cards */
+.nav-cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 500px;
+    box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.125), 
+                inset 0 0 3px 1px rgba(255, 255, 255, 0.125);
+}
+
+/* Hover effects matching existing navigation */
+.nav-cta-btn:hover {
+    background: rgba(226, 220, 218, 0.15);
+    transform: translateY(-2px);
+    filter: drop-shadow(-8px -12px 48px #0000007f);
+    backdrop-filter: blur(8px);
+    border-color: rgba(226, 220, 218, 0.6);
+}
+
+.nav-cta-btn:active {
+    transform: translateY(0px);
+    background: rgba(226, 220, 218, 0.05);
+}
+
+/* Desktop-specific positioning for the CTA button - now handled by flexbox */
+
+/* Mobile Navigation Styles */
 
 .nav-items-mobile {
     display: none;
@@ -564,9 +648,7 @@ body.scroll-disabled {
     transition: all 0.3s ease;
 }
 
-#hero-title{
-    padding-bottom: 2vw;
-}
+
 
 .mobile-menu-toggle.active .hamburger-line:nth-child(1) {
     transform: rotate(45deg) translate(6px, 6px);
@@ -712,54 +794,66 @@ body.scroll-disabled {
     margin: 8px 0;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .nav-items-desktop {
-        display: none;
-    }
-    
-    .nav-items-mobile {
-        display: flex;
-        align-items: center;
-    }
-    
-    .custom-navbar {
-        width: 90vw;
-        top: 50px;
-    }
-    
+/* Mobile CTA Button Styles */
+.mobile-cta-wrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.mobile-cta-btn {
+    /* Mobile-specific adjustments */
+    width: 200px; /* Slightly wider for touch targets */
+    height: 48px; /* Taller for better touch interaction */
+    font-size: 16px; /* Larger text for mobile readability */
+    padding: 12px 32px;
+}
+
+/* Small Mobile Devices (≤480px) - Extra Compact Layout */
+@media (max-width: 480px) {
     .nav-container {
-        gap: 24px;
+        padding: 0 var(--spacing-xs); /* Minimal padding for very small screens */
     }
     
-    .nav-link {
-        font-size: 14px;
-        line-height: 18px;
+    .nav-logo svg {
+        width: calc(var(--logo-size) * 0.85); /* Slightly smaller logo */
+        height: calc(var(--logo-height) * 0.85);
     }
     
-    .dropdown-menu {
-        min-width: 140px;
-        /* Mobile-specific improvements */
-        max-width: calc(100vw - 20px); /* Prevent overflow */
-        border-radius: 12px; /* Larger touch targets */
+    .hero {
+        margin-left: var(--spacing-xs);
+        margin-right: var(--spacing-xs);
+        padding: var(--spacing-md);
+        border-radius: 16px; /* Smaller radius for compact screens */
     }
     
-    .dropdown-item {
-        font-size: 13px;
-        padding: 8px 16px; /* Larger touch targets */
-        min-height: 44px; /* iOS touch target minimum */
-        display: flex;
-        align-items: center;
+    .hero h1 {
+        font-size: var(--font-size-xl); /* Smaller heading for tiny screens */
     }
     
-    /* Better touch interaction */
-    .dropdown-trigger {
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .hero .subtitle {
+        font-size: clamp(12px, 1.8vw, 16px); /* Small mobile, well under 24px max */
+    }
+    
+    .card {
+        font-size: var(--font-size-xs); /* Smaller button text */
+        padding: 15px 28px; /* Maintain proportional padding */
+        width: 160px; /* Slightly smaller for small mobile */
+        min-width: 160px;
+        height: 44px; /* Slightly smaller height */
+    }
+    
+    /* Hero text for very small screens */
+    .hero-text {
+        width: 100%; /* Full width on small mobile */
+        height: auto;
+        margin: 0;
+        gap: 16px; /* Compact gap */
     }
 }
+
+/* Mobile Responsive Design - Consolidated (481px - 768px) */
 
 /* Content Container for ScrollSmoother */
 #smooth-wrapper {
@@ -787,12 +881,15 @@ body.scroll-disabled {
     margin-right: var(--container-padding);
     margin-bottom: var(--spacing-lg);
     max-width: calc(100vw - (var(--container-padding) * 2));
+    min-height: 30vh; /* Ensure enough height for flexible button positioning */
     position: relative;
     z-index: 4;
     overflow: hidden; /* Clip the SVG backgrounds */
     /* Create new stacking context for backdrop-filter to work properly */
     isolation: isolate;
     box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
+    /* DEBUG: Temporary border to visualize hero container */
+    
     
     /* Smooth, non-layout transitions to avoid jank */
     transition:
@@ -805,21 +902,22 @@ body.scroll-disabled {
 
 /* Full-section background for Section 4 with top-left SVG */
 section[data-section="4"] {
-    background-image: url('/images/top-left-LooperGroup.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+    background-image: url('/images/NFTFI-Logo-loopergroup.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
     background-repeat: no-repeat, no-repeat;
-    background-position: left top, center;
-    background-size: auto, cover;
+    background-position: -10%, center;
+    background-size:100%,100%;
+    
 }
 
-/* Section 3 background hero using LooperGroup.svg, positioned behind the dashboard SVG */
+/* Section 3 background hero using LooperGroup.svg, positioned within parent container */
 .hero--looper {
-    /* Layered backgrounds; size/position will be set from config via JS */
+    /* Layered backgrounds; size/position set relative to parent via HERO_LOOPER config in JS */
     /* Put SVG on top layer, gradient underneath */
     background-image: url('/images/LooperGroup.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
-    background-size: contain, cover;
+    background-size: 150%;
     background-repeat: no-repeat, no-repeat;
-    background-position: right top, center;
-    position: absolute;
+    background-position: 10% 50%;
+    /* Position set via JavaScript relative to .section3-container parent */
     z-index: 1; /* Below #dashboard-svg-container */
     pointer-events: none; /* never block interactions */
     padding: 60px 97px  !important;
@@ -883,7 +981,7 @@ section[data-section="4"] {
 .feature-4 { padding-left: 64px; padding-top: 16px; } */
 
 .section3-features .feature-cta { padding-left: 334px; padding-top: 24px; padding-right: 60px; }
-.section3-features .feature-cta .cta-button { pointer-events: auto; }
+.section3-features .feature-cta .cta-button { pointer-events: auto; min-width: 280px; }
 
 @media (min-width: 1025px) {
   .features-title { padding-left: 96px; padding-top: 96px; }
@@ -910,12 +1008,11 @@ section[data-section="4"] {
     display: none; /* remove default hero pseudo SVGs */
 }
 
-/* Ensure the dashboard SVG container sits above the looper background */
+/* Dashboard SVG container - positioning handled by JavaScript via DASHBOARD_SVG config */
 #dashboard-svg-container {
-    position: absolute;
-    inset: 0;
+    /* Basic styles - positioning applied via GSAP in section3Dashboard.js */
     z-index: 2;
-    overflow: hidden;
+    overflow: visible;
     pointer-events: none; /* allow interactions to pass through */
 }
 
@@ -975,9 +1072,16 @@ html.is-prep .hero-text {
   }
 
 .hero-content {
+    /* Flexbox layout to push buttons to bottom */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Start content at top */
+    min-height: 50vh; /* Match hero container's min-height to ensure full coverage */
+    /* DEBUG: Temporary border to visualize container */
+    
+    
     text-align: left;
     padding: 0px;
-    gap: 9px;
     margin: 0; /* Remove auto margin to align left */
     /* Ensure content is below glass card for proper distortion */
     z-index: 1;
@@ -986,19 +1090,29 @@ html.is-prep .hero-text {
     transition: 
         width 0.3s ease-out,
         height 0.3s ease-out,
-        padding 0.3s ease-out,
-        gap 0.3s ease-out;
+        padding 0.3s ease-out;
 }
 
 .hero-text {
-    display: inline-block;
-    text-align: left;
-    padding-bottom: 7vw; /* Add space between subtitle and buttons */
+    /* Auto layout matching your specifications */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 24px;
+    
+    /* Dimensions from your spec */
+    margin: 0;
+    width: 667px;
+    
+    /* Inside auto layout - allow flexible height */
+    flex: 0 0 auto; /* Don't grow, don't shrink, auto height */
+    order: 0;
     
     /* Smooth transitions for text sizing */
     transition: 
         width 0.3s ease-out,
-        padding-bottom 0.3s ease-out,
+        height 0.3s ease-out,
         opacity 0.25s ease-out;
 
     /* Opacity reveal to avoid jarring redraw */
@@ -1011,7 +1125,7 @@ h2 {
     font-family: 'Satoshi Variable', sans-serif;
     font-style: normal;
     font-weight: 300;
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-3xl); /* Default large heading size */
     line-height: 1.4;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.8);
@@ -1031,7 +1145,7 @@ h2 {
     font-family: 'Satoshi Variable', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: var(--font-size-lg);
+    font-size: clamp(16px, 2.5vw, 24px); /* Max 24px as requested */
     line-height: 1.5;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.5);
@@ -1039,7 +1153,7 @@ h2 {
     flex: none;
     order: 1;
     flex-grow: 0;
-    text-align: left;
+    text-align: left; /* Left-aligned as requested */
     width: 100%;
 }
 
@@ -1047,13 +1161,16 @@ h2 {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    align-items: center;
+    align-items: start;
     padding: 0px;
     gap: 24px;
     margin: 0;
-    flex: none;
-    order: 1;
-    flex-grow: 0;
+    margin-top: auto; /* Push to bottom with flexible gap above */
+    /* Position at bottom of hero-content */
+    flex: 0 0 auto; /* Don't grow, don't shrink, auto height */
+    order: 2; /* Ensure it comes after hero-text */
+    /* DEBUG: Temporary border to visualize actions container */
+    
     
     /* Smooth transitions for actions sizing */
     transition: 
@@ -1067,8 +1184,8 @@ h2 {
 .section {
     min-height: 100vh;
     display: flex;
-    align-items: flex-end; /* Changed from center to flex-end to position at bottom */
-    justify-content: flex-start; /* Changed from center to flex-start for hero alignment */
+    align-items: center; /* Center content vertically */
+    justify-content: flex-start; /* Keep left alignment for hero */
     padding: 2rem;
     position: relative;
     z-index: 2;
@@ -1087,7 +1204,7 @@ h2 {
     z-index: 3;
     width: 100%;
     height: 100%;
-    color: #fff
+    color: #fff;
 }
 
 
@@ -1131,6 +1248,15 @@ h2 {
 .section[data-section="3"] {
     height: 100vh;
     min-height: 100vh;
+    position: relative; /* Ensure proper positioning context for children */
+}
+
+/* Section 3 Parent Container - Centralized positioning system */
+.section3-container {
+    /* Positioning handled by JavaScript via SECTION3_CONTAINER config */
+    /* This container centers both the hero panel and SVG as a cohesive unit */
+    position: absolute;
+    z-index: 1;
 }
 
   .stats {
@@ -1251,39 +1377,50 @@ h2 {
 
 
 .card {
-    /* Button Layout */
+    /* Auto layout matching your specifications */
     display: flex;
-    align-items: center;
+    flex-direction: row;
     justify-content: center;
-    gap: 12px;
-    padding: 12px 32px;
-    min-width: 180px;
-    height: 42px;
+    align-items: center;
+    padding: 17px 36px;
+    gap: 10px;
     
-    /* Typography */
+    /* Dimensions from your spec */
+    margin: 0;
+    width: 180px;
+    min-width: 180px;
+    height: 48px;
+    
+    /* Background from your spec - now configurable */
+    background: rgba(226, 220, 218, var(--hero-button-bg-opacity, 0.1));
+    border-radius: 500px;
+    border: none;
+    
+    /* Typography from your spec */
     font-family: 'General Sans Variable';
     font-style: normal;
-    font-weight: 400;
+    font-weight: 500;
     font-size: 14px;
-    line-height: 1.2;
+    line-height: 14px; /* identical to box height, or 100% */
     text-align: center;
     letter-spacing: 0.02em;
     color: #E2DCDA;
     
-    /* Glass Effect */
-    background: rgba(226, 220, 218, 0.09);
-    border-radius: 500px;
-    border: none;
-    filter: drop-shadow(-8px -10px 46px #0000005f);
-    backdrop-filter: blur(3px) url(#displacementFilter);
+    /* Inside auto layout */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
     
-    /* Positioning */
+    /* Positioning and interaction */
     position: relative;
     cursor: pointer;
     z-index: 10;
     
     /* Transitions */
     transition: all 0.2s ease;
+    
+    /* Default distortion effect (always visible) */
+    backdrop-filter: blur(var(--hero-button-displacement-blur, 0.5px)) url(#displacementFilter);
 }
 
 /* Ensure anchor-based cards match Section 1 buttons */
@@ -1305,10 +1442,22 @@ a.card:focus {
     z-index: 0;
     overflow: hidden;
     border-radius: 500px;
-    -webkit-box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.125), 
-                        inset 0 0 3px 1px rgba(255, 255, 255, 0.125);
-    box-shadow: inset 2px 2px 0px -2px rgba(255, 255, 255, 0.125), 
-                inset 0 0 3px 1px rgba(255, 255, 255, 0.125);
+    -webkit-box-shadow: inset var(--hero-button-glow-offset-x, 2px) var(--hero-button-glow-offset-y, 2px) 0px calc(-1 * var(--hero-button-glow-spread, 2px)) rgba(255, 255, 255, var(--hero-button-highlight-opacity, 0.3)), 
+                        inset var(--hero-button-glow2-offset-x, -2px) var(--hero-button-glow2-offset-y, -2px) 0px calc(-1 * var(--hero-button-glow-spread, 2px)) rgba(255, 255, 255, var(--hero-button-highlight2-opacity, 0.3)),
+                        inset 0 0 var(--hero-button-glow-blur, 3px) 1px rgba(255, 255, 255, var(--hero-button-glow-opacity, 0.125));
+    box-shadow: inset var(--hero-button-glow-offset-x, 2px) var(--hero-button-glow-offset-y, 2px) 0px calc(-1 * var(--hero-button-glow-spread, 2px)) rgba(255, 255, 255, var(--hero-button-highlight-opacity, 0.3)), 
+                inset var(--hero-button-glow2-offset-x, -2px) var(--hero-button-glow2-offset-y, -2px) 0px calc(-1 * var(--hero-button-glow-spread, 2px)) rgba(255, 255, 255, var(--hero-button-highlight2-opacity, 0.3)),
+                inset 0 0 var(--hero-button-glow-blur, 3px) 1px rgba(255, 255, 255, var(--hero-button-glow-opacity, 0.125));
+}
+
+/* Enhanced highlights on hover */
+.card:hover::before {
+    -webkit-box-shadow: inset var(--hero-button-glow-offset-x, 2px) var(--hero-button-glow-offset-y, 2px) 0px calc(-1 * var(--hero-button-glow-spread, 2px)) rgba(255, 255, 255, var(--hero-button-highlight-opacity-hover, 0.5)), 
+                        inset var(--hero-button-glow2-offset-x, -2px) var(--hero-button-glow2-offset-y, -2px) 0px calc(-1 * var(--hero-button-glow-spread, 2px)) rgba(255, 255, 255, var(--hero-button-highlight2-opacity-hover, 0.5)),
+                        inset 0 0 var(--hero-button-glow-blur, 3px) 1px rgba(255, 255, 255, var(--hero-button-glow-opacity, 0.125));
+    box-shadow: inset var(--hero-button-glow-offset-x, 2px) var(--hero-button-glow-offset-y, 2px) 0px calc(-1 * var(--hero-button-glow-spread, 2px)) rgba(255, 255, 255, var(--hero-button-highlight-opacity-hover, 0.5)), 
+                inset var(--hero-button-glow2-offset-x, -2px) var(--hero-button-glow2-offset-y, -2px) 0px calc(-1 * var(--hero-button-glow-spread, 2px)) rgba(255, 255, 255, var(--hero-button-highlight2-opacity-hover, 0.5)),
+                inset 0 0 var(--hero-button-glow-blur, 3px) 1px rgba(255, 255, 255, var(--hero-button-glow-opacity, 0.125));
 }
 
 .dock-icon {
@@ -1326,7 +1475,7 @@ a.card:focus {
     /* background: rgba(226, 220, 218, 0.25); */
     transform: translateY(-5px);
     filter: drop-shadow(-8px -10px 46px #0000005f);
-    backdrop-filter: blur(1px) url(#displacementFilter);
+    backdrop-filter: blur(var(--hero-button-displacement-blur-hover, 1.5px)) url(#displacementFilterHover);
 }
 
 .card:active {
@@ -1350,33 +1499,67 @@ a.card:focus {
     }
     
     .nav-items-mobile {
-        display: block;
+        display: flex;
+        align-items: center;
     }
     
     .custom-navbar {
-        width: 100%;
-        left: 0;
-        transform: none;
-        padding: 0 var(--container-padding);
+        top: 50px;
     }
     
     .nav-container {
         justify-content: space-between;
         gap: 0;
+        padding: 0 var(--spacing-sm);
+    }
+    
+    /* Show only logo and mobile menu toggle on mobile */
+    .nav-items-desktop,
+    .nav-cta-btn {
+        display: none;
+    }
+    
+    /* Navigation Typography */
+    .nav-link {
+        font-size: 14px;
+        line-height: 18px;
+    }
+    
+    /* Mobile Dropdown Improvements */
+    .dropdown-menu {
+        min-width: 140px;
+        max-width: calc(100vw - 20px); /* Prevent overflow */
+        border-radius: 12px; /* Larger touch targets */
+    }
+    
+    .dropdown-item {
+        font-size: 13px;
+        padding: 8px 16px; /* Larger touch targets */
+        min-height: 44px; /* iOS touch target minimum */
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Better touch interaction */
+    .dropdown-trigger {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     /* Mobile Typography */
     .hero h1 {
-        font-size: var(--font-size-2xl);
+        font-size: var(--font-size-4xl);
         line-height: 1.4;
         text-align: center;
         width: 100%;
     }
     
     .hero .subtitle {
-        font-size: var(--font-size-base);
+        font-size: clamp(14px, 2vw, 18px); /* Mobile-appropriate sizing with 24px never exceeded */
         line-height: 1.4;
-        text-align: center;
+        text-align: left; /* Keep left-aligned on mobile */
     }
     
     /* Mobile Layout */
@@ -1385,26 +1568,30 @@ a.card:focus {
         margin-left: var(--spacing-sm);
         margin-right: var(--spacing-sm);
         border-radius: 20px;
-        height: 82vh;
-        padding-top: 30vh;
-        align-content: end;
+        min-height: 82vh;
+        /* Remove padding-top and align-content to let flexbox handle positioning */
     }
     
     .hero-text {
-        padding-bottom: var(--spacing-lg);
+        width: 100%; /* Full width on mobile */
+        height: auto; /* Auto height on mobile */
+        margin: 0; /* Remove centering margin on mobile */
+        gap: var(--spacing-sm); /* Smaller gap on mobile */
     }
     
     .hero-actions {
         flex-direction: column;
         gap: var(--spacing-sm);
-        align-items: stretch;
+        align-items: start;
+        margin-top: auto; /* Maintain bottom positioning on mobile */
     }
     
     /* Mobile Buttons */
     .card {
         min-width: 100%;
-        height: 48px;
-        padding: 12px 24px;
+        width: 100%; /* Full width on mobile */
+        height: 48px; /* Keep 48px height as specified */
+        padding: 17px 36px; /* Maintain spec padding */
         font-size: var(--font-size-sm);
     }
     
@@ -1423,10 +1610,38 @@ a.card:focus {
     }
 }
 
-/* Tablet Responsive Design */
+/* Tablet Responsive Design (769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
+    /* Navigation Adjustments for Tablet */
+    .nav-container {
+        padding: 0 var(--spacing-md);
+        max-width: 1100px; /* Intermediate container width */
+    }
+    
+    .nav-items-desktop {
+        gap: 28px; /* Reduce gap for tablet */
+    }
+    
+    /* Tablet CTA Button */
+    .nav-cta-btn {
+        width: 150px; /* Slightly smaller for tablet */
+        height: 43px; /* Intermediate height */
+        font-size: 13px;
+        padding: 14px 28px 15px;
+    }
+    
+    /* Navigation Typography */
+    .nav-link {
+        font-size: 15px; /* Intermediate font size */
+        line-height: 20px;
+    }
+    
+    /* Hero Section for Tablet */
     .hero {
-        padding: var(--spacing-xl);
+        padding-top: var(--spacing-vertical-xl);
+        padding-bottom: var(--spacing-vertical-xl);
+        padding-left: var(--spacing-horizontal-xl);
+        padding-right: var(--spacing-horizontal-xl);
     }
     
     .hero h1 {
@@ -1434,19 +1649,31 @@ a.card:focus {
     }
     
     .hero .subtitle {
-        font-size: var(--font-size-lg);
+        font-size: clamp(16px, 2.2vw, 22px); /* Tablet sizing, still under 24px max */
     }
     
     .card {
-        min-width: 140px;
-        height: 50px;
+        min-width: 160px;
+        width: 160px; /* Intermediate size for tablet */
+        height: 48px; /* Consistent with spec */
+        padding: 16px 32px; /* Slightly smaller padding for tablet */
+    }
+    
+    /* Hero text adjustments for tablet */
+    .hero-text {
+        width: 580px; /* Slightly smaller for tablet */
+        height: auto; /* Allow flexible height */
+        gap: 20px; /* Intermediate gap */
     }
 }
 
-/* Large Screen Optimization */
-@media (min-width: 1025px) {
+/* Desktop Optimization (1025px - 1199px) */
+@media (min-width: 1025px) and (max-width: 1199px) {
     .hero {
-        padding: var(--spacing-xl);
+        padding-top: var(--spacing-vertical-xl);
+        padding-bottom: var(--spacing-vertical-xl);
+        padding-left: var(--spacing-horizontal-xl);
+        padding-right: var(--spacing-horizontal-xl);
     }
     
     .hero h1 {
@@ -1454,7 +1681,62 @@ a.card:focus {
     }
     
     .hero .subtitle {
-        font-size: var(--font-size-xl);
+        font-size: clamp(18px, 2.4vw, 24px); /* Desktop sizing, exactly 24px max */
+    }
+}
+
+/* XL Screen Optimization (1200px+) - Enhanced Experience for Large Monitors */
+@media (min-width: 1200px) {
+    /* Enhanced Navigation for Large Screens */
+    .nav-container {
+        max-width: 1400px; /* Wider container for large screens */
+        
+    }
+    
+    .nav-items-desktop {
+        gap: 40px; /* Increased spacing for better visual hierarchy */
+    }
+    
+    .nav-cta-btn {
+        width: 190px; /* Larger button for large screens */
+        height: 50px; /* Taller for better proportion */
+        font-size: 15px; /* Slightly larger text */
+        padding: 18px 40px 19px; /* More generous padding */
+    }
+    
+    /* Enhanced Typography */
+    .nav-link {
+        font-size: 16px; /* Larger navigation text */
+        line-height: 22px;
+    }
+    
+    /* Enhanced Hero Section */
+    .hero {
+        padding-top: var(--spacing-vertical-xl);
+        padding-bottom: var(--spacing-vertical-xl);
+        padding-left: var(--spacing-horizontal-xl);
+        padding-right: var(--spacing-horizontal-xl);
+        max-width: 1400px; /* Match navigation container */
+        margin: 0 auto; /* Center the hero */
+        min-height: 500px;
+    }
+    
+    .hero h1 {
+        font-size: var(--font-size-4xl); /* Even larger for XL screens */
+    }
+    
+    .hero .subtitle {
+        font-size: clamp(16px, 2.25vw, 20px); /* XL sizing, capped at 24px max */
+    }
+    
+    /* Enhanced Visual Effects for High-Performance Devices */
+    .nav-cta-btn::before {
+        filter: blur(3px); /* Sharper glow effect */
+    }
+    
+    .nav-cta-btn:hover {
+        transform: translateY(-3px); /* More pronounced hover effect */
+        filter: drop-shadow(-10px -14px 52px #00000090);
     }
 }
 

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { gsap } from 'gsap';
-import { MODEL_CONFIG } from '../config.js';
+import { MODEL_CONFIG } from '../config/index.js';
 
 // Animation completion tracking
 let isInitialAnimationComplete = false;
@@ -68,6 +68,11 @@ function calculateCorrectScaleForScroll() {
 
 // Global reference
 export let backgroundPlane = null;
+
+// Safari detection utility
+function isSafari() {
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
 
 // Video texture system for Section 4 asset categories
 let videoTextures = {};
@@ -403,7 +408,7 @@ export function createBackgroundPlane(scene, uniforms) {
     
     // Set position based on breakpoint
     import('../utils/breakpointManager.js').then(({ getCurrentBreakpoint }) => {
-        import('../config.js').then(({ WHITE_SPHERE_POSITIONS }) => {
+        import('../config/index.js').then(({ WHITE_SPHERE_POSITIONS }) => {
             const breakpoint = getCurrentBreakpoint();
             const position = WHITE_SPHERE_POSITIONS[breakpoint] || WHITE_SPHERE_POSITIONS.desktop;
             
@@ -506,31 +511,103 @@ export function updatePlaneTextureForSection(selector) {
                 reject(new Error('updatePlaneTextureForSection: element not found'));
                 return;
             }
-            html2canvas(el, {
+            
+            // Safari-specific configuration
+            const safariMode = isSafari();
+            const html2canvasOptions = {
                 backgroundColor: null,
-                scale: 2,
+                scale: safariMode ? 1 : 2, // Reduce scale for Safari to avoid canvas size limits
                 useCORS: true,
                 allowTaint: true,
-                logging: false,
+                logging: safariMode, // Enable logging for Safari to debug issues
                 width: el.offsetWidth,
                 height: el.offsetHeight,
+                windowWidth: safariMode ? Math.min(el.scrollWidth, 1024) : el.scrollWidth,
+                windowHeight: safariMode ? Math.min(el.scrollHeight, 768) : el.scrollHeight,
                 scrollX: window.scrollX,
-                scrollY: window.scrollY
-            }).then((canvas) => {
-                const texture = new THREE.CanvasTexture(canvas);
-                texture.needsUpdate = true;
-                if (backgroundPlane && backgroundPlane.material) {
-                    if (backgroundPlane.material.map) {
-                        try { backgroundPlane.material.map.dispose(); } catch (_) { void 0; }
+                scrollY: window.scrollY,
+                // Safari-specific: Skip problematic elements
+                ignoreElements: safariMode ? (element) => {
+                    return element.tagName === 'CANVAS' || 
+                           element.tagName === 'VIDEO' ||
+                           element.classList.contains('three-canvas') ||
+                           element.id === 'three-canvas' ||
+                           element.id === 'three-container';
+                } : undefined
+            };
+            
+            // Safari-specific: Add additional timing delay for layout stability
+            const captureDelay = safariMode ? 100 : 0;
+            
+            const doCapture = () => {
+                console.log(`[Texture] Capturing Section 4 content (Safari: ${safariMode})`);
+                
+                html2canvas(el, html2canvasOptions).then((canvas) => {
+                    const texture = new THREE.CanvasTexture(canvas);
+                    texture.needsUpdate = true;
+                    
+                    if (backgroundPlane && backgroundPlane.material) {
+                        if (backgroundPlane.material.map) {
+                            try { backgroundPlane.material.map.dispose(); } catch (_) { void 0; }
+                        }
+                        backgroundPlane.material.map = texture;
+                        backgroundPlane.material.needsUpdate = true;
+                        backgroundPlane.visible = true;
                     }
-                    backgroundPlane.material.map = texture;
-                    backgroundPlane.material.needsUpdate = true;
-                    backgroundPlane.visible = true;
-                }
-                resolve(texture);
-            }).catch((err) => {
-                reject(err);
-            });
+                    
+                    console.log(`[Texture] Section 4 capture successful (Safari: ${safariMode})`);
+                    resolve(texture);
+                }).catch((err) => {
+                    console.error(`[Texture] Section 4 capture failed (Safari: ${safariMode}):`, err);
+                    
+                    // Safari fallback: try with even more conservative settings
+                    if (safariMode) {
+                        console.log('[Texture] Attempting Safari fallback capture...');
+                        const fallbackOptions = {
+                            ...html2canvasOptions,
+                            scale: 0.5, // Very conservative scale
+                            windowWidth: Math.min(el.offsetWidth, 1024), // Limit window size
+                            windowHeight: Math.min(el.offsetHeight, 768),
+                            ignoreElements: (element) => {
+                                // Skip complex elements that might cause issues in Safari
+                                return element.tagName === 'VIDEO' || 
+                                       element.tagName === 'CANVAS' ||
+                                       element.classList.contains('three-canvas');
+                            }
+                        };
+                        
+                        html2canvas(el, fallbackOptions).then((canvas) => {
+                            const texture = new THREE.CanvasTexture(canvas);
+                            texture.needsUpdate = true;
+                            
+                            if (backgroundPlane && backgroundPlane.material) {
+                                if (backgroundPlane.material.map) {
+                                    try { backgroundPlane.material.map.dispose(); } catch (_) { void 0; }
+                                }
+                                backgroundPlane.material.map = texture;
+                                backgroundPlane.material.needsUpdate = true;
+                                backgroundPlane.visible = true;
+                            }
+                            
+                            console.log('[Texture] Safari fallback capture successful');
+                            resolve(texture);
+                        }).catch((fallbackErr) => {
+                            console.error('[Texture] Safari fallback capture also failed:', fallbackErr);
+                            reject(fallbackErr);
+                        });
+                    } else {
+                        reject(err);
+                    }
+                });
+            };
+            
+            // Apply timing delay for Safari
+            if (captureDelay > 0) {
+                setTimeout(doCapture, captureDelay);
+            } else {
+                doCapture();
+            }
+            
         } catch (e) { /* noop to satisfy linter */ reject(e); }
     });
 }
@@ -546,14 +623,30 @@ export function setupSectionPreCapture(selector, rootMargin) {
             const entry = entries[0];
             if (!captured && entry && entry.isIntersecting) {
                 captured = true;
-                // Split steps across frames to avoid jank
-                requestAnimationFrame(() => {
-                    try {
-                        updatePlaneTextureForSection(selector)
-                            .then(() => { try { window.__s4PreCaptured = true; } catch (_) { void 0; } })
-                            .catch(() => { void 0; });
-                    } catch (_) { void 0; }
-                });
+                
+                // Safari-specific: Add extra delay for layout stability
+                const safariMode = isSafari();
+                const captureDelay = safariMode ? 200 : 0;
+                
+                console.log(`[Texture] Pre-capture triggered for Section 4 (Safari: ${safariMode}, delay: ${captureDelay}ms)`);
+                
+                setTimeout(() => {
+                    requestAnimationFrame(() => {
+                        try {
+                            updatePlaneTextureForSection(selector)
+                                .then(() => { 
+                                    try { 
+                                        window.__s4PreCaptured = true;
+                                        console.log('[Texture] Section 4 pre-capture completed successfully');
+                                    } catch (_) { void 0; } 
+                                })
+                                .catch((err) => { 
+                                    console.warn('[Texture] Section 4 pre-capture failed:', err);
+                                });
+                        } catch (_) { void 0; }
+                    });
+                }, captureDelay);
+                
                 try { obs.disconnect(); } catch (_) { void 0; }
             }
         }, { root: null, rootMargin: rootMargin, threshold: 0 });

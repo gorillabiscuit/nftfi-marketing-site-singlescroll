@@ -4,7 +4,7 @@ import { GLTFLoader } from '../libs/GLTFLoader.js';
 import nftfiLogoUrl from '../models/nftfi_logo.glb?url';
 import vertexShader from '../shaders/glass.vert.js';
 import fragmentShader from '../shaders/glass.frag.js';
-import { SHADER_DEFAULTS } from '../config.js';
+import { SHADER_DEFAULTS } from '../config/index.js';
 
 // Global references
 export let mesh = null;

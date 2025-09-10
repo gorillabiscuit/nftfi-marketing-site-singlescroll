@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { createScene } from './scene.js';
 import { createCamera } from './camera.js';
 import { createRenderer, createRenderTargets } from './renderer.js';
-import { SHADER_DEFAULTS } from '../config.js';
+import { SHADER_DEFAULTS } from '../config/index.js';
 
 // Global references
 export let scene = null;

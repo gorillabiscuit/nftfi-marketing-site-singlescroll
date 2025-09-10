@@ -6,7 +6,7 @@ import { scene, camera, renderer, mainRenderTarget, backRenderTarget } from './i
 import { showBackgroundPlane, hideBackgroundPlane } from '../objects/backgroundPlane.js';
 import { getScrollSpinVelocity } from '../controls/scrollTrigger.js';
 import { calculateStartPosition } from '../utils/viewport.js';
-import { ANIMATION_CONFIG, MODEL_CONFIG, SECTION4_PEBBLE_SPIN, SECTION4_PEBBLE_WOBBLE } from '../config.js';
+import { ANIMATION_CONFIG, MODEL_CONFIG, SECTION4_PEBBLE_SPIN, SECTION4_PEBBLE_WOBBLE } from '../config/index.js';
 // NEW: Import ScrollSmoother performance monitoring
 import { startPerformanceFrame, recordScrollEvent } from '../controls/scrollSynchronizer.js';
 import { pebbleMesh, pebbleGroup, isPebbleReady } from '../objects/pebbleModel.js';

@@ -14,7 +14,7 @@ import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from '
 import { initHeaderAnimation } from './controls/headerAnimation.js';
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
 import { createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
-import { TARGET_CONFIG, MODEL_CONFIG } from './config.js';
+import { TARGET_CONFIG, MODEL_CONFIG } from './config/index.js';
 import { initializeBreakpointDetection, getCurrentAnimationState, onStateChange, debugSetState, getAnimationState } from './utils/breakpointManager.js';
 // NEW: Import ScrollSmoother synchronization layer
 import { 
@@ -27,6 +27,8 @@ import {
 } from './controls/scrollSynchronizer.js';
 // NEW: Section 3 dashboard embed + scroll
 import { initSection3Dashboard, initSection3Scroll } from './controls/section3Dashboard.js';
+// NEW: Hero button stroke effects
+import { initHeroButtonEffects } from './controls/heroButtonEffects.js';
 
 // Main initialization function
 async function init() {
@@ -233,6 +235,9 @@ async function init() {
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize navigation
     initializeNavigation();
+    
+    // Initialize hero button stroke effects
+    initHeroButtonEffects();
     
     // Initialize application
     init();

@@ -17,8 +17,9 @@ let isVisible = true; // track state to avoid redundant tweens
  * Initialize header hide/show animation
  */
 export function initHeaderAnimation() {
-    // Get only the desktop navigation elements (exclude mobile menu)
+    // Get desktop navigation elements and CTA button (exclude mobile menu)
     const desktopNav = document.querySelector(".nav-items-desktop");
+    const ctaButton = document.querySelector(".nav-cta-btn-wrapper");
     const mobileNav = document.querySelector(".nav-items-mobile");
     
     if (!desktopNav) {
@@ -26,16 +27,16 @@ export function initHeaderAnimation() {
         return;
     }
     
-    // Create a wrapper for just the desktop nav if it doesn't exist
-    if (!desktopNav.parentElement.classList.contains('desktop-nav-wrapper')) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'desktop-nav-wrapper';
-        desktopNav.parentNode.insertBefore(wrapper, desktopNav);
-        wrapper.appendChild(desktopNav);
+    // Target both desktop nav and CTA button for animation
+    const elementsToAnimate = [desktopNav];
+    if (ctaButton) {
+        elementsToAnimate.push(ctaButton);
+        console.log('CTA button found and added to header animation');
+    } else {
+        console.warn('CTA button not found for header animation');
     }
     
-    // Target only the desktop navigation wrapper
-    header = document.querySelector(".desktop-nav-wrapper");
+    header = elementsToAnimate;
 
     // Create a single global watcher that tracks scroller velocity
     // Works across pinned regions and with ScrollSmoother
@@ -43,17 +44,25 @@ export function initHeaderAnimation() {
         clearTimeout(hideDelay);
         if (!isVisible) return;
         isVisible = false;
-        gsap.to(header, { y: -100, duration: 0.3, overwrite: true, ease: 'power2.out' });
+        // Animate all elements in the header array
+        header.forEach(element => {
+            gsap.to(element, { y: -100, duration: 0.3, overwrite: true, ease: 'power2.out' });
+        });
     };
     const show = () => {
         clearTimeout(hideDelay);
         if (isVisible) return;
         isVisible = true;
-        gsap.to(header, { y: 0, duration: 0.3, overwrite: true, ease: 'power2.out' });
+        // Animate all elements in the header array
+        header.forEach(element => {
+            gsap.to(element, { y: 0, duration: 0.3, overwrite: true, ease: 'power2.out' });
+        });
     };
 
     if (watcher && watcher.kill) {
-        try { watcher.kill(); } catch (_) {}
+        try { watcher.kill(); } catch (_) {
+            // Ignore watcher kill errors
+        }
         watcher = null;
     }
 
@@ -68,7 +77,7 @@ export function initHeaderAnimation() {
         }
     });
 
-    console.log('Header hide/show animation initialized');
+    console.log(`Header hide/show animation initialized for ${header.length} elements`);
 }
 
 /**
@@ -79,7 +88,9 @@ export function cleanupHeaderAnimation() {
         clearTimeout(hideDelay);
     }
     if (watcher && watcher.kill) {
-        try { watcher.kill(); } catch (_) {}
+        try { watcher.kill(); } catch (_) {
+            // Ignore watcher kill errors
+        }
         watcher = null;
     }
     // Reset header position

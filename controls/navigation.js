@@ -13,7 +13,7 @@ export function initializeNavigation() {
         const trigger = dropdown.querySelector('.dropdown-trigger');
         const menu = dropdown.querySelector('.dropdown-menu');
         
-        console.log(`Dropdown ${index}:`, { trigger: !!trigger, menu: !!menu });
+        console.log(`Dropdown ${index}:`, { trigger: Boolean(trigger), menu: Boolean(menu) });
         
         if (!trigger || !menu) {
             console.error('Missing trigger or menu element');
@@ -76,6 +76,17 @@ export function initializeNavigation() {
                 menu.classList.remove('open');
                 trigger.classList.remove('open');
             }
+        });
+    });
+    
+    // CTA Button functionality
+    const ctaButtons = document.querySelectorAll('.nav-cta-btn');
+    ctaButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('CTA button clicked: Launch App');
+            // Add your launch app logic here
+            // For example: window.open('https://app.nftfi.com', '_blank');
         });
     });
     

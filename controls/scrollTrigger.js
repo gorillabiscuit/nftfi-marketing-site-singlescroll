@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG } from '../config.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG } from '../config/index.js';
 import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
 // Blur plugin registration for GSAP
@@ -522,8 +522,26 @@ function createScrollTimeline() {
                     );
                     wrapper.scale.setScalar(currentScale);
                     
+                    // Hide mesh just before reaching final position and show logo accent paths
+                    if (progress > 0.99) {
+                        wrapper.visible = false;
+                        // Show the accent paths in the logo when mesh disappears
+                        const accentPath1 = document.getElementById('logo-accent-1');
+                        const accentPath2 = document.getElementById('logo-accent-2');
+                        if (accentPath1) accentPath1.style.opacity = '1';
+                        if (accentPath2) accentPath2.style.opacity = '1';
+                        console.log('[Mesh] Hidden and logo accents shown at scroll progress:', progress.toFixed(3));
+                    } else {
+                        wrapper.visible = true;
+                        // Hide the accent paths when mesh is visible
+                        const accentPath1 = document.getElementById('logo-accent-1');
+                        const accentPath2 = document.getElementById('logo-accent-2');
+                        if (accentPath1) accentPath1.style.opacity = '0';
+                        if (accentPath2) accentPath2.style.opacity = '0';
+                    }
+                    
                     // debug (disabled): S1 scroll state
-                    // console.log('S1 scroll debug', { progress, startScale: startPos.scale, targetScale: dynamicTarget.scale, currentScale, wrapperScale: wrapper.scale.x, at: Date.now() });
+                    // console.log('S1 scroll debug', { progress, startScale: startPos.scale, targetScale: dynamicTarget.scale, currentScale, wrapperScale: wrapper.scale.x, meshOpacity, at: Date.now() });
                 }
             }
         }

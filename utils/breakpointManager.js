@@ -1,13 +1,13 @@
 // Breakpoint Manager for NFTfi Marketing Site
 // Handles breakpoint detection and animation state management
 
-import { ANIMATION_STATES } from '../config.js';
+import { ANIMATION_STATES, BREAKPOINT_VALUES, BREAKPOINT_NAMES } from '../config/index.js';
 
-// Breakpoint definitions (matching CSS breakpoints with mobile-first approach)
+// Use centralized breakpoint definitions
 export const BREAKPOINTS = {
-    mobile: 768,    // <768px = mobile (matches CSS @media (max-width: 768px))
-    tablet: 1024,   // 768-1023px = tablet
-    desktop: 1024   // ≥1024px = desktop
+    mobile: BREAKPOINT_VALUES.TABLET,    // Legacy: old mobile was 768px
+    tablet: BREAKPOINT_VALUES.DESKTOP,   // Legacy: old tablet was 1024px
+    desktop: BREAKPOINT_VALUES.DESKTOP   // Legacy: old desktop was 1024px
 };
 
 // Current animation state

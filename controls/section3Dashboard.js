@@ -2,13 +2,7 @@
 // Purpose: Load and inline images/dashboard.svg into #dashboard-svg-container with strict guards
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SECTION3 } from '../config.js';
-import { SECTION3_SCROLL } from '../config.js';
-import { LOOPER_BG } from '../config.js';
-import { SECTION3_ARROWS } from '../config.js';
-import { SECTION3_ARROWS_DEBUG } from '../config.js';
-import { SECTION3_ARROWS_VISIBLE_ZERO } from '../config.js';
-import { SECTION3_ARROWS_ENABLED } from '../config.js';
+import { SECTION3, SECTION3_SCROLL, SECTION3_CONTAINER, HERO_LOOPER, DASHBOARD_SVG, SECTION3_ARROWS, SECTION3_ARROWS_DEBUG, SECTION3_ARROWS_VISIBLE_ZERO, SECTION3_ARROWS_ENABLED } from '../config/index.js';
 // Bundle the dashboard SVG at build time to ensure availability in production
 import dashboardSvg from '../images/dashboard.svg?raw';
 
@@ -92,24 +86,97 @@ function fadeOutArrow(index, durationMs) {
 
 
 function getSvgConfigFor(breakpoint) {
-    if (!SECTION3) {
-        throw new Error('[Section3Dashboard] Missing SECTION3 config');
+    if (!DASHBOARD_SVG) {
+        throw new Error('[Section3Dashboard] Missing DASHBOARD_SVG config');
     }
-    if (!SECTION3.svg) {
-        throw new Error('[Section3Dashboard] Missing SECTION3.svg config');
-    }
-    const cfg = SECTION3.svg[breakpoint];
+    const cfg = DASHBOARD_SVG[breakpoint];
     if (!cfg) {
-        throw new Error('[Section3Dashboard] Missing SECTION3.svg.' + breakpoint + ' config');
-    }
-    if (typeof cfg.x !== 'number') {
-        throw new Error('[Section3Dashboard] Invalid x in SECTION3.svg.' + breakpoint);
+        throw new Error('[Section3Dashboard] Missing DASHBOARD_SVG.' + breakpoint + ' config');
     }
     if (typeof cfg.scale !== 'number') {
-        throw new Error('[Section3Dashboard] Invalid scale in SECTION3.svg.' + breakpoint);
+        throw new Error('[Section3Dashboard] Invalid scale in DASHBOARD_SVG.' + breakpoint);
     }
-    const origin = typeof cfg.transformOrigin === 'string' ? cfg.transformOrigin : '0% 0%';
-    return { x: cfg.x, scale: cfg.scale, transformOrigin: origin };
+    
+    // Extract scale from consolidated config
+    const scale = cfg.scale;
+    
+    return { scale };
+}
+
+function getParentContainerConfigFor(breakpoint) {
+    if (!SECTION3_CONTAINER) {
+        throw new Error('[Section3Dashboard] Missing SECTION3_CONTAINER config');
+    }
+    const cfg = SECTION3_CONTAINER[breakpoint];
+    if (!cfg) {
+        throw new Error('[Section3Dashboard] Missing SECTION3_CONTAINER.' + breakpoint + ' config');
+    }
+    
+    // Extract parent container positioning properties
+    const width = cfg.width || '100%';
+    const height = cfg.height || '100%';
+    const left = typeof cfg.left === 'string' ? cfg.left : '50%';
+    const top = typeof cfg.top === 'string' ? cfg.top : '50%';
+    const xPercent = typeof cfg.xPercent === 'number' ? cfg.xPercent : -50;
+    const yPercent = typeof cfg.yPercent === 'number' ? cfg.yPercent : -50;
+    
+    return { width, height, left, top, xPercent, yPercent };
+}
+
+function getHeroLooperConfigFor(breakpoint) {
+    if (!HERO_LOOPER) {
+        throw new Error('[Section3Dashboard] Missing HERO_LOOPER config');
+    }
+    const cfg = HERO_LOOPER[breakpoint];
+    if (!cfg) {
+        throw new Error('[Section3Dashboard] Missing HERO_LOOPER.' + breakpoint + ' config');
+    }
+    
+    // Convert pixel-based offset to GSAP positioning
+    const width = cfg.width || 750;
+    const height = cfg.height || 620;
+    const offsetX = cfg.offsetX || 0;
+    const offsetY = cfg.offsetY || 0;
+    
+    return { 
+        width, 
+        height, 
+        // Position at center, then apply pixel offset
+        left: '50%',
+        top: '50%',
+        x: offsetX,         // GSAP x offset in pixels
+        y: offsetY,         // GSAP y offset in pixels
+        xPercent: -50,      // Center the element
+        yPercent: -50       // Center the element
+    };
+}
+
+function getDashboardSvgConfigFor(breakpoint) {
+    if (!DASHBOARD_SVG) {
+        throw new Error('[Section3Dashboard] Missing DASHBOARD_SVG config');
+    }
+    const cfg = DASHBOARD_SVG[breakpoint];
+    if (!cfg) {
+        throw new Error('[Section3Dashboard] Missing DASHBOARD_SVG.' + breakpoint + ' config');
+    }
+    
+    // Convert pixel-based offset to GSAP positioning
+    const width = typeof cfg.width === 'number' ? `${cfg.width}px` : (cfg.width || '100%');
+    const height = typeof cfg.height === 'number' ? `${cfg.height}px` : (cfg.height || '100%');
+    const offsetX = cfg.offsetX || 0;
+    const offsetY = cfg.offsetY || 0;
+    
+    return { 
+        width, 
+        height, 
+        // Position at center, then apply pixel offset
+        left: '50%',
+        top: '50%',
+        x: offsetX,         // GSAP x offset in pixels
+        y: offsetY,         // GSAP y offset in pixels
+        xPercent: -50,      // Center the element
+        yPercent: -50       // Center the element
+    };
 }
 
 function getSvgRootStrict() {
@@ -189,15 +256,41 @@ export async function initSection3Dashboard() {
         // Position SVG so it's properly visible; use GSAP canonical setter
         const svgEl = getSvgRootStrict();
 
-        // Apply per-breakpoint transforms using GSAP matchMedia
+        // Apply per-breakpoint positioning using new parent container system
         if (typeof gsap !== 'undefined' && gsap && typeof gsap.matchMedia === 'function') {
             const mm = gsap.matchMedia();
 
-            // Desktop: ≥1024px
+            // Desktop: ≥1024px - Use config values for positioning
             mm.add('(min-width: 1024px)', () => {
                 try {
-                    const cfg = getSvgConfigFor('desktop');
-                    gsap.set(svgEl, { x: cfg.x, scale: cfg.scale, transformOrigin: cfg.transformOrigin });
+                    const dashboardCfg = getDashboardSvgConfigFor('desktop');
+                    const svgCfg = getSvgConfigFor('desktop');
+                    
+                    // Position container using new pixel offset system
+                    gsap.set(container, { 
+                        position: 'absolute',
+                        width: dashboardCfg.width,
+                        height: dashboardCfg.height,
+                        left: dashboardCfg.left,
+                        top: dashboardCfg.top,
+                        x: dashboardCfg.x,
+                        y: dashboardCfg.y,
+                        xPercent: dashboardCfg.xPercent,
+                        yPercent: dashboardCfg.yPercent,
+                        zIndex: 3,
+                        overflow: 'visible',
+                        pointerEvents: 'none',
+                        // Clear any existing transforms
+                        rotation: 0,
+                        scaleX: 1,
+                        scaleY: 1
+                    });
+                    
+                    // Scale the SVG within the positioned container
+                    gsap.set(svgEl, { 
+                        scale: svgCfg.scale,
+                        transformOrigin: '0 0'  // Top-left origin instead of center
+                    });
                 } catch (e) {
                     console.error(e);
                 }
@@ -206,8 +299,34 @@ export async function initSection3Dashboard() {
             // Tablet: 768px–1023px
             mm.add('(min-width: 768px) and (max-width: 1023px)', () => {
                 try {
-                    const cfg = getSvgConfigFor('tablet');
-                    gsap.set(svgEl, { x: cfg.x, scale: cfg.scale, transformOrigin: cfg.transformOrigin });
+                    const svgContainerCfg = getDashboardSvgConfigFor('tablet');
+                    const svgCfg = getSvgConfigFor('tablet');
+                    
+                    // Position the SVG container using new pixel offset system
+                    gsap.set(container, { 
+                        position: 'absolute',
+                        width: svgContainerCfg.width,
+                        height: svgContainerCfg.height,
+                        left: svgContainerCfg.left,
+                        top: svgContainerCfg.top,
+                        x: svgContainerCfg.x,
+                        y: svgContainerCfg.y,
+                        xPercent: svgContainerCfg.xPercent,
+                        yPercent: svgContainerCfg.yPercent,
+                        zIndex: 3,
+                        overflow: 'visible',
+                        pointerEvents: 'none',
+                        // Clear any existing transforms
+                        rotation: 0,
+                        scaleX: 1,
+                        scaleY: 1
+                    });
+                    
+                    // Scale the SVG within the positioned container
+                    gsap.set(svgEl, { 
+                        scale: svgCfg.scale,
+                        transformOrigin: '0 0'  // Top-left origin instead of center
+                    });
                 } catch (e) {
                     console.error(e);
                 }
@@ -216,17 +335,65 @@ export async function initSection3Dashboard() {
             // Mobile: <768px
             mm.add('(max-width: 767px)', () => {
                 try {
-                    const cfg = getSvgConfigFor('mobile');
-                    gsap.set(svgEl, { x: cfg.x, scale: cfg.scale, transformOrigin: cfg.transformOrigin });
+                    const svgContainerCfg = getDashboardSvgConfigFor('mobile');
+                    const svgCfg = getSvgConfigFor('mobile');
+                    
+                    // Position the SVG container using new pixel offset system
+                    gsap.set(container, { 
+                        position: 'absolute',
+                        width: svgContainerCfg.width,
+                        height: svgContainerCfg.height,
+                        left: svgContainerCfg.left,
+                        top: svgContainerCfg.top,
+                        x: svgContainerCfg.x,
+                        y: svgContainerCfg.y,
+                        xPercent: svgContainerCfg.xPercent,
+                        yPercent: svgContainerCfg.yPercent,
+                        zIndex: 3,
+                        overflow: 'visible',
+                        pointerEvents: 'none',
+                        // Clear any existing transforms
+                        rotation: 0,
+                        scaleX: 1,
+                        scaleY: 1
+                    });
+                    
+                    // Scale the SVG within the positioned container
+                    gsap.set(svgEl, { 
+                        scale: svgCfg.scale,
+                        transformOrigin: '0 0'  // Top-left origin instead of center
+                    });
                 } catch (e) {
                     console.error(e);
                 }
             });
         } else if (typeof gsap !== 'undefined' && gsap && typeof gsap.set === 'function') {
-            // Fallback if matchMedia not available - use desktop config strictly
+            // Fallback if matchMedia not available - use desktop config
             try {
-                const cfg = getSvgConfigFor('desktop');
-                gsap.set(svgEl, { x: cfg.x, scale: cfg.scale, transformOrigin: cfg.transformOrigin });
+                const dashboardCfg = getDashboardSvgConfigFor('desktop');
+                const svgCfg = getSvgConfigFor('desktop');
+                
+                // Position container using new pixel offset system
+                gsap.set(container, { 
+                    position: 'absolute',
+                    width: dashboardCfg.width,
+                    height: dashboardCfg.height,
+                    left: dashboardCfg.left,
+                    top: dashboardCfg.top,
+                    x: dashboardCfg.x,
+                    y: dashboardCfg.y,
+                    xPercent: dashboardCfg.xPercent,
+                    yPercent: dashboardCfg.yPercent,
+                    zIndex: 2,
+                    overflow: 'visible',
+                    pointerEvents: 'none'
+                });
+                
+                // Scale the SVG
+                gsap.set(svgEl, { 
+                    scale: svgCfg.scale, 
+                    transformOrigin: svgCfg.transformOrigin
+                });
             } catch (e) {
                 console.error(e);
             }
@@ -270,9 +437,17 @@ export function initSection3Scroll() {
         console.error('[Section3Dashboard] Section 3 element not found for ScrollTrigger');
         return null;
     }
+    
+    // Get the new parent container and child elements
+    const parentContainer = sectionEl.querySelector('.section3-container');
     const looperEl = sectionEl.querySelector('.hero.hero--looper');
     const svgEl = getSvgRootStrict();
     const targets = getSection3Targets();
+    
+    if (!parentContainer) {
+        console.error('[Section3Dashboard] Parent container .section3-container not found');
+        return null;
+    }
 
     // Determine scroll distance from config (in % of viewport height)
     let endPercent = 100;
@@ -360,29 +535,57 @@ export function initSection3Scroll() {
     console.log('[Section3Dashboard] Section 3 timeline created with ScrollTrigger pin+scrub');
     try { ScrollTrigger.refresh(); } catch (e) { void 0; }
 
-    // Apply config-driven size/position for the Looper background per breakpoint
+    // Apply config-driven positioning for the new parent container system
     try {
-        if (looperEl && typeof gsap.matchMedia === 'function') {
+        if (parentContainer && typeof gsap.matchMedia === 'function') {
             const mm = gsap.matchMedia();
-            const apply = (bpKey) => () => {
-                const cfg = LOOPER_BG && LOOPER_BG[bpKey] ? LOOPER_BG[bpKey] : null;
-                if (!cfg) return;
-                const w = (typeof cfg.width === 'number') ? cfg.width : null;
-                const h = (typeof cfg.height === 'number') ? cfg.height : null;
-                const left = (typeof cfg.left === 'string') ? cfg.left : '50%';
-                const top = (typeof cfg.top === 'string') ? cfg.top : '50%';
-                const xPct = (typeof cfg.xPercent === 'number') ? cfg.xPercent : -50;
-                const yPct = (typeof cfg.yPercent === 'number') ? cfg.yPercent : -50;
-                const setObj = { position: 'absolute', zIndex: 1, pointerEvents: 'none', left, top, xPercent: xPct, yPercent: yPct };
-                if (w != null) setObj.width = w;
-                if (h != null) setObj.height = h;
+            
+            // Apply parent container positioning and child element positioning per breakpoint
+            const applyPositioning = (bpKey) => () => {
+                try {
+                    // Position the parent container in the section
+                    const parentCfg = getParentContainerConfigFor(bpKey);
+                    gsap.set(parentContainer, { 
+                        position: 'absolute',
+                        width: parentCfg.width,
+                        height: parentCfg.height,
+                        left: parentCfg.left,
+                        top: parentCfg.top,
+                        xPercent: parentCfg.xPercent,
+                        yPercent: parentCfg.yPercent,
+                        zIndex: 1
+                    });
+                    
+                    // Position the hero looper within the parent container using new pixel offset system
+                    if (looperEl) {
+                        const heroCfg = getHeroLooperConfigFor(bpKey);
+                        const setObj = { 
+                            position: 'absolute', 
+                            zIndex: 1, 
+                            pointerEvents: 'none', 
+                            left: heroCfg.left, 
+                            top: heroCfg.top,
+                            x: heroCfg.x,
+                            y: heroCfg.y,
+                            xPercent: heroCfg.xPercent, 
+                            yPercent: heroCfg.yPercent 
+                        };
+                        if (heroCfg.width != null) setObj.width = heroCfg.width;
+                        if (heroCfg.height != null) setObj.height = heroCfg.height;
                 gsap.set(looperEl, setObj);
+                    }
+                } catch (e) {
+                    console.error('[Section3Dashboard] Error applying positioning for', bpKey, ':', e);
+                }
             };
-            mm.add('(max-width: 767px)', apply('mobile'));
-            mm.add('(min-width: 768px) and (max-width: 1023px)', apply('tablet'));
-            mm.add('(min-width: 1024px)', apply('desktop'));
+            
+            mm.add('(max-width: 767px)', applyPositioning('mobile'));
+            mm.add('(min-width: 768px) and (max-width: 1023px)', applyPositioning('tablet'));
+            mm.add('(min-width: 1024px)', applyPositioning('desktop'));
         }
-    } catch (e) { (void e); }
+    } catch (e) { 
+        console.error('[Section3Dashboard] Error setting up parent container positioning:', e);
+    }
 
     // Reset play-once guards when entering Section 2 (both directions)
     try {
