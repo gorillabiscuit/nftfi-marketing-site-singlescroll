@@ -422,7 +422,7 @@ body.scroll-disabled {
     width: 100%;
     max-width: 1200px; /* Max width to match hero section */
     margin: 0 auto; /* Center the container */
-    padding: 0; /* Match hero padding */
+    padding: 0 16px; /* Add 16px left/right padding to match section1 */
 }
 
 /* Logo positioning */
@@ -813,7 +813,7 @@ body.scroll-disabled {
 /* Small Mobile Devices (≤480px) - Extra Compact Layout */
 @media (max-width: 480px) {
     .nav-container {
-        padding: 0 var(--spacing-xs); /* Minimal padding for very small screens */
+        padding: 0 16px; /* Use consistent 16px padding for alignment with section1 */
     }
     
     .nav-logo svg {
@@ -1193,8 +1193,8 @@ h2 {
 
 .section:first-child {
     justify-content: flex-start; /* Ensure first section aligns left */
-    padding-left: 0; /* Remove left padding to allow hero to align with logo */
-    padding-right: 0; /* Remove right padding for consistency */
+    padding-left: 16px; /* Add 16px left padding */
+    padding-right: 16px; /* Add 16px right padding */
 }
 
 .content {
@@ -1510,7 +1510,7 @@ a.card:focus {
     .nav-container {
         justify-content: space-between;
         gap: 0;
-        padding: 0 var(--spacing-sm);
+        padding: 0 16px; /* Use consistent 16px padding instead of variable spacing */
     }
     
     /* Show only logo and mobile menu toggle on mobile */
@@ -1614,7 +1614,7 @@ a.card:focus {
 @media (min-width: 769px) and (max-width: 1024px) {
     /* Navigation Adjustments for Tablet */
     .nav-container {
-        padding: 0 var(--spacing-md);
+        padding: 0 16px; /* Use consistent 16px padding instead of variable spacing */
         max-width: 1100px; /* Intermediate container width */
     }
     
@@ -1690,7 +1690,7 @@ a.card:focus {
     /* Enhanced Navigation for Large Screens */
     .nav-container {
         max-width: 1400px; /* Wider container for large screens */
-        
+        padding: 0 16px; /* Maintain consistent 16px padding on large screens */
     }
     
     .nav-items-desktop {
