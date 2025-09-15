@@ -1,0 +1,88 @@
+/* Section 4 - Supporting Digital Assets Styles */
+
+/* Full-section background for Section 4 with top-left SVG */
+section[data-section="4"] {
+    background-image: url('/images/NFTFI-Logo-loopergroup.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+    background-repeat: no-repeat, no-repeat;
+    background-position: -10%, center;
+    background-size: 100%, 100%;
+}
+
+/* Section 4 layout adjustments */
+.section4-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    min-height: 100vh; /* ensure enough scroll distance for pinned ST */
+}
+
+/* Stage container to allow center-anchored absolute positioning */
+.section4-stage {
+    position: relative;
+}
+
+/* Center-anchored utility: position by percent offsets from dead-center */
+.center-anchored {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    --x: 0%;
+    --y: 0%;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)));
+    transform-origin: center;
+}
+
+.section4-title {
+    text-align: center;
+    font-family: 'Satoshi Variable', sans-serif;
+    will-change: transform, filter, opacity;
+}
+
+.section4-list {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    text-align: left;
+    font-family: inherit;
+    will-change: transform, filter, opacity;
+}
+
+.section4-list li {
+    width: 303px;
+    height: 31px;
+    font-family: 'Satoshi Variable', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 31px; /* 129% */
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0.25rem 0;
+}
+
+/* Section 4 single-panel text */
+.section4-panel {
+    display: grid;
+    grid-auto-rows: min-content;
+    gap: 12px;
+    text-align: left;
+    width: min(520px, 80vw);
+}
+
+.section4-item-title {
+    font-family: 'Satoshi Variable', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.25;
+    color: rgba(255, 255, 255, 0.9);
+    will-change: transform, filter, opacity;
+}
+
+.section4-item-body {
+    font-family: 'Satoshi Variable', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    will-change: transform, filter, opacity;
+}
