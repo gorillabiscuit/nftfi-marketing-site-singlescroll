@@ -72,11 +72,11 @@ export const RECT_STATES = {
         sizeFactor: 0.48,
         cornerRadiusFactor: 0.18,
         pattern: 'none',
-        cells: [],
-        sizeFactorOutStart: undefined,
-        sizeFactorOutEnd: undefined,
-        sizeFactorFinalStart: undefined,
-        sizeFactorFinalEnd: undefined,
+        cells: [[-2,0],[-1,0],[1,-1],[0,-2]],
+        sizeFactorOutStart: 1,
+        sizeFactorOutEnd: 1,
+        sizeFactorFinalStart: 1,
+        sizeFactorFinalEnd: 1,
         positionOutMultiplierStart: 1,
         positionOutMultiplierEnd: 1,
         positionFinalMultiplierStart: 1,
@@ -107,37 +107,6 @@ export const RECT_STATES = {
             strokeOpacity: 0.38,
             strokeWidth: 1,
             rxOverride: 15 // optional override; otherwise computed from cornerRadiusFactor
-        },
-        // Text configurations for the primary cell (global defaults)
-        amount: {
-            text: '$700M+',
-            color: 'rgba(255, 255, 255, 0.75)',
-            fontFamily: 'Roboto Mono, monospace',
-            fontSize: 36,
-            fontWeight: '300',
-            letterSpacing: 1.44,
-            center: true,
-            anchor: 'middle',
-            baseline: 'middle',
-            centerOffsetX: 70,
-            centerOffsetY: 65,
-            rotateDeg: -45
-        },
-        label: {
-            text: 'LOAN VOLUME',
-            color: '#FFFFFF',
-            opacity: 0.5,
-            fontFamily: 'Satoshi Variable, sans-serif',
-            fontSize: 16,
-            fontWeight: '500',
-            // bottom-left by default; you can switch to bottom-right using padRight
-            padLeft: 200,
-            padBottom: undefined,
-            padRight: undefined,
-            padTop: 180,
-            rotateDeg: -90,
-            anchor: 'start',
-            baseline: 'alphabetic'
         },
         // Blocks array: order maps to visible cells sequence. Only text is required; rect can override gradient.
         blocks: [
