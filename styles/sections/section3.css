@@ -1,0 +1,155 @@
+/* Section 3 - Features Dashboard Styles */
+
+/* Hard-cap Section 3 to exactly one viewport height to match Section 1 */
+.section[data-section="3"] {
+    height: 100vh;
+    min-height: 100vh;
+    position: relative; /* Ensure proper positioning context for children */
+}
+
+/* Section 3 Parent Container - Centralized positioning system */
+.section3-container {
+    /* Positioning handled by JavaScript via SECTION3_CONTAINER config */
+    /* This container centers both the hero panel and SVG as a cohesive unit */
+    position: absolute;
+    z-index: 1;
+}
+
+/* Section 3 background hero using LooperGroup.svg, positioned within parent container */
+.hero--looper {
+    /* Layered backgrounds; size/position set relative to parent via HERO_LOOPER config in JS */
+    /* Put SVG on top layer, gradient underneath */
+    background-image: url('/images/LooperGroup.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+    background-size: 150%;
+    background-repeat: no-repeat, no-repeat;
+    background-position: 10% 50%;
+    /* Position set via JavaScript relative to .section3-container parent */
+    z-index: 1; /* Below #dashboard-svg-container */
+    pointer-events: none; /* never block interactions */
+    padding: 60px 97px  !important;
+}
+
+.hero--looper::before,
+.hero--looper::after {
+    display: none; /* remove default hero pseudo SVGs */
+}
+
+/* Section 3 features layout */
+.section3-features {
+    position: absolute;
+    inset: 0;
+    z-index: 3; /* above dashboard svg text but below nav */
+    display: grid;
+    grid-template-rows: auto auto auto auto auto 1fr; /* title + 4 blocks + cta */
+    align-content: start;
+    pointer-events: none; /* so dashboard interactions pass through if needed */
+}
+
+.section3-features .feature-block {
+    pointer-events: auto;
+    max-width: 640px;
+    text-align: left;
+}
+
+.section3-features .features-title {
+    font-family: 'Satoshi Variable', sans-serif;
+    font-weight: 300;
+    font-size: 42px;
+    line-height: 1.2;
+    color: rgba(255,255,255,0.85);
+    margin: 0 0 8px 0;
+    padding-top: 56px;
+}
+
+.section3-features .feature-block h3 {
+    font-family: 'Satoshi Variable', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 25px; /* 129% */
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 8px 0;
+}
+
+.section3-features .feature-block p {
+    width: 303px;
+    font-family: 'Satoshi Variable', sans-serif;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 22px; /* 157% */
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 16px 0;
+}
+
+/* Per-block left padding and vertical spacing by breakpoint */
+/* .feature-1 { padding-left: 264px; padding-top: 80px; }
+.feature-2 { padding-left: 164px; padding-top: 16px; }
+.feature-3 { padding-left: 664px; padding-top: 16px; }
+.feature-4 { padding-left: 64px; padding-top: 16px; } */
+
+.section3-features .feature-cta { 
+    padding-left: 334px; 
+    padding-top: 24px; 
+    padding-right: 60px; 
+}
+
+.section3-features .feature-cta .cta-button { 
+    pointer-events: auto; 
+    min-width: 280px; 
+}
+
+/* Dashboard SVG container - positioning handled by JavaScript via DASHBOARD_SVG config */
+#dashboard-svg-container {
+    /* Basic styles - positioning applied via GSAP in section3Dashboard.js */
+    z-index: 2;
+    overflow: visible;
+    pointer-events: none; /* allow interactions to pass through */
+}
+
+/* Responsive breakpoints for Section 3 */
+@media (min-width: 1025px) {
+    .features-title { 
+        padding-left: 96px; 
+        padding-top: 96px; 
+    }
+    .feature-1 { 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT) + 80px); 
+        padding-top: 24px; 
+    }
+    .feature-2 { 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT) + 130px); 
+    }
+    .feature-3 { 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT) + 182px); 
+    }
+    .feature-4 { 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT) + 235px); 
+    }
+    .section3-features .feature-block p { 
+        width: 360px; 
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .feature-1, .feature-2, .feature-3, .feature-4, .section3-features .feature-cta { 
+        padding-left: 72px; 
+    }
+}
+
+@media (max-width: 768px) {
+    .section3-features { 
+        padding: 16px; 
+        grid-template-rows: auto auto auto auto auto; 
+    }
+    .features-title { 
+        padding-left: 16px; 
+        padding-top: 24px; 
+    }
+    .feature-1, .feature-2, .feature-3, .feature-4, .section3-features .feature-cta { 
+        padding-left: 16px; 
+    }
+    .section3-features .feature-block p { 
+        width: 100%; 
+    }
+}
