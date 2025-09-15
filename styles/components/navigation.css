@@ -424,37 +424,6 @@
         width: calc(var(--logo-size) * 0.85); /* Slightly smaller logo */
         height: calc(var(--logo-height) * 0.85);
     }
-    
-    .hero {
-        margin-left: var(--spacing-xs);
-        margin-right: var(--spacing-xs);
-        padding: var(--spacing-md);
-        border-radius: 16px; /* Smaller radius for compact screens */
-    }
-    
-    .hero h1 {
-        font-size: var(--font-size-xl); /* Smaller heading for tiny screens */
-    }
-    
-    .hero .subtitle {
-        font-size: clamp(12px, 1.8vw, 16px); /* Small mobile, well under 24px max */
-    }
-    
-    .card {
-        font-size: var(--font-size-xs); /* Smaller button text */
-        padding: 15px 28px; /* Maintain proportional padding */
-        width: 160px; /* Slightly smaller for small mobile */
-        min-width: 160px;
-        height: 44px; /* Slightly smaller height */
-    }
-    
-    /* Hero text for very small screens */
-    .hero-text {
-        width: 100%; /* Full width on small mobile */
-        height: auto;
-        margin: 0;
-        gap: 16px; /* Compact gap */
-    }
 }
 
 /* Mobile Responsive Design - Consolidated (481px - 768px) */
@@ -513,67 +482,6 @@
         align-items: center;
         justify-content: center;
     }
-    
-    /* Mobile Typography */
-    .hero h1 {
-        font-size: var(--font-size-4xl);
-        line-height: 1.4;
-        text-align: center;
-        width: 100%;
-    }
-    
-    .hero .subtitle {
-        font-size: clamp(14px, 2vw, 18px); /* Mobile-appropriate sizing with 24px never exceeded */
-        line-height: 1.4;
-        text-align: left; /* Keep left-aligned on mobile */
-    }
-    
-    /* Mobile Layout */
-    .hero {
-        padding: var(--spacing-lg);
-        margin-left: var(--spacing-sm);
-        margin-right: var(--spacing-sm);
-        border-radius: 20px;
-        min-height: 82vh;
-        /* Remove padding-top and align-content to let flexbox handle positioning */
-    }
-    
-    .hero-text {
-        width: 100%; /* Full width on mobile */
-        height: auto; /* Auto height on mobile */
-        margin: 0; /* Remove centering margin on mobile */
-        gap: var(--spacing-sm); /* Smaller gap on mobile */
-    }
-    
-    .hero-actions {
-        flex-direction: column;
-        gap: var(--spacing-sm);
-        align-items: start;
-        margin-top: auto; /* Maintain bottom positioning on mobile */
-    }
-    
-    /* Mobile Buttons */
-    .card {
-        min-width: 100%;
-        width: 100%; /* Full width on mobile */
-        height: 48px; /* Keep 48px height as specified */
-        padding: 17px 36px; /* Maintain spec padding */
-        font-size: var(--font-size-sm);
-    }
-    
-    /* Mobile Content */
-    .content {
-        padding: 0 var(--spacing-sm);
-    }
-    
-    /* Mobile Gradient Optimization */
-    .gradients-bg::before,
-    .gradients-bg::after,
-    .gradient-layer-3,
-    .gradient-layer-4,
-    .gradient-layer-5 {
-        filter: blur(20px); /* Reduce blur for mobile performance */
-    }
 }
 
 /* Tablet Responsive Design (769px - 1024px) */
@@ -601,54 +509,6 @@
         font-size: 15px; /* Intermediate font size */
         line-height: 20px;
     }
-    
-    /* Hero Section for Tablet */
-    .hero {
-        padding-top: var(--spacing-vertical-xl);
-        padding-bottom: var(--spacing-vertical-xl);
-        padding-left: var(--spacing-horizontal-xl);
-        padding-right: var(--spacing-horizontal-xl);
-    }
-    
-    .hero h1 {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .hero .subtitle {
-        font-size: clamp(16px, 2.2vw, 22px); /* Tablet sizing, still under 24px max */
-    }
-    
-    .card {
-        min-width: 160px;
-        width: 160px; /* Intermediate size for tablet */
-        height: 48px; /* Consistent with spec */
-        padding: 16px 32px; /* Slightly smaller padding for tablet */
-    }
-    
-    /* Hero text adjustments for tablet */
-    .hero-text {
-        width: 580px; /* Slightly smaller for tablet */
-        height: auto; /* Allow flexible height */
-        gap: 20px; /* Intermediate gap */
-    }
-}
-
-/* Desktop Optimization (1025px - 1199px) */
-@media (min-width: 1025px) and (max-width: 1199px) {
-    .hero {
-        padding-top: var(--spacing-vertical-xl);
-        padding-bottom: var(--spacing-vertical-xl);
-        padding-left: var(--spacing-horizontal-xl);
-        padding-right: var(--spacing-horizontal-xl);
-    }
-    
-    .hero h1 {
-        font-size: var(--font-size-3xl);
-    }
-    
-    .hero .subtitle {
-        font-size: clamp(18px, 2.4vw, 24px); /* Desktop sizing, exactly 24px max */
-    }
 }
 
 /* XL Screen Optimization (1200px+) - Enhanced Experience for Large Monitors */
@@ -674,25 +534,6 @@
     .nav-link {
         font-size: 16px; /* Larger navigation text */
         line-height: 22px;
-    }
-    
-    /* Enhanced Hero Section */
-    .hero {
-        padding-top: var(--spacing-vertical-xl);
-        padding-bottom: var(--spacing-vertical-xl);
-        padding-left: var(--spacing-horizontal-xl);
-        padding-right: var(--spacing-horizontal-xl);
-        max-width: 1400px; /* Match navigation container */
-        margin: 0 auto; /* Center the hero */
-        min-height: 500px;
-    }
-    
-    .hero h1 {
-        font-size: var(--font-size-4xl); /* Even larger for XL screens */
-    }
-    
-    .hero .subtitle {
-        font-size: clamp(16px, 2.25vw, 20px); /* XL sizing, capped at 24px max */
     }
     
     /* Enhanced Visual Effects for High-Performance Devices */
