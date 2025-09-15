@@ -1,0 +1,135 @@
+/* ==========================================================================
+   RESPONSIVE DESIGN SYSTEM GUIDE
+   ==========================================================================
+   
+   This system provides a bulletproof responsive design foundation with:
+   - Fluid typography that scales smoothly across devices
+   - Adaptive spacing that maintains visual hierarchy
+   - Device-specific optimizations for performance
+   - Accessibility compliance with reduced motion support
+   
+   USAGE GUIDE:
+   - Use clamp() functions for fluid scaling between min/max values
+   - Breakpoints: mobile (≤480px), tablet (481-768px), desktop (≥769px)
+   - All measurements are viewport-relative for consistent scaling
+   - Performance: Mobile gets reduced effects, desktop gets full features
+   
+   ========================================================================== */
+
+/* Responsive Design System */
+:root {
+    /* ==========================================================================
+       BREAKPOINTS
+       ==========================================================================
+       These define the responsive breakpoints for the entire application.
+       Used in media queries and JavaScript device detection.
+       
+       --mobile: 480px    - Small mobile devices (iPhone SE, etc.)
+       --tablet: 768px    - Large mobile/small tablet (iPhone 12, iPad mini)
+       --desktop: 1024px  - Tablet/laptop (iPad, small laptops)
+       --large: 1200px    - Desktop/large screens (monitors, large laptops)
+       ========================================================================== */
+    --mobile: 480px;
+    --tablet: 768px;
+    --desktop: 1024px;
+    --large: 1200px;
+    --MY_BUFFER_AMOUNT: 70px;
+    
+    /* ==========================================================================
+       ADAPTIVE SPACING SYSTEM
+       ==========================================================================
+       Fluid spacing that scales with viewport size while maintaining
+       visual hierarchy and touch-friendly minimums.
+       
+       Formula: clamp(minimum, preferred, maximum)
+       - minimum: Ensures touch-friendly sizes on mobile
+       - preferred: Viewport-relative scaling (vw units)
+       - maximum: Prevents excessive spacing on large screens
+       
+       Usage examples:
+       - --spacing-xs: For micro-interactions, icons, small gaps
+       - --spacing-sm: For button padding, card margins, section gaps
+       - --spacing-md: For section padding, major component spacing
+       - --spacing-lg: For hero sections, large component margins
+       - --spacing-xl: For full-screen sections, major page spacing
+       ========================================================================== */
+    --spacing-xs: clamp(8px, 2vw, 12px);    /* Micro-spacing: icons, small gaps */
+    --spacing-sm: clamp(16px, 3vw, 24px);   /* Small spacing: buttons, cards */
+    --spacing-md: clamp(24px, 4vw, 48px);   /* Medium spacing: sections, components */
+    --spacing-lg: clamp(32px, 6vw, 50px);   /* Large spacing: hero sections */
+    --spacing-vertical-xl: clamp(48px, 8vw, 8vh);   /* Extra large: full-screen sections */
+    --spacing-horizontal-xl: clamp(48px, 8vw, 4vw);   /* Extra large: full-screen sections */
+    
+    /* ==========================================================================
+       FLUID TYPOGRAPHY SYSTEM
+       ==========================================================================
+       Responsive typography that scales smoothly across all devices
+       while maintaining readability and visual hierarchy.
+       
+       Scale: xs → sm → base → lg → xl → 2xl → 3xl
+       Each step increases by approximately 1.25x (golden ratio)
+       
+       Mobile considerations:
+       - Minimum sizes ensure readability on small screens
+       - Maximum sizes prevent excessive scaling on large screens
+       - Line heights are optimized for each size
+       
+       Usage by component:
+       - --font-size-xs: Captions, metadata, small labels
+       - --font-size-sm: Body text on mobile, small buttons
+       - --font-size-base: Primary body text, navigation
+       - --font-size-lg: Subheadings, emphasized text
+       - --font-size-xl: Section headings, large buttons
+       - --font-size-2xl: Page titles, hero text
+       - --font-size-3xl: Main headlines, hero titles
+       - --font-size-4xl: Large hero titles, prominent headings
+       ========================================================================== */
+    --font-size-xs: clamp(10px, 1.25vw, 12px);   /* Captions, metadata */
+    --font-size-sm: clamp(12px, 1.5vw, 14px);    /* Small text, mobile body */
+    --font-size-base: clamp(14px, 2vw, 16px);    /* Primary body text */
+    --font-size-lg: clamp(16px, 2.25vw, 18px);   /* Subheadings, emphasized */
+    --font-size-xl: clamp(18px, 2.75vw, 22px);   /* Section headings */
+    --font-size-2xl: clamp(24px, 4vw, 32px);     /* Page titles, hero text */
+    --font-size-3xl: clamp(32px, 6vw, 40px);     /* Main headlines */
+    --font-size-4xl: clamp(40px, 8vw, 48px);     /* Large hero titles - MAX SIZE */
+    
+    /* ==========================================================================
+       LAYOUT & COMPONENT VARIABLES
+       ==========================================================================
+       Specific measurements for key components that need
+       consistent responsive behavior across the application.
+       
+       Container padding: Adapts to screen size for consistent margins
+       Hero padding: Scales from mobile-friendly to desktop spacious
+       Logo sizing: Maintains brand visibility across all devices
+       
+       These variables ensure:
+       - Consistent spacing across all components
+       - Brand visibility maintained on all screen sizes
+       - Touch-friendly minimums on mobile devices
+       - Optimal visual hierarchy on desktop
+       ========================================================================== */
+    --container-padding: clamp(16px, 4vw, 32px);  /* Page margins, component padding */
+    --hero-padding: clamp(40px, 8vw, 97px);      /* Hero section internal spacing */
+    --logo-size: clamp(60px, 12vw, 102px);       /* Logo width (maintains aspect ratio) */
+    --logo-height: clamp(15px, 3vw, 26px);       /* Logo height (maintains aspect ratio) */
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .gradients-bg::before,
+    .gradients-bg::after,
+    .gradient-layer-3,
+    .gradient-layer-4,
+    .gradient-layer-5 {
+        animation: none;
+    }
+    
+    .card:hover {
+        transform: none;
+    }
+    
+    .card:active {
+        transform: none;
+    }
+}

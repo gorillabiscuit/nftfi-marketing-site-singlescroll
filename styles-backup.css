@@ -74,6 +74,327 @@
   color: rgba(255,255,255,0.8);
   will-change: transform, filter, opacity;
 }
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN SYSTEM GUIDE
+   ==========================================================================
+   
+   This system provides a bulletproof responsive design foundation with:
+   - Fluid typography that scales smoothly across devices
+   - Adaptive spacing that maintains visual hierarchy
+   - Device-specific optimizations for performance
+   - Accessibility compliance with reduced motion support
+   
+   USAGE GUIDE:
+   - Use clamp() functions for fluid scaling between min/max values
+   - Breakpoints: mobile (≤480px), tablet (481-768px), desktop (≥769px)
+   - All measurements are viewport-relative for consistent scaling
+   - Performance: Mobile gets reduced effects, desktop gets full features
+   
+   ========================================================================== */
+
+/* Responsive Design System */
+:root {
+    /* ==========================================================================
+       BREAKPOINTS
+       ==========================================================================
+       These define the responsive breakpoints for the entire application.
+       Used in media queries and JavaScript device detection.
+       
+       --mobile: 480px    - Small mobile devices (iPhone SE, etc.)
+       --tablet: 768px    - Large mobile/small tablet (iPhone 12, iPad mini)
+       --desktop: 1024px  - Tablet/laptop (iPad, small laptops)
+       --large: 1200px    - Desktop/large screens (monitors, large laptops)
+       ========================================================================== */
+    --mobile: 480px;
+    --tablet: 768px;
+    --desktop: 1024px;
+    --large: 1200px;
+    --MY_BUFFER_AMOUNT: 70px;
+    
+    /* ==========================================================================
+       ADAPTIVE SPACING SYSTEM
+       ==========================================================================
+       Fluid spacing that scales with viewport size while maintaining
+       visual hierarchy and touch-friendly minimums.
+       
+       Formula: clamp(minimum, preferred, maximum)
+       - minimum: Ensures touch-friendly sizes on mobile
+       - preferred: Viewport-relative scaling (vw units)
+       - maximum: Prevents excessive spacing on large screens
+       
+       Usage examples:
+       - --spacing-xs: For micro-interactions, icons, small gaps
+       - --spacing-sm: For button padding, card margins, section gaps
+       - --spacing-md: For section padding, major component spacing
+       - --spacing-lg: For hero sections, large component margins
+       - --spacing-xl: For full-screen sections, major page spacing
+       ========================================================================== */
+    --spacing-xs: clamp(8px, 2vw, 12px);    /* Micro-spacing: icons, small gaps */
+    --spacing-sm: clamp(16px, 3vw, 24px);   /* Small spacing: buttons, cards */
+    --spacing-md: clamp(24px, 4vw, 48px);   /* Medium spacing: sections, components */
+    --spacing-lg: clamp(32px, 6vw, 50px);   /* Large spacing: hero sections */
+    --spacing-vertical-xl: clamp(48px, 8vw, 8vh);   /* Extra large: full-screen sections */
+    --spacing-horizontal-xl: clamp(48px, 8vw, 4vw);   /* Extra large: full-screen sections */
+    
+    /* ==========================================================================
+       FLUID TYPOGRAPHY SYSTEM
+       ==========================================================================
+       Responsive typography that scales smoothly across all devices
+       while maintaining readability and visual hierarchy.
+       
+       Scale: xs → sm → base → lg → xl → 2xl → 3xl
+       Each step increases by approximately 1.25x (golden ratio)
+       
+       Mobile considerations:
+       - Minimum sizes ensure readability on small screens
+       - Maximum sizes prevent excessive scaling on large screens
+       - Line heights are optimized for each size
+       
+       Usage by component:
+       - --font-size-xs: Captions, metadata, small labels
+       - --font-size-sm: Body text on mobile, small buttons
+       - --font-size-base: Primary body text, navigation
+       - --font-size-lg: Subheadings, emphasized text
+       - --font-size-xl: Section headings, large buttons
+       - --font-size-2xl: Page titles, hero text
+       - --font-size-3xl: Main headlines, hero titles
+       - --font-size-4xl: Large hero titles, prominent headings
+       ========================================================================== */
+    --font-size-xs: clamp(10px, 1.25vw, 12px);   /* Captions, metadata */
+    --font-size-sm: clamp(12px, 1.5vw, 14px);    /* Small text, mobile body */
+    --font-size-base: clamp(14px, 2vw, 16px);    /* Primary body text */
+    --font-size-lg: clamp(16px, 2.25vw, 18px);   /* Subheadings, emphasized */
+    --font-size-xl: clamp(18px, 2.75vw, 22px);   /* Section headings */
+    --font-size-2xl: clamp(24px, 4vw, 32px);     /* Page titles, hero text */
+    --font-size-3xl: clamp(32px, 6vw, 40px);     /* Main headlines */
+    --font-size-4xl: clamp(40px, 8vw, 48px);     /* Large hero titles - MAX SIZE */
+    
+    /* ==========================================================================
+       LAYOUT & COMPONENT VARIABLES
+       ==========================================================================
+       Specific measurements for key components that need
+       consistent responsive behavior across the application.
+       
+       Container padding: Adapts to screen size for consistent margins
+       Hero padding: Scales from mobile-friendly to desktop spacious
+       Logo sizing: Maintains brand visibility across all devices
+       
+       These variables ensure:
+       - Consistent spacing across all components
+       - Brand visibility maintained on all screen sizes
+       - Touch-friendly minimums on mobile devices
+       - Optimal visual hierarchy on desktop
+       ========================================================================== */
+    --container-padding: clamp(16px, 4vw, 32px);  /* Page margins, component padding */
+    --hero-padding: clamp(40px, 8vw, 97px);      /* Hero section internal spacing */
+    --logo-size: clamp(60px, 12vw, 102px);       /* Logo width (maintains aspect ratio) */
+    --logo-height: clamp(15px, 3vw, 26px);       /* Logo height (maintains aspect ratio) */
+}
+
+body {
+    overflow-x: hidden;
+    background-color: #271E23;
+    position: relative;
+}
+
+/* Scroll prevention styles */
+body.scroll-disabled {
+    overflow: hidden !important;
+    cursor: wait;
+}
+
+/* Animated Morphing Gradients Background */
+.gradients-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.gradients-bg::before {
+    content: '';
+    position: absolute;
+    top: 30%;
+    left: 25%;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 123, 202, 0.4) 0%, rgba(255, 153, 0, 0.1) 50%, transparent 70%);
+    animation: morph1 25s ease-in-out infinite;
+    filter: blur(40px);
+}
+
+.gradients-bg::after {
+    content: '';
+    position: absolute;
+    top: 70%;
+    left: 75%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 123, 202, 0.4) 0% , rgba(255, 123, 202, 0.4)  20%, transparent 70%);
+    animation: morph2 30s ease-in-out infinite;
+    filter: blur(40px);
+}
+
+/* Third gradient layer */
+.gradient-layer-3 {
+    position: absolute;
+    top: 20%;
+    left: 70%;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(224, 146, 29, 0.397) 0%, rgba(255, 197, 111, 0.2) 50%, transparent 70%);
+    animation: morph3 35s ease-in-out infinite;
+    filter: blur(40px);
+    transform: translate(-50%, -50%);
+}
+
+/* Fourth gradient layer */
+.gradient-layer-4 {
+    position: absolute;
+    top: 80%;
+    left: 20%;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 118, 184, 0.586) 0%, rgba(251, 146, 60, 0.425) 50%, transparent 70%);
+    animation: morph4 28s ease-in-out infinite;
+    filter: blur(40px);
+    transform: translate(-50%, -50%);
+}
+
+/* Fifth gradient layer */
+.gradient-layer-5 {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    width: 550px;
+    height: 550px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.2) 0%, rgba(255, 197, 111, 0.2) 50%, transparent 70%);
+    animation: morph5 32s ease-in-out infinite;
+    filter: blur(40px);
+    transform: translate(-50%, -50%);
+}
+
+@keyframes morph1 {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.8;
+    }
+    33% {
+        transform: translate(-30%, -70%) scale(1.3) rotate(120deg);
+        opacity: 0.6;
+    }
+    66% {
+        transform: translate(-70%, -30%) scale(0.7) rotate(240deg);
+        opacity: 1;
+    }
+}
+
+@keyframes morph2 {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.6;
+    }
+    33% {
+        transform: translate(-70%, -30%) scale(1.2) rotate(120deg);
+        opacity: 0.8;
+    }
+    66% {
+        transform: translate(-30%, -70%) scale(0.8) rotate(240deg);
+        opacity: 0.4;
+    }
+}
+
+@keyframes morph3 {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.4;
+    }
+    25% {
+        transform: translate(-20%, -80%) scale(1.4) rotate(90deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translate(-80%, -20%) scale(0.6) rotate(180deg);
+        opacity: 0.3;
+    }
+    75% {
+        transform: translate(-20%, -20%) scale(1.1) rotate(270deg);
+        opacity: 0.7;
+    }
+}
+
+@keyframes morph4 {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.3;
+    }
+    33% {
+        transform: translate(-30%, -60%) scale(1.3) rotate(120deg);
+        opacity: 0.5;
+    }
+    66% {
+        transform: translate(-60%, -30%) scale(0.7) rotate(240deg);
+        opacity: 0.2;
+    }
+}
+
+@keyframes morph5 {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.4;
+    }
+    20% {
+        transform: translate(-40%, -70%) scale(1.2) rotate(72deg);
+        opacity: 0.6;
+    }
+    40% {
+        transform: translate(-70%, -40%) scale(0.8) rotate(144deg);
+        opacity: 0.3;
+    }
+    60% {
+        transform: translate(-40%, -40%) scale(1.1) rotate(216deg);
+        opacity: 0.5;
+    }
+    80% {
+        transform: translate(-70%, -70%) scale(0.9) rotate(288deg);
+        opacity: 0.4;
+    }
+}
+
+/* Three.js Container */
+#three-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 100; /* Higher z-index to be visible but behind UI controls */
+    pointer-events: none; /* Make canvas invisible to mouse events - canonical solution */
+}
+
+/* Three.js Canvas */
+#three-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    opacity: 0; /* Will fade in when model is ready */
+}
 
 /* Legacy logo styles - now handled by nav-logo */
 
@@ -534,6 +855,21 @@
 
 /* Mobile Responsive Design - Consolidated (481px - 768px) */
 
+/* Content Container for ScrollSmoother */
+#smooth-wrapper {
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    z-index: 50;
+}
+
+#smooth-content {
+    position: relative;
+    z-index: 50; /* Lower z-index to be behind canvas but above background */
+    pointer-events: auto; /* Ensure content is clickable */
+    height: auto;
+    min-height: 100vh;
+}
 
 /* Hero Section */
 .hero {
@@ -680,6 +1016,15 @@ section[data-section="4"] {
     pointer-events: none; /* allow interactions to pass through */
 }
 
+/* Prep state to disable transitions and keep text hidden until layout is ready */
+html.is-prep .hero,
+html.is-prep .hero-text,
+html.is-prep .hero-actions {
+    transition: none !important;
+}
+html.is-prep .hero-text {
+    opacity: 0;
+}
 
 /* SVG Background - Top Right Copy */
 .hero::before {
@@ -1138,6 +1483,13 @@ a.card:focus {
     background: rgba(226, 220, 218, 0.05);
 }
 
+/* SVG Filter for Distortion Effect */
+.svg-filters {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
 
 /* Comprehensive Mobile Responsive Design */
 @media (max-width: 768px) {
@@ -1388,6 +1740,24 @@ a.card:focus {
     }
 }
 
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .gradients-bg::before,
+    .gradients-bg::after,
+    .gradient-layer-3,
+    .gradient-layer-4,
+    .gradient-layer-5 {
+        animation: none;
+    }
+    
+    .card:hover {
+        transform: none;
+    }
+    
+    .card:active {
+        transform: none;
+    }
+}
 
 /* SVG Lines Container */
 .svg-lines-container {

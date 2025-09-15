@@ -1,0 +1,10 @@
+/* Base Styles Index - Import all base stylesheets */
+
+/* Core reset and foundational styles */
+@import './reset.css';
+
+/* Responsive design system variables and utilities */
+@import './responsive.css';
+
+/* Global layout and background elements */
+@import './global.css';

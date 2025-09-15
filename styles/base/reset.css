@@ -1,0 +1,18 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    background-color: #271E23;
+    position: relative;
+}
+
+/* Scroll prevention styles */
+body.scroll-disabled {
+    overflow: hidden !important;
+    cursor: wait;
+}
