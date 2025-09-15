@@ -345,7 +345,11 @@ a.card:focus {
         flex-direction: column;
         justify-content: flex-end; /* Align content to bottom */
     }
-    
+
+    .hero-content {
+        min-height: 30vh;
+       } 
+
     .section:first-child {
         padding-left: calc(var(--container-padding) + 3px);
         padding-right: calc(var(--container-padding) + 3px);
