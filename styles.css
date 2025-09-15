@@ -657,32 +657,6 @@ section[data-section="4"] {
 
 
 
-.section[data-section="2"] {
-    /* Your styles here */
-    
-    
-  /*  min-height: 50vh !important; /* Override the 100vh min-height */
-  /*  max-height: 50vh; /* Ensure it doesn't exceed 50% viewport height */
-    
-    /* Center content both vertically and horizontally */
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-/* Ensure content in section 2 is properly centered */
-.section[data-section="2"] .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* Center align the h2 text in section 2 */
-.section[data-section="2"] h1 {
-    text-align: center !important;
-    padding-bottom: 5vw;
-}
 
 /* Hard-cap Section 3 to exactly one viewport height to match Section 1 */
 .section[data-section="3"] {
@@ -699,49 +673,6 @@ section[data-section="4"] {
     z-index: 1;
 }
 
-  .stats {
-    display: flex;
-    justify-content: space-around; 
-    align-items: center;    
-    
-    height: 100%;
-    padding: 15px;
-    gap: 5px;
-    width: 100%;
-    /* Desktop: horizontal layout */
-    flex-direction: row;
-  }
-
-  .stats > div{
-    padding: 8px;
-    
-    /* Make stat elements display vertically */
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    justify-content: left;
-    text-align: left;
-    gap: 4px;
-  }
-  
-  /* Style the number and label elements */
-  .stats .number {
-    font-family: 'Roboto Mono', monospace;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 32px;
-    line-height: 46px;
-    color: #C9C9C9;
-  }
-  
-  .stats .label {
-    font-family: 'Satoshi Variable', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 28px;
-    color: #B5B5B5;
-  }
 
 
 
@@ -758,51 +689,8 @@ section[data-section="4"] {
 
 
 
-.glass {
-    position: relative;
-    background: rgba(255, 255, 255, 0.15); /* subtle transparency */
-    backdrop-filter: blur(2px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 2rem;
-    box-shadow:
-      0 8px 32px rgba(31, 38, 135, 0.2),
-      inset 0 4px 20px rgba(255, 255, 255, 0.3);
-  }
-  
-  .glass::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2rem;
-    backdrop-filter: blur(1px);
-    box-shadow:
-      inset -10px -8px 0px -11px rgba(255,255,255,1),
-      inset 0px -9px 0px -8px rgba(255,255,255,1);
-    opacity: 0.6;
-    z-index: -1;
-    filter: blur(1px) drop-shadow(10px 4px 6px black) brightness(115%);
-  }
   
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .content {
-        margin-left: 0;
-    }
-    
-    /* Mobile: vertical layout for stats */
-    .stats {
-        flex-direction: column;
-        gap: 15px;
-        padding: 20px;
-    }
-    
-    .stats > div {
-        width: 100%;
-        text-align: center;
-    }
-} 
 
 
 
@@ -1068,40 +956,6 @@ section[data-section="4"] {
 }
 
 
-/* SVG Lines Container */
-.svg-lines-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-#lines-svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Center the SVG */
-    /* Width and height will be set dynamically via JavaScript */
-    /* Debug: Add a subtle border to see the SVG boundaries */
-    /* border: 1px solid rgba(255, 255, 255, 0.1); */
-}
-
-/* SVG Line Styles */
-.line {
-    stroke: var(--grid-line-color, #F2F2F2);
-    stroke-width: var(--grid-line-width, 0.5px);
-    fill: none;
-    vector-effect: non-scaling-stroke;
-    opacity: var(--grid-line-opacity, 0.8);
-}
-
-.key-metrics-title {
-    display: inline-block;
-    transform: translate(20px, -100px) rotate(45deg);
-    transform-origin: center center;
-}
 
 /* Section 5 Styles */
 .section[data-section="5"] {
