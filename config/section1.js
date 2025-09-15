@@ -29,7 +29,7 @@ export const ANIMATION_STATES = {
         target: { x: -0.67, y: 0.7, z: 0, scale: 0.3 }
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        start: { x: 0.55, y: -0.15, z: 0, scale: 3.0 },
+        start: { x: 0.55, y: 0.0, z: 0, scale: 2.5 },
         target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
     },
     [BREAKPOINT_NAMES.LARGE]: {

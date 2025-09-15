@@ -26,7 +26,7 @@
     width: 100%;
     max-width: 1200px; /* Max width to match hero section */
     margin: 0 auto; /* Center the container */
-    padding: 0 16px; /* Add 16px left/right padding to match section1 */
+    padding: 0 var(--container-padding); /* Use same responsive padding as hero section */
 }
 
 /* Logo positioning */
@@ -417,7 +417,7 @@
 /* Small Mobile Devices (≤480px) - Extra Compact Layout */
 @media (max-width: 480px) {
     .nav-container {
-        padding: 0 16px; /* Use consistent 16px padding for alignment with section1 */
+        padding: 0 var(--container-padding); /* Use same responsive padding as hero section */
     }
     
     .nav-logo svg {
@@ -445,7 +445,7 @@
     .nav-container {
         justify-content: space-between;
         gap: 0;
-        padding: 0 16px; /* Use consistent 16px padding instead of variable spacing */
+        padding: 0 var(--container-padding); /* Use same responsive padding as hero section */
     }
     
     /* Show only logo and mobile menu toggle on mobile */
@@ -488,7 +488,7 @@
 @media (min-width: 769px) and (max-width: 1024px) {
     /* Navigation Adjustments for Tablet */
     .nav-container {
-        padding: 0 16px; /* Use consistent 16px padding instead of variable spacing */
+        padding: 0 var(--container-padding); /* Use same responsive padding as hero section */
         max-width: 1100px; /* Intermediate container width */
     }
     
@@ -516,7 +516,7 @@
     /* Enhanced Navigation for Large Screens */
     .nav-container {
         max-width: 1400px; /* Wider container for large screens */
-        padding: 0 16px; /* Maintain consistent 16px padding on large screens */
+        padding: 0 var(--container-padding); /* Use same responsive padding as hero section */
     }
     
     .nav-items-desktop {

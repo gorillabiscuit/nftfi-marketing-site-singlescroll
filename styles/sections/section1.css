@@ -144,7 +144,7 @@ h2 {
     font-family: 'Satoshi Variable', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: clamp(16px, 2.5vw, 24px); /* Max 24px as requested */
+    font-size: clamp(16px, 2.5vw, 22px); /* Max 24px as requested */
     line-height: 1.5;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.5);
