@@ -211,7 +211,7 @@ h2 {
     flex: 1; /* Take up all available space in flex container */
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center hero vertically within the full-height content */
+    
     padding: 2rem 0; /* Add back vertical padding, horizontal handled by section */
 }
 
@@ -341,7 +341,15 @@ a.card:focus {
         min-height: calc(100vh - 260px) !important;
         margin-top: 80px;
         margin-bottom: 0;
+        /* Align content to bottom for tablet */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end; /* Push content to bottom */
     }
+
+    .hero-content {
+        min-height: 35vh;
+       } 
     
     .section:first-child {
         padding-left: calc(var(--container-padding) + 3px);
@@ -352,7 +360,6 @@ a.card:focus {
 /* Desktop Responsive Design (769px-1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
     .hero {
-        /* height: calc(100vh - 260px) !important; Full height minus top margin and content padding */
         min-height: calc(100vh - 260px) !important;
         margin-top: 80px;
         margin-bottom: 0;
@@ -364,14 +371,14 @@ a.card:focus {
     }
 }
 
-/* XL Screen Optimization (1200px+) - Match Navigation Container Width */
-@media (min-width: 1200px) {
+/* Large Screen Optimization (1025px+) - Match Navigation Container Width */
+@media (min-width: 1025px) {
     .hero {
         max-width: 1400px; /* Match navigation max-width on large screens */
     }
     
     .section:first-child {
-        padding-left: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
-        padding-right: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+        padding-left: calc(var(--container-padding) + 3px);
+        padding-right: calc(var(--container-padding) + 3px);
     }
 }
