@@ -23,7 +23,7 @@ export const BREAKPOINT_VALUES = {
     MOBILE: 480,
     TABLET: 768, 
     DESKTOP: 1024,
-    LARGE: 1200
+    LARGE: 1025  // Changed from 1200 to 1025 to eliminate gap
 };
 
 // Breakpoint names as constants to prevent typos and enable refactoring
