@@ -314,9 +314,30 @@ a.card:focus {
     background: rgba(226, 220, 218, 0.05);
 }
 
+/* Mobile Responsive Design - Match Navigation Padding */
+@media (max-width: 768px) {
+    .section:first-child {
+        padding-left: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+        padding-right: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+    }
+}
+
+/* Tablet Responsive Design - Match Navigation Padding */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .section:first-child {
+        padding-left: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+        padding-right: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+    }
+}
+
 /* XL Screen Optimization (1200px+) - Match Navigation Container Width */
 @media (min-width: 1200px) {
     .hero {
         max-width: 1400px; /* Match navigation max-width on large screens */
+    }
+    
+    .section:first-child {
+        padding-left: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+        padding-right: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
     }
 }
