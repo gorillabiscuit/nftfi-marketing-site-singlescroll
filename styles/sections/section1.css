@@ -321,31 +321,46 @@ a.card:focus {
     background: rgba(226, 220, 218, 0.05);
 }
 
-/* Mobile Responsive Design - Match Navigation Padding */
-@media (max-width: 768px) {
+/* Mobile Responsive Design (≤480px) */
+@media (max-width: 480px) {
     .hero {
-        margin-top: 0px; /* Added 20px top spacing */
-        margin-bottom: 0px; /* Added 20px top spacing */
+        margin-top: 0px;
+        margin-bottom: 0px;
     }
     
     .section:first-child {
-        padding-left: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
-        padding-right: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+        padding-left: calc(var(--container-padding) + 3px);
+        padding-right: calc(var(--container-padding) + 3px);
     }
 }
 
-/* Tablet Responsive Design - Match Navigation Padding */
-@media (min-width: 769px) and (max-width: 1024px) {
+/* Tablet Responsive Design (481px-768px) */
+@media (min-width: 481px) and (max-width: 768px) {
     .hero {
-        height: calc(100vh - 160px); /* Full height minus top margin and content padding */
-        min-height: calc(100vh - 160px);
-        margin-top: 80px; /* Keep top spacing */
-        margin-bottom: 0; /* Remove bottom margin for full height */
+        /* height: calc(100vh - 260px) !important; Full height minus top margin and content padding */
+        min-height: calc(100vh - 260px) !important;
+        margin-top: 80px;
+        margin-bottom: 0;
     }
     
     .section:first-child {
-        padding-left: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
-        padding-right: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+        padding-left: calc(var(--container-padding) + 3px);
+        padding-right: calc(var(--container-padding) + 3px);
+    }
+}
+
+/* Desktop Responsive Design (769px-1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .hero {
+        /* height: calc(100vh - 260px) !important; Full height minus top margin and content padding */
+        min-height: calc(100vh - 260px) !important;
+        margin-top: 80px;
+        margin-bottom: 0;
+    }
+    
+    .section:first-child {
+        padding-left: calc(var(--container-padding) + 3px);
+        padding-right: calc(var(--container-padding) + 3px);
     }
 }
 
