@@ -336,6 +336,13 @@ a.card:focus {
 
 /* Tablet Responsive Design - Match Navigation Padding */
 @media (min-width: 769px) and (max-width: 1024px) {
+    .hero {
+        height: calc(100vh - 160px); /* Full height minus top margin and content padding */
+        min-height: calc(100vh - 160px);
+        margin-top: 80px; /* Keep top spacing */
+        margin-bottom: 0; /* Remove bottom margin for full height */
+    }
+    
     .section:first-child {
         padding-left: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
         padding-right: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
