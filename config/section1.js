@@ -25,10 +25,14 @@ export const ANIMATION_STATES = {
         target: { x: -0.86, y: 0.9, z: 0, scale: 0.135 }
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        start: { x: 0.6, y: -0.1, z: 0, scale: 2.8 },
+        start: { x: 0.6, y: -0.1, z: 0, scale: 0.1 },
         target: { x: -0.67, y: 0.7, z: 0, scale: 0.3 }
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
+        start: { x: 0.55, y: -0.15, z: 0, scale: 3.0 },
+        target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
+    },
+    [BREAKPOINT_NAMES.LARGE]: {
         start: { x: 0.55, y: -0.15, z: 0, scale: 3.0 },
         target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
     }

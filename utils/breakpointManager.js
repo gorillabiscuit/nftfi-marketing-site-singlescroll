@@ -18,13 +18,15 @@ let stateChangeCallbacks = [];
 export function getCurrentBreakpoint() {
     const width = window.innerWidth;
     
-    // Mobile-first approach (canonical Bootstrap-style):
-    // Mobile: <768px
-    // Tablet: 768-1023px  
-    // Desktop: ≥1024px
-    if (width < BREAKPOINTS.mobile) return 'mobile';
-    if (width < BREAKPOINTS.tablet) return 'tablet';
-    return 'desktop';
+    // Use the centralized breakpoint system with all 4 breakpoints:
+    // Mobile: ≤480px
+    // Tablet: 481-768px  
+    // Desktop: 769-1024px
+    // Large: ≥1025px
+    if (width <= BREAKPOINT_VALUES.MOBILE) return BREAKPOINT_NAMES.MOBILE;
+    if (width <= BREAKPOINT_VALUES.TABLET) return BREAKPOINT_NAMES.TABLET;
+    if (width <= BREAKPOINT_VALUES.DESKTOP) return BREAKPOINT_NAMES.DESKTOP;
+    return BREAKPOINT_NAMES.LARGE;
 }
 
 // Get current animation state
