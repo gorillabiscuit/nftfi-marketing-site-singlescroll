@@ -189,8 +189,8 @@ h2 {
 
 .section:first-child {
     justify-content: flex-start; /* Ensure first section aligns left */
-    padding-left: var(--container-padding); /* Use responsive padding to match navigation */
-    padding-right: var(--container-padding); /* Use responsive padding to match navigation */
+    padding-left: calc(var(--container-padding) + 3px); /* Match navigation's actual computed padding (35px) */
+    padding-right: calc(var(--container-padding) + 3px); /* Match navigation's actual computed padding (35px) */
 }
 
 .content {
