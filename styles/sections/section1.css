@@ -189,6 +189,7 @@ h2 {
 
 .section:first-child {
     justify-content: flex-start; /* Ensure first section aligns left */
+    align-items: stretch; /* Allow content to fill full height instead of centering */
     padding-left: calc(var(--container-padding) + 3px); /* Match navigation's actual computed padding (35px) */
     padding-right: calc(var(--container-padding) + 3px); /* Match navigation's actual computed padding (35px) */
 }
