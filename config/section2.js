@@ -41,6 +41,16 @@ export const GRID_STATES = {
         lineWidth: 0.5,
         lineColor: '#F2F2F2',
         lineOpacity: 0.25
+    },
+    [BREAKPOINT_NAMES.LARGE]: {
+        initialSpacing: 80,
+        outwardFactor: 1.9,
+        finalFactor: 3.0,
+        levels: 4,
+        svgSizeMultiplier: 1.6,
+        lineWidth: 0.5,
+        lineColor: '#F2F2F2',
+        lineOpacity: 0.25
     }
 };
 
@@ -85,6 +95,38 @@ export const RECT_STATES = {
         label: { rotateDeg: undefined, padRight: undefined, padTop: undefined, padBottom: undefined }
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
+        enabled: true,
+        sizeFactor: 1,
+        cornerRadiusFactor: 0.1,
+        pattern: 'checker',
+        cells: [[-2,0],[-1,0],[1,-1],[0,-2]],
+        sizeFactorOutStart: 1,
+        sizeFactorOutEnd: 1.4,
+        sizeFactorFinalStart: 1,
+        sizeFactorFinalEnd: 1,
+        positionOutMultiplierStart: 1,
+        positionOutMultiplierEnd: 1.5265,
+        positionFinalMultiplierStart: 1,
+        positionFinalMultiplierEnd: 1,
+        // Default rect styling for all blocks (can be overridden per block)
+        rectDefaults: {
+            gradientStart: 'rgba(109, 62, 88, 0.0)',
+            gradientEnd: 'rgba(109, 62, 88, 0.8)',
+            gradientAngle: 45,
+            strokeColor: '#FFFFFF',
+            strokeOpacity: 0.38,
+            strokeWidth: 1,
+            rxOverride: 15 // optional override; otherwise computed from cornerRadiusFactor
+        },
+        // Blocks array: order maps to visible cells sequence. Only text is required; rect can override gradient.
+        blocks: [
+            { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' }, rect: { /* uses defaults */ } },
+            { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { gradientStart: 'rgba(139, 103, 76, 0.10)', gradientEnd: 'rgba(139, 103, 76, 0.80)', gradientAngle: 45 } },
+            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { gradientStart: 'rgba(72, 55, 65, 0.10)', gradientEnd: 'rgba(72, 55, 65, 0.80)', gradientAngle: 45 } },
+            { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
+        ]
+    },
+    [BREAKPOINT_NAMES.LARGE]: {
         enabled: true,
         sizeFactor: 1,
         cornerRadiusFactor: 0.1,
