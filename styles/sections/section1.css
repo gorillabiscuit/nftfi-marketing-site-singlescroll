@@ -5,11 +5,13 @@
     border-radius: 27px;
     border: 1px solid rgba(217, 213, 214, 0.25);
     background: linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
-    padding: var(--hero-padding);
-    margin-left: var(--container-padding);
-    margin-right: var(--container-padding);
+    padding: var(--hero-padding); /* Only vertical padding - horizontal handled by section wrapper */
+    margin-top: 80px; /* Added 20px top spacing */
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: var(--spacing-lg);
-    max-width: calc(100vw - (var(--container-padding) * 2));
+    max-width: 1200px; /* Match navigation max-width */
+    width: 100%; /* Full width up to max-width - like navigation */
     min-height: 30vh; /* Ensure enough height for flexible button positioning */
     position: relative;
     z-index: 4;
@@ -187,8 +189,8 @@ h2 {
 
 .section:first-child {
     justify-content: flex-start; /* Ensure first section aligns left */
-    padding-left: 16px; /* Add 16px left padding */
-    padding-right: 16px; /* Add 16px right padding */
+    padding-left: var(--container-padding); /* Use responsive padding to match navigation */
+    padding-right: var(--container-padding); /* Use responsive padding to match navigation */
 }
 
 .content {
@@ -310,4 +312,11 @@ a.card:focus {
 .card:active {
     transform: translateY(0px);
     background: rgba(226, 220, 218, 0.05);
+}
+
+/* XL Screen Optimization (1200px+) - Match Navigation Container Width */
+@media (min-width: 1200px) {
+    .hero {
+        max-width: 1400px; /* Match navigation max-width on large screens */
+    }
 }
