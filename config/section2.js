@@ -78,10 +78,10 @@ export const RECT_STATES = {
         label: { rotateDeg: undefined, padRight: undefined, padTop: undefined, padBottom: undefined }
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        enabled: false,
+        enabled: true,
         sizeFactor: 0.48,
         cornerRadiusFactor: 0.18,
-        pattern: 'none',
+        pattern: 'checker',
         cells: [[-2,0],[-1,0],[1,-1],[0,-2]],
         sizeFactorOutStart: 1,
         sizeFactorOutEnd: 1,
@@ -91,8 +91,53 @@ export const RECT_STATES = {
         positionOutMultiplierEnd: 1,
         positionFinalMultiplierStart: 1,
         positionFinalMultiplierEnd: 1,
-        amount: {},
-        label: { rotateDeg: undefined, padRight: undefined, padTop: undefined, padBottom: undefined }
+        amount: {
+            text: '$700M+',
+            color: 'rgba(255, 255, 255, 0.75)',
+            fontFamily: 'Roboto Mono, monospace',
+            fontSize: 36,
+            fontWeight: '300',
+            letterSpacing: 1.44,
+            center: true,
+            anchor: 'middle',
+            baseline: 'middle',
+            centerOffsetX: 70,
+            centerOffsetY: 65,
+            rotateDeg: -45
+        },
+        label: {
+            text: 'LOAN VOLUME',
+            color: '#FFFFFF',
+            opacity: 0.5,
+            fontFamily: 'Satoshi Variable, sans-serif',
+            fontSize: 16,
+            fontWeight: '500',
+            // bottom-left by default; you can switch to bottom-right using padRight
+            padLeft: 200,
+            padBottom: undefined,
+            padRight: undefined,
+            padTop: 180,
+            rotateDeg: -90,
+            anchor: 'start',
+            baseline: 'alphabetic'
+        },
+        // Default rect styling for all blocks (can be overridden per block)
+        rectDefaults: {
+            gradientStart: 'rgba(109, 62, 88, 0.0)',
+            gradientEnd: 'rgba(109, 62, 88, 0.8)',
+            gradientAngle: 45,
+            strokeColor: '#FFFFFF',
+            strokeOpacity: 0.38,
+            strokeWidth: 1,
+            rxOverride: 15 // optional override; otherwise computed from cornerRadiusFactor
+        },
+        // Blocks array: order maps to visible cells sequence. Only text is required; rect can override gradient.
+        blocks: [
+            { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' }, rect: { /* uses defaults */ } },
+            { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { gradientStart: 'rgba(139, 103, 76, 0.10)', gradientEnd: 'rgba(139, 103, 76, 0.80)', gradientAngle: 45 } },
+            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { gradientStart: 'rgba(72, 55, 65, 0.10)', gradientEnd: 'rgba(72, 55, 65, 0.80)', gradientAngle: 45 } },
+            { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
+        ]
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
         enabled: true,
