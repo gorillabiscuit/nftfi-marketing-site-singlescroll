@@ -260,11 +260,47 @@ export async function initSection3Dashboard() {
         if (typeof gsap !== 'undefined' && gsap && typeof gsap.matchMedia === 'function') {
             const mm = gsap.matchMedia();
 
-            // Desktop: ≥1024px - Use config values for positioning
-            mm.add('(min-width: 1024px)', () => {
+            // Desktop: 1024px only - Use config values for positioning
+            mm.add('(min-width: 1024px) and (max-width: 1024px)', () => {
                 try {
                     const dashboardCfg = getDashboardSvgConfigFor('desktop');
                     const svgCfg = getSvgConfigFor('desktop');
+                    
+                    // Position container using new pixel offset system
+                    gsap.set(container, { 
+                        position: 'absolute',
+                        width: dashboardCfg.width,
+                        height: dashboardCfg.height,
+                        left: dashboardCfg.left,
+                        top: dashboardCfg.top,
+                        x: dashboardCfg.x,
+                        y: dashboardCfg.y,
+                        xPercent: dashboardCfg.xPercent,
+                        yPercent: dashboardCfg.yPercent,
+                        zIndex: 3,
+                        overflow: 'visible',
+                        pointerEvents: 'none',
+                        // Clear any existing transforms
+                        rotation: 0,
+                        scaleX: 1,
+                        scaleY: 1
+                    });
+                    
+                    // Scale the SVG within the positioned container
+                    gsap.set(svgEl, { 
+                        scale: svgCfg.scale,
+                        transformOrigin: '0 0'  // Top-left origin instead of center
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            });
+
+            // Large: ≥1025px - Use config values for positioning
+            mm.add('(min-width: 1025px)', () => {
+                try {
+                    const dashboardCfg = getDashboardSvgConfigFor('large');
+                    const svgCfg = getSvgConfigFor('large');
                     
                     // Position container using new pixel offset system
                     gsap.set(container, { 
@@ -581,7 +617,8 @@ export function initSection3Scroll() {
             
             mm.add('(max-width: 767px)', applyPositioning('mobile'));
             mm.add('(min-width: 768px) and (max-width: 1023px)', applyPositioning('tablet'));
-            mm.add('(min-width: 1024px)', applyPositioning('desktop'));
+            mm.add('(min-width: 1024px) and (max-width: 1024px)', applyPositioning('desktop'));
+            mm.add('(min-width: 1025px)', applyPositioning('large'));
         }
     } catch (e) { 
         console.error('[Section3Dashboard] Error setting up parent container positioning:', e);
