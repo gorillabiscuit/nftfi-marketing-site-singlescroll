@@ -786,8 +786,22 @@ function setupSection2Pinning() {
                 const padX = 4;
                 const padY = 20;
 
-                // Ensure positioned context and initial invisibility
-                gsap.set(titleEl, { opacity: 0, position: cs.position === 'static' ? 'relative' : cs.position });
+                // Store original transform to restore later
+                const originalTransform = cs.transform;
+                
+                // Temporarily remove transform to get accurate text width measurement
+                gsap.set(titleEl, { transform: 'none' });
+                
+                // Measure the text width without any transforms applied
+                const rect = titleEl.getBoundingClientRect();
+                const textWidth = Math.max(padX * 2, rect.width + padX * 2);
+                
+                // Restore original transform and ensure positioned context and initial invisibility
+                gsap.set(titleEl, { 
+                    transform: originalTransform,
+                    opacity: 0, 
+                    position: cs.position === 'static' ? 'relative' : cs.position 
+                });
 
                 // Create highlight overlay on top of the title
                 const hl = document.createElement('div');
@@ -805,8 +819,7 @@ function setupSection2Pinning() {
                 });
 
                 const measure = () => {
-                    const rect = titleEl.getBoundingClientRect();
-                    return Math.max(padX * 2, rect.width + padX * 2);
+                    return textWidth;
                 };
 
                 // 1) Wipe expand (schedule after rotation)
