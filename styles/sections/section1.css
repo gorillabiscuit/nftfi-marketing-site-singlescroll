@@ -324,13 +324,34 @@ a.card:focus {
 /* Mobile Responsive Design (≤480px) */
 @media (max-width: 480px) {
     .hero {
-        margin-top: 0px;
-        margin-bottom: 0px;
+        min-height: calc(100vh - 160px) !important;
+        margin-top: 80px;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end; /* Align content to bottom */
     }
     
     .section:first-child {
         padding-left: calc(var(--container-padding) + 3px);
         padding-right: calc(var(--container-padding) + 3px);
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .card {
+        width: 100%;
+    }
+    .hero-content {
+        height: 52vh;
+    }
+
+    .hero-text {
+        gap: 8px;
+        width: 100%;
     }
 }
 

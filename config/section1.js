@@ -21,12 +21,12 @@ export const TARGET_CONFIG = {
 // Each breakpoint can have different start and target positions/scales
 export const ANIMATION_STATES = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        start: { x: 0.4, y: .5, z: 0, scale: 1.5 },
-        target: { x: -0.86, y: 0.9, z: 0, scale: 0.135 }
+        start: { x: 0.4, y: .5, z: 0, scale: 1.25 },
+        target: { x: -0.86, y: 0.86, z: 0, scale: 0.135 }
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        start: { x: 0.6, y: -0.1, z: 0, scale: 0.1 },
-        target: { x: -0.67, y: 0.7, z: 0, scale: 0.3 }
+        start: { x: 0.5, y: 0.4, z: 0, scale: 2.1 },
+        target: { x: -0.886, y: 0.875, z: 0, scale: 0.17 }
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
         start: { x: 0.55, y: 0.0, z: 0, scale: 2.5 },

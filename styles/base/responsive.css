@@ -90,7 +90,7 @@
     --font-size-lg: clamp(16px, 2.25vw, 18px);   /* Subheadings, emphasized */
     --font-size-xl: clamp(18px, 2.75vw, 22px);   /* Section headings */
     --font-size-2xl: clamp(24px, 4vw, 32px);     /* Page titles, hero text */
-    --font-size-3xl: clamp(32px, 6vw, 40px);     /* Main headlines */
+    --font-size-3xl: clamp(36px, 6vw, 44px);     /* Main headlines */
     --font-size-4xl: clamp(40px, 8vw, 48px);     /* Large hero titles - MAX SIZE */
     
     /* ==========================================================================
@@ -111,8 +111,8 @@
        ========================================================================== */
     --container-padding: clamp(16px, 4vw, 32px);  /* Page margins, component padding */
     --hero-padding: clamp(40px, 8vw, 97px);      /* Hero section internal spacing */
-    --logo-size: clamp(60px, 12vw, 102px);       /* Logo width (maintains aspect ratio) */
-    --logo-height: clamp(15px, 3vw, 26px);       /* Logo height (maintains aspect ratio) */
+    --logo-size: clamp(80px, 12vw, 102px);       /* Logo width (maintains aspect ratio) */
+    --logo-height: clamp(24px, 3vw, 26px);       /* Logo height (maintains aspect ratio) */
 }
 
 /* Accessibility: Reduced Motion */

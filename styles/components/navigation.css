@@ -421,8 +421,8 @@
     }
     
     .nav-logo svg {
-        width: calc(var(--logo-size) * 0.85); /* Slightly smaller logo */
-        height: calc(var(--logo-height) * 0.85);
+        width: calc(var(--logo-size) ); /* Slightly smaller logo */
+        height: calc(var(--logo-height) );
     }
 }
 

@@ -18,9 +18,9 @@ export const GRID_STATES = {
         // SVG size multiplier relative to max(viewportWidth, viewportHeight)
         svgSizeMultiplier: 1.8,
         // Grid line styling
-        lineWidth: 1.5,
+        lineWidth: 0.5,
         lineColor: '#F2F2F2',
-        lineOpacity: 0.8
+        lineOpacity: 0.25
     },
     [BREAKPOINT_NAMES.TABLET]: {
         initialSpacing: 55,
@@ -28,9 +28,9 @@ export const GRID_STATES = {
         finalFactor: 3.2,
         levels: 4,
         svgSizeMultiplier: 1.7,
-        lineWidth: 1.5,
+        lineWidth: 0.5,
         lineColor: '#F2F2F2',
-        lineOpacity: 0.8
+        lineOpacity: 0.25
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
         initialSpacing: 80,
@@ -79,16 +79,16 @@ export const RECT_STATES = {
     },
     [BREAKPOINT_NAMES.TABLET]: {
         enabled: true,
-        sizeFactor: 0.48,
+        sizeFactor: 1,
         cornerRadiusFactor: 0.18,
         pattern: 'checker',
         cells: [[-2,0],[-1,0],[1,-1],[0,-2]],
         sizeFactorOutStart: 1,
-        sizeFactorOutEnd: 1,
+        sizeFactorOutEnd: 1.4,
         sizeFactorFinalStart: 1,
-        sizeFactorFinalEnd: 1,
+        sizeFactorFinalEnd: 2,
         positionOutMultiplierStart: 1,
-        positionOutMultiplierEnd: 1,
+        positionOutMultiplierEnd: 1.5,
         positionFinalMultiplierStart: 1,
         positionFinalMultiplierEnd: 1,
         amount: {
