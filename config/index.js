@@ -19,7 +19,7 @@ export * from './section5.js';
 
 // Re-export commonly used configs with their original names
 export { TARGET_CONFIG, ANIMATION_STATES, HERO_BUTTON_STROKE_EFFECTS } from './section1.js';
-export { GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL } from './section2.js';
+export { GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, UNIVERSAL_BLOCKS } from './section2.js';
 export { 
     SECTION3, 
     SECTION3_SCROLL, 

@@ -3,6 +3,15 @@
 
 import { BREAKPOINT_NAMES } from './breakpoints.js';
 
+// Universal blocks configuration - same content across all breakpoints
+// Only text content is required; rect styling can override gradient per block
+export const UNIVERSAL_BLOCKS = [
+    { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' }, rect: { /* uses defaults */ } },
+    { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { gradientStart: 'rgba(139, 103, 76, 0.10)', gradientEnd: 'rgba(139, 103, 76, 0.80)', gradientAngle: 45 } },
+    { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { gradientStart: 'rgba(72, 55, 65, 0.10)', gradientEnd: 'rgba(72, 55, 65, 0.80)', gradientAngle: 45 } },
+    { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
+];
+
 // Grid sizing states for Section 2 (breakpoint-aware)
 // Controls: line spacing and counts, plus how far they expand and SVG sizing multiplier
 export const GRID_STATES = {
@@ -131,13 +140,8 @@ export const RECT_STATES = {
             strokeWidth: 1,
             rxOverride: 15 // optional override; otherwise computed from cornerRadiusFactor
         },
-        // Blocks array: order maps to visible cells sequence. Only text is required; rect can override gradient.
-        blocks: [
-            { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' }, rect: { /* uses defaults */ } },
-            { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { gradientStart: 'rgba(139, 103, 76, 0.10)', gradientEnd: 'rgba(139, 103, 76, 0.80)', gradientAngle: 45 } },
-            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { gradientStart: 'rgba(72, 55, 65, 0.10)', gradientEnd: 'rgba(72, 55, 65, 0.80)', gradientAngle: 45 } },
-            { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
-        ]
+        // Blocks array: uses universal blocks configuration
+        blocks: UNIVERSAL_BLOCKS
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
         enabled: true,
@@ -194,13 +198,8 @@ export const RECT_STATES = {
             anchor: 'start',
             baseline: 'alphabetic'
         },
-        // Blocks array: order maps to visible cells sequence. Only text is required; rect can override gradient.
-        blocks: [
-            { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' }, rect: { /* uses defaults */ } },
-            { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { gradientStart: 'rgba(139, 103, 76, 0.10)', gradientEnd: 'rgba(139, 103, 76, 0.80)', gradientAngle: 45 } },
-            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { gradientStart: 'rgba(72, 55, 65, 0.10)', gradientEnd: 'rgba(72, 55, 65, 0.80)', gradientAngle: 45 } },
-            { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
-        ]
+        // Blocks array: uses universal blocks configuration
+        blocks: UNIVERSAL_BLOCKS
     },
     [BREAKPOINT_NAMES.LARGE]: {
         enabled: true,
@@ -257,13 +256,8 @@ export const RECT_STATES = {
             anchor: 'start',
             baseline: 'alphabetic'
         },
-        // Blocks array: order maps to visible cells sequence. Only text is required; rect can override gradient.
-        blocks: [
-            { amount: { text: '$700M+' }, label: { text: 'LOAN VOLUME' }, rect: { /* uses defaults */ } },
-            { amount: { text: '73,000' },  label: { text: 'LOANS' }, rect: { gradientStart: 'rgba(139, 103, 76, 0.10)', gradientEnd: 'rgba(139, 103, 76, 0.80)', gradientAngle: 45 } },
-            { amount: { text: '$20,000' }, label: { text: 'AVERAGE LOAN' }, rect: { gradientStart: 'rgba(72, 55, 65, 0.10)', gradientEnd: 'rgba(72, 55, 65, 0.80)', gradientAngle: 45 } },
-            { amount: { text: 'May 2020' }, label: { text: 'RUNNING SAFE SINCE' }, rect: { /* overrides optional */ } }
-        ]
+        // Blocks array: uses universal blocks configuration
+        blocks: UNIVERSAL_BLOCKS
     }
 };
 
