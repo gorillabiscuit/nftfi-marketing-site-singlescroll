@@ -59,6 +59,9 @@
     color: rgba(255,255,255,0.85);
     margin: 0 0 8px 0;
     padding-top: 56px;
+    max-width: 640px; /* Allow text wrapping - same as feature blocks */
+    word-wrap: break-word; /* Ensure long words can break */
+    overflow-wrap: break-word; /* Modern browsers */
 }
 
 .section3-features .feature-block h3 {
@@ -105,17 +108,19 @@
     z-index: 2;
     overflow: visible;
     pointer-events: none; /* allow interactions to pass through */
+    
 }
 
 /* Responsive breakpoints for Section 3 */
 @media (min-width: 1025px) {
     .hero--looper {
-        margin-top: 120px; /* Large screens - more space */
+        margin-top: 0px; /* Large screens - more space */
     }
     
     .features-title { 
         padding-left: 96px; 
-        padding-top: 96px; 
+        padding-top: 96px;
+        max-width: 640px; /* Ensure consistent width constraint */
     }
     .feature-1 { 
         padding-left: calc(var(--MY_BUFFER_AMOUNT) + 80px); 
@@ -137,7 +142,11 @@
 
 @media (min-width: 769px) and (max-width: 1024px) {
     .hero--looper {
-        margin-top: 100px; /* Desktop - moderate space */
+        margin-top: 0px; /* Desktop - moderate space */
+    }
+    
+    .features-title {
+        max-width: 600px; /* Slightly smaller for desktop breakpoint */
     }
     
     .feature-1, .feature-2, .feature-3, .feature-4, .section3-features .feature-cta { 
@@ -156,7 +165,8 @@
     }
     .features-title { 
         padding-left: 16px; 
-        padding-top: 24px; 
+        padding-top: 24px;
+        max-width: calc(100vw - 32px); /* Full width minus container padding for mobile */
     }
     .feature-1, .feature-2, .feature-3, .feature-4, .section3-features .feature-cta { 
         padding-left: 16px; 
