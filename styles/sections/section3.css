@@ -118,7 +118,8 @@
     }
     
     .features-title { 
-        padding-left: 96px; 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT) + 26px); /* 70px + 26px = 96px (matches current) */
+        padding-right: var(--MY_BUFFER_AMOUNT); /* 70px right padding to prevent edge collision */
         padding-top: 96px;
         max-width: 640px; /* Ensure consistent width constraint */
     }
@@ -146,6 +147,8 @@
     }
     
     .features-title {
+        padding-left: calc(var(--MY_BUFFER_AMOUNT) + 2px); /* 70px + 2px = 72px (matches feature blocks) */
+        padding-right: var(--MY_BUFFER_AMOUNT); /* 70px right padding */
         max-width: 600px; /* Slightly smaller for desktop breakpoint */
     }
     
@@ -165,6 +168,7 @@
     }
     .features-title { 
         padding-left: 16px; 
+        padding-right: 16px; /* Match left padding for symmetry */
         padding-top: 24px;
         max-width: calc(100vw - 32px); /* Full width minus container padding for mobile */
     }
