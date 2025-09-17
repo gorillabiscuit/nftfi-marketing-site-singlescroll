@@ -146,3 +146,63 @@
         text-align: center;
     }
 }
+
+/* ==========================================================================
+   SVG TEXT ELEMENT TARGETING - RESPONSIVE
+   ==========================================================================
+   Target the dynamically generated SVG text elements in Section 2
+   These elements are created by JavaScript with data-role attributes
+   ========================================================================== */
+
+/* Mobile Breakpoint (≤480px) */
+@media (max-width: 480px) {
+    /* Target amount text (large numbers like $700M+) */
+    svg text[data-role="amount"] {
+        font-size: 36px !important;
+        
+    }
+
+    /* Target label text (descriptive text like LOAN VOLUME) */
+    svg text[data-role="label"] {
+        font-size: 14px !important;
+    }
+}
+
+/* Tablet Breakpoint (481px-768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    /* Target amount text */
+    svg text[data-role="amount"] {
+        font-size: 28px !important;
+    }
+
+    /* Target label text */
+    svg text[data-role="label"] {
+        font-size: 12px !important;
+    }
+}
+
+/* Desktop Breakpoint (769px-1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Target amount text */
+    svg text[data-role="amount"] {
+        font-size: 36px !important;
+    }
+
+    /* Target label text */
+    svg text[data-role="label"] {
+        font-size: 16px !important;
+    }
+}
+
+/* Large Breakpoint (≥1025px) */
+@media (min-width: 1025px) {
+    /* Target amount text */
+    svg text[data-role="amount"] {
+        font-size: 40px !important;
+    }
+
+    /* Target label text */
+    svg text[data-role="label"] {
+        font-size: 18px !important;
+    }
+}

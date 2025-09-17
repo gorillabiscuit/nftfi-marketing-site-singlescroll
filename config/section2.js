@@ -67,24 +67,64 @@ export const GRID_STATES = {
 // Controls: visibility (enabled), size relative to spacing, corner radius, and selection pattern
 export const RECT_STATES = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        enabled: false,
+        enabled: true,
         sizeFactor: 0.45,          // rect size as fraction of spacing
         cornerRadiusFactor: 0.1,   // rounded corner as fraction of rect size
-        pattern: 'none',           // 'all' | 'checker' | 'none'
-        cells: [],                 // Explicit [i,j] pairs. If non-empty, overrides pattern
+        pattern: 'checker',           // 'all' | 'checker' | 'none'
+        cells: [[-1,-2],[0,0],[1,0],[-1,0]],
         // Optional per-phase size factors (override sizeFactor if set)
-        sizeFactorOutStart: undefined,
-        sizeFactorOutEnd: undefined,
-        sizeFactorFinalStart: undefined,
-        sizeFactorFinalEnd: undefined,
+        sizeFactorOutStart: 1,
+        sizeFactorOutEnd: 1.4,
+        sizeFactorFinalStart: 1,
+        sizeFactorFinalEnd: 1.5,
         // Outward travel multipliers (1 = match grid exactly)
         positionOutMultiplierStart: 1,
-        positionOutMultiplierEnd: 1,
+        positionOutMultiplierEnd: 1.46,
         positionFinalMultiplierStart: 1,
         positionFinalMultiplierEnd: 1,
         // Optional text configs
-        amount: {},
-        label: { rotateDeg: undefined, padRight: undefined, padTop: undefined, padBottom: undefined }
+        amount: {
+            text: '$700M+',
+            color: 'rgba(255, 255, 255, 0.75)',
+            fontFamily: 'Roboto Mono, monospace',
+            fontSize: 36,
+            fontWeight: '300',
+            letterSpacing: 1.44,
+            center: true,
+            anchor: 'middle',
+            baseline: 'middle',
+            centerOffsetX: 80,
+            centerOffsetY: 80,
+            rotateDeg: -45
+        },
+        label: {
+            text: 'LOAN VOLUME',
+            color: '#FFFFFF',
+            opacity: 0.5,
+            fontFamily: 'Satoshi Variable, sans-serif',
+            fontSize: 16,
+            fontWeight: '500',
+            // bottom-left by default; you can switch to bottom-right using padRight
+            padLeft: 170,
+            padBottom: undefined,
+            padRight: undefined,
+            padTop: 150,
+            rotateDeg: -90,
+            anchor: 'start',
+            baseline: 'alphabetic'
+        },
+        // Default rect styling for all blocks (can be overridden per block)
+        rectDefaults: {
+            gradientStart: 'rgba(109, 62, 88, 0.0)',
+            gradientEnd: 'rgba(109, 62, 88, 0.8)',
+            gradientAngle: 45,
+            strokeColor: '#FFFFFF',
+            strokeOpacity: 0.38,
+            strokeWidth: 1,
+            rxOverride: 15 // optional override; otherwise computed from cornerRadiusFactor
+        },
+        // Blocks array: uses universal blocks configuration
+        blocks: UNIVERSAL_BLOCKS
     },
     [BREAKPOINT_NAMES.TABLET]: {
         enabled: true,
@@ -110,8 +150,8 @@ export const RECT_STATES = {
             center: true,
             anchor: 'middle',
             baseline: 'middle',
-            centerOffsetX: 70,
-            centerOffsetY: 65,
+            centerOffsetX: 50,
+            centerOffsetY: 50,
             rotateDeg: -45
         },
         label: {
@@ -122,10 +162,10 @@ export const RECT_STATES = {
             fontSize: 16,
             fontWeight: '500',
             // bottom-left by default; you can switch to bottom-right using padRight
-            padLeft: 200,
+            padLeft: 140,
             padBottom: undefined,
             padRight: undefined,
-            padTop: 180,
+            padTop: 120,
             rotateDeg: -90,
             anchor: 'start',
             baseline: 'alphabetic'
