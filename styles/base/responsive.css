@@ -34,6 +34,7 @@
     --desktop: 1024px;
     --large: 1200px;
     --MY_BUFFER_AMOUNT: 70px;
+    --MY_BUFFER_AMOUNT_desktop: 20px;
     
     /* ==========================================================================
        ADAPTIVE SPACING SYSTEM

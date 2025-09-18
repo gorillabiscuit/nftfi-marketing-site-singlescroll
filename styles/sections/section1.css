@@ -396,6 +396,7 @@ a.card:focus {
 @media (min-width: 1200px) {
     .hero {
         max-width: 1400px; /* Match navigation max-width on large screens */
+        margin-top: 110px;
     }
     
     .section:first-child {

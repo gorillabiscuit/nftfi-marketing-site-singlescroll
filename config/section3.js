@@ -79,27 +79,27 @@ export const HERO_LOOPER = {
     },
     [BREAKPOINT_NAMES.TABLET]: {
         // Panel size (in pixels)
-        width: 740,
-        height: 700,
+        width: 400,
+        height: 200,
         // Pixel offset from center point (0,0 = perfect center)
         offsetX: 0,         // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 0          // Vertical offset in pixels (+ = down, - = up)
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
         // Panel size (in pixels)
-        width: 750,
+        width: 580,
         height: 620,
         // Pixel offset from center point (0,0 = perfect center)
-        offsetX: 280,      // Horizontal offset in pixels (+ = right, - = left)
+        offsetX: 190,      // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 50          // Vertical offset in pixels (+ = down, - = up)
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        // Panel size (in pixels) - Larger for big screens
-        width: 850,
-        height: 720,
+        // Panel size (in pixels)
+        width: 780,
+        height: 620,
         // Pixel offset from center point (0,0 = perfect center)
-        offsetX: 320,      // Horizontal offset in pixels (+ = right, - = left) - More spacing
-        offsetY: 30          // Vertical offset in pixels (+ = down, - = up) - Slightly higher
+        offsetX: 280,      // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: 50         // Vertical offset in pixels (+ = down, - = up) - Slightly higher
     }
 };
 
@@ -130,7 +130,7 @@ export const DASHBOARD_SVG = {
         offsetX: 0,         // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 0,         // Vertical offset in pixels (+ = down, - = up)
         // SVG content scaling
-        scale: 0.5,
+        scale: 0.25,
         transformOrigin: 'center center'
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
@@ -138,20 +138,19 @@ export const DASHBOARD_SVG = {
         width: 1000,
         height: 1000,
         // Pixel offset from center point (0,0 = perfect center)
+        offsetX: -340,       // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: 140,         // Vertical offset in pixels (+ = down, - = up)
+        // SVG content scaling
+        scale: 0.32
+    },
+    [BREAKPOINT_NAMES.LARGE]: {
+        width: 1000,
+        height: 1000,
+        // Pixel offset from center point (0,0 = perfect center)
         offsetX: -350,       // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 140,         // Vertical offset in pixels (+ = down, - = up)
         // SVG content scaling
-        scale: 0.33
-    },
-    [BREAKPOINT_NAMES.LARGE]: {
-        // Container size (pixels for precise control) - Larger for big screens
-        width: 1200,
-        height: 1200,
-        // Pixel offset from center point (0,0 = perfect center)
-        offsetX: -400,       // Horizontal offset in pixels (+ = right, - = left) - More left spacing
-        offsetY: 100,         // Vertical offset in pixels (+ = down, - = up) - Slightly higher
-        // SVG content scaling
-        scale: 0.35,         // Slightly larger scale for big screens
+        scale: 0.33,
         transformOrigin: 'center center'
     }
 };

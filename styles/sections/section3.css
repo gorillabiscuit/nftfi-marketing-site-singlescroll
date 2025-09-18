@@ -1,4 +1,8 @@
 /* Section 3 - Features Dashboard Styles */
+h2 {
+
+    width: 100%; /* Size to content */
+}
 
 /* Hard-cap Section 3 to exactly one viewport height to match Section 1 */
 .section[data-section="3"] {
@@ -47,7 +51,7 @@
 
 .section3-features .feature-block {
     pointer-events: auto;
-    max-width: 640px;
+    
     text-align: left;
 }
 
@@ -59,7 +63,7 @@
     color: rgba(255,255,255,0.85);
     margin: 0 0 8px 0;
     padding-top: 56px;
-    max-width: 640px; /* Allow text wrapping - same as feature blocks */
+    
     word-wrap: break-word; /* Ensure long words can break */
     overflow-wrap: break-word; /* Modern browsers */
 }
@@ -116,12 +120,14 @@
     .hero--looper {
         margin-top: 0px; /* Large screens - more space */
     }
+
+
     
     .features-title { 
         padding-left: calc(var(--MY_BUFFER_AMOUNT) + 26px); /* 70px + 26px = 96px (matches current) */
         padding-right: var(--MY_BUFFER_AMOUNT); /* 70px right padding to prevent edge collision */
         padding-top: 96px;
-        max-width: 640px; /* Ensure consistent width constraint */
+        
     }
     .feature-1 { 
         padding-left: calc(var(--MY_BUFFER_AMOUNT) + 80px); 
@@ -142,18 +148,36 @@
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
+
     .hero--looper {
         margin-top: 0px; /* Desktop - moderate space */
     }
     
     .features-title {
-        padding-left: calc(var(--MY_BUFFER_AMOUNT) + 2px); /* 70px + 2px = 72px (matches feature blocks) */
-        padding-right: var(--MY_BUFFER_AMOUNT); /* 70px right padding */
-        max-width: 600px; /* Slightly smaller for desktop breakpoint */
+        padding-left: calc(var(--MY_BUFFER_AMOUNT_desktop) + 50px); /* 70px + 2px = 72px (matches feature blocks) */
+        padding-right: var(--MY_BUFFER_AMOUNT_desktop); /* 70px right padding */
+    }
+
+    .section3-features .features-title {
+        font-size: 30px;
     }
     
-    .feature-1, .feature-2, .feature-3, .feature-4, .section3-features .feature-cta { 
-        padding-left: 72px; 
+    .section3-features .feature-cta { 
+        padding-left: 250px; 
+    }
+
+      .feature-1 { 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT_desktop) + 80px); 
+        padding-top: 24px; 
+    }
+    .feature-2 { 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT_desktop) + 130px); 
+    }
+    .feature-3 { 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT_desktop) + 182px); 
+    }
+    .feature-4 { 
+        padding-left: calc(var(--MY_BUFFER_AMOUNT_desktop) + 235px); 
     }
 }
 
@@ -167,7 +191,7 @@
         padding-left: calc(var(--MY_BUFFER_AMOUNT) + 2px); /* 70px + 2px = 72px (matches feature blocks) */
         padding-right: var(--MY_BUFFER_AMOUNT); /* 70px right padding */
         padding-top: 24px;
-        max-width: 500px; /* Tablet-specific width */
+        
     }
     
     .feature-1, .feature-2, .feature-3, .feature-4, .section3-features .feature-cta { 
