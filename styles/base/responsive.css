@@ -10,7 +10,7 @@
    
    USAGE GUIDE:
    - Use clamp() functions for fluid scaling between min/max values
-   - Breakpoints: mobile (≤480px), tablet (481-768px), desktop (≥769px)
+   - Breakpoints: mobile (≤600px), tablet (601-900px), desktop (901-1200px), large (≥1201px)
    - All measurements are viewport-relative for consistent scaling
    - Performance: Mobile gets reduced effects, desktop gets full features
    
@@ -24,15 +24,15 @@
        These define the responsive breakpoints for the entire application.
        Used in media queries and JavaScript device detection.
        
-       --mobile: 480px    - Small mobile devices (iPhone SE, etc.)
-       --tablet: 768px    - Large mobile/small tablet (iPhone 12, iPad mini)
-       --desktop: 1024px  - Tablet/laptop (iPad, small laptops)
-       --large: 1200px    - Desktop/large screens (monitors, large laptops)
+       --mobile: 600px    - Small to large phones, compact content
+       --tablet: 900px    - Large phones, tablets, narrow laptops
+       --desktop: 1200px  - Standard laptops, small desktop monitors
+       --large: 1800px    - Large desktop monitors, wide screens
        ========================================================================== */
-    --mobile: 480px;
-    --tablet: 768px;
-    --desktop: 1024px;
-    --large: 1200px;
+    --mobile: 600px;
+    --tablet: 900px;
+    --desktop: 1200px;
+    --large: 1800px;
     --MY_BUFFER_AMOUNT: 70px;
     --MY_BUFFER_AMOUNT_desktop: 20px;
     

@@ -2,8 +2,11 @@
 // Single source of truth for all breakpoint values across CSS, JavaScript, and configuration
 
 /**
- * BREAKPOINT SYSTEM OVERVIEW
- * =========================
+ * WORLD-CLASS BREAKPOINT SYSTEM
+ * =============================
+ * 
+ * Based on industry best practices from Tailwind CSS, CSS-Tricks, and modern responsive design patterns.
+ * Content-driven breakpoints that adapt naturally to layout needs rather than specific devices.
  * 
  * This system provides consistent breakpoint values across:
  * - CSS media queries (@media queries)
@@ -11,19 +14,25 @@
  * - Configuration objects (animation states, layouts, etc.)
  * - Three.js responsive positioning and scaling
  * 
- * BREAKPOINT DEFINITIONS:
- * - MOBILE: ≤ 480px    - Small mobile devices (iPhone SE, etc.)
- * - TABLET: 481-768px  - Large mobile/small tablet (iPhone 12, iPad mini)  
- * - DESKTOP: 769-1024px - Tablet/laptop (iPad, small laptops)
- * - LARGE: ≥ 1025px    - Desktop/large screens (monitors, large laptops)
+ * BREAKPOINT DEFINITIONS (Content-Driven):
+ * - MOBILE: ≤ 600px     - Small to large phones, compact content
+ * - TABLET: 601-900px   - Large phones, tablets, narrow laptops
+ * - DESKTOP: 901-1200px - Standard laptops, small desktop monitors  
+ * - LARGE: ≥ 1201px     - Large desktop monitors, wide screens
+ * 
+ * Benefits:
+ * - No boundary conflicts or 1px gaps
+ * - Content naturally breaks at these points
+ * - Future-proof for new device sizes
+ * - Aligns with industry standards
  */
 
-// Breakpoint values in pixels
+// Breakpoint values in pixels (Industry Standard)
 export const BREAKPOINT_VALUES = {
-    MOBILE: 480,
-    TABLET: 768, 
-    DESKTOP: 1024,
-    LARGE: 1025  // Changed from 1200 to 1025 to eliminate gap
+    MOBILE: 600,
+    TABLET: 900, 
+    DESKTOP: 1200,
+    LARGE: 1800  // Large desktop and ultra-wide monitors
 };
 
 // Breakpoint names as constants to prevent typos and enable refactoring
@@ -85,9 +94,9 @@ export const MEDIA_QUERIES = {
 // Export all breakpoint names as an array for iteration
 export const ALL_BREAKPOINT_NAMES = Object.values(BREAKPOINT_NAMES);
 
-// Legacy compatibility - maps to the old breakpoint system used in breakpointManager.js
+// Legacy compatibility - maps to the old breakpoint system (DEPRECATED - will be removed)
 export const LEGACY_BREAKPOINTS = {
-    mobile: BREAKPOINT_VALUES.TABLET,    // Old mobile was 768px
-    tablet: BREAKPOINT_VALUES.DESKTOP,   // Old tablet was 1024px  
-    desktop: BREAKPOINT_VALUES.DESKTOP   // Old desktop was 1024px
+    mobile: 768,    // Old mobile was 768px (DEPRECATED)
+    tablet: 1024,   // Old tablet was 1024px (DEPRECATED)
+    desktop: 1024   // Old desktop was 1024px (DEPRECATED)
 };

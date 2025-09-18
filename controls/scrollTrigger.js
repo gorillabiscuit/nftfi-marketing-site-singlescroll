@@ -674,9 +674,9 @@ function setupSection2Pinning() {
     };
 
     const mm = gsap.matchMedia();
-    mm.add("(max-width: 767px)", () => rebuildFor('mobile'));
-    mm.add("(min-width: 768px) and (max-width: 1023px)", () => rebuildFor('tablet'));
-    mm.add("(min-width: 1024px)", () => rebuildFor('desktop'));
+    mm.add("(max-width: 600px)", () => rebuildFor('mobile'));
+    mm.add("(min-width: 601px) and (max-width: 900px)", () => rebuildFor('tablet'));
+    mm.add("(min-width: 901px)", () => rebuildFor('desktop'));
     
     // Function to start the advanced 3-phase animation sequence
     function startAdvancedAnimationSequence(triggerEl, scrollerEl) {

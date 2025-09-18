@@ -116,7 +116,7 @@ h2 {
 }
 
 /* Responsive breakpoints for Section 3 */
-@media (min-width: 1025px) {
+@media (min-width: 1201px) {
     .hero--looper {
         margin-top: 0px; /* Large screens - more space */
     }
@@ -147,7 +147,7 @@ h2 {
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 901px) and (max-width: 1200px) {
 
     .hero--looper {
         margin-top: 0px; /* Desktop - moderate space */
@@ -182,7 +182,7 @@ h2 {
 }
 
 /* Tablet breakpoint: 481px - 768px */
-@media (min-width: 481px) and (max-width: 768px) {
+@media (min-width: 601px) and (max-width: 900px) {
     .hero--looper {
         margin-top: 60px; /* Tablet - less space */
     }
@@ -203,7 +203,7 @@ h2 {
 }
 
 /* Mobile breakpoint: ≤ 480px */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .hero--looper {
         margin-top: 40px; /* Mobile - minimal space */
     }

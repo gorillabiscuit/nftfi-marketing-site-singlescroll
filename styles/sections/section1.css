@@ -322,7 +322,7 @@ a.card:focus {
 }
 
 /* Mobile Responsive Design (≤480px) */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .hero {
         min-height: calc(100vh - 160px) !important;
         margin-top: 80px;
@@ -356,7 +356,7 @@ a.card:focus {
 }
 
 /* Tablet Responsive Design (481px-768px) */
-@media (min-width: 481px) and (max-width: 768px) {
+@media (min-width: 601px) and (max-width: 900px) {
     .hero {
         /* height: calc(100vh - 260px) !important; Full height minus top margin and content padding */
         min-height: calc(100vh - 260px) !important;
@@ -378,7 +378,7 @@ a.card:focus {
 }
 
 /* Desktop Responsive Design (769px-1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 901px) and (max-width: 1200px) {
     .hero {
         /* height: calc(100vh - 260px) !important; Full height minus top margin and content padding */
         min-height: calc(100vh - 260px) !important;
@@ -393,7 +393,7 @@ a.card:focus {
 }
 
 /* XL Screen Optimization (1200px+) - Match Navigation Container Width */
-@media (min-width: 1200px) {
+@media (min-width: 1201px) {
     .hero {
         max-width: 1400px; /* Match navigation max-width on large screens */
         margin-top: 110px;

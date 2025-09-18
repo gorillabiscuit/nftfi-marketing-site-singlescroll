@@ -32,10 +32,11 @@
  * ```
  * 
  * DEVICE TYPES:
- * - mobile: ≤768px width, optimized for touch and performance
- * - tablet: 769-1024px width, balanced performance and features
+ * - mobile: ≤600px width, optimized for touch and performance
+ * - tablet: 601-900px width, balanced performance and features
+ * - desktop: 901-1200px width, balanced features
+ * - large: >1200px width, full feature set
  * - high-dpi: >2x pixel ratio, optimized for retina displays
- * - desktop: >1024px width, full feature set
  * 
  * PERFORMANCE OPTIMIZATIONS:
  * - Mobile: Reduced pixel ratio (1.5x), disabled shadows, wider FOV
@@ -83,14 +84,16 @@ class ResponsiveController {
         const width = window.innerWidth;
         const height = window.innerHeight;
         const pixelRatio = window.devicePixelRatio || 1;
-        const isMobile = width <= 768;
-        const isTablet = width > 768 && width <= 1024;
+        const isMobile = width <= 600;
+        const isTablet = width > 600 && width <= 900;
+        const isDesktop = width > 900 && width <= 1200;
         const isHighDPI = pixelRatio > 2;
 
         if (isMobile) return 'mobile';
         if (isTablet) return 'tablet';
+        if (isDesktop) return 'desktop';
         if (isHighDPI) return 'high-dpi';
-        return 'desktop';
+        return 'large';
     }
 
     /**

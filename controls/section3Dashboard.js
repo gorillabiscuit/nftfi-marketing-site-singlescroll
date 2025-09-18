@@ -260,8 +260,8 @@ export async function initSection3Dashboard() {
         if (typeof gsap !== 'undefined' && gsap && typeof gsap.matchMedia === 'function') {
             const mm = gsap.matchMedia();
 
-            // Desktop: 1024px only - Use config values for positioning
-            mm.add('(min-width: 1024px) and (max-width: 1024px)', () => {
+            // Desktop: 901px-1200px - Use config values for positioning
+            mm.add('(min-width: 901px) and (max-width: 1200px)', () => {
                 try {
                     const dashboardCfg = getDashboardSvgConfigFor('desktop');
                     const svgCfg = getSvgConfigFor('desktop');
@@ -332,8 +332,8 @@ export async function initSection3Dashboard() {
                 }
             });
 
-            // Tablet: 768px–1023px
-            mm.add('(min-width: 768px) and (max-width: 1023px)', () => {
+            // Tablet: 601px–900px
+            mm.add('(min-width: 601px) and (max-width: 900px)', () => {
                 try {
                     const svgContainerCfg = getDashboardSvgConfigFor('tablet');
                     const svgCfg = getSvgConfigFor('tablet');
@@ -368,8 +368,8 @@ export async function initSection3Dashboard() {
                 }
             });
 
-            // Mobile: <768px
-            mm.add('(max-width: 767px)', () => {
+            // Mobile: ≤600px
+            mm.add('(max-width: 600px)', () => {
                 try {
                     const svgContainerCfg = getDashboardSvgConfigFor('mobile');
                     const svgCfg = getSvgConfigFor('mobile');
@@ -615,10 +615,10 @@ export function initSection3Scroll() {
                 }
             };
             
-            mm.add('(max-width: 767px)', applyPositioning('mobile'));
-            mm.add('(min-width: 768px) and (max-width: 1023px)', applyPositioning('tablet'));
-            mm.add('(min-width: 1024px) and (max-width: 1024px)', applyPositioning('desktop'));
-            mm.add('(min-width: 1025px)', applyPositioning('large'));
+            mm.add('(max-width: 600px)', applyPositioning('mobile'));
+            mm.add('(min-width: 601px) and (max-width: 900px)', applyPositioning('tablet'));
+            mm.add('(min-width: 901px) and (max-width: 1200px)', applyPositioning('desktop'));
+            mm.add('(min-width: 1201px)', applyPositioning('large'));
         }
     } catch (e) { 
         console.error('[Section3Dashboard] Error setting up parent container positioning:', e);
@@ -1149,8 +1149,9 @@ function ensureArrowsOverlay(sectionEl) {
 
 function getBreakpointKey() {
     const w = window.innerWidth;
-    if (w >= 1024) return 'desktop';
-    if (w >= 768) return 'tablet';
+    if (w >= 1201) return 'large';
+    if (w >= 901) return 'desktop';
+    if (w >= 601) return 'tablet';
     return 'mobile';
 }
 

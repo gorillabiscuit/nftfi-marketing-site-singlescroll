@@ -415,7 +415,7 @@
 /* Navigation Responsive Design */
 
 /* Small Mobile Devices (≤480px) - Extra Compact Layout */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .nav-container {
         padding: 0 var(--container-padding); /* Use same responsive padding as hero section */
     }
@@ -427,7 +427,7 @@
 }
 
 /* Mobile Responsive Design - Consolidated (481px - 768px) */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     /* Mobile Navigation */
     .nav-items-desktop {
         display: none;
@@ -485,7 +485,7 @@
 }
 
 /* Tablet Responsive Design (769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 901px) and (max-width: 1200px) {
     /* Navigation Adjustments for Tablet */
     .nav-container {
         padding: 0 var(--container-padding); /* Use same responsive padding as hero section */
@@ -512,7 +512,7 @@
 }
 
 /* XL Screen Optimization (1200px+) - Enhanced Experience for Large Monitors */
-@media (min-width: 1200px) {
+@media (min-width: 1201px) {
     /* Enhanced Navigation for Large Screens */
     .nav-container {
         max-width: 1400px; /* Wider container for large screens */
