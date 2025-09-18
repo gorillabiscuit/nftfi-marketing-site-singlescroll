@@ -100,9 +100,10 @@
     padding: 0px;
     gap: 24px;
     
-    /* Dimensions from your spec */
+    /* Responsive dimensions */
     margin: 0;
-    width: 667px;
+    width: 100%; /* Let it fill available space */
+    max-width: 667px; /* But don't exceed original design width */
     
     /* Inside auto layout - allow flexible height */
     flex: 0 0 auto; /* Don't grow, don't shrink, auto height */
@@ -146,6 +147,8 @@ h2 {
     font-weight: 400;
     font-size: clamp(16px, 2.5vw, 22px); /* Max 24px as requested */
     line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.5);
     margin: 0;
@@ -321,10 +324,10 @@ a.card:focus {
     background: rgba(226, 220, 218, 0.05);
 }
 
-/* Mobile Responsive Design (≤480px) */
+/* All Mobile Responsive Design (≤600px) */
 @media (max-width: 600px) {
     .hero {
-        min-height: calc(100vh - 160px) !important;
+        min-height: calc(100vh - 120px) !important;
         margin-top: 80px;
         margin-bottom: 0;
         display: flex;
@@ -339,23 +342,71 @@ a.card:focus {
 
     .hero-actions {
         flex-direction: column;
-        gap: 16px;
+        gap: 10px; /* Base mobile spacing */
     }
 
     .card {
         width: 100%;
+        padding: 14px 38px; /* Base mobile padding */
     }
+    
     .hero-content {
-        height: 52vh;
+        height: 58vh; /* Base mobile height */
     }
 
     .hero-text {
-        gap: 8px;
+        gap: 9px; /* Base mobile text spacing */
         width: 100%;
     }
 }
 
-/* Tablet Responsive Design (481px-768px) */
+/* Large Mobile Enhancement (390px-600px) */
+@media (min-width: 390px) and (max-width: 600px) {
+    .hero {
+        min-height: calc(100vh - 200px) !important; /* More space on larger mobile */
+    }
+
+    .hero-actions {
+        gap: 12px; /* More generous spacing on larger mobile */
+    }
+
+    .card {
+        padding: 15px 40px; /* Slightly larger touch targets */
+    }
+    
+    .hero-content {
+        height: 45vh; /* More content space on larger screens */
+    }
+
+    .hero-text {
+        gap: 10px; /* More breathing room for text */
+    }
+}
+
+/* Small Mobile Override (≤389px) */
+@media (max-width: 389px) {
+    .hero {
+        min-height: calc(100vh - 160px) !important; /* Compact for small screens */
+    }
+
+    .hero-actions {
+        gap: 8px; /* Tighter spacing on small screens */
+    }
+
+    .card {
+        padding: 12px 36px; /* Compact touch targets */
+    }
+    
+    .hero-content {
+        height: 56vh; /* Less space for small screens */
+    }
+
+    .hero-text {
+        gap: 8px; /* Tighter text spacing */
+    }
+}
+
+/* Tablet Responsive Design (601px-900px) */
 @media (min-width: 601px) and (max-width: 900px) {
     .hero {
         /* height: calc(100vh - 260px) !important; Full height minus top margin and content padding */
@@ -377,7 +428,7 @@ a.card:focus {
     }
 }
 
-/* Desktop Responsive Design (769px-1024px) */
+/* Desktop Responsive Design (901px-1200px) */
 @media (min-width: 901px) and (max-width: 1200px) {
     .hero {
         /* height: calc(100vh - 260px) !important; Full height minus top margin and content padding */
