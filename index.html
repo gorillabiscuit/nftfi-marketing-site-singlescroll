@@ -442,11 +442,24 @@
           const applyFinalLayout = () => {
             // 2) Apply final widths in a single frame
             requestAnimationFrame(() => {
-              const isMobile = window.innerWidth < 768;
+              // Use the same breakpoint system as the rest of the site
+              const width = window.innerWidth;
+              const isMobile = width <= 600;
+              const isTablet = width > 600 && width <= 900;
+              const isDesktop = width > 900 && width <= 1200;
+              const isLarge = width > 1200;
+              
               const titleWidth = title.offsetWidth;
-              subtitle.style.width = titleWidth + 'px';
+              
+              // Only constrain subtitle width on desktop and large screens
+              // Let it flow naturally on mobile and tablet for better responsive behavior
+              if (isDesktop || isLarge) {
+                subtitle.style.width = titleWidth + 'px';
+              } else {
+                subtitle.style.width = 'auto';
+              }
               // Don't force width on hero-actions - let flexbox handle it naturally
-              // if (!isMobile) {
+              // if (isDesktop || isLarge) {
               //   heroActions.style.width = titleWidth + 'px';
               // }
 
