@@ -11,10 +11,10 @@ export const SECTION5_LAYOUT = {
         topRowCount: 6,           // Exactly 6 tweets in top row
         bottomRowCount: 6,        // Exactly 6 tweets in bottom row
         // Card sizing (CSS handles responsive sizing)
-        topRowTileSize: 200,      // Base size for CSS calculations
-        bottomRowTileSize: 200,   // Base size for CSS calculations
+        topRowTileSize: 220,      // Base size for CSS calculations
+        bottomRowTileSize: 220,   // Base size for CSS calculations
         // Y-offset from natural center (CSS transform translateY value)
-        yOffset: '-10px',         // Slightly higher on mobile
+        yOffset: '0px',         // Slightly higher on mobile
         // Row spacing
         rowGap: '2rem',
         // Title positioning
@@ -25,8 +25,8 @@ export const SECTION5_LAYOUT = {
         topRowCount: 8,           // Exactly 8 tweets in top row
         bottomRowCount: 8,        // Exactly 8 tweets in bottom row
         // Card sizing
-        topRowTileSize: 240,      // Base size for CSS calculations
-        bottomRowTileSize: 220,   // Base size for CSS calculations
+        topRowTileSize: 280,      // Base size for CSS calculations
+        bottomRowTileSize: 280,   // Base size for CSS calculations
         yOffset: '0px',           // Natural center
         rowGap: '2.5rem',
         titleYOffset: '0px'
@@ -47,8 +47,8 @@ export const SECTION5_LAYOUT = {
         topRowCount: 12,          // Exactly 12 tweets in top row
         bottomRowCount: 12,       // Exactly 12 tweets in bottom row
         // Card sizing
-        topRowTileSize: 220,      // Base size for CSS calculations
-        bottomRowTileSize: 220,   // Base size for CSS calculations
+        topRowTileSize: 280,      // Base size for CSS calculations
+        bottomRowTileSize: 280,   // Base size for CSS calculations
         yOffset: '0px',          // More spacing on large screens
         rowGap: '1.5rem',
         titleYOffset: '15px'
@@ -58,7 +58,7 @@ export const SECTION5_LAYOUT = {
 // Section 5 horizontal scroll animation configuration
 export const SECTION5_CONFIG = {
     // Scroll speed control (pixels of scroll per second of timeline duration)
-    scrollSpeed: 6000, // Reduced from 10000 for slower, more readable scroll
+    scrollSpeed: 4000, // Further reduced for slower, more readable scroll
     
     // Tile size configuration (base sizes in pixels)
     topRowTileSize: 320,      // Top row tile size
@@ -88,8 +88,8 @@ export const SECTION5_CONFIG = {
     
     // Travel distance multipliers for fine-tuning synchronization
     travelMultipliers: {
-        topRow: 0.8,    // Reduced for slower top row movement
-        bottomRow: 0.8  // Reduced for slower bottom row movement
+        topRow: 0.6,    // Further reduced for slower top row movement
+        bottomRow: 0.6  // Further reduced for slower bottom row movement
     },
     
     // Starting positions (where tiles begin off-screen)
