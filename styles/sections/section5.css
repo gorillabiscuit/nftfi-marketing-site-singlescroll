@@ -85,12 +85,11 @@
     width: var(--tile-size, 180px);
     height: var(--tile-size, 180px);
     
-    /* Glass Effect - matching hero buttons */
-    background: rgba(226, 220, 218, 0.09);
-    border: none;
+    /* Solid styling - no glass effect */
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
-    filter: drop-shadow(-8px -10px 46px #0000005f);
-    backdrop-filter: blur(3px) url(#displacementFilter);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     
     /* Layout and typography */
     transition: all 0.3s ease;
@@ -103,7 +102,7 @@
     font-family: 'Roboto Mono', monospace;
     flex-shrink: 0; /* Prevent tiles from shrinking during animation */
     
-    /* Positioning for glass effect */
+    /* Basic positioning */
     position: relative;
     z-index: 5;
 }
@@ -123,14 +122,14 @@
 }
 
 .tile:hover {
-    background: rgba(226, 220, 218, 0.15);
-    filter: drop-shadow(-8px -10px 46px #0000007f);
-    backdrop-filter: blur(4px) url(#displacementFilter);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     transform: translateY(-2px) scale(1.02);
 }
 
 /* Responsive adjustments for Section 5 */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .section5-title {
         font-size: 2.5rem;
         top: 20%; /* Move title higher on smaller screens */
@@ -152,7 +151,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .section5-title {
         font-size: 2rem;
         top: 15%; /* Even higher on mobile */
