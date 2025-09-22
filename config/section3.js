@@ -70,9 +70,9 @@ export const SECTION3_CONTAINER = {
 //
 export const HERO_LOOPER = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        // Panel size (in pixels)
-        width: 600,
-        height: 560,
+        // Panel size (in pixels) - Fixed height for consistency across all mobile devices
+        width: 340,
+        height: 500,        // Consistent height for both mobile standard and large
         // Pixel offset from center point (0,0 = perfect center)
         offsetX: 0,         // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 0          // Vertical offset in pixels (+ = down, - = up)
@@ -117,10 +117,10 @@ export const DASHBOARD_SVG = {
         width: 600,
         height: 600,
         // Pixel offset from center point (0,0 = perfect center)
-        offsetX: 0,         // Horizontal offset in pixels (+ = right, - = left)
-        offsetY: 0,         // Vertical offset in pixels (+ = down, - = up)
+        offsetX: 220,         // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: 40,         // Vertical offset in pixels (+ = down, - = up)
         // SVG content scaling
-        scale: 0.4
+        scale: 0.085
     },
     [BREAKPOINT_NAMES.TABLET]: {
         // Container size (pixels for precise control)
