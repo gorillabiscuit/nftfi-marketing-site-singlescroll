@@ -297,7 +297,7 @@ export async function initSection3Dashboard() {
             });
 
             // Large: ≥1025px - Use config values for positioning
-            mm.add('(min-width: 1025px)', () => {
+            mm.add('(min-width: 1201px)', () => {
                 try {
                     const dashboardCfg = getDashboardSvgConfigFor('large');
                     const svgCfg = getSvgConfigFor('large');
@@ -476,7 +476,7 @@ export function initSection3Scroll() {
     
     // Get the new parent container and child elements
     const parentContainer = sectionEl.querySelector('.section3-container');
-    const looperEl = sectionEl.querySelector('.hero.hero--looper');
+    const looperEl = sectionEl.querySelector('.hero--looper');
     const svgEl = getSvgRootStrict();
     const targets = getSection3Targets();
     
@@ -1074,7 +1074,7 @@ function addPerIdDetailSequences(tl, targets) {
         const ctaDelay = 1.0; // 1 second delay after last feature
         const ctaStartTime = cursor + ctaDelay;
         const ctaDuration = 0.6; // Duration of button animation
-        const ctaPause = 5.5; // Pause after button appears (2.5 seconds)
+        const ctaPause = 10.5; // Pause after button appears (2.5 seconds)
         
         tl.to('.section3-features .feature-cta', {
             opacity: 1,

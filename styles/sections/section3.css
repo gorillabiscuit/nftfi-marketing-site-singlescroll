@@ -20,17 +20,40 @@ h2 {
 }
 
 /* Section 3 background hero using LooperGroup.svg, positioned within parent container */
+/* Standalone hero--looper class (no inheritance from .hero) */
 .hero--looper {
-    /* Layered backgrounds; size/position set relative to parent via HERO_LOOPER config in JS */
-    /* Put SVG on top layer, gradient underneath */
+    /* Essential layout properties */
+    position: absolute; /* Positioned by JavaScript */
+    z-index: 1; /* Below #dashboard-svg-container */
+    
+    /* Backgrounds: LooperGroup.svg + gradient */
     background-image: url('/images/LooperGroup.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
     background-size: 150%;
     background-repeat: no-repeat, no-repeat;
     background-position: 10% 50%;
-    /* Position set via JavaScript relative to .section3-container parent */
-    z-index: 1; /* Below #dashboard-svg-container */
-    pointer-events: none; /* never block interactions */
-    padding: 60px 97px  !important;
+    
+    /* Size and spacing - controlled by JavaScript + padding */
+    padding: 60px 97px;
+    
+    /* Visual styling */
+    border-radius: 27px;
+    border: 1px solid rgba(217, 213, 214, 0.25);
+    box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
+    overflow: hidden; /* Clip backgrounds */
+    
+    /* Interaction */
+    pointer-events: none; /* Never block interactions */
+    
+    /* Performance */
+    isolation: isolate; /* Create new stacking context */
+    
+    /* Smooth transitions */
+    transition:
+        opacity 0.25s ease-out,
+        transform 0.3s ease-out,
+        box-shadow 0.3s ease-out,
+        background 0.3s ease-out,
+        filter 0.3s ease-out;
 }
 
 .hero--looper::before,
@@ -181,7 +204,7 @@ h2 {
     }
 }
 
-/* Tablet breakpoint: 481px - 768px */
+/* Tablet breakpoint: 601px - 900px */
 @media (min-width: 601px) and (max-width: 900px) {
     .hero--looper {
         margin-top: 60px; /* Tablet - less space */
@@ -202,8 +225,18 @@ h2 {
     }
 }
 
-/* Mobile breakpoint: ≤ 480px */
+/* Mobile breakpoint: ≤ 600px */
 @media (max-width: 600px) {
+    h2 {
+        width: 160px;
+        padding-bottom: 20px;
+    }
+
+
+
+    .feature-1, .feature-2, .feature-3, .feature-4, .section3-features .feature-cta {
+        padding-left: 0px !important;
+    }
     .hero--looper {
         margin-top: 40px; /* Mobile - minimal space */
     }
@@ -211,17 +244,36 @@ h2 {
     .section3-features { 
         padding: 16px; 
         grid-template-rows: auto auto auto auto auto; 
+        align-content: end;
     }
-    .features-title { 
-        padding-left: 16px; 
+    .section3-features .features-title { 
+        padding-left: 0px; 
         padding-right: 16px; /* Match left padding for symmetry */
         padding-top: 24px;
         max-width: calc(100vw - 32px); /* Full width minus container padding for mobile */
+        font-size: 28px;
+
+        padding-top: 20px;
     }
     .feature-1, .feature-2, .feature-3, .feature-4, .section3-features .feature-cta { 
         padding-left: 16px; 
     }
     .section3-features .feature-block p { 
         width: 100%; 
+    }
+    .section3-features .feature-block h3 {
+        font-size: 16px;
+        line-height: 19px; /* 129% */
+    }
+    
+    .section3-features .feature-block p {
+        font-size: 12px;
+        line-height: 18px; /* 157% */
+    }
+
+    .section3-features .feature-cta { 
+        padding-left: 0px; 
+        padding-top: 0px; 
+        padding-right: 0px; 
     }
 }
