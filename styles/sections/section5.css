@@ -99,6 +99,15 @@
     overflow-x: visible; /* Allow tiles to extend beyond screen edges */
 }
 
+/* Initial positioning - hide rows off-screen until GSAP animation takes control */
+.tiles-row-1 {
+    transform: translateX(100vw); /* Start top row off-screen to the right */
+}
+
+.tiles-row-2 {
+    transform: translateX(-100vw); /* Start bottom row off-screen to the left */
+}
+
 /* Testimonial Card Styles - Based on Figma Design */
 .testimonial-card {
     /* Frame 32660 - Main card container */

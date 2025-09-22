@@ -66,7 +66,7 @@ export const SECTION5_CONFIG = {
     },
     
     // Initial offset distance control (single value for synchronized appearance)
-    initialOffsetMultiplier: 0.5, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
+    initialOffsetMultiplier: 1.5, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
     
     // Exit offset distance control (single value for synchronized unpinning)
     exitOffsetMultiplier: 0.6, // Controls how far off-screen tiles must travel before unpinning (0.5 = unpin sooner, 2.0 = unpin later)
