@@ -90,7 +90,6 @@ function createTestimonialCard(testimonial) {
             </div>
         </div>
         <div class="testimonial-content">${testimonial.tweet}</div>
-        <div class="testimonial-date">${testimonial.dateTime}</div>
     `;
     
     // Try to load avatar image (prioritize random profile picture)

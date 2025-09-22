@@ -218,7 +218,7 @@
     max-width: 100%;
 }
 
-/* Tweet content styling */
+/* Tweet content styling - now takes full available space */
 .testimonial-content {
     font-family: 'Satoshi Variable', -apple-system, BlinkMacSystemFont, sans-serif;
     font-style: normal;
@@ -232,25 +232,10 @@
     margin: 0;
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 9; /* Limit to ~9 lines to fit in card */
+    -webkit-line-clamp: 12; /* Increased from 9 to 12 lines for more content */
     -webkit-box-orient: vertical;
     word-wrap: break-word;
     hyphens: auto;
-}
-
-/* Date/time styling */
-.testimonial-date {
-    font-family: 'General Sans Variable', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 16px;
-    color: rgba(255, 255, 255, 0.7);
-    flex: none;
-    order: 2;
-    flex-grow: 0;
-    margin: 0;
-    align-self: flex-start;
 }
 
 /* Row-specific sizing */
@@ -267,7 +252,7 @@
 .tiles-row-1 .testimonial-content {
     font-size: 12px;
     line-height: 16px;
-    -webkit-line-clamp: 9;
+    -webkit-line-clamp: 12; /* More lines available without date */
 }
 
 /* Bottom row uses smaller config-defined size */
@@ -283,7 +268,7 @@
 .tiles-row-2 .testimonial-content {
     font-size: 11px;
     line-height: 14px;
-    -webkit-line-clamp: 7; /* Fewer lines for smaller cards */
+    -webkit-line-clamp: 10; /* More lines for smaller cards without date */
 }
 
 .tiles-row-2 .testimonial-name {
@@ -291,10 +276,6 @@
 }
 
 .tiles-row-2 .testimonial-handle {
-    font-size: 11px;
-}
-
-.tiles-row-2 .testimonial-date {
     font-size: 11px;
 }
 
@@ -369,7 +350,7 @@
     .tiles-row-2 .testimonial-content {
         font-size: 10px; /* Smaller font for testimonial content on mobile */
         line-height: 13px;
-        -webkit-line-clamp: 6;
+        -webkit-line-clamp: 8; /* More lines available without date */
     }
     
     .section5-content {
@@ -390,7 +371,7 @@
     .tiles-row-2 .testimonial-content {
         font-size: 10px; /* Medium font for testimonial content on tablet */
         line-height: 13px;
-        -webkit-line-clamp: 6;
+        -webkit-line-clamp: 8; /* More lines available without date */
     }
 }
 
@@ -407,7 +388,7 @@
     .tiles-row-2 .testimonial-content {
         font-size: 11px; /* Standard font for testimonial content on desktop */
         line-height: 14px;
-        -webkit-line-clamp: 7;
+        -webkit-line-clamp: 10; /* More lines available without date */
     }
 }
 
@@ -424,7 +405,7 @@
     .tiles-row-2 .testimonial-content {
         font-size: 11px; /* Larger font for testimonial content on large screens */
         line-height: 14px;
-        -webkit-line-clamp: 7;
+        -webkit-line-clamp: 10; /* More lines available without date */
     }
     
     .section5-content {
