@@ -58,7 +58,7 @@ export const SECTION5_LAYOUT = {
 // Section 5 horizontal scroll animation configuration
 export const SECTION5_CONFIG = {
     // Scroll speed control (pixels of scroll per second of timeline duration)
-    scrollSpeed: 4000, // Further reduced for slower, more readable scroll
+    scrollSpeed: 10000, // Further reduced for slower, more readable scroll
     
     // Tile size configuration (base sizes in pixels)
     topRowTileSize: 320,      // Top row tile size
@@ -81,15 +81,15 @@ export const SECTION5_CONFIG = {
     },
     
     // Initial offset distance control (single value for synchronized appearance)
-    initialOffsetMultiplier: 1.5, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
+    initialOffsetMultiplier: 2, // Controls how far off-screen both rows start (0.5 = closer, 2.0 = further)
     
     // Exit offset distance control (single value for synchronized unpinning)
-    exitOffsetMultiplier: 1.5, // Controls how far off-screen tiles must travel before unpinning (0.5 = unpin sooner, 2.0 = unpin later)
+    exitOffsetMultiplier: 2, // Controls how far off-screen tiles must travel before unpinning (0.5 = unpin sooner, 2.0 = unpin later)
     
     // Travel distance multipliers for fine-tuning synchronization
     travelMultipliers: {
-        topRow: 0.6,    // Further reduced for slower top row movement
-        bottomRow: 0.6  // Further reduced for slower bottom row movement
+        topRow: 0.3,    // Further reduced for slower top row movement
+        bottomRow: 0.3  // Further reduced for slower bottom row movement
     },
     
     // Starting positions (where tiles begin off-screen)
@@ -100,9 +100,9 @@ export const SECTION5_CONFIG = {
     
     // Title animation timings (matches Section 4 pattern)
     titleTimings: {
-        periodA: 0.5,      // Initial delay before title appears
-        h2FadeIn: 0.5,     // Title fade in duration  
-        h2Show: 1.0,       // How long title stays visible
-        h2FadeOut: 0.5     // Title fade out duration
+        periodA: 0.2,      // Initial delay before title appears
+        h2FadeIn: 0.25,     // Title fade in duration  
+        h2Show: 0.5,       // How long title stays visible
+        h2FadeOut: 0.2     // Title fade out duration
     }
 };
