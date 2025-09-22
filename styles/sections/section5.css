@@ -348,8 +348,9 @@
 
 /* Mobile Breakpoint (≤600px) */
 @media (max-width: 600px) {
+    .section[data-section="5"] h2,
     .section5-title {
-        font-size: 2rem; /* Smaller title on mobile */
+        font-size: 1rem; /* Smaller title on mobile */
     }
     
     .tiles-row {
@@ -369,6 +370,7 @@
 
 /* Tablet Breakpoint (601px-900px) */
 @media (min-width: 601px) and (max-width: 900px) {
+    .section[data-section="5"] h2,
     .section5-title {
         font-size: 2.5rem; /* Medium title size */
     }
@@ -386,6 +388,7 @@
 
 /* Desktop Breakpoint (901px-1200px) */
 @media (min-width: 901px) and (max-width: 1200px) {
+    .section[data-section="5"] h2,
     .section5-title {
         font-size: 3.5rem; /* Standard title size */
     }
@@ -403,6 +406,7 @@
 
 /* Large Breakpoint (≥1201px) */
 @media (min-width: 1201px) {
+    .section[data-section="5"] h2,
     .section5-title {
         font-size: 4rem; /* Larger title on large screens */
     }
