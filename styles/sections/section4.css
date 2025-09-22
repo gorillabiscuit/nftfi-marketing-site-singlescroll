@@ -86,3 +86,158 @@ section[data-section="4"] {
     color: rgba(255, 255, 255, 0.8);
     will-change: transform, filter, opacity;
 }
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS - SECTION 4
+   ==========================================================================
+   Following the world-class breakpoint system:
+   - MOBILE: ≤600px
+   - TABLET: 601px-900px  
+   - DESKTOP: 901px-1200px
+   - LARGE: ≥1201px
+   ========================================================================== */
+
+/* Large Breakpoint (≥1201px) */
+@media (min-width: 1201px) {
+    .section4-content {
+        gap: 3rem; /* More generous spacing on large screens */
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .section4-panel {
+        width: min(600px, 80vw); /* Slightly larger on large screens */
+    }
+    
+    .section4-title {
+        font-size: 32px; /* Larger title on large screens */
+    }
+    
+    .section4-list li {
+        font-size: 26px;
+        width: 350px; /* More space for larger text */
+    }
+    
+    .section4-item-title {
+        font-size: 32px; /* Larger item titles */
+    }
+    
+    .section4-item-body {
+        font-size: 20px; /* Larger body text */
+    }
+}
+
+/* Desktop Breakpoint (901px-1200px) */
+@media (min-width: 901px) and (max-width: 1200px) {
+    .section4-content {
+        gap: 2.5rem; /* Moderate spacing */
+    }
+    
+    .section4-panel {
+        width: min(550px, 80vw);
+    }
+    
+    .section4-title {
+        font-size: 30px;
+    }
+    
+    .section4-list li {
+        font-size: 24px; /* Keep current size for desktop */
+        width: 320px;
+    }
+    
+    .section4-item-title {
+        font-size: 28px; /* Keep current size */
+    }
+    
+    .section4-item-body {
+        font-size: 18px; /* Keep current size */
+    }
+}
+
+/* Tablet Breakpoint (601px-900px) */
+@media (min-width: 601px) and (max-width: 900px) {
+    .section4-content {
+        grid-template-columns: 1fr; /* Stack vertically on tablet */
+        gap: 2rem;
+        text-align: center;
+    }
+    
+    .section4-panel {
+        width: min(480px, 90vw);
+        margin: 0 auto;
+    }
+    
+    .section4-title {
+        font-size: 28px;
+    }
+    
+    .section4-list {
+        text-align: center; /* Center list on tablet */
+    }
+    
+    .section4-list li {
+        font-size: 22px;
+        width: 280px;
+        margin: 0.3rem auto; /* Center list items */
+    }
+    
+    .section4-item-title {
+        font-size: 26px;
+        text-align: center;
+    }
+    
+    .section4-item-body {
+        font-size: 17px;
+        text-align: center;
+    }
+}
+
+/* Mobile Breakpoint (≤600px) */
+@media (max-width: 600px) {
+    section[data-section="4"] {
+        background-position: -20%, center; /* Adjust background position */
+        background-size: 120%, 100%; /* Adjust background size for mobile */
+    }
+    
+    .section4-content {
+        grid-template-columns: 1fr; /* Single column layout */
+        gap: 1.5rem;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .section4-panel {
+        width: min(100%, 90vw);
+        gap: 16px; /* Tighter spacing on mobile */
+    }
+    
+    .section4-title {
+        font-size: 24px; /* Smaller title on mobile */
+    }
+    
+    .section4-list {
+        text-align: center;
+        margin: 1rem 0;
+    }
+    
+    .section4-list li {
+        font-size: 18px; /* Smaller text on mobile */
+        width: 100%; /* Full width on mobile */
+        height: auto; /* Allow height to adjust */
+        line-height: 1.4; /* Better line height for mobile */
+        margin: 0.4rem 0;
+    }
+    
+    .section4-item-title {
+        font-size: 22px; /* Smaller item titles */
+        text-align: center;
+        line-height: 1.3;
+    }
+    
+    .section4-item-body {
+        font-size: 16px; /* Smaller body text */
+        text-align: center;
+        line-height: 1.5;
+    }
+}
