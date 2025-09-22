@@ -137,7 +137,7 @@ function distributeTestimonials(testimonials) {
     
     // Calculate how many cards fit per row (with generous overflow for scrolling effect)
     // Use a higher multiplier to ensure enough cards for smooth scrolling
-    const scrollMultiplier = 3.0; // Increased from 1.5 to ensure more cards
+    const scrollMultiplier = 2.2; // Reduced from 3.0 for better card count balance
     const topRowCount = Math.max(8, Math.ceil((viewportWidth * scrollMultiplier) / (topTileSize + gapSize)));
     const bottomRowCount = Math.max(8, Math.ceil((viewportWidth * scrollMultiplier) / (bottomTileSize + gapSize)));
     

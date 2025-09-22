@@ -18,8 +18,8 @@ export const SECTION5_LAYOUT = {
         titleYOffset: '-20px'
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        topRowTileSize: 300,      // Medium cards for tablet
-        bottomRowTileSize: 260,   // Slightly smaller bottom row
+        topRowTileSize: 240,      // Smaller cards for more tweets per row
+        bottomRowTileSize: 220,   // Slightly smaller bottom row
         yOffset: '0px',           // Natural center
         rowGap: '2.5rem',
         titleYOffset: '0px'
@@ -32,8 +32,8 @@ export const SECTION5_LAYOUT = {
         titleYOffset: '10px'
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        topRowTileSize: 280,      // Larger cards for big screens
-        bottomRowTileSize: 280,   // Proportionally larger
+        topRowTileSize: 220,      // Smaller cards for more tweets per row
+        bottomRowTileSize: 220,   // Same size for consistency
         yOffset: '0px',          // More spacing on large screens
         rowGap: '1.5rem',
         titleYOffset: '15px'
@@ -43,7 +43,7 @@ export const SECTION5_LAYOUT = {
 // Section 5 horizontal scroll animation configuration
 export const SECTION5_CONFIG = {
     // Scroll speed control (pixels of scroll per second of timeline duration)
-    scrollSpeed: 10000, // Adjustable: higher = faster scroll, lower = slower scroll
+    scrollSpeed: 6000, // Reduced from 10000 for slower, more readable scroll
     
     // Tile size configuration (base sizes in pixels)
     topRowTileSize: 320,      // Top row tile size
@@ -73,8 +73,8 @@ export const SECTION5_CONFIG = {
     
     // Travel distance multipliers for fine-tuning synchronization
     travelMultipliers: {
-        topRow: 1.0,    // Multiplier for top row travel distance
-        bottomRow: 1.0  // Multiplier for bottom row travel distance
+        topRow: 0.8,    // Reduced for slower top row movement
+        bottomRow: 0.8  // Reduced for slower bottom row movement
     },
     
     // Starting positions (where tiles begin off-screen)
