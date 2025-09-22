@@ -72,7 +72,7 @@ export const HERO_LOOPER = {
     [BREAKPOINT_NAMES.MOBILE]: {
         // Panel size (in pixels) - Fixed height for consistency across all mobile devices
         width: 340,
-        height: 500,        // Consistent height for both mobile standard and large
+        height: 380,        // Reduced to account for CSS padding (60px top + 60px bottom = 120px)
         // Pixel offset from center point (0,0 = perfect center)
         offsetX: 0,         // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 0          // Vertical offset in pixels (+ = down, - = up)
