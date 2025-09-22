@@ -7,9 +7,12 @@ import { BREAKPOINT_NAMES } from './breakpoints.js';
 // Controls tile sizes, vertical positioning, and spacing per breakpoint
 export const SECTION5_LAYOUT = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        // Testimonial card sizes (pixels) - optimized for mobile viewing
-        topRowTileSize: 200,      // Smaller cards for mobile
-        bottomRowTileSize: 200,   // Even smaller for bottom row
+        // Explicit tweet count per row (world-class approach)
+        topRowCount: 6,           // Exactly 6 tweets in top row
+        bottomRowCount: 6,        // Exactly 6 tweets in bottom row
+        // Card sizing (CSS handles responsive sizing)
+        topRowTileSize: 200,      // Base size for CSS calculations
+        bottomRowTileSize: 200,   // Base size for CSS calculations
         // Y-offset from natural center (CSS transform translateY value)
         yOffset: '-10px',         // Slightly higher on mobile
         // Row spacing
@@ -18,22 +21,34 @@ export const SECTION5_LAYOUT = {
         titleYOffset: '-20px'
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        topRowTileSize: 240,      // Smaller cards for more tweets per row
-        bottomRowTileSize: 220,   // Slightly smaller bottom row
+        // Explicit tweet count per row
+        topRowCount: 8,           // Exactly 8 tweets in top row
+        bottomRowCount: 8,        // Exactly 8 tweets in bottom row
+        // Card sizing
+        topRowTileSize: 240,      // Base size for CSS calculations
+        bottomRowTileSize: 220,   // Base size for CSS calculations
         yOffset: '0px',           // Natural center
         rowGap: '2.5rem',
         titleYOffset: '0px'
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        topRowTileSize: 200,      // Standard testimonial card size
-        bottomRowTileSize: 200,   // Slightly smaller for variety
+        // Explicit tweet count per row
+        topRowCount: 10,          // Exactly 10 tweets in top row
+        bottomRowCount: 10,       // Exactly 10 tweets in bottom row
+        // Card sizing
+        topRowTileSize: 200,      // Base size for CSS calculations
+        bottomRowTileSize: 200,   // Base size for CSS calculations
         yOffset: '20px',          // Slightly lower on desktop
         rowGap: '3rem',
         titleYOffset: '10px'
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        topRowTileSize: 220,      // Smaller cards for more tweets per row
-        bottomRowTileSize: 220,   // Same size for consistency
+        // Explicit tweet count per row
+        topRowCount: 12,          // Exactly 12 tweets in top row
+        bottomRowCount: 12,       // Exactly 12 tweets in bottom row
+        // Card sizing
+        topRowTileSize: 220,      // Base size for CSS calculations
+        bottomRowTileSize: 220,   // Base size for CSS calculations
         yOffset: '0px',          // More spacing on large screens
         rowGap: '1.5rem',
         titleYOffset: '15px'

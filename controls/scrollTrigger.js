@@ -1783,13 +1783,15 @@ export function setupSection5HorizontalScroll() {
             return { topTravelDistance: 0, bottomTravelDistance: 0 };
         }
         
-        // Use responsive tile sizes from layout config
+        // Use explicit counts and responsive tile sizes from layout config
         const topTileWidth = layoutConfig.topRowTileSize;
         const bottomTileWidth = layoutConfig.bottomRowTileSize;
+        const topRowCount = layoutConfig.topRowCount || 8;
+        const bottomRowCount = layoutConfig.bottomRowCount || 8;
         const gapWidth = 32; // 2rem from CSS
         
-        const topRowWidth = (topTileWidth * 12) + (gapWidth * 11);
-        const bottomRowWidth = (bottomTileWidth * 12) + (gapWidth * 11);
+        const topRowWidth = (topTileWidth * topRowCount) + (gapWidth * (topRowCount - 1));
+        const bottomRowWidth = (bottomTileWidth * bottomRowCount) + (gapWidth * (bottomRowCount - 1));
         
         // Calculate full travel distances with multipliers
         const topTravelDistance = (viewportWidth + topRowWidth) * config.travelMultipliers.topRow;

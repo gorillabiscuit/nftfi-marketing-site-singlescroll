@@ -129,22 +129,11 @@ function distributeTestimonials(testimonials) {
     const breakpointKey = getCurrentBreakpoint();
     const layoutConfig = SECTION5_LAYOUT[breakpointKey];
     
-    // Determine how many cards to show based on tile sizes and viewport
-    const viewportWidth = window.innerWidth;
-    const topTileSize = layoutConfig?.topRowTileSize || 320;
-    const bottomTileSize = layoutConfig?.bottomRowTileSize || 240;
-    const gapSize = 32; // 2rem gap from CSS
-    
-    // Calculate how many cards fit per row (with generous overflow for scrolling effect)
-    // Use a higher multiplier to ensure enough cards for smooth scrolling
-    const scrollMultiplier = 2.2; // Reduced from 3.0 for better card count balance
-    const topRowCount = Math.max(8, Math.ceil((viewportWidth * scrollMultiplier) / (topTileSize + gapSize)));
-    const bottomRowCount = Math.max(8, Math.ceil((viewportWidth * scrollMultiplier) / (bottomTileSize + gapSize)));
+    // Use explicit, breakpoint-specific tweet counts (world-class approach)
+    const topRowCount = layoutConfig?.topRowCount || 8;
+    const bottomRowCount = layoutConfig?.bottomRowCount || 8;
     
     console.log('[Testimonials] Card distribution:', {
-        viewportWidth,
-        topTileSize,
-        bottomTileSize,
         topRowCount,
         bottomRowCount,
         breakpointKey
