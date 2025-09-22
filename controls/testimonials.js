@@ -5,16 +5,51 @@ import { getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { SECTION5_LAYOUT } from '../config/index.js';
 
 /**
- * Load testimonials data from JSON file
+ * Fetch random profile pictures from randomuser.me API
+ */
+async function fetchRandomProfilePictures(count) {
+    if (count === undefined) count = 18;
+    try {
+        const response = await fetch(`https://randomuser.me/api/?results=${count}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch profile pictures: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('[Testimonials] Fetched profile pictures:', data.results.map(u => u.picture.large));
+        return data.results.map(user => ({
+            large: user.picture.large,
+            medium: user.picture.medium,
+            thumbnail: user.picture.thumbnail
+        }));
+    } catch (error) {
+        console.error('Error fetching profile pictures:', error);
+        return [];
+    }
+}
+
+/**
+ * Load testimonials data from JSON file and populate with random profile pictures
  */
 async function loadTestimonials() {
     try {
+        // Load testimonials data
         const response = await fetch('/data/testimonials.json');
         if (!response.ok) {
             throw new Error(`Failed to load testimonials: ${response.status}`);
         }
         const data = await response.json();
-        return data.testimonials;
+        
+        // Fetch random profile pictures
+        const profilePictures = await fetchRandomProfilePictures(data.testimonials.length);
+        
+        // Combine testimonials with random profile pictures
+        const testimonialsWithPictures = data.testimonials.map((testimonial, index) => ({
+            ...testimonial,
+            profilePicture: profilePictures[index]?.large || testimonial.profilePicture,
+            profilePictureSet: profilePictures[index] || null
+        }));
+        
+        return testimonialsWithPictures;
     } catch (error) {
         console.error('Error loading testimonials:', error);
         return [];
@@ -58,17 +93,26 @@ function createTestimonialCard(testimonial) {
         <div class="testimonial-date">${testimonial.dateTime}</div>
     `;
     
-    // Try to load avatar image
+    // Try to load avatar image (prioritize random profile picture)
     const avatarEl = card.querySelector('.testimonial-avatar');
     const img = new Image();
+    
+    // Add loading class for better UX
+    avatarEl.classList.add('loading');
+    
     img.onload = () => {
+        avatarEl.classList.remove('loading');
         avatarEl.innerHTML = '';
         avatarEl.appendChild(img);
+        console.log(`[Testimonials] Loaded avatar for ${testimonial.name}`);
     };
+    
     img.onerror = () => {
-        // Keep initials fallback if image fails to load
-        console.log(`Avatar image not found for ${testimonial.name}, using initials`);
+        avatarEl.classList.remove('loading');
+        console.log(`[Testimonials] Avatar image failed for ${testimonial.name}, using initials fallback`);
     };
+    
+    // Use the random profile picture if available, otherwise fall back to original
     img.src = testimonial.profilePicture;
     img.alt = `${testimonial.name} avatar`;
     
