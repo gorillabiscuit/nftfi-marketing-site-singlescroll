@@ -7,12 +7,12 @@ import { BREAKPOINT_NAMES } from './breakpoints.js';
 // Values are CSS percentages as strings (e.g., '0%', '15%', '-20%')
 export const SECTION4_LAYOUT = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        title: { x: '0%', y: '-5%' },
-        panel: { x: '0%',  y: '15%' }
+        title: { x: '0%', y: '0%' },
+        panel: { x: '0%',  y: '150%' }
     },
     [BREAKPOINT_NAMES.TABLET]: {
         title: { x: '0%', y: '0%' },
-        panel: { x: '-15%', y: '2%' }
+        panel: { x: '0%', y: '200%' }
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
         title: { x: '0%', y: '0%' },
@@ -28,11 +28,11 @@ export const SECTION4_LAYOUT = {
 // Units are world units relative to current baseline position/scale
 export const SECTION4_PEBBLE = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: -2.2, y: 0.1, z: 0 },
+        position: { x: 0, y: 1.5, z: 0 },
         scale: 1.4
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: -3.0, y: 0, z: 0 },
+        position: { x: 0.0, y: 1.5, z: 0 },
         scale: 1.6
     },
     [BREAKPOINT_NAMES.DESKTOP]: {

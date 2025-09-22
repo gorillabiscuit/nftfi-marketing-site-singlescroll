@@ -8,8 +8,8 @@ import { BREAKPOINT_NAMES } from './breakpoints.js';
 export const SECTION5_LAYOUT = {
     [BREAKPOINT_NAMES.MOBILE]: {
         // Testimonial card sizes (pixels) - optimized for mobile viewing
-        topRowTileSize: 280,      // Smaller cards for mobile
-        bottomRowTileSize: 240,   // Even smaller for bottom row
+        topRowTileSize: 200,      // Smaller cards for mobile
+        bottomRowTileSize: 200,   // Even smaller for bottom row
         // Y-offset from natural center (CSS transform translateY value)
         yOffset: '-10px',         // Slightly higher on mobile
         // Row spacing
@@ -25,17 +25,17 @@ export const SECTION5_LAYOUT = {
         titleYOffset: '0px'
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        topRowTileSize: 320,      // Standard testimonial card size
-        bottomRowTileSize: 280,   // Slightly smaller for variety
+        topRowTileSize: 200,      // Standard testimonial card size
+        bottomRowTileSize: 200,   // Slightly smaller for variety
         yOffset: '20px',          // Slightly lower on desktop
         rowGap: '3rem',
         titleYOffset: '10px'
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        topRowTileSize: 340,      // Larger cards for big screens
-        bottomRowTileSize: 300,   // Proportionally larger
-        yOffset: '30px',          // More spacing on large screens
-        rowGap: '3.5rem',
+        topRowTileSize: 280,      // Larger cards for big screens
+        bottomRowTileSize: 280,   // Proportionally larger
+        yOffset: '0px',          // More spacing on large screens
+        rowGap: '1.5rem',
         titleYOffset: '15px'
     }
 };
