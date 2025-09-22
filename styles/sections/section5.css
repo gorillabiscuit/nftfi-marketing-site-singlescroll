@@ -49,27 +49,37 @@
     width: 100%;
     max-width: 1200px;
     padding: 0 2rem;
+    
+    /* Responsive positioning via CSS custom properties set by JavaScript */
+    transform: translateY(var(--section5-y-offset, 0));
+    
+    /* CSS custom properties for breakpoint-specific control */
+    --section5-y-offset: 0px;
+    --section5-row-gap: 3rem;
+    --section5-top-tile-size: 180px;
+    --section5-bottom-tile-size: 126px;
+    --section5-title-y-offset: 0px;
 }
 
 .section5-title {
     font-size: 3.5rem;
     font-weight: 300;
     color: #F2F2F2;
-    margin: 0 0 6rem 0; /* Increased margin to add space between title and tiles */
+    margin: 0 0 4rem 0; /* Reduced margin for better spacing */
     letter-spacing: -0.02em;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    
+    /* Use transform for responsive Y positioning instead of absolute */
+    transform: translateY(var(--section5-title-y-offset, 0));
     z-index: 10;
+    position: relative; /* Changed from absolute to relative */
 }
 
 .section5-tiles {
     display: flex;
     flex-direction: column;
-    gap: 3rem; /* Increased gap between rows */
+    gap: var(--section5-row-gap, 3rem); /* Use CSS custom property for responsive gap */
     align-items: center;
-    margin-top: 8rem; /* Add top margin to create space below centered title */
+    /* Removed fixed margin-top - now uses natural flow */
 }
 
 .tiles-row {
@@ -107,14 +117,14 @@
     z-index: 5;
 }
 
-/* Top row uses config-defined size */
+/* Top row uses config-defined size via CSS custom property */
 .tiles-row-1 {
-    --tile-size: 180px; /* Will be updated via JavaScript from config */
+    --tile-size: var(--section5-top-tile-size, 180px); /* Responsive size from breakpoint config */
 }
 
-/* Bottom row uses smaller config-defined size */
+/* Bottom row uses smaller config-defined size via CSS custom property */
 .tiles-row-2 {
-    --tile-size: 126px; /* Will be updated via JavaScript from config */
+    --tile-size: var(--section5-bottom-tile-size, 126px); /* Responsive size from breakpoint config */
 }
 
 .tiles-row-2 .tile {
@@ -128,47 +138,83 @@
     transform: translateY(-2px) scale(1.02);
 }
 
-/* Responsive adjustments for Section 5 */
-@media (max-width: 900px) {
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS - SECTION 5
+   ==========================================================================
+   Following the world-class breakpoint system:
+   - MOBILE: ≤600px
+   - TABLET: 601px-900px  
+   - DESKTOP: 901px-1200px
+   - LARGE: ≥1201px
+   
+   Note: Tile sizes and positioning are now controlled via CSS custom 
+   properties set by JavaScript based on SECTION5_LAYOUT configuration
+   ========================================================================== */
+
+/* Mobile Breakpoint (≤600px) */
+@media (max-width: 600px) {
     .section5-title {
-        font-size: 2.5rem;
-        top: 20%; /* Move title higher on smaller screens */
-    }
-    
-    .section5-tiles {
-        margin-top: 12rem; /* More space for higher title position */
-        gap: 2.5rem;
-    }
-    
-    .tile {
-        width: 120px; /* 50% bigger than original 80px */
-        height: 120px;
-        font-size: 1.5rem;
+        font-size: 2rem; /* Smaller title on mobile */
     }
     
     .tiles-row {
-        gap: 1.5rem;
+        gap: 1.2rem; /* Tighter spacing between tiles */
+    }
+    
+    .tiles-row-2 .tile {
+        font-size: 1.2rem; /* Smaller font for bottom row on mobile */
+    }
+    
+    .section5-content {
+        padding: 0 1rem; /* Reduced padding on mobile */
     }
 }
 
-@media (max-width: 600px) {
+/* Tablet Breakpoint (601px-900px) */
+@media (min-width: 601px) and (max-width: 900px) {
     .section5-title {
-        font-size: 2rem;
-        top: 15%; /* Even higher on mobile */
-    }
-    
-    .section5-tiles {
-        margin-top: 10rem;
-        gap: 2rem;
-    }
-    
-    .tile {
-        width: 90px; /* 50% bigger than original 60px */
-        height: 90px;
-        font-size: 1.2rem;
+        font-size: 2.5rem; /* Medium title size */
     }
     
     .tiles-row {
-        gap: 1.2rem;
+        gap: 1.5rem; /* Moderate spacing between tiles */
+    }
+    
+    .tiles-row-2 .tile {
+        font-size: 1.4rem; /* Medium font for bottom row */
+    }
+}
+
+/* Desktop Breakpoint (901px-1200px) */
+@media (min-width: 901px) and (max-width: 1200px) {
+    .section5-title {
+        font-size: 3.5rem; /* Standard title size */
+    }
+    
+    .tiles-row {
+        gap: 2rem; /* Standard spacing */
+    }
+    
+    .tiles-row-2 .tile {
+        font-size: 1.6rem; /* Standard font size */
+    }
+}
+
+/* Large Breakpoint (≥1201px) */
+@media (min-width: 1201px) {
+    .section5-title {
+        font-size: 4rem; /* Larger title on large screens */
+    }
+    
+    .tiles-row {
+        gap: 2.5rem; /* More generous spacing */
+    }
+    
+    .tiles-row-2 .tile {
+        font-size: 1.8rem; /* Larger font for bottom row */
+    }
+    
+    .section5-content {
+        max-width: 1400px; /* Wider container on large screens */
     }
 }

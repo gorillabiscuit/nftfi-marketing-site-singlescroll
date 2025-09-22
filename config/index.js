@@ -40,7 +40,7 @@ export {
     SECTION4_TIMINGS, 
     SECTION4_SCROLL 
 } from './section4.js';
-export { SECTION5_CONFIG } from './section5.js';
+export { SECTION5_CONFIG, SECTION5_LAYOUT } from './section5.js';
 export { 
     SHADER_DEFAULTS, 
     CAMERA_CONFIG, 

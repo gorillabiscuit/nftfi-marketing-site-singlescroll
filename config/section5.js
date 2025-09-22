@@ -1,6 +1,45 @@
 // Section 5 (Trusted By/Horizontal Scroll) Configuration for NFTfi Marketing Site
 // Contains horizontal scroll animation settings for tiles and logos
 
+import { BREAKPOINT_NAMES } from './breakpoints.js';
+
+// Breakpoint-specific layout configuration for Section 5
+// Controls tile sizes, vertical positioning, and spacing per breakpoint
+export const SECTION5_LAYOUT = {
+    [BREAKPOINT_NAMES.MOBILE]: {
+        // Tile sizes (pixels)
+        topRowTileSize: 90,
+        bottomRowTileSize: 60,
+        // Y-offset from natural center (CSS transform translateY value)
+        yOffset: '-10px',  // Slightly higher on mobile
+        // Row spacing
+        rowGap: '2rem',
+        // Title positioning
+        titleYOffset: '-20px'
+    },
+    [BREAKPOINT_NAMES.TABLET]: {
+        topRowTileSize: 120,
+        bottomRowTileSize: 80,
+        yOffset: '0px',    // Natural center
+        rowGap: '2.5rem',
+        titleYOffset: '0px'
+    },
+    [BREAKPOINT_NAMES.DESKTOP]: {
+        topRowTileSize: 180,
+        bottomRowTileSize: 126,
+        yOffset: '20px',   // Slightly lower on desktop
+        rowGap: '3rem',
+        titleYOffset: '10px'
+    },
+    [BREAKPOINT_NAMES.LARGE]: {
+        topRowTileSize: 220,
+        bottomRowTileSize: 150,
+        yOffset: '30px',   // More spacing on large screens
+        rowGap: '3.5rem',
+        titleYOffset: '15px'
+    }
+};
+
 // Section 5 horizontal scroll animation configuration
 export const SECTION5_CONFIG = {
     // Scroll speed control (pixels of scroll per second of timeline duration)

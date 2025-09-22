@@ -4,8 +4,8 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG } from '../config/index.js';
-import { onStateChange, getCurrentAnimationState } from '../utils/breakpointManager.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT } from '../config/index.js';
+import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
 // Blur plugin registration for GSAP
 (function () {
@@ -1728,9 +1728,39 @@ export function setupSection5HorizontalScroll() {
     // Apply config values to CSS and positioning
     const config = SECTION5_CONFIG;
     
-    // Apply tile sizes from config via CSS custom properties
-    topRow.style.setProperty('--tile-size', config.topRowTileSize + 'px');
-    bottomRow.style.setProperty('--tile-size', config.bottomRowTileSize + 'px');
+    // Apply breakpoint-specific layout settings
+    const applySection5Layout = () => {
+        const breakpointKey = getCurrentBreakpoint();
+        const layoutConfig = SECTION5_LAYOUT[breakpointKey];
+        
+        if (!layoutConfig) {
+            console.warn('[Section5] No layout config found for breakpoint:', breakpointKey);
+            return;
+        }
+        
+        console.log('[Section5] Applying layout for breakpoint:', breakpointKey, layoutConfig);
+        
+        // Get the content container for CSS custom properties
+        const contentEl = section5El.querySelector('.section5-content');
+        if (contentEl) {
+            // Apply responsive positioning and sizing via CSS custom properties
+            contentEl.style.setProperty('--section5-y-offset', layoutConfig.yOffset);
+            contentEl.style.setProperty('--section5-row-gap', layoutConfig.rowGap);
+            contentEl.style.setProperty('--section5-top-tile-size', layoutConfig.topRowTileSize + 'px');
+            contentEl.style.setProperty('--section5-bottom-tile-size', layoutConfig.bottomRowTileSize + 'px');
+            contentEl.style.setProperty('--section5-title-y-offset', layoutConfig.titleYOffset);
+        }
+        
+        // Also set the legacy tile size properties for backward compatibility
+        topRow.style.setProperty('--tile-size', layoutConfig.topRowTileSize + 'px');
+        bottomRow.style.setProperty('--tile-size', layoutConfig.bottomRowTileSize + 'px');
+        
+        // Update travel distances for new tile sizes
+        return layoutConfig;
+    };
+    
+    // Apply initial layout
+    const currentLayoutConfig = applySection5Layout();
     
     // Set initial row positions (vertical offsets)
     gsap.set(topRow, { 
@@ -1742,13 +1772,19 @@ export function setupSection5HorizontalScroll() {
         x: config.bottomRowPosition.x 
     });
 
-    // Calculate travel distances dynamically
+    // Calculate travel distances dynamically using current layout config
     const calculateTravelDistances = () => {
         const viewportWidth = window.innerWidth;
+        const layoutConfig = currentLayoutConfig || applySection5Layout();
         
-        // Use config values for tile sizes
-        const topTileWidth = config.topRowTileSize;
-        const bottomTileWidth = config.bottomRowTileSize;
+        if (!layoutConfig) {
+            console.warn('[Section5] No layout config available for travel distance calculation');
+            return { topTravelDistance: 0, bottomTravelDistance: 0 };
+        }
+        
+        // Use responsive tile sizes from layout config
+        const topTileWidth = layoutConfig.topRowTileSize;
+        const bottomTileWidth = layoutConfig.bottomRowTileSize;
         const gapWidth = 32; // 2rem from CSS
         
         const topRowWidth = (topTileWidth * 12) + (gapWidth * 11);
@@ -1882,6 +1918,17 @@ export function setupSection5HorizontalScroll() {
         }
     });
 
+    // Add responsive handling for breakpoint changes
+    const handleBreakpointChange = () => {
+        console.log('[Section5] Breakpoint changed, updating layout');
+        applySection5Layout();
+        // Refresh ScrollTrigger to recalculate with new dimensions
+        ScrollTrigger.refresh();
+    };
+    
+    // Listen for breakpoint changes using the existing breakpoint manager
+    onStateChange(handleBreakpointChange);
+    
     // Refresh ScrollTrigger after setup
     try {
         setTimeout(() => { ScrollTrigger.refresh(); }, 100);
