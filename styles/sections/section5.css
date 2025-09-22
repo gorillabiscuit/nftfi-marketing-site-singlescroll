@@ -1,11 +1,5 @@
 /* Section 5 - Trusted By Tiles Styles */
 
-h2 {
-
-    text-align: center;
-
-}
-
 .section[data-section="5"] {
     min-height: 100vh;
     display: flex;
@@ -68,6 +62,8 @@ h2 {
     --section5-title-y-offset: 0px;
 }
 
+/* Section 5 specific h2 and title styling */
+.section[data-section="5"] h2,
 .section5-title {
     font-size: 3.5rem;
     font-weight: 300;
