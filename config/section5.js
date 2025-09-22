@@ -7,34 +7,34 @@ import { BREAKPOINT_NAMES } from './breakpoints.js';
 // Controls tile sizes, vertical positioning, and spacing per breakpoint
 export const SECTION5_LAYOUT = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        // Tile sizes (pixels)
-        topRowTileSize: 90,
-        bottomRowTileSize: 60,
+        // Testimonial card sizes (pixels) - optimized for mobile viewing
+        topRowTileSize: 280,      // Smaller cards for mobile
+        bottomRowTileSize: 240,   // Even smaller for bottom row
         // Y-offset from natural center (CSS transform translateY value)
-        yOffset: '-10px',  // Slightly higher on mobile
+        yOffset: '-10px',         // Slightly higher on mobile
         // Row spacing
         rowGap: '2rem',
         // Title positioning
         titleYOffset: '-20px'
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        topRowTileSize: 120,
-        bottomRowTileSize: 80,
-        yOffset: '0px',    // Natural center
+        topRowTileSize: 300,      // Medium cards for tablet
+        bottomRowTileSize: 260,   // Slightly smaller bottom row
+        yOffset: '0px',           // Natural center
         rowGap: '2.5rem',
         titleYOffset: '0px'
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        topRowTileSize: 180,
-        bottomRowTileSize: 126,
-        yOffset: '20px',   // Slightly lower on desktop
+        topRowTileSize: 320,      // Standard testimonial card size
+        bottomRowTileSize: 280,   // Slightly smaller for variety
+        yOffset: '20px',          // Slightly lower on desktop
         rowGap: '3rem',
         titleYOffset: '10px'
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        topRowTileSize: 220,
-        bottomRowTileSize: 150,
-        yOffset: '30px',   // More spacing on large screens
+        topRowTileSize: 340,      // Larger cards for big screens
+        bottomRowTileSize: 300,   // Proportionally larger
+        yOffset: '30px',          // More spacing on large screens
         rowGap: '3.5rem',
         titleYOffset: '15px'
     }

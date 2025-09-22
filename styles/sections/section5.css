@@ -90,52 +90,220 @@
     overflow-x: visible; /* Allow tiles to extend beyond screen edges */
 }
 
-.tile {
-    /* Tile sizes now controlled by CSS custom properties set via config */
-    width: var(--tile-size, 180px);
-    height: var(--tile-size, 180px);
+/* Testimonial Card Styles - Based on Figma Design */
+.testimonial-card {
+    /* Frame 32660 - Main card container */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 32px;
+    gap: 24px;
     
-    /* Solid styling - no glass effect */
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    /* Responsive sizing via CSS custom properties */
+    width: var(--tile-size, 320px);
+    height: var(--tile-size, 320px);
     
-    /* Layout and typography */
+    /* Glass effect styling */
+    background: rgba(197, 197, 197, 0.05);
+    backdrop-filter: blur(6px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    
+    /* Positioning and interaction */
+    position: relative;
+    z-index: 5;
+    flex-shrink: 0;
     transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Frame 32663 - Header container (profile + info) */
+.testimonial-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0px;
+    gap: 16px;
+    width: 100%;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+/* Frame 32661 - Profile picture */
+.testimonial-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 20px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.testimonial-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Frame 32662 - Name and handle container */
+.testimonial-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 2px;
+    flex: 1;
+    height: auto;
+    order: 1;
+    flex-grow: 0;
+}
+
+/* Name styling */
+.testimonial-name {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
     font-weight: 500;
-    color: #F2F2F2;
-    font-family: 'Roboto Mono', monospace;
-    flex-shrink: 0; /* Prevent tiles from shrinking during animation */
-    
-    /* Basic positioning */
-    position: relative;
-    z-index: 5;
+    font-size: 14px;
+    line-height: 17px;
+    color: #FFFFFF;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
-/* Top row uses config-defined size via CSS custom property */
+/* Handle styling */
+.testimonial-handle {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* Tweet content styling */
+.testimonial-content {
+    font-family: 'Satoshi Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    color: #FFFFFF;
+    flex: 1;
+    order: 1;
+    flex-grow: 1;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 9; /* Limit to ~9 lines to fit in card */
+    -webkit-box-orient: vertical;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Date/time styling */
+.testimonial-date {
+    font-family: 'General Sans Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+    margin: 0;
+    align-self: flex-start;
+}
+
+/* Row-specific sizing */
+/* Top row uses larger config-defined size */
 .tiles-row-1 {
-    --tile-size: var(--section5-top-tile-size, 180px); /* Responsive size from breakpoint config */
+    --tile-size: var(--section5-top-tile-size, 320px);
 }
 
-/* Bottom row uses smaller config-defined size via CSS custom property */
+.tiles-row-1 .testimonial-card {
+    padding: 24px 32px;
+    gap: 24px;
+}
+
+.tiles-row-1 .testimonial-content {
+    font-size: 12px;
+    line-height: 16px;
+    -webkit-line-clamp: 9;
+}
+
+/* Bottom row uses smaller config-defined size */
 .tiles-row-2 {
-    --tile-size: var(--section5-bottom-tile-size, 126px); /* Responsive size from breakpoint config */
+    --tile-size: var(--section5-bottom-tile-size, 240px);
 }
 
-.tiles-row-2 .tile {
-    font-size: 1.6rem; /* Proportionally smaller font for smaller tiles */
+.tiles-row-2 .testimonial-card {
+    padding: 20px 24px;
+    gap: 20px;
 }
 
-.tile:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px) scale(1.02);
+.tiles-row-2 .testimonial-content {
+    font-size: 11px;
+    line-height: 14px;
+    -webkit-line-clamp: 7; /* Fewer lines for smaller cards */
+}
+
+.tiles-row-2 .testimonial-name {
+    font-size: 13px;
+}
+
+.tiles-row-2 .testimonial-handle {
+    font-size: 11px;
+}
+
+.tiles-row-2 .testimonial-date {
+    font-size: 11px;
+}
+
+/* Hover effects */
+.testimonial-card:hover {
+    background: rgba(197, 197, 197, 0.08);
+    backdrop-filter: blur(8px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px) scale(1.02);
+}
+
+/* Loading state for missing avatars */
+.testimonial-avatar:empty::before {
+    content: attr(data-initials);
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 /* ==========================================================================
@@ -161,8 +329,10 @@
         gap: 1.2rem; /* Tighter spacing between tiles */
     }
     
-    .tiles-row-2 .tile {
-        font-size: 1.2rem; /* Smaller font for bottom row on mobile */
+    .tiles-row-2 .testimonial-content {
+        font-size: 10px; /* Smaller font for testimonial content on mobile */
+        line-height: 13px;
+        -webkit-line-clamp: 6;
     }
     
     .section5-content {
@@ -180,8 +350,10 @@
         gap: 1.5rem; /* Moderate spacing between tiles */
     }
     
-    .tiles-row-2 .tile {
-        font-size: 1.4rem; /* Medium font for bottom row */
+    .tiles-row-2 .testimonial-content {
+        font-size: 10px; /* Medium font for testimonial content on tablet */
+        line-height: 13px;
+        -webkit-line-clamp: 6;
     }
 }
 
@@ -195,8 +367,10 @@
         gap: 2rem; /* Standard spacing */
     }
     
-    .tiles-row-2 .tile {
-        font-size: 1.6rem; /* Standard font size */
+    .tiles-row-2 .testimonial-content {
+        font-size: 11px; /* Standard font for testimonial content on desktop */
+        line-height: 14px;
+        -webkit-line-clamp: 7;
     }
 }
 
@@ -210,8 +384,10 @@
         gap: 2.5rem; /* More generous spacing */
     }
     
-    .tiles-row-2 .tile {
-        font-size: 1.8rem; /* Larger font for bottom row */
+    .tiles-row-2 .testimonial-content {
+        font-size: 11px; /* Larger font for testimonial content on large screens */
+        line-height: 14px;
+        -webkit-line-clamp: 7;
     }
     
     .section5-content {

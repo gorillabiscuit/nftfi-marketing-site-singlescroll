@@ -414,7 +414,7 @@
 
 /* Navigation Responsive Design */
 
-/* Small Mobile Devices (≤480px) - Extra Compact Layout */
+/* Small Mobile Devices (≤600px) - Extra Compact Layout */
 @media (max-width: 600px) {
     .nav-container {
         padding: 0 var(--container-padding); /* Use same responsive padding as hero section */
@@ -426,7 +426,7 @@
     }
 }
 
-/* Mobile Responsive Design - Consolidated (481px - 768px) */
+/* Mobile Responsive Design - Consolidated (601px - 900px) */
 @media (max-width: 900px) {
     /* Mobile Navigation */
     .nav-items-desktop {
@@ -484,7 +484,7 @@
     }
 }
 
-/* Tablet Responsive Design (769px - 1024px) */
+/* Tablet Responsive Design (901px - 1200px) */
 @media (min-width: 901px) and (max-width: 1200px) {
     /* Navigation Adjustments for Tablet */
     .nav-container {

@@ -70,17 +70,17 @@ export const SECTION3_CONTAINER = {
 //
 export const HERO_LOOPER = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        // Panel size (in pixels) - Fixed height for consistency across all mobile devices
+        // Panel size (in pixels)
         width: 340,
-        height: 380,        // Reduced to account for CSS padding (60px top + 60px bottom = 120px)
+        height: 560,
         // Pixel offset from center point (0,0 = perfect center)
         offsetX: 0,         // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 0          // Vertical offset in pixels (+ = down, - = up)
     },
     [BREAKPOINT_NAMES.TABLET]: {
         // Panel size (in pixels)
-        width: 400,
-        height: 200,
+        width: 700,
+        height: 800,
         // Pixel offset from center point (0,0 = perfect center)
         offsetX: 0,         // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 0          // Vertical offset in pixels (+ = down, - = up)
@@ -125,12 +125,12 @@ export const DASHBOARD_SVG = {
     [BREAKPOINT_NAMES.TABLET]: {
         // Container size (pixels for precise control)
         width: 800,
-        height: 800,
+        height: 720,
         // Pixel offset from center point (0,0 = perfect center)
-        offsetX: 0,         // Horizontal offset in pixels (+ = right, - = left)
-        offsetY: 0,         // Vertical offset in pixels (+ = down, - = up)
+        offsetX: 150,         // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: -70,         // Vertical offset in pixels (+ = down, - = up)
         // SVG content scaling
-        scale: 0.25,
+        scale: 0.19,
         transformOrigin: 'center center'
     },
     [BREAKPOINT_NAMES.DESKTOP]: {

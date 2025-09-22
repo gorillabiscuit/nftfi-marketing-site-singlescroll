@@ -158,7 +158,7 @@
 @media (max-width: 600px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(15px, -80px) rotate(45deg);
+        transform: translate(40px, -45px) rotate(45deg);
     }
 
     /* Target amount text (large numbers like $700M+) */
@@ -177,7 +177,7 @@
 @media (min-width: 601px) and (max-width: 900px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(18px, -90px) rotate(45deg);
+        transform: translate(-10px, -100px) rotate(45deg);
     }
 
     /* Target amount text */
@@ -195,7 +195,7 @@
 @media (min-width: 901px) and (max-width: 1200px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(20px, -100px) rotate(45deg);
+        transform: translate(0px, -120px) rotate(45deg);
     }
 
     /* Target amount text */
@@ -213,7 +213,7 @@
 @media (min-width: 1201px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(25px, -110px) rotate(45deg);
+        transform: translate(0px, -120px) rotate(45deg);
     }
 
     /* Target amount text */

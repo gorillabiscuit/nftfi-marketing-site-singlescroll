@@ -106,7 +106,7 @@ section[data-section="4"] {
     }
     
     .section4-panel {
-        width: min(600px, 80vw); /* Slightly larger on large screens */
+        width: min(500px, 80vw); /* Slightly larger on large screens */
     }
     
     .section4-title {
@@ -134,7 +134,7 @@ section[data-section="4"] {
     }
     
     .section4-panel {
-        width: min(550px, 80vw);
+        width: min(40px, 80vw);
     }
     
     .section4-title {

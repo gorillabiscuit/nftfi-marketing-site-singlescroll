@@ -66,10 +66,11 @@ class ResponsiveController {
      * and hardware capabilities. This drives all responsive optimizations.
      * 
      * DETECTION CRITERIA:
-     * - Mobile: Width ≤ 768px (iPhone, Android phones)
-     * - Tablet: Width 769-1024px (iPad, Android tablets)
+     * - Mobile: Width ≤ 600px (iPhone, Android phones)
+     * - Tablet: Width 601-900px (iPad, Android tablets)
+     * - Desktop: Width 901-1200px (laptops, small monitors)
+     * - Large: Width > 1200px (large monitors, ultra-wide)
      * - High-DPI: Pixel ratio > 2x (Retina displays, 4K screens)
-     * - Desktop: Width > 1024px (laptops, monitors)
      * 
      * OPTIMIZATION STRATEGY:
      * - Mobile: Performance-first, touch-optimized, reduced effects

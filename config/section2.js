@@ -17,7 +17,7 @@ export const UNIVERSAL_BLOCKS = [
 export const GRID_STATES = {
     [BREAKPOINT_NAMES.MOBILE]: {
         // Base spacing between logical levels before expansion
-        initialSpacing: 60,
+        initialSpacing: 45,
         // How far lines spread during outward expansion (phase 2)
         outwardFactor: 2.2,
         // Final spacing factor for the last phase (phase 4)
@@ -93,8 +93,8 @@ export const RECT_STATES = {
             center: true,
             anchor: 'middle',
             baseline: 'middle',
-            centerOffsetX: 80,
-            centerOffsetY: 80,
+            centerOffsetX: 60,
+            centerOffsetY: 60,
             rotateDeg: -45
         },
         label: {
@@ -105,10 +105,10 @@ export const RECT_STATES = {
             fontSize: 16,
             fontWeight: '500',
             // bottom-left by default; you can switch to bottom-right using padRight
-            padLeft: 170,
+            padLeft: 130,
             padBottom: undefined,
             padRight: undefined,
-            padTop: 150,
+            padTop: 112,
             rotateDeg: -90,
             anchor: 'start',
             baseline: 'alphabetic'

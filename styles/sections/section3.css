@@ -206,8 +206,14 @@ h2 {
 
 /* Tablet breakpoint: 601px - 900px */
 @media (min-width: 601px) and (max-width: 900px) {
+
+    h2 {
+        width: 360px;
+        padding-bottom: 20px;
+    }
+
     .hero--looper {
-        margin-top: 60px; /* Tablet - less space */
+        margin-top: 0px; /* Tablet - less space */
     }
     
     .features-title { 
@@ -222,6 +228,12 @@ h2 {
     }
     .section3-features .feature-block p { 
         width: 100%; 
+    }
+
+    .section3-features { 
+        align-content: end;
+        display: block;
+        padding-bottom: 60px;
     }
 }
 

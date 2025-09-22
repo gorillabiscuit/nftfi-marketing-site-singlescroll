@@ -10,6 +10,7 @@ import { loadPebbleModel, pebbleGroup } from './objects/pebbleModel.js';
 import { loadRoundPebbleModel } from './objects/roundPebbleModel.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane, initializeVideoTextures } from './objects/backgroundPlane.js';
 import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned, setupSection5HorizontalScroll } from './controls/scrollTrigger.js';
+import { initializeTestimonials } from './controls/testimonials.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
 import { initHeaderAnimation } from './controls/headerAnimation.js';
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
@@ -147,11 +148,20 @@ async function init() {
         }
     });
     
-    // Initialize Section 5 horizontal scroll animation
+    // Initialize Section 5 testimonials and horizontal scroll animation
     try {
+        // First initialize testimonials (this populates the DOM with cards)
+        const testimonialsInitialized = await initializeTestimonials();
+        if (testimonialsInitialized) {
+            console.log('[App] Testimonials initialized successfully');
+        } else {
+            console.warn('[App] Testimonials initialization failed');
+        }
+        
+        // Then setup the horizontal scroll animation (this animates the cards)
         setupSection5HorizontalScroll();
     } catch (e) {
-        console.error('Failed to setup Section 5 animation:', e);
+        console.error('Failed to setup Section 5:', e);
     }
     
     // Start and complete images loading step (most images are loaded via CSS)
