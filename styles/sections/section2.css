@@ -154,22 +154,32 @@
    These elements are created by JavaScript with data-role attributes
    ========================================================================== */
 
-/* Mobile Breakpoint (≤480px) */
+/* Mobile Breakpoint (≤600px) */
 @media (max-width: 600px) {
+    /* Key Metrics Title positioning */
+    .key-metrics-title {
+        transform: translate(15px, -80px) rotate(45deg);
+    }
+
     /* Target amount text (large numbers like $700M+) */
     svg text[data-role="amount"] {
-        font-size: 36px !important;
+        font-size:24px !important;
         
     }
 
     /* Target label text (descriptive text like LOAN VOLUME) */
     svg text[data-role="label"] {
-        font-size: 14px !important;
+        font-size: 11px !important;
     }
 }
 
-/* Tablet Breakpoint (481px-768px) */
+/* Tablet Breakpoint (601px-900px) */
 @media (min-width: 601px) and (max-width: 900px) {
+    /* Key Metrics Title positioning */
+    .key-metrics-title {
+        transform: translate(18px, -90px) rotate(45deg);
+    }
+
     /* Target amount text */
     svg text[data-role="amount"] {
         font-size: 28px !important;
@@ -181,8 +191,13 @@
     }
 }
 
-/* Desktop Breakpoint (769px-1024px) */
+/* Desktop Breakpoint (901px-1200px) */
 @media (min-width: 901px) and (max-width: 1200px) {
+    /* Key Metrics Title positioning */
+    .key-metrics-title {
+        transform: translate(20px, -100px) rotate(45deg);
+    }
+
     /* Target amount text */
     svg text[data-role="amount"] {
         font-size: 36px !important;
@@ -194,8 +209,13 @@
     }
 }
 
-/* Large Breakpoint (≥1025px) */
+/* Large Breakpoint (≥1201px) */
 @media (min-width: 1201px) {
+    /* Key Metrics Title positioning */
+    .key-metrics-title {
+        transform: translate(25px, -110px) rotate(45deg);
+    }
+
     /* Target amount text */
     svg text[data-role="amount"] {
         font-size: 40px !important;
