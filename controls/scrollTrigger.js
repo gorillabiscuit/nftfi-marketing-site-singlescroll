@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT } from '../config/index.js';
+import { BREAKPOINT_NAMES } from '../config/breakpoints.js';
 import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
 // Blur plugin registration for GSAP
@@ -146,8 +147,8 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
     const titleEl = document.getElementById('section4-title');
     const panelEl = document.getElementById('section4-panel');
     try {
-        const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
-        const cfg = (SECTION4_LAYOUT && SECTION4_LAYOUT[bp]) ? SECTION4_LAYOUT[bp] : SECTION4_LAYOUT.desktop;
+        const bp = getCurrentBreakpoint();
+        const cfg = (SECTION4_LAYOUT && SECTION4_LAYOUT[bp]) ? SECTION4_LAYOUT[bp] : SECTION4_LAYOUT[BREAKPOINT_NAMES.DESKTOP];
         if (titleEl) {
             titleEl.style.setProperty('--x', cfg.title.x);
             titleEl.style.setProperty('--y', cfg.title.y);
@@ -197,8 +198,8 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
     }, 0);
     // Lift from offscreen and position/scale per breakpoint settings
     try {
-        const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
-        const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE.desktop;
+        const bp = getCurrentBreakpoint();
+        const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE[BREAKPOINT_NAMES.DESKTOP];
         const t = SECTION4_TIMINGS; let cursor = (title && title._s4CursorAfterTitle) ? title._s4CursorAfterTitle : 0.4;
         // After title fade-out, wait period, then animate pebble in, then another period, then first item
         cursor += (t.periodB ?? 0.05);
@@ -434,8 +435,8 @@ function setupPebbleExitAnimation(pebbleGroup) {
             try { gsap.killTweensOf([pebbleGroup.position, pebbleGroup.scale]); } catch (_) { void 0; }
             
             // Get current breakpoint configuration for proper restoration
-            const bp = (window.getCurrentAnimationState && window.getCurrentAnimationState()) || 'desktop';
-            const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE.desktop;
+            const bp = getCurrentBreakpoint();
+            const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE[BREAKPOINT_NAMES.DESKTOP];
             
             // Restore to Section 4 position smoothly
             gsap.to(pebbleGroup.position, {
