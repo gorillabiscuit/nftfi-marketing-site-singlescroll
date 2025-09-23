@@ -2,7 +2,7 @@
 // Purpose: Load and inline images/dashboard.svg into #dashboard-svg-container with strict guards
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SECTION3, SECTION3_SCROLL, SECTION3_CONTAINER, HERO_LOOPER, DASHBOARD_SVG, SECTION3_ARROWS, SECTION3_ARROWS_DEBUG, SECTION3_ARROWS_VISIBLE_ZERO, SECTION3_ARROWS_ENABLED } from '../config/index.js';
+import { SECTION3, SECTION3_SCROLL, SECTION3_CONTAINER, HERO_LOOPER, DASHBOARD_SVG, SECTION3_ARROWS, SECTION3_ARROWS_DEBUG, SECTION3_ARROWS_VISIBLE_ZERO, SECTION3_ARROWS_ENABLED, BREAKPOINT_NAMES } from '../config/index.js';
 // Bundle the dashboard SVG at build time to ensure availability in production
 import dashboardSvg from '../images/dashboard.svg?raw';
 
@@ -263,8 +263,8 @@ export async function initSection3Dashboard() {
             // Desktop: 901px-1200px - Use config values for positioning
             mm.add('(min-width: 901px) and (max-width: 1200px)', () => {
                 try {
-                    const dashboardCfg = getDashboardSvgConfigFor('desktop');
-                    const svgCfg = getSvgConfigFor('desktop');
+                    const dashboardCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.DESKTOP);
+                    const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.DESKTOP);
                     
                     // Position container using new pixel offset system
                     gsap.set(container, { 
@@ -299,8 +299,8 @@ export async function initSection3Dashboard() {
             // Large: ≥1025px - Use config values for positioning
             mm.add('(min-width: 1201px)', () => {
                 try {
-                    const dashboardCfg = getDashboardSvgConfigFor('large');
-                    const svgCfg = getSvgConfigFor('large');
+                    const dashboardCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.LARGE);
+                    const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.LARGE);
                     
                     // Position container using new pixel offset system
                     gsap.set(container, { 
@@ -335,8 +335,8 @@ export async function initSection3Dashboard() {
             // Tablet: 601px–900px
             mm.add('(min-width: 601px) and (max-width: 900px)', () => {
                 try {
-                    const svgContainerCfg = getDashboardSvgConfigFor('tablet');
-                    const svgCfg = getSvgConfigFor('tablet');
+                    const svgContainerCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.TABLET);
+                    const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.TABLET);
                     
                     // Position the SVG container using new pixel offset system
                     gsap.set(container, { 
@@ -371,8 +371,8 @@ export async function initSection3Dashboard() {
             // Mobile: ≤600px
             mm.add('(max-width: 600px)', () => {
                 try {
-                    const svgContainerCfg = getDashboardSvgConfigFor('mobile');
-                    const svgCfg = getSvgConfigFor('mobile');
+                    const svgContainerCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.MOBILE);
+                    const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.MOBILE);
                     
                     // Position the SVG container using new pixel offset system
                     gsap.set(container, { 
@@ -406,8 +406,8 @@ export async function initSection3Dashboard() {
         } else if (typeof gsap !== 'undefined' && gsap && typeof gsap.set === 'function') {
             // Fallback if matchMedia not available - use desktop config
             try {
-                const dashboardCfg = getDashboardSvgConfigFor('desktop');
-                const svgCfg = getSvgConfigFor('desktop');
+                const dashboardCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.DESKTOP);
+                const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.DESKTOP);
                 
                 // Position container using new pixel offset system
                 gsap.set(container, { 
@@ -615,10 +615,10 @@ export function initSection3Scroll() {
                 }
             };
             
-            mm.add('(max-width: 600px)', applyPositioning('mobile'));
-            mm.add('(min-width: 601px) and (max-width: 900px)', applyPositioning('tablet'));
-            mm.add('(min-width: 901px) and (max-width: 1200px)', applyPositioning('desktop'));
-            mm.add('(min-width: 1201px)', applyPositioning('large'));
+            mm.add('(max-width: 600px)', applyPositioning(BREAKPOINT_NAMES.MOBILE));
+            mm.add('(min-width: 601px) and (max-width: 900px)', applyPositioning(BREAKPOINT_NAMES.TABLET));
+            mm.add('(min-width: 901px) and (max-width: 1200px)', applyPositioning(BREAKPOINT_NAMES.DESKTOP));
+            mm.add('(min-width: 1201px)', applyPositioning(BREAKPOINT_NAMES.LARGE));
         }
     } catch (e) { 
         console.error('[Section3Dashboard] Error setting up parent container positioning:', e);
@@ -1149,10 +1149,10 @@ function ensureArrowsOverlay(sectionEl) {
 
 function getBreakpointKey() {
     const w = window.innerWidth;
-    if (w >= 1201) return 'large';
-    if (w >= 901) return 'desktop';
-    if (w >= 601) return 'tablet';
-    return 'mobile';
+    if (w >= 1201) return BREAKPOINT_NAMES.LARGE;
+    if (w >= 901) return BREAKPOINT_NAMES.DESKTOP;
+    if (w >= 601) return BREAKPOINT_NAMES.TABLET;
+    return BREAKPOINT_NAMES.MOBILE;
 }
 
 function getFeatureAnchorRect(sectionEl, selector) {

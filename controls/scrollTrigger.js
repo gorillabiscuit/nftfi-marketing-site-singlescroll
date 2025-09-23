@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT } from '../config/index.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
 import { BREAKPOINT_NAMES } from '../config/breakpoints.js';
 import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
@@ -1938,6 +1938,78 @@ export function setupSection5HorizontalScroll() {
     } catch (_) { void 0; }
 
     console.log('[Section5] Pure scroll-driven animation setup complete');
+}
+
+/**
+ * Setup Section 6 title animation (matches Section 3 pattern)
+ * Simple fade in/out animation for "Our Investors" title
+ */
+export function setupSection6TitleAnimation() {
+    const section6El = document.querySelector(".section[data-section='6']");
+    if (!section6El) {
+        console.warn('[Section6] Section 6 element not found');
+        return;
+    }
+
+    const title = section6El.querySelector('.section6-title');
+    if (!title) {
+        console.warn('[Section6] Section 6 title element not found');
+        return;
+    }
+
+    console.log('[Section6] Setting up title animation');
+
+    // Prepare title for animation (start hidden)
+    gsap.set(title, { opacity: 0 });
+
+    // Create timeline with ScrollTrigger
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: section6El,
+            start: 'top top',
+            end: () => '+=' + Math.round(tl.totalDuration() * (SECTION6_SCROLL?.pxPerUnit || 800)),
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            scrub: true,
+            markers: false,
+            id: 'section6-title-animation'
+        }
+    });
+
+    // Build timeline using Section 6 timings (matches Section 3 pattern)
+    const t = SECTION6_TIMINGS;
+    let cursor = 0;
+
+    // Initial delay
+    cursor += (t.periodA ?? 0.5);
+
+    // Title fade in
+    tl.to(title, { 
+        opacity: 1, 
+        ease: 'power1.out', 
+        duration: (t.titleFadeIn ?? 0.35) 
+    }, cursor);
+    cursor += (t.titleFadeIn ?? 0.35);
+
+    // Title show period
+    cursor += (t.titleShow ?? 2.0);
+
+    // Title fade out
+    tl.to(title, { 
+        opacity: 0, 
+        ease: 'power1.in', 
+        duration: (t.titleFadeOut ?? 0.35) 
+    }, cursor);
+    cursor += (t.titleFadeOut ?? 0.35);
+
+    // Final delay
+    cursor += (t.periodB ?? 0.5);
+
+    console.log('[Section6] Title animation setup complete', {
+        totalDuration: cursor,
+        scrollDistance: Math.round(cursor * (SECTION6_SCROLL?.pxPerUnit || 800)) + 'px'
+    });
 }
 
  

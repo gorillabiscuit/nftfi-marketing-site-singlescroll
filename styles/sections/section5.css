@@ -356,16 +356,38 @@
     .tiles-row {
         gap: 1.2rem; /* Tighter spacing between tiles */
     }
+
+    .tiles-row-1 .testimonial-content {
+
+        font-size: 12px;
+        line-height: 18px;
+        -webkit-line-clamp: 12; /* More lines available without date */
+    }
     
+    .tiles-row-1 .testimonial-card {
+        padding: 16px 16px;
+        gap: 16px;
+    }
+
     .tiles-row-2 .testimonial-content {
-        font-size: 10px; /* Smaller font for testimonial content on mobile */
-        line-height: 13px;
+        font-size: 12px; /* Smaller font for testimonial content on mobile */
+        line-height: 18px;
         -webkit-line-clamp: 8; /* More lines available without date */
+    }
+
+    .tiles-row-2 .testimonial-card {
+        padding: 16px 16px;
+        gap: 16px;
     }
     
     .section5-content {
         padding: 0 1rem; /* Reduced padding on mobile */
     }
+
+
+
+
+
 }
 
 /* Tablet Breakpoint (601px-900px) */
@@ -377,12 +399,20 @@
     
     .tiles-row {
         gap: 1.5rem; /* Moderate spacing between tiles */
+        font-size: 14px; /* Medium font for testimonial content on tablet */
+        line-height: 18px;
+    }
+
+    .tiles-row-1 .testimonial-content {
+        font-size: 14px;
+        line-height: 20px;
+        -webkit-line-clamp: 12; /* More lines available without date */
     }
     
     .tiles-row-2 .testimonial-content {
-        font-size: 10px; /* Medium font for testimonial content on tablet */
-        line-height: 13px;
-        -webkit-line-clamp: 8; /* More lines available without date */
+        font-size: 14px; /* Medium font for testimonial content on tablet */
+        line-height: 20px;
+        -webkit-line-clamp: 12; /* More lines available without date */
     }
 }
 
@@ -402,6 +432,8 @@
         line-height: 14px;
         -webkit-line-clamp: 10; /* More lines available without date */
     }
+
+    
 }
 
 /* Large Breakpoint (≥1201px) */

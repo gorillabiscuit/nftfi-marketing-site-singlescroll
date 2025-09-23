@@ -13,6 +13,7 @@ export * from './section2.js';
 export * from './section3.js';
 export * from './section4.js';
 export * from './section5.js';
+export * from './section6.js';
 
 // Legacy compatibility exports for existing imports
 // These maintain backward compatibility while the codebase transitions
@@ -41,6 +42,7 @@ export {
     SECTION4_SCROLL 
 } from './section4.js';
 export { SECTION5_CONFIG, SECTION5_LAYOUT } from './section5.js';
+export { SECTION6_TIMINGS, SECTION6_SCROLL, SECTION6_CONTAINER } from './section6.js';
 export { 
     SHADER_DEFAULTS, 
     CAMERA_CONFIG, 
