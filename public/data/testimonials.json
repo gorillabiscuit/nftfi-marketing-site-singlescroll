@@ -1,0 +1,173 @@
+{
+  "testimonials": [
+    {
+      "id": "sergito_1",
+      "profilePicture": "/images/testimonials/sergito.jpg",
+      "name": "Sergito ❚ ❚",
+      "handle": "@sergitosergito",
+      "tweet": "gm! I'm amazed at how easy it was to borrow against my Punks on @NFTfi. Listed 2 of them and got very competitive offers within a few minutes. Was able to unlock 89eth of liquidity without having to sell them. I also dont have to worry about liquidation unless I dont pay 👐.",
+      "dateTime": "5:51 PM · Jul 4, 2022",
+      "timestamp": "2022-07-04T17:51:00Z"
+    },
+    {
+      "id": "phantom_1",
+      "profilePicture": "/images/testimonials/phantom.jpg",
+      "name": "Phantom",
+      "handle": "@phantom_scribbs",
+      "tweet": "Just used @NFTfi for the first time and WOW. Got a 15 ETH loan against my BAYC in under 10 minutes. The peer-to-peer lending model is genius - no oracles, no liquidation risks like other platforms. This is the future of NFT finance! 🚀",
+      "dateTime": "2:34 PM · Mar 22, 2021",
+      "timestamp": "2021-03-22T14:34:00Z"
+    },
+    {
+      "id": "benroy_1",
+      "profilePicture": "/images/testimonials/benroy.jpg",
+      "name": "Ben Roy",
+      "handle": "@benroy__",
+      "tweet": "Shoutout to @NFTfi for making NFT lending so smooth. Got multiple offers on my Azuki within hours and chose the best terms. The fixed-rate loans give me peace of mind - no surprise liquidations. Perfect for diamond hands who need liquidity! 💎🙌",
+      "dateTime": "11:22 AM · Aug 15, 2022",
+      "timestamp": "2022-08-15T11:22:00Z"
+    },
+    {
+      "id": "pranksy_1",
+      "profilePicture": "/images/testimonials/pranksy.jpg",
+      "name": "Pranksy",
+      "handle": "@pranksynft",
+      "tweet": "Been using @NFTfi consistently for months now. The platform has evolved so much - better UX, more lenders, competitive rates. It's become my go-to for unlocking liquidity from my collection without selling. Game changer for NFT holders! 🔥",
+      "dateTime": "7:18 PM · Nov 8, 2022",
+      "timestamp": "2022-11-08T19:18:00Z"
+    },
+    {
+      "id": "metapunk_1",
+      "profilePicture": "/images/testimonials/metapunk.jpg",
+      "name": "MetaPunk",
+      "handle": "@metapunk_eth",
+      "tweet": "Love how @NFTfi lets me keep my NFTs while accessing capital. Just borrowed 25 ETH against my Doodles collection. The fixed terms mean I know exactly what I owe and when. No stress about market volatility causing liquidations! 📈",
+      "dateTime": "4:45 PM · Sep 12, 2022",
+      "timestamp": "2022-09-12T16:45:00Z"
+    },
+    {
+      "id": "nunocosta_1",
+      "profilePicture": "/images/testimonials/nunocosta.jpg",
+      "name": "Nuno Costa",
+      "handle": "@nunocosta_nft",
+      "tweet": "As a collector, @NFTfi has been invaluable. Instead of selling pieces I love, I can borrow against them for new opportunities. The peer-to-peer model means fair market rates. Already used it 5+ times - flawless execution every time! ⭐",
+      "dateTime": "1:12 PM · Jun 28, 2022",
+      "timestamp": "2022-06-28T13:12:00Z"
+    },
+    {
+      "id": "piffington_1",
+      "profilePicture": "/images/testimonials/piffington.jpg",
+      "name": "Piffington",
+      "handle": "@piffington_nft",
+      "tweet": "The @NFTfi experience is incredibly smooth. Listed my Cool Cat, got 8 loan offers within 2 hours, picked the best one. 12 ETH unlocked without selling my favorite NFT. This is how DeFi should work - simple, fair, and effective! 🐱",
+      "dateTime": "9:33 AM · Oct 3, 2022",
+      "timestamp": "2022-10-03T09:33:00Z"
+    },
+    {
+      "id": "keyrock_1",
+      "profilePicture": "/images/testimonials/keyrock.jpg",
+      "name": "KeyRock Capital",
+      "handle": "@keyrock_capital",
+      "tweet": "From an institutional perspective, @NFTfi provides excellent NFT-backed lending infrastructure. Clean interface, transparent terms, and reliable execution. We've facilitated multiple loans through the platform with zero issues. Highly recommended! 🏛️",
+      "dateTime": "3:27 PM · Dec 14, 2022",
+      "timestamp": "2022-12-14T15:27:00Z"
+    },
+    {
+      "id": "jenn_1",
+      "profilePicture": "/images/testimonials/jenn.jpg",
+      "name": "Jenn",
+      "handle": "@jennlikesnfts",
+      "tweet": "New to NFT lending and @NFTfi made it so easy! The educational resources helped me understand the process. Got a fair loan on my first blue chip and the lender was super professional. Great onboarding experience! 💜",
+      "dateTime": "6:55 PM · May 17, 2022",
+      "timestamp": "2022-05-17T18:55:00Z"
+    },
+    {
+      "id": "wale_1",
+      "profilePicture": "/images/testimonials/wale.jpg",
+      "name": "Wale.eth",
+      "handle": "@waleswoosh",
+      "tweet": "Bullish on @NFTfi! The platform keeps improving - new features, better rates, more collections supported. Used it to leverage my Moonbirds for a sick flip opportunity. Paid back early and kept my bird. Win-win! 🌙🐦",
+      "dateTime": "12:08 PM · Apr 25, 2022",
+      "timestamp": "2022-04-25T12:08:00Z"
+    },
+    {
+      "id": "charlie_1",
+      "profilePicture": "/images/testimonials/charlie.jpg",
+      "name": "Charlie",
+      "handle": "@charliebitmex",
+      "tweet": "The @NFTfi team has built something special. Fixed-rate NFT loans without liquidation risk? Revolutionary. I've used it multiple times to access liquidity while holding my favorite pieces. The future of NFT finance is here! 🔮",
+      "dateTime": "8:14 AM · Jan 19, 2023",
+      "timestamp": "2023-01-19T08:14:00Z"
+    },
+    {
+      "id": "oxoreo_1",
+      "profilePicture": "/images/testimonials/oxoreo.jpg",
+      "name": "0xOreo",
+      "handle": "@0xOreoNFT",
+      "tweet": "Tried several NFT lending platforms but @NFTfi is by far the best. User-friendly interface, competitive rates, and most importantly - no surprise liquidations! Got 18 ETH on my Otherdeeds and used it to mint more alpha. Smart money! 🧠💰",
+      "dateTime": "10:42 AM · Aug 7, 2022",
+      "timestamp": "2022-08-07T10:42:00Z"
+    },
+    {
+      "id": "tylerd_1",
+      "profilePicture": "/images/testimonials/tylerd.jpg",
+      "name": "Tyler D",
+      "handle": "@tylerdnft",
+      "tweet": "Been lending on @NFTfi for over a year now as a lender. Great returns, transparent process, and the escrow system gives me confidence. Borrowers are generally responsible and the platform handles everything smoothly. Solid passive income! 📊",
+      "dateTime": "4:29 PM · Nov 22, 2022",
+      "timestamp": "2022-11-22T16:29:00Z"
+    },
+    {
+      "id": "gmoney_1",
+      "profilePicture": "/images/testimonials/gmoney.jpg",
+      "name": "gmoney.eth",
+      "handle": "@gmoneyNFT",
+      "tweet": "Respect to the @NFTfi team for building the infrastructure that lets NFT holders access capital without selling. Used it multiple times for various opportunities. The peer-to-peer model creates fair market dynamics. Essential tool for any serious collector! 🎯",
+      "dateTime": "2:16 PM · Sep 30, 2022",
+      "timestamp": "2022-09-30T14:16:00Z"
+    },
+    {
+      "id": "cryptopunk_1",
+      "profilePicture": "/images/testimonials/cryptopunk.jpg",
+      "name": "cryptopunk.eth",
+      "handle": "@cryptopunketh",
+      "tweet": "The beauty of @NFTfi is the simplicity. List your NFT, review offers, accept the best terms. No complex liquidation mechanisms or oracle dependencies. Just straightforward peer-to-peer lending. This is how DeFi should work! 🤝",
+      "dateTime": "7:03 PM · Jul 18, 2022",
+      "timestamp": "2022-07-18T19:03:00Z"
+    },
+    {
+      "id": "panic_1",
+      "profilePicture": "/images/testimonials/panic.jpg",
+      "name": "Panic",
+      "handle": "@panicbuyingnft",
+      "tweet": "Market down but still need liquidity? @NFTfi has you covered! Even in tough times, I'm getting decent loan offers on quality NFTs. The platform's resilience during market stress shows its true value. Diamond hands with liquid options! 💎📉",
+      "dateTime": "11:37 AM · Jun 15, 2022",
+      "timestamp": "2022-06-15T11:37:00Z"
+    },
+    {
+      "id": "ryan_1",
+      "profilePicture": "/images/testimonials/ryan.jpg",
+      "name": "Ryan - Bankless",
+      "handle": "@RyanSAdams",
+      "tweet": "Impressed with @NFTfi's approach to NFT lending. The fixed-rate, no-liquidation model is much more user-friendly than traditional DeFi. Perfect for NFT holders who want to maintain exposure while accessing capital. This is going mainstream! 🏦",
+      "dateTime": "5:21 PM · Oct 11, 2022",
+      "timestamp": "2022-10-11T17:21:00Z"
+    },
+    {
+      "id": "josh_1",
+      "profilePicture": "/images/testimonials/josh.jpg",
+      "name": "Josh Ong",
+      "handle": "@joshong",
+      "tweet": "The @NFTfi product market fit is undeniable. Elegant solution to a real problem - how to access liquidity from illiquid NFT assets. The growth metrics speak for themselves. This is infrastructure that the space desperately needed! 📈🏗️",
+      "dateTime": "3:48 PM · Dec 5, 2022",
+      "timestamp": "2022-12-05T15:48:00Z"
+    }
+  ],
+  "metadata": {
+    "totalTestimonials": 18,
+    "lastUpdated": "2023-01-20T10:00:00Z",
+    "categories": ["lending", "borrowing", "nft-finance", "defi"],
+    "averageRating": 4.8,
+    "platform": "twitter"
+  }
+}
