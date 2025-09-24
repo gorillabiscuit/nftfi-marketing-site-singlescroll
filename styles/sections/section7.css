@@ -1,0 +1,231 @@
+/* Section 7 (Final CTA) Styles for NFTfi Marketing Site */
+/* Simple centered call-to-action section with consistent styling */
+
+/* Base section styling */
+.section[data-section="7"] {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #6C3C59 0%, #4A2B47 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 2rem; /* Keep standard section padding */
+}
+
+/* Container styling - matches other sections */
+.section7-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1400px; /* Match site-wide max width */
+}
+
+/* Content container */
+.section7-content {
+    position: relative;
+    width: 100%;
+    max-width: 800px; /* Constrain content width for readability */
+    text-align: center;
+    z-index: 2;
+    padding: 0 2rem;
+}
+
+/* Title styling */
+.section7-title {
+    font-family: 'Satoshi Variable', sans-serif;
+    font-weight: 300;
+    font-size: 3.5rem;
+    line-height: 1.2;
+    color: #F2F2F2;
+    margin: 0 0 1.5rem 0;
+    letter-spacing: -0.02em;
+}
+
+/* Text styling */
+.section7-text {
+    font-family: 'Satoshi Variable', sans-serif;
+    font-weight: 300;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 3rem 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* CTA Button styling - matches site-wide button patterns */
+.section7-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2.5rem;
+    font-family: 'Satoshi Variable', sans-serif;
+    font-weight: 500;
+    font-size: 1.125rem;
+    text-decoration: none;
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-width: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* CTA Button hover effects */
+.section7-cta:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    color: #FFFFFF;
+}
+
+/* CTA Button active state */
+.section7-cta:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Optional: Add a subtle background pattern or decoration */
+.section[data-section="7"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/images/LooperGroup.svg') no-repeat center center;
+    background-size: 60%;
+    opacity: 0.03;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Responsive breakpoints following site-wide system */
+
+/* Mobile Breakpoint (≤600px) */
+@media (max-width: 600px) {
+    .section[data-section="7"] {
+        padding: 1rem;
+    }
+    
+    .section7-content {
+        padding: 0 1rem;
+    }
+    
+    .section7-title {
+        font-size: 2.5rem;
+        line-height: 1.3;
+        margin-bottom: 1rem;
+    }
+    
+    .section7-text {
+        font-size: 1.125rem;
+        line-height: 1.5;
+        margin-bottom: 2rem;
+    }
+    
+    .section7-cta {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        min-width: 180px;
+    }
+}
+
+/* Tablet Breakpoint (601px-900px) */
+@media (min-width: 601px) and (max-width: 900px) {
+    .section7-title {
+        font-size: 3rem;
+        line-height: 1.25;
+    }
+    
+    .section7-text {
+        font-size: 1.1875rem;
+        line-height: 1.55;
+        margin-bottom: 2.5rem;
+    }
+    
+    .section7-cta {
+        padding: 0.9375rem 2.25rem;
+        font-size: 1.0625rem;
+    }
+}
+
+/* Desktop Breakpoint (901px-1200px) */
+@media (min-width: 901px) and (max-width: 1200px) {
+    .section7-title {
+        font-size: 3.25rem;
+        line-height: 1.2;
+    }
+    
+    .section7-text {
+        font-size: 1.1875rem;
+        margin-bottom: 2.75rem;
+    }
+    
+    .section7-cta {
+        padding: 1rem 2.375rem;
+        font-size: 1.125rem;
+    }
+}
+
+/* Large Breakpoint (≥1201px) */
+@media (min-width: 1201px) {
+    .section7-title {
+        font-size: 4rem;
+        line-height: 1.15;
+    }
+    
+    .section7-text {
+        font-size: 1.3125rem;
+        margin-bottom: 3.5rem;
+    }
+    
+    .section7-cta {
+        padding: 1.125rem 2.75rem;
+        font-size: 1.1875rem;
+        min-width: 220px;
+    }
+}
+
+/* Focus states for accessibility */
+.section7-cta:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 12px 48px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation-ready states (for future GSAP integration) */
+.section7-title,
+.section7-text,
+.section7-cta {
+    opacity: 1; /* Default visible state */
+    transform: translateY(0);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+/* Optional: Hidden states for entrance animations */
+.section7-content.animate-in .section7-title {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.section7-content.animate-in .section7-text {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.section7-content.animate-in .section7-cta {
+    opacity: 0;
+    transform: translateY(10px);
+}
