@@ -235,9 +235,9 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
 
     // Define items (title + body). Placeholder copy per request.
     const s4Items = [
-        { title: 'Digital Art', body: 'Unique on-chain artworks — provenance, scarcity, and creator royalties baked-in.' },
-        { title: 'PFPs', body: 'Profile-picture collections used for identity, access, and community membership.' },
-        { title: 'Real-World Assets (RWAs)', body: 'Tokenized real-world instruments like invoices, treasuries, and real estate cashflows.' },
+        { title: 'Digital Art', body: 'Unique, scarce, and truly ownable digital artworks, from generative masterpieces to AI and networked creativity.' },
+        { title: 'PFPs', body: 'Profile-picture collections powering digital identity, and online community networks.' },
+        { title: 'Real-World Assets (RWAs)', body: 'Tokenized real estate, land, and fine art, moving billion-dollar markets on-chain.' },
         { title: 'DeFi tokens', body: 'Liquidity positions and protocol tokens, enabling composable, on-chain finance.' }
     ];
 
@@ -1952,22 +1952,71 @@ export function setupSection6TitleAnimation() {
     }
 
     const title = section6El.querySelector('.section6-title');
+    const tilesContainer = section6El.querySelector('.section6-tiles');
+    const tiles = section6El.querySelectorAll('.investor-tile');
+    
     if (!title) {
         console.warn('[Section6] Section 6 title element not found');
         return;
     }
+    
+    if (!tilesContainer || tiles.length === 0) {
+        console.warn('[Section6] Section 6 tiles not found');
+        return;
+    }
 
-    console.log('[Section6] Setting up title animation');
+    console.log('[Section6] Setting up title and tiles animation');
 
-    // Prepare title for animation (start hidden)
+    // Prepare elements for animation (start hidden)
     gsap.set(title, { opacity: 0 });
+    gsap.set(tilesContainer, { opacity: 0 });
+    gsap.set(tiles, { opacity: 0, scale: 0.8, y: 20 });
 
-    // Create timeline with ScrollTrigger
+    // PRE-CALCULATE total timeline duration from Section 6 timings
+    // This fixes the circular dependency issue where ScrollTrigger end calculation
+    // tried to use tl.totalDuration() before any animations were added to the timeline
+    const t = SECTION6_TIMINGS;
+    const calculatedDuration = 
+        (t.periodA ?? 0.5) +                                                    // Initial delay
+        (t.titleFadeIn ?? 0.35) +                                              // Title fade in
+        (t.titleShow ?? 2.0) +                                                 // Title show period  
+        (t.titleFadeOut ?? 0.35) +                                             // Title fade out
+        (t.tilesDelay ?? 0.3) +                                                // Delay before tiles
+        (t.tilesFadeIn ?? 0.8) + (tiles.length * (t.tilesStagger ?? 0.05)) +  // Tiles animation + stagger
+        (t.tilesShow ?? 3.0) +                                                 // Tiles show period
+        (t.tilesHold ?? 3.0) +                                                 // HOLD period after tiles appear
+        (t.postTilesDelay ?? 8.0) +                                            // Extra time after all logos appeared
+        (t.periodB ?? 3.5);                                                    // Final delay
+
+    // Calculate scroll distance using simple approach (like other sections)
+    const scrollDistance = Math.round(calculatedDuration * (SECTION6_SCROLL?.pxPerUnit || 300));
+
+    console.log('[Section6] Timeline calculation', {
+        totalDuration: calculatedDuration.toFixed(2) + ' timeline units',
+        totalScrollDistance: scrollDistance + 'px',
+        pxPerUnit: (SECTION6_SCROLL?.pxPerUnit || 300) + 'px per unit',
+        postTilesDelay: (t.postTilesDelay ?? 8.0) + ' units ← Extra time after logos appear',
+        breakdown: {
+            periodA: (t.periodA ?? 0.5),
+            titleFadeIn: (t.titleFadeIn ?? 0.35),
+            titleShow: (t.titleShow ?? 2.0),
+            titleFadeOut: (t.titleFadeOut ?? 0.35),
+            tilesDelay: (t.tilesDelay ?? 0.3),
+            tilesFadeIn: (t.tilesFadeIn ?? 0.8),
+            tilesStagger: tiles.length * (t.tilesStagger ?? 0.05),
+            tilesShow: (t.tilesShow ?? 3.0),
+            tilesHold: (t.tilesHold ?? 3.0),
+            postTilesDelay: (t.postTilesDelay ?? 8.0),
+            periodB: (t.periodB ?? 3.5)
+        }
+    });
+
+    // Create timeline with ScrollTrigger using PRE-CALCULATED duration
     const tl = gsap.timeline({
         scrollTrigger: {
             trigger: section6El,
             start: 'top top',
-            end: () => '+=' + Math.round(tl.totalDuration() * (SECTION6_SCROLL?.pxPerUnit || 800)),
+            end: '+=' + scrollDistance,  // Use pre-calculated scroll distance
             pin: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
@@ -1977,8 +2026,7 @@ export function setupSection6TitleAnimation() {
         }
     });
 
-    // Build timeline using Section 6 timings (matches Section 3 pattern)
-    const t = SECTION6_TIMINGS;
+    // Build timeline using same timing logic (cursor tracking)
     let cursor = 0;
 
     // Initial delay
@@ -1992,10 +2040,10 @@ export function setupSection6TitleAnimation() {
     }, cursor);
     cursor += (t.titleFadeIn ?? 0.35);
 
-    // Title show period
+    // Title show period (title stays visible during this time)
     cursor += (t.titleShow ?? 2.0);
 
-    // Title fade out
+    // Title fade out (starts after show period)
     tl.to(title, { 
         opacity: 0, 
         ease: 'power1.in', 
@@ -2003,12 +2051,46 @@ export function setupSection6TitleAnimation() {
     }, cursor);
     cursor += (t.titleFadeOut ?? 0.35);
 
-    // Final delay
-    cursor += (t.periodB ?? 0.5);
+    // Delay before tiles appear
+    cursor += (t.tilesDelay ?? 0.3);
 
-    console.log('[Section6] Title animation setup complete', {
-        totalDuration: cursor,
-        scrollDistance: Math.round(cursor * (SECTION6_SCROLL?.pxPerUnit || 800)) + 'px'
+    // Tiles container fade in
+    tl.to(tilesContainer, { 
+        opacity: 1, 
+        duration: 0.1 
+    }, cursor);
+
+    // Individual tiles staggered animation
+    tl.to(tiles, { 
+        opacity: 1, 
+        scale: 1, 
+        y: 0, 
+        duration: (t.tilesFadeIn ?? 0.8),
+        stagger: (t.tilesStagger ?? 0.05),
+        ease: 'back.out(1.2)'
+    }, cursor);
+    cursor += (t.tilesFadeIn ?? 0.8) + (tiles.length * (t.tilesStagger ?? 0.05));
+
+    // Tiles show period
+    cursor += (t.tilesShow ?? 3.0);
+
+    // Additional hold period after tiles are fully visible
+    // This is now properly accounted for in the ScrollTrigger end calculation
+    cursor += (t.tilesHold ?? 3.0);
+
+    // Extra time period after all logo blocks have fully appeared
+    cursor += (t.postTilesDelay ?? 8.0);
+
+    // Final delay
+    cursor += (t.periodB ?? 3.5);
+
+    // Verify that our pre-calculated duration matches the actual timeline duration
+    const actualDuration = tl.totalDuration();
+    console.log('[Section6] Duration verification', {
+        preCalculated: calculatedDuration.toFixed(2) + 's',
+        actualTimeline: actualDuration.toFixed(2) + 's',
+        match: Math.abs(calculatedDuration - actualDuration) < 0.01 ? '✅' : '❌',
+        tilesHoldActive: (t.tilesHold ?? 2.0) + 's hold period included'
     });
 }
 

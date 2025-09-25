@@ -110,7 +110,7 @@ section[data-section="4"] {
     }
     
     .section4-title {
-        font-size: 32px; /* Larger title on large screens */
+        font-size: 4rem; /* Match Section 5 large title size */
     }
     
     .section4-list li {
@@ -134,11 +134,11 @@ section[data-section="4"] {
     }
     
     .section4-panel {
-        width: min(40px, 80vw);
+        width: min(400px, 80vw);
     }
     
     .section4-title {
-        font-size: 30px;
+        font-size: 3.5rem; /* Match Section 5 desktop title size */
     }
     
     .section4-list li {
@@ -169,7 +169,7 @@ section[data-section="4"] {
     }
     
     .section4-title {
-        font-size: 28px;
+        font-size: 2.5rem; /* Match Section 5 tablet title size */
     }
     
     .section4-list {
@@ -213,7 +213,7 @@ section[data-section="4"] {
     }
     
     .section4-title {
-        font-size: 24px; /* Smaller title on mobile */
+        font-size: 2rem; /* Match Section 5 mobile title size */
     }
     
     .section4-list {

@@ -81,6 +81,7 @@
     
     /* Ensure title is above testimonial cards */
     pointer-events: none; /* Allow interaction with cards behind */
+    width: 60%;
 }
 
 .section5-tiles {
