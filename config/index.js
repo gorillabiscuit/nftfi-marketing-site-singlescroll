@@ -15,6 +15,9 @@ export * from './section4.js';
 export * from './section5.js';
 export * from './section6.js';
 
+// Global scroll configuration
+export * from './scrollConfig.js';
+
 // Legacy compatibility exports for existing imports
 // These maintain backward compatibility while the codebase transitions
 

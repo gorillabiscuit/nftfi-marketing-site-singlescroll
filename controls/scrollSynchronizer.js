@@ -4,6 +4,7 @@
 
 import { gsap } from 'gsap';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
+import { SCROLL_CONFIG } from '../config/scrollConfig.js';
 
 // Register the ScrollSmoother plugin with GSAP
 gsap.registerPlugin(ScrollSmoother);
@@ -95,21 +96,21 @@ export function initializeScrollSmoother() {
             return null;
         }
 
-        // Create ScrollSmoother with SAFE configuration
-        // Key: We're NOT configuring ScrollTrigger to use this
+        // Create ScrollSmoother with GLOBAL configuration
+        // Using centralized settings for consistent behavior
         smoother = ScrollSmoother.create({
             wrapper: "#smooth-wrapper", // Use the wrapper div
             content: "#smooth-content", // Use the content div
-            smooth: 2, // Moderate smoothness
-            effects: true, // Disable effects to prevent interference
-            normalizeScroll: false, // Keep native scroll behavior
-            ignoreMobileResize: true,
-            smoothTouch: 0.1, // Minimal touch smoothness
-            ease: "power1.out", // Subtle easing
-            // Critical: Don't let ScrollSmoother control scroll events
-            preventDefault: false,
-            // Don't interfere with existing scroll behavior
-            syncInterval: 60
+            smooth: SCROLL_CONFIG.smoother.smooth, // Use global smooth duration
+            effects: SCROLL_CONFIG.smoother.effects, // Enable effects for parallax
+            normalizeScroll: SCROLL_CONFIG.smoother.normalizeScroll, // Critical for consistency
+            ignoreMobileResize: SCROLL_CONFIG.smoother.ignoreMobileResize,
+            smoothTouch: SCROLL_CONFIG.smoother.smoothTouch, // Touch device smoothing
+            ease: SCROLL_CONFIG.smoother.ease, // Smoother easing curve
+            preventDefault: SCROLL_CONFIG.smoother.preventDefault,
+            syncInterval: SCROLL_CONFIG.smoother.syncInterval,
+            // Add global speed control
+            speed: SCROLL_CONFIG.smoother.speed
         });
 
         // Initialize performance monitor
@@ -120,7 +121,12 @@ export function initializeScrollSmoother() {
         isEnabled = true;
         
         isInitialized = true;
-        console.log('ScrollSmoother initialized and enabled by default');
+        console.log('ScrollSmoother initialized with global configuration:', {
+            smooth: SCROLL_CONFIG.smoother.smooth,
+            normalizeScroll: SCROLL_CONFIG.smoother.normalizeScroll,
+            effects: SCROLL_CONFIG.smoother.effects,
+            ease: SCROLL_CONFIG.smoother.ease
+        });
         
         // Expose ScrollSmoother globally for other modules to use
         window.smoother = smoother;
