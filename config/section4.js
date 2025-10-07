@@ -50,7 +50,7 @@ export const SECTION4_PEBBLE = {
 export const SECTION4_PEBBLE_ROTATION = {
     enabled: true,
     axis: 'x', // Change this to 'x', 'y', or 'z' to test different axes
-    degrees: 45, // 45 degree rotation
+    degrees: 0, // 45 degree rotation
     // You can also test different angles: 30, 60, 90, etc.
 };
 
@@ -75,7 +75,7 @@ export function setPebbleRotation(axis, degrees) {
 
 // Continuous Y spin (degrees per second) independent of scroll
 export const SECTION4_PEBBLE_SPIN = {
-    enabled: true, // Re-enabled Y-axis spin only
+    enabled: false, // Disabled - no Y-axis animation
     degPerSecond: 24,
     // Extra spin impulse when middle items appear
     boostDegPerSecond: 1000,

@@ -136,10 +136,16 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
     });
     // Prepare materials for fading
     materials.forEach((m) => { try { m.transparent = true; m.opacity = 0; } catch (_) { void 0; } });
-    // Ensure starting state: hidden and offscreen
-    gsap.set(pebbleGroup, { visible: false });
-    const startY = (typeof pebbleGroup.position?.y === 'number') ? pebbleGroup.position.y : -20;
-    gsap.set(pebbleGroup.position, { y: startY });
+    // Position pebble directly in Section 4 (visible from start)
+    gsap.set(pebbleGroup, { visible: true });
+    // Set initial position to Section 4 position (no offscreen positioning)
+    const bp = getCurrentBreakpoint();
+    const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE[BREAKPOINT_NAMES.DESKTOP];
+    gsap.set(pebbleGroup.position, { 
+        y: 0 + (pcfg.position?.y ?? 0), 
+        x: (pcfg.position?.x ?? -3.5), 
+        z: (pcfg.position?.z ?? 0) 
+    });
 
     // Build timeline first (without ScrollTrigger) so we can scale scroll distance to its duration
     const tl = gsap.timeline();
@@ -203,8 +209,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         const t = SECTION4_TIMINGS; let cursor = (title && title._s4CursorAfterTitle) ? title._s4CursorAfterTitle : 0.4;
         // After title fade-out, wait period, then animate pebble in, then another period, then first item
         cursor += (t.periodB ?? 0.05);
-        // pebble animates in
-        tl.to(pebbleGroup.position, { y: 0 + (pcfg.position?.y ?? 0), x: (pcfg.position?.x ?? -3.5), z: (pcfg.position?.z ?? 0), ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
+        // pebble already positioned directly in Section 4 (no animation needed)
         // scale relative: multiply baseline by factor; using additive on each axis
         const s = (pcfg.scale ?? 1.75) - 1.0;
         tl.to(pebbleGroup.scale, { x: `+=${s}`, y: `+=${s}`, z: `+=${s}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);

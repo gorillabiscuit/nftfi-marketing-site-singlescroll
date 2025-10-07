@@ -51,11 +51,11 @@ export function loadPebbleModel(scene, sharedUniforms) {
         gltf.scene.position.set(-center.x, -center.y, -center.z);
         pebbleGroup.add(gltf.scene);
         
-        // Default: keep pebble offscreen and hidden until section 4
-        // Position it well below the viewport; we'll animate it up on section 4
-        pebbleGroup.position.set(0, -20, 0);
+        // Position pebble directly in Section 4 (visible from start)
+        // Default Section 4 position (will be overridden by scroll trigger setup)
+        pebbleGroup.position.set(-3.5, 0, 0);
         pebbleGroup.scale.setScalar(2.0);
-        pebbleGroup.visible = false;
+        pebbleGroup.visible = true;
         scene.add(pebbleGroup);
 
         isPebbleReady = true;
