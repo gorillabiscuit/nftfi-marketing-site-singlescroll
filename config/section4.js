@@ -47,11 +47,12 @@ export const SECTION4_PEBBLE = {
 
 // Pebble rotation for Section 4 - Multi-axis rotation support
 // Set rotation degrees for each axis independently
+// NOTE: Mesh is now pre-rotated 45° in Blender (pebble_45.glb)
 export const SECTION4_PEBBLE_ROTATION = {
-    enabled: true,
+    enabled: false,  // Disabled - mesh is pre-rotated in Blender
     x: 0,  // X-axis rotation in degrees
-    y: 90,   // Y-axis rotation in degrees  
-    z: 0,   // Z-axis rotation in degrees
+    y: 0,  // Y-axis rotation in degrees  
+    z: 0,  // Z-axis rotation in degrees
     // You can set any combination of axes: 0 = no rotation, any value = rotation in degrees
 };
 
@@ -59,9 +60,9 @@ export const SECTION4_PEBBLE_ROTATION = {
 // This gets applied FIRST, before SECTION4_PEBBLE_ROTATION
 // Use this to align the pebble's axes to match your desired rotation behavior
 export const SECTION4_COORDINATE_SYSTEM = {
-    enabled: true,  // Enable to apply coordinate system rotation first
+    enabled: false,  // Disabled - mesh is pre-rotated in Blender
     x: 0,   // Rotate coordinate system on X-axis (in degrees)
-    y: 45,   // Rotate coordinate system on Y-axis (in degrees)
+    y: 0,   // Rotate coordinate system on Y-axis (in degrees)
     z: 0    // Rotate coordinate system on Z-axis (in degrees)
 };
 
