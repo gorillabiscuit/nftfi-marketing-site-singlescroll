@@ -32,6 +32,8 @@ import { initSection3Dashboard, initSection3Scroll } from './controls/section3Da
 import { initHeroButtonEffects } from './controls/heroButtonEffects.js';
 // NEW: Scroll Speed Manager
 import scrollSpeedManager from './controls/scrollSpeedManager.js';
+// NEW: Unified Pinning System
+import unifiedPinningSystem from './controls/unifiedPinningSystem.js';
 
 // Main initialization function
 async function init() {
@@ -61,6 +63,10 @@ async function init() {
     } else {
         console.log('Scroll Speed Manager initialized without ScrollSmoother');
     }
+    
+    // NEW: Initialize Unified Pinning System
+    unifiedPinningSystem.initialize();
+    console.log('Unified Pinning System initialized');
     
     // CRITICAL: Switch loading manager to ScrollSmoother control now that it's initialized
     if (scrollSmootherStatus) {
@@ -223,6 +229,7 @@ async function init() {
     window.forceAllowScrolling = forceAllowScrolling;
     window.switchToScrollSmootherControl = switchToScrollSmootherControl;
     window.scrollSpeedManager = scrollSpeedManager; // Expose for debugging
+    window.unifiedPinningSystem = unifiedPinningSystem; // Expose for debugging
     
 
     
