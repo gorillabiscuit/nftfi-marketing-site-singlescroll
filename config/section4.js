@@ -26,22 +26,24 @@ export const SECTION4_LAYOUT = {
 
 // Pebble positioning for Section 4 (Three.js world-space offsets and scale)
 // Units are world units relative to current baseline position/scale
+// NOTE: Scales reduced by 50% from original values
+// NOTE: Y positions increased by ~2 units (moved up ~20%)
 export const SECTION4_PEBBLE = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: 0, y: 1.5, z: 0 },
-        scale: 1.4
+        position: { x: 0, y: 3.5, z: 0 },  // Moved up from 1.5
+        scale: 0.7  // 50% of 1.4
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: 0.0, y: 1.5, z: 0 },
-        scale: 1.6
+        position: { x: 0.0, y: 3.5, z: 0 },  // Moved up from 1.5
+        scale: 0.8  // 50% of 1.6
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: -3.5, y: 0, z: 0 },
-        scale: 1.75
+        position: { x: -3.5, y: 2.0, z: 0 },  // Moved up from 0
+        scale: 0.875  // 50% of 1.75
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: -3.5, y: 0, z: 0 },  // Keep same as desktop
-        scale: 1.75  // Keep same as desktop
+        position: { x: -3.5, y: 2.0, z: 0 },  // Moved up from 0
+        scale: 0.875  // 50% of 1.75
     }
 };
 

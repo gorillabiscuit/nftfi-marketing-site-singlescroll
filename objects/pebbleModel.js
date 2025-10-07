@@ -54,7 +54,7 @@ export function loadPebbleModel(scene, sharedUniforms) {
         // Default: keep pebble offscreen and hidden until section 4
         // Position it well below the viewport; we'll animate it up on section 4
         pebbleGroup.position.set(0, -20, 0);
-        pebbleGroup.scale.setScalar(2.0);
+        pebbleGroup.scale.setScalar(1.0);  // Reduced from 2.0 to 1.0 (50% smaller)
         pebbleGroup.visible = false;
         scene.add(pebbleGroup);
 
