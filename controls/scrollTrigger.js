@@ -351,8 +351,11 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         // Note: continuous spin handled per-frame (not scrubbed) in core/loop.js
     } catch (_) { void 0; }
 
-    // Calculate original scroll distance using the old method
-    const originalDistance = Math.round(tl.totalDuration() * (SECTION4_SCROLL?.pxPerUnit ?? 1400));
+    // Calculate original scroll distance
+    // Section 4's timeline is content-based (pebble fade + list items)
+    // Use a fixed large base distance that the speed manager will normalize
+    // This ensures the speed control has proper range and effect
+    const originalDistance = 5000; // Large base for proper speed control (speed manager will adjust)
     
     // Use Unified Pinning System to create the ScrollTrigger with consistent speed
     const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
