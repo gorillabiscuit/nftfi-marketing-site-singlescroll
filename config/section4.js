@@ -49,23 +49,28 @@ export const SECTION4_PEBBLE = {
 // Set rotation degrees for each axis independently
 export const SECTION4_PEBBLE_ROTATION = {
     enabled: true,
-    x: 45,  // X-axis rotation in degrees
+    x: 0,  // X-axis rotation in degrees
     y: 0,   // Y-axis rotation in degrees  
     z: 0,   // Z-axis rotation in degrees
     // You can set any combination of axes: 0 = no rotation, any value = rotation in degrees
 };
 
+// Coordinate System Adjustment - Reorient the pebble's local coordinate system
+// This gets applied FIRST, before SECTION4_PEBBLE_ROTATION
+// Use this to align the pebble's axes to match your desired rotation behavior
+export const SECTION4_COORDINATE_SYSTEM = {
+    enabled: false,  // Enable to apply coordinate system rotation first
+    x: 0,   // Rotate coordinate system on X-axis (in degrees)
+    y: 0,   // Rotate coordinate system on Y-axis (in degrees)
+    z: 0    // Rotate coordinate system on Z-axis (in degrees)
+};
+
 // Axes Helper Configuration - Visualize X, Y, Z axes for the pebble
 export const SECTION4_AXES_HELPER = {
     enabled: true,  // Set to true to show axes, false to hide
-    size: 5,        // Length of the axes lines (adjust to make more/less visible)
-    // Axes orientation/rotation adjustment (in degrees)
-    // This rotates the axes helper itself, not the pebble
-    rotation: {
-        x: 0,  // Rotate axes helper on X-axis
-        y: 0,  // Rotate axes helper on Y-axis
-        z: 0   // Rotate axes helper on Z-axis
-    }
+    size: 2,        // Length of the axes lines (adjust to make more/less visible)
+    // If you want axes to match the adjusted coordinate system, 
+    // they will automatically align with SECTION4_COORDINATE_SYSTEM when enabled
 };
 
 // Helper function to toggle axes visibility

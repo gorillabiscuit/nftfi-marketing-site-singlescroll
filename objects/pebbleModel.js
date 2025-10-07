@@ -5,7 +5,7 @@ import pebbleUrl from '../models/round-pebble.glb?url';
 // import pebbleUrl from '../models/pebble.glb?url';
 import vertexShader from '../shaders/glass.vert.js';
 import fragmentShader from '../shaders/glass.frag.js';
-import { SECTION4_AXES_HELPER } from '../config/section4.js';
+import { SECTION4_AXES_HELPER, SECTION4_COORDINATE_SYSTEM } from '../config/section4.js';
 
 export let pebbleMesh = null;
 export let pebbleGroup = null;
@@ -63,15 +63,14 @@ export function loadPebbleModel(scene, sharedUniforms) {
         if (SECTION4_AXES_HELPER.enabled) {
             axesHelper = new THREE.AxesHelper(SECTION4_AXES_HELPER.size);
             
-            // Apply axes rotation if configured
-            if (SECTION4_AXES_HELPER.rotation) {
-                axesHelper.rotation.x = (SECTION4_AXES_HELPER.rotation.x * Math.PI) / 180;
-                axesHelper.rotation.y = (SECTION4_AXES_HELPER.rotation.y * Math.PI) / 180;
-                axesHelper.rotation.z = (SECTION4_AXES_HELPER.rotation.z * Math.PI) / 180;
-            }
+            // Axes helper stays aligned with pebbleGroup's local coordinate system
+            // So it will automatically show the adjusted axes when coordinate system is rotated
             
             pebbleGroup.add(axesHelper);
             console.log('[Section 4] AxesHelper added to pebble (Red=X, Green=Y, Blue=Z)');
+            if (SECTION4_COORDINATE_SYSTEM.enabled) {
+                console.log('[Section 4] Axes will align with adjusted coordinate system');
+            }
         }
         
         scene.add(pebbleGroup);

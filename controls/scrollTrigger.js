@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_PEBBLE_ROTATION, setPebbleRotation, toggleAxesHelper, setAxesSize, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_COORDINATE_SYSTEM, SECTION4_PEBBLE_ROTATION, setPebbleRotation, toggleAxesHelper, setAxesSize, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
 import { BREAKPOINT_NAMES } from '../config/breakpoints.js';
 import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
@@ -214,14 +214,35 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         const s = (pcfg.scale ?? 1.75) - 1.0;
         tl.to(pebbleGroup.scale, { x: `+=${s}`, y: `+=${s}`, z: `+=${s}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
         
-        // Apply multi-axis rotation to pebble based on configuration
-        if (SECTION4_PEBBLE_ROTATION.enabled) {
-            // Apply rotation to all three axes
-            pebbleGroup.rotation.x = (SECTION4_PEBBLE_ROTATION.x * Math.PI) / 180;
-            pebbleGroup.rotation.y = (SECTION4_PEBBLE_ROTATION.y * Math.PI) / 180;
-            pebbleGroup.rotation.z = (SECTION4_PEBBLE_ROTATION.z * Math.PI) / 180;
+        // STEP 1: Apply coordinate system adjustment FIRST (if enabled)
+        // This reorients the local axes before applying the final rotation
+        if (SECTION4_COORDINATE_SYSTEM.enabled) {
+            pebbleGroup.rotation.x = (SECTION4_COORDINATE_SYSTEM.x * Math.PI) / 180;
+            pebbleGroup.rotation.y = (SECTION4_COORDINATE_SYSTEM.y * Math.PI) / 180;
+            pebbleGroup.rotation.z = (SECTION4_COORDINATE_SYSTEM.z * Math.PI) / 180;
             
-            console.log(`[Section 4] Applied multi-axis rotation to pebble:`, {
+            console.log(`[Section 4] Applied coordinate system adjustment:`, {
+                x: `${SECTION4_COORDINATE_SYSTEM.x}°`,
+                y: `${SECTION4_COORDINATE_SYSTEM.y}°`,
+                z: `${SECTION4_COORDINATE_SYSTEM.z}°`
+            });
+        }
+        
+        // STEP 2: Apply final pebble rotation (relative to adjusted coordinate system)
+        if (SECTION4_PEBBLE_ROTATION.enabled) {
+            // If coordinate system is enabled, add to existing rotation
+            // Otherwise, set directly
+            if (SECTION4_COORDINATE_SYSTEM.enabled) {
+                pebbleGroup.rotation.x += (SECTION4_PEBBLE_ROTATION.x * Math.PI) / 180;
+                pebbleGroup.rotation.y += (SECTION4_PEBBLE_ROTATION.y * Math.PI) / 180;
+                pebbleGroup.rotation.z += (SECTION4_PEBBLE_ROTATION.z * Math.PI) / 180;
+            } else {
+                pebbleGroup.rotation.x = (SECTION4_PEBBLE_ROTATION.x * Math.PI) / 180;
+                pebbleGroup.rotation.y = (SECTION4_PEBBLE_ROTATION.y * Math.PI) / 180;
+                pebbleGroup.rotation.z = (SECTION4_PEBBLE_ROTATION.z * Math.PI) / 180;
+            }
+            
+            console.log(`[Section 4] Applied pebble rotation:`, {
                 x: `${SECTION4_PEBBLE_ROTATION.x}°`,
                 y: `${SECTION4_PEBBLE_ROTATION.y}°`,
                 z: `${SECTION4_PEBBLE_ROTATION.z}°`
