@@ -1913,30 +1913,31 @@ export function setupSection5HorizontalScroll() {
         tilesStartTime
     );
 
-    // Create ScrollTrigger with config-driven scroll speed
-    ScrollTrigger.create({
-        trigger: section5El,
-        start: 'top top',
-        end: () => '+=' + config.scrollSpeed + 'vh', // Use viewport height units for consistent speed
-        pin: true,
-        scrub: 1, // Smooth scrubbing
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        animation: tl,
-        markers: false,
-        id: 'section5-horizontal-scroll',
-        onEnter: () => {
-            console.log('[Section5] Pure scroll-driven animation started');
-        },
-        onLeave: () => {
-            console.log('[Section5] Animation completed - section unpinned');
-        },
-        onUpdate: (self) => {
-            // Optional: Add any scroll progress-based effects here
-            const progress = self.progress;
-            // Could add effects like opacity, scale, rotation based on progress
+    // Calculate original scroll distance
+    // Section 5 uses viewport height units (scrollSpeed: 10000vh)
+    // Convert to pixels for consistent speed control
+    const originalDistance = Math.round((config.scrollSpeed / 100) * window.innerHeight);
+    
+    // Use Unified Pinning System to create the ScrollTrigger with consistent speed
+    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+        5, // sectionNumber
+        section5El, // triggerElement
+        tl, // animation
+        originalDistance, // originalDistance
+        {
+            onEnter: () => {
+                console.log('[Section5] Pure scroll-driven animation started');
+            },
+            onLeave: () => {
+                console.log('[Section5] Animation completed - section unpinned');
+            },
+            onUpdate: (self) => {
+                // Optional: Add any scroll progress-based effects here
+                const progress = self.progress;
+                // Could add effects like opacity, scale, rotation based on progress
+            }
         }
-    });
+    );
 
     // Add responsive handling for breakpoint changes
     const handleBreakpointChange = () => {
@@ -2028,20 +2029,19 @@ export function setupSection6TitleAnimation() {
         }
     });
 
-    // Create timeline with ScrollTrigger using PRE-CALCULATED duration
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: section6El,
-            start: 'top top',
-            end: '+=' + scrollDistance,  // Use pre-calculated scroll distance
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            scrub: true,
-            markers: false,
-            id: 'section6-title-animation'
+    // Create timeline without ScrollTrigger (will be added by unified system)
+    const tl = gsap.timeline();
+    
+    // Use Unified Pinning System to create the ScrollTrigger with consistent speed
+    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+        6, // sectionNumber
+        section6El, // triggerElement
+        tl, // animation
+        scrollDistance, // originalDistance
+        {
+            // No custom callbacks needed for Section 6
         }
-    });
+    );
 
     // Build timeline using same timing logic (cursor tracking)
     let cursor = 0;
