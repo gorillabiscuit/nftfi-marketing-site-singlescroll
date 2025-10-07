@@ -3,6 +3,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SECTION3, SECTION3_SCROLL, SECTION3_CONTAINER, HERO_LOOPER, DASHBOARD_SVG, SECTION3_ARROWS, SECTION3_ARROWS_DEBUG, SECTION3_ARROWS_VISIBLE_ZERO, SECTION3_ARROWS_ENABLED, BREAKPOINT_NAMES } from '../config/index.js';
+import unifiedPinningSystem from './unifiedPinningSystem.js';
 // Bundle the dashboard SVG at build time to ensure availability in production
 import dashboardSvg from '../images/dashboard.svg?raw';
 
@@ -485,26 +486,30 @@ export function initSection3Scroll() {
         return null;
     }
 
-    // Determine scroll distance from config (in % of viewport height)
+    // Calculate original scroll distance
+    // Section 3 uses viewport height percentages (durationVh: 600 = 600% of viewport)
+    // Convert to pixels for consistent speed control
     let endPercent = 100;
     try {
         if (SECTION3_SCROLL && typeof SECTION3_SCROLL.durationVh === 'number') {
             endPercent = Math.max(1, SECTION3_SCROLL.durationVh);
         }
     } catch (_) { void 0; }
+    
+    // Convert viewport percentage to pixels
+    // 600% = 6x viewport height
+    const originalDistance = Math.round((endPercent / 100) * window.innerHeight);
 
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: sectionEl,
-            start: 'top top',
-            end: '+=' + String(endPercent) + '%',
-            pin: true,
-            pinSpacing: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            scrub: true,
-            markers: false,
-            id: 'section3-timeline',
+    // Create timeline without ScrollTrigger (will be added by unified system)
+    const tl = gsap.timeline();
+    
+    // Use Unified Pinning System to create the ScrollTrigger
+    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+        3, // sectionNumber
+        sectionEl, // triggerElement
+        tl, // animation
+        originalDistance, // originalDistance
+        {
             onUpdate: (self) => {
                 try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
                 // Store current scroll direction for direction-aware arrow behavior
@@ -521,7 +526,7 @@ export function initSection3Scroll() {
             onLeave: () => { void 0; },
             onEnterBack: () => { void 0; }
         }
-    });
+    );
 
     // Prepare UI elements for reveal
     try {
