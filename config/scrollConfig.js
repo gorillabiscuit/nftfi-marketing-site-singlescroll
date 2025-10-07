@@ -31,7 +31,7 @@ export const SCROLL_CONFIG = {
     // Section-specific speed multipliers
     sectionSpeeds: {
         section1: 1.0, // Hero section - normal speed
-        section2: 0.1, // Key metrics - much slower for better readability and timing
+        section2: 1.0, // Key metrics - much slower for better readability and timing
         section3: 1.0, // Dashboard - normal speed
         section4: 0.8, // Pebble animation - slower for dramatic effect
         section5: 0.9, // Testimonials - slightly slower for reading
@@ -42,8 +42,8 @@ export const SCROLL_CONFIG = {
     // Viewport-based calculations
     viewport: {
         useViewportUnits: true, // Use vh/vw units for responsive calculations
-        minScrollDistance: 300, // Minimum scroll distance in pixels
-        maxScrollDistance: 2000, // Maximum scroll distance in pixels
+        minScrollDistance: 50, // Much lower minimum to allow very slow speeds
+        maxScrollDistance: 10000, // Higher maximum to allow very slow speeds
         mobileSpeedMultiplier: 0.7, // Slower on mobile devices
         tabletSpeedMultiplier: 0.85, // Slightly slower on tablets
         desktopSpeedMultiplier: 1.0 // Full speed on desktop

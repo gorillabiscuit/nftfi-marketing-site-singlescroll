@@ -97,17 +97,18 @@ class ScrollSpeedManager {
         
         const result = Math.round(clampedDistance);
         
-        if (this.debugMode) {
-            console.log(`ScrollSpeedManager: Section ${sectionNumber} speed calculation:`, {
-                originalDistance,
-                viewportDistance,
-                sectionSpeed,
-                deviceMultiplier,
-                currentSpeed: this.currentSpeed,
-                speedMultiplier: 1 / (sectionSpeed * deviceMultiplier * this.currentSpeed),
-                finalDistance: result
-            });
-        }
+        // Always log for speed testing
+        console.log(`ScrollSpeedManager: Section ${sectionNumber} speed calculation:`, {
+            originalDistance,
+            viewportDistance,
+            sectionSpeed,
+            deviceMultiplier,
+            currentSpeed: this.currentSpeed,
+            speedMultiplier: 1 / (sectionSpeed * deviceMultiplier * this.currentSpeed),
+            calculatedDistance: finalDistance,
+            clampedDistance: result,
+            wasClamped: finalDistance !== result
+        });
         
         return result;
     }
