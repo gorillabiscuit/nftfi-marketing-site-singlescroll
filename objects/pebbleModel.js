@@ -5,6 +5,7 @@ import pebbleUrl from '../models/round-pebble.glb?url';
 // import pebbleUrl from '../models/pebble.glb?url';
 import vertexShader from '../shaders/glass.vert.js';
 import fragmentShader from '../shaders/glass.frag.js';
+import { SECTION4_AXES_HELPER } from '../config/section4.js';
 
 export let pebbleMesh = null;
 export let pebbleGroup = null;
@@ -56,13 +57,30 @@ export function loadPebbleModel(scene, sharedUniforms) {
         pebbleGroup.position.set(-3.5, 0, 0);
         pebbleGroup.scale.setScalar(2.0);
         pebbleGroup.visible = true;
+        
+        // Add AxesHelper to visualize X, Y, Z axes (Red = X, Green = Y, Blue = Z)
+        let axesHelper = null;
+        if (SECTION4_AXES_HELPER.enabled) {
+            axesHelper = new THREE.AxesHelper(SECTION4_AXES_HELPER.size);
+            
+            // Apply axes rotation if configured
+            if (SECTION4_AXES_HELPER.rotation) {
+                axesHelper.rotation.x = (SECTION4_AXES_HELPER.rotation.x * Math.PI) / 180;
+                axesHelper.rotation.y = (SECTION4_AXES_HELPER.rotation.y * Math.PI) / 180;
+                axesHelper.rotation.z = (SECTION4_AXES_HELPER.rotation.z * Math.PI) / 180;
+            }
+            
+            pebbleGroup.add(axesHelper);
+            console.log('[Section 4] AxesHelper added to pebble (Red=X, Green=Y, Blue=Z)');
+        }
+        
         scene.add(pebbleGroup);
 
         isPebbleReady = true;
         // Expose readiness flag for debugging
         window.isPebbleReady = isPebbleReady;
         // Expose for debugging/adjustment
-        window.PEBBLE = { pebbleGroup, pebbleMesh, gltf: gltf.scene };
+        window.PEBBLE = { pebbleGroup, pebbleMesh, gltf: gltf.scene, axesHelper };
     }, undefined, (error) => {
         console.error('Error loading pebble model:', error);
     });

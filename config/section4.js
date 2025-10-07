@@ -50,10 +50,51 @@ export const SECTION4_PEBBLE = {
 export const SECTION4_PEBBLE_ROTATION = {
     enabled: true,
     x: 45,  // X-axis rotation in degrees
-    y: 90,  // Y-axis rotation in degrees  
+    y: 0,   // Y-axis rotation in degrees  
     z: 0,   // Z-axis rotation in degrees
     // You can set any combination of axes: 0 = no rotation, any value = rotation in degrees
 };
+
+// Axes Helper Configuration - Visualize X, Y, Z axes for the pebble
+export const SECTION4_AXES_HELPER = {
+    enabled: true,  // Set to true to show axes, false to hide
+    size: 5,        // Length of the axes lines (adjust to make more/less visible)
+    // Axes orientation/rotation adjustment (in degrees)
+    // This rotates the axes helper itself, not the pebble
+    rotation: {
+        x: 0,  // Rotate axes helper on X-axis
+        y: 0,  // Rotate axes helper on Y-axis
+        z: 0   // Rotate axes helper on Z-axis
+    }
+};
+
+// Helper function to toggle axes visibility
+// Usage: window.toggleAxes() or window.toggleAxes(true/false)
+export function toggleAxesHelper(show) {
+    if (window.PEBBLE && window.PEBBLE.axesHelper) {
+        if (show === undefined) {
+            // Toggle current state
+            window.PEBBLE.axesHelper.visible = !window.PEBBLE.axesHelper.visible;
+        } else {
+            window.PEBBLE.axesHelper.visible = show;
+        }
+        console.log(`[Section 4] Axes helper ${window.PEBBLE.axesHelper.visible ? 'shown' : 'hidden'}`);
+    } else {
+        console.warn('[Section 4] Axes helper not found. Make sure the pebble is loaded.');
+    }
+}
+
+// Helper function to change axes size
+// Usage: window.setAxesSize(10)
+export function setAxesSize(size) {
+    if (typeof size !== 'number' || size <= 0) {
+        console.error('Invalid size. Use a positive number.');
+        return;
+    }
+    
+    SECTION4_AXES_HELPER.size = size;
+    console.log(`[Section 4] Axes size updated to ${size}. Refresh to see changes.`);
+}
 
 // Helper function to easily change rotation for testing
 // Usage: In browser console, run: window.setPebbleRotation('x', 45) or window.setPebbleRotation({x: 45, y: 90, z: 0})
