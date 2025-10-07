@@ -111,6 +111,10 @@ export function initializeVideoTextures() {
                 texture.minFilter = THREE.LinearFilter;
                 texture.magFilter = THREE.LinearFilter;
                 
+                // Apply counter-rotation to keep video content upright
+                texture.rotation = -Math.PI / 4; // -45 degrees in radians
+                texture.center.set(0.5, 0.5); // Rotate around center
+                
                 videoTextures[category] = {
                     video: video,
                     texture: texture
@@ -173,6 +177,13 @@ export function switchToVideoTexture(category) {
     }
     
     roundPebbleMesh.material.map = videoData.texture;
+    
+    // Apply counter-rotation to keep video content upright
+    if (videoData.texture) {
+        videoData.texture.rotation = -Math.PI / 4; // -45 degrees in radians
+        videoData.texture.center.set(0.5, 0.5); // Rotate around center
+    }
+    
     roundPebbleMesh.material.needsUpdate = true;
     currentVideoTexture = videoData;
     
