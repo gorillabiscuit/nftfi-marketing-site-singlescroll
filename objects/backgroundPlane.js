@@ -111,6 +111,10 @@ export function initializeVideoTextures() {
                 texture.minFilter = THREE.LinearFilter;
                 texture.magFilter = THREE.LinearFilter;
                 
+                // Rotate texture by 45 degrees (π/4 radians)
+                texture.rotation = Math.PI / 4; // 45 degrees
+                texture.center.set(0.5, 0.5); // Rotate around center
+                
                 videoTextures[category] = {
                     video: video,
                     texture: texture
@@ -231,6 +235,10 @@ function restoreOriginalPebbleVideo() {
     originalVideoTexture.minFilter = THREE.LinearFilter;
     originalVideoTexture.magFilter = THREE.LinearFilter;
     originalVideoTexture.generateMipmaps = false;
+    
+    // Rotate texture by 45 degrees (π/4 radians)
+    originalVideoTexture.rotation = Math.PI / 4; // 45 degrees
+    originalVideoTexture.center.set(0.5, 0.5); // Rotate around center
     
     // Apply the original video texture
     roundPebbleMesh.material.map = originalVideoTexture;

@@ -34,6 +34,10 @@ export function loadRoundPebbleModel(parentGroup, scene) {
         videoTexture.minFilter = THREE.LinearFilter;
         videoTexture.magFilter = THREE.LinearFilter;
         videoTexture.generateMipmaps = false;
+        
+        // Rotate texture by 45 degrees (π/4 radians)
+        videoTexture.rotation = Math.PI / 4; // 45 degrees
+        videoTexture.center.set(0.5, 0.5); // Rotate around center
 
         // Additive so black is transparent-ish
         const planeMaterial = new THREE.MeshStandardMaterial({
