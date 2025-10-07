@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_PEBBLE_ROTATION, setPebbleRotation, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
 import { BREAKPOINT_NAMES } from '../config/breakpoints.js';
 import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
@@ -208,6 +208,27 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         // scale relative: multiply baseline by factor; using additive on each axis
         const s = (pcfg.scale ?? 1.75) - 1.0;
         tl.to(pebbleGroup.scale, { x: `+=${s}`, y: `+=${s}`, z: `+=${s}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
+        
+        // Apply 45-degree rotation to pebble based on configuration
+        if (SECTION4_PEBBLE_ROTATION.enabled) {
+            const rotationAxis = SECTION4_PEBBLE_ROTATION.axis;
+            const rotationDegrees = SECTION4_PEBBLE_ROTATION.degrees;
+            const rotationRadians = (rotationDegrees * Math.PI) / 180;
+            
+            // Apply rotation to the specified axis
+            if (rotationAxis === 'x') {
+                pebbleGroup.rotation.x = rotationRadians;
+            } else if (rotationAxis === 'y') {
+                pebbleGroup.rotation.y = rotationRadians;
+            } else if (rotationAxis === 'z') {
+                pebbleGroup.rotation.z = rotationRadians;
+            }
+            
+            console.log(`[Section 4] Applied ${rotationDegrees}° rotation to pebble on ${rotationAxis.toUpperCase()}-axis`);
+        }
+        
+        // Expose rotation helper function globally for easy testing
+        window.setPebbleRotation = setPebbleRotation;
         cursor += (t.pebbleIn ?? 0.20);
         // hold after entrance before first item begins
         cursor += (t.periodC ?? 0.05);

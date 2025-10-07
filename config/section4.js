@@ -45,6 +45,34 @@ export const SECTION4_PEBBLE = {
     }
 };
 
+// Pebble rotation for Section 4 - 45 degree rotation on different axes
+// Change the axis (x, y, z) to test which one gives the desired effect
+export const SECTION4_PEBBLE_ROTATION = {
+    enabled: true,
+    axis: 'z', // Change this to 'x', 'y', or 'z' to test different axes
+    degrees: 45, // 45 degree rotation
+    // You can also test different angles: 30, 60, 90, etc.
+};
+
+// Helper function to easily change rotation for testing
+// Usage: In browser console, run: window.setPebbleRotation('x', 45)
+export function setPebbleRotation(axis, degrees) {
+    if (typeof axis !== 'string' || !['x', 'y', 'z'].includes(axis.toLowerCase())) {
+        console.error('Invalid axis. Use "x", "y", or "z"');
+        return;
+    }
+    if (typeof degrees !== 'number' || degrees < 0 || degrees > 360) {
+        console.error('Invalid degrees. Use a number between 0 and 360');
+        return;
+    }
+    
+    SECTION4_PEBBLE_ROTATION.axis = axis.toLowerCase();
+    SECTION4_PEBBLE_ROTATION.degrees = degrees;
+    
+    console.log(`[Section 4] Rotation updated: ${degrees}° on ${axis.toUpperCase()}-axis`);
+    console.log('Refresh the page to see the changes, or scroll to Section 4');
+}
+
 // Continuous Y spin (degrees per second) independent of scroll
 export const SECTION4_PEBBLE_SPIN = {
     enabled: true,

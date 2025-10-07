@@ -45,8 +45,6 @@ export function loadRoundPebbleModel(parentGroup, scene) {
             blending: THREE.AdditiveBlending,
             depthWrite: false
         });
-        
-        // Video texture will rotate with the mesh (no counter-rotation needed)
 
         gltf.scene.traverse((child) => {
             if (child.isMesh) {
@@ -57,9 +55,6 @@ export function loadRoundPebbleModel(parentGroup, scene) {
                 child.material = planeMaterial;
                 child.castShadow = true;
                 child.receiveShadow = true;
-                
-                // Rotate the video plane mesh 45 degrees around Z-axis for diamond shape
-                child.rotation.z = Math.PI / 4; // 45 degrees in radians
             }
         });
 
