@@ -29,9 +29,14 @@ export function loadPebbleModel(scene, sharedUniforms) {
         box.getSize(size);
 
         // Apply glass shader material to meshes, using shared uniforms but with per-mesh uTexture
+        console.log('[Pebble] Traversing pebble_45.glb scene...');
+        let meshCount = 0;
         gltf.scene.traverse((child) => {
+            console.log('[Pebble] Child:', child.type, child.name, 'isMesh:', child.isMesh);
             if (child.isMesh) {
+                meshCount++;
                 pebbleMesh = child;
+                console.log('[Pebble] Found mesh #' + meshCount + ':', child.name, 'Material before:', child.material);
                 if (child.geometry) {
                     child.geometry.computeVertexNormals();
                 }
@@ -45,8 +50,10 @@ export function loadPebbleModel(scene, sharedUniforms) {
                     uniforms,
                     side: THREE.DoubleSide
                 });
+                console.log('[Pebble] Applied glass shader material to:', child.name);
             }
         });
+        console.log('[Pebble] Total meshes found in pebble_45.glb:', meshCount);
 
         // Group for later animation control; add "as is"
         pebbleGroup = new THREE.Group();
