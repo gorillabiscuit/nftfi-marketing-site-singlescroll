@@ -46,12 +46,7 @@ export function loadRoundPebbleModel(parentGroup, scene) {
             depthWrite: false
         });
         
-        // Counter-rotate the video texture to keep content upright
-        // This compensates for the 45-degree frame rotation
-        if (planeMaterial.map) {
-            planeMaterial.map.rotation = -Math.PI / 4; // -45 degrees in radians
-            planeMaterial.map.center.set(0.5, 0.5); // Rotate around center
-        }
+        // Video texture will rotate with the mesh (no counter-rotation needed)
 
         gltf.scene.traverse((child) => {
             if (child.isMesh) {
@@ -62,6 +57,9 @@ export function loadRoundPebbleModel(parentGroup, scene) {
                 child.material = planeMaterial;
                 child.castShadow = true;
                 child.receiveShadow = true;
+                
+                // Rotate the video plane mesh 45 degrees around Z-axis for diamond shape
+                child.rotation.z = Math.PI / 4; // 45 degrees in radians
             }
         });
 
@@ -75,10 +73,6 @@ export function loadRoundPebbleModel(parentGroup, scene) {
         //  - rotation.y = ±Math.PI/2 spins it left/right
         // Use radians; tweak sign (+/-) if mirrored.
         try { gltf.scene.rotation.x = -Math.PI / 2; } catch (_) { void 0; }
-        
-        // Add 45-degree rotation to the video plane frame (diamond shape)
-        // This rotates the frame while keeping the video content upright
-        try { gltf.scene.rotation.z = Math.PI / 4; } catch (_) { void 0; }
         roundPebbleGroup.add(gltf.scene);
         roundPebbleGroup.position.set(0, 0, 0);
         roundPebbleGroup.scale.setScalar(1);
