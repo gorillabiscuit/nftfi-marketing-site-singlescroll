@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_COORDINATE_SYSTEM, SECTION4_PEBBLE_ROTATION, setPebbleRotation, toggleAxesHelper, setAxesSize, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
 import { BREAKPOINT_NAMES } from '../config/breakpoints.js';
 import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
@@ -136,16 +136,10 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
     });
     // Prepare materials for fading
     materials.forEach((m) => { try { m.transparent = true; m.opacity = 0; } catch (_) { void 0; } });
-    // Position pebble directly in Section 4 (visible from start)
-    gsap.set(pebbleGroup, { visible: true });
-    // Set initial position to Section 4 position (no offscreen positioning)
-    const bp = getCurrentBreakpoint();
-    const pcfg = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE[BREAKPOINT_NAMES.DESKTOP];
-    gsap.set(pebbleGroup.position, { 
-        y: 0 + (pcfg.position?.y ?? 0), 
-        x: (pcfg.position?.x ?? -3.5), 
-        z: (pcfg.position?.z ?? 0) 
-    });
+    // Ensure starting state: hidden and offscreen
+    gsap.set(pebbleGroup, { visible: false });
+    const startY = (typeof pebbleGroup.position?.y === 'number') ? pebbleGroup.position.y : -20;
+    gsap.set(pebbleGroup.position, { y: startY });
 
     // Build timeline first (without ScrollTrigger) so we can scale scroll distance to its duration
     const tl = gsap.timeline();
@@ -209,50 +203,11 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         const t = SECTION4_TIMINGS; let cursor = (title && title._s4CursorAfterTitle) ? title._s4CursorAfterTitle : 0.4;
         // After title fade-out, wait period, then animate pebble in, then another period, then first item
         cursor += (t.periodB ?? 0.05);
-        // pebble already positioned directly in Section 4 (no animation needed)
+        // pebble animates in
+        tl.to(pebbleGroup.position, { y: 0 + (pcfg.position?.y ?? 0), x: (pcfg.position?.x ?? -3.5), z: (pcfg.position?.z ?? 0), ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
         // scale relative: multiply baseline by factor; using additive on each axis
         const s = (pcfg.scale ?? 1.75) - 1.0;
         tl.to(pebbleGroup.scale, { x: `+=${s}`, y: `+=${s}`, z: `+=${s}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
-        
-        // STEP 1: Apply coordinate system adjustment FIRST (if enabled)
-        // This reorients the local axes before applying the final rotation
-        if (SECTION4_COORDINATE_SYSTEM.enabled) {
-            pebbleGroup.rotation.x = (SECTION4_COORDINATE_SYSTEM.x * Math.PI) / 180;
-            pebbleGroup.rotation.y = (SECTION4_COORDINATE_SYSTEM.y * Math.PI) / 180;
-            pebbleGroup.rotation.z = (SECTION4_COORDINATE_SYSTEM.z * Math.PI) / 180;
-            
-            console.log(`[Section 4] Applied coordinate system adjustment:`, {
-                x: `${SECTION4_COORDINATE_SYSTEM.x}°`,
-                y: `${SECTION4_COORDINATE_SYSTEM.y}°`,
-                z: `${SECTION4_COORDINATE_SYSTEM.z}°`
-            });
-        }
-        
-        // STEP 2: Apply final pebble rotation (relative to adjusted coordinate system)
-        if (SECTION4_PEBBLE_ROTATION.enabled) {
-            // If coordinate system is enabled, add to existing rotation
-            // Otherwise, set directly
-            if (SECTION4_COORDINATE_SYSTEM.enabled) {
-                pebbleGroup.rotation.x += (SECTION4_PEBBLE_ROTATION.x * Math.PI) / 180;
-                pebbleGroup.rotation.y += (SECTION4_PEBBLE_ROTATION.y * Math.PI) / 180;
-                pebbleGroup.rotation.z += (SECTION4_PEBBLE_ROTATION.z * Math.PI) / 180;
-            } else {
-                pebbleGroup.rotation.x = (SECTION4_PEBBLE_ROTATION.x * Math.PI) / 180;
-                pebbleGroup.rotation.y = (SECTION4_PEBBLE_ROTATION.y * Math.PI) / 180;
-                pebbleGroup.rotation.z = (SECTION4_PEBBLE_ROTATION.z * Math.PI) / 180;
-            }
-            
-            console.log(`[Section 4] Applied pebble rotation:`, {
-                x: `${SECTION4_PEBBLE_ROTATION.x}°`,
-                y: `${SECTION4_PEBBLE_ROTATION.y}°`,
-                z: `${SECTION4_PEBBLE_ROTATION.z}°`
-            });
-        }
-        
-        // Expose helper functions globally for easy testing
-        window.setPebbleRotation = setPebbleRotation;
-        window.toggleAxes = toggleAxesHelper;
-        window.setAxesSize = setAxesSize;
         cursor += (t.pebbleIn ?? 0.20);
         // hold after entrance before first item begins
         cursor += (t.periodC ?? 0.05);

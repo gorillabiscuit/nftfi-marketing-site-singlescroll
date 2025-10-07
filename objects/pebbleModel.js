@@ -7,7 +7,6 @@ import pebbleUrl from '../models/pebble_45.glb?url';
 // import pebbleUrl from '../models/pebble.glb?url';
 import vertexShader from '../shaders/glass.vert.js';
 import fragmentShader from '../shaders/glass.frag.js';
-import { SECTION4_AXES_HELPER, SECTION4_COORDINATE_SYSTEM } from '../config/section4.js';
 
 export let pebbleMesh = null;
 export let pebbleGroup = null;
@@ -28,15 +27,11 @@ export function loadPebbleModel(scene, sharedUniforms) {
         box.getCenter(center);
         box.getSize(size);
 
-        // Apply glass shader material to meshes, using shared uniforms but with per-mesh uTexture
-        console.log('[Pebble] Traversing pebble_45.glb scene...');
-        let meshCount = 0;
+        // Apply glass shader material to ALL meshes in pebble_45.glb
+        // This applies the glass material uniformly to everything in the model
         gltf.scene.traverse((child) => {
-            console.log('[Pebble] Child:', child.type, child.name, 'isMesh:', child.isMesh);
             if (child.isMesh) {
-                meshCount++;
                 pebbleMesh = child;
-                console.log('[Pebble] Found mesh #' + meshCount + ':', child.name, 'Material before:', child.material);
                 if (child.geometry) {
                     child.geometry.computeVertexNormals();
                 }
@@ -50,10 +45,9 @@ export function loadPebbleModel(scene, sharedUniforms) {
                     uniforms,
                     side: THREE.DoubleSide
                 });
-                console.log('[Pebble] Applied glass shader material to:', child.name);
+                console.log('[Pebble] Applied glass shader to mesh:', child.name || 'unnamed');
             }
         });
-        console.log('[Pebble] Total meshes found in pebble_45.glb:', meshCount);
 
         // Group for later animation control; add "as is"
         pebbleGroup = new THREE.Group();
@@ -61,34 +55,18 @@ export function loadPebbleModel(scene, sharedUniforms) {
         gltf.scene.position.set(-center.x, -center.y, -center.z);
         pebbleGroup.add(gltf.scene);
         
-        // Position pebble directly in Section 4 (visible from start)
-        // Default Section 4 position (will be overridden by scroll trigger setup)
-        pebbleGroup.position.set(-3.5, 0, 0);
+        // Default transform for pebble
+        // Position will be overridden by scroll trigger setup
+        pebbleGroup.position.set(0, -20, 0); // Start offscreen
         pebbleGroup.scale.setScalar(2.0);
-        pebbleGroup.visible = true;
-        
-        // Add AxesHelper to visualize X, Y, Z axes (Red = X, Green = Y, Blue = Z)
-        let axesHelper = null;
-        if (SECTION4_AXES_HELPER.enabled) {
-            axesHelper = new THREE.AxesHelper(SECTION4_AXES_HELPER.size);
-            
-            // Axes helper stays aligned with pebbleGroup's local coordinate system
-            // So it will automatically show the adjusted axes when coordinate system is rotated
-            
-            pebbleGroup.add(axesHelper);
-            console.log('[Section 4] AxesHelper added to pebble (Red=X, Green=Y, Blue=Z)');
-            if (SECTION4_COORDINATE_SYSTEM.enabled) {
-                console.log('[Section 4] Axes will align with adjusted coordinate system');
-            }
-        }
-        
+        pebbleGroup.visible = false; // Hidden until Section 4
         scene.add(pebbleGroup);
 
         isPebbleReady = true;
         // Expose readiness flag for debugging
         window.isPebbleReady = isPebbleReady;
         // Expose for debugging/adjustment
-        window.PEBBLE = { pebbleGroup, pebbleMesh, gltf: gltf.scene, axesHelper };
+        window.PEBBLE = { pebbleGroup, pebbleMesh, gltf: gltf.scene };
     }, undefined, (error) => {
         console.error('Error loading pebble model:', error);
     });
