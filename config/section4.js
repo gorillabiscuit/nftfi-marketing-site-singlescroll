@@ -50,7 +50,7 @@ export const SECTION4_PEBBLE = {
 export const SECTION4_PEBBLE_ROTATION = {
     enabled: true,
     x: 0,  // X-axis rotation in degrees
-    y: 0,   // Y-axis rotation in degrees  
+    y: 90,   // Y-axis rotation in degrees  
     z: 0,   // Z-axis rotation in degrees
     // You can set any combination of axes: 0 = no rotation, any value = rotation in degrees
 };
@@ -59,9 +59,9 @@ export const SECTION4_PEBBLE_ROTATION = {
 // This gets applied FIRST, before SECTION4_PEBBLE_ROTATION
 // Use this to align the pebble's axes to match your desired rotation behavior
 export const SECTION4_COORDINATE_SYSTEM = {
-    enabled: false,  // Enable to apply coordinate system rotation first
+    enabled: true,  // Enable to apply coordinate system rotation first
     x: 0,   // Rotate coordinate system on X-axis (in degrees)
-    y: 0,   // Rotate coordinate system on Y-axis (in degrees)
+    y: 45,   // Rotate coordinate system on Y-axis (in degrees)
     z: 0    // Rotate coordinate system on Z-axis (in degrees)
 };
 
