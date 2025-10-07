@@ -1,9 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from '../libs/GLTFLoader.js';
 // Import model via Vite asset handling
-import pebbleUrl from '../models/pebble_45.glb?url';
-// Previous models:
-// import pebbleUrl from '../models/round-pebble.glb?url';
+import pebbleUrl from '../models/round-pebble.glb?url';
 // import pebbleUrl from '../models/pebble.glb?url';
 import vertexShader from '../shaders/glass.vert.js';
 import fragmentShader from '../shaders/glass.frag.js';
@@ -27,8 +25,7 @@ export function loadPebbleModel(scene, sharedUniforms) {
         box.getCenter(center);
         box.getSize(size);
 
-        // Apply glass shader material to ALL meshes in pebble_45.glb
-        // This applies the glass material uniformly to everything in the model
+        // Apply glass shader material to meshes, using shared uniforms but with per-mesh uTexture
         gltf.scene.traverse((child) => {
             if (child.isMesh) {
                 pebbleMesh = child;
@@ -45,7 +42,6 @@ export function loadPebbleModel(scene, sharedUniforms) {
                     uniforms,
                     side: THREE.DoubleSide
                 });
-                console.log('[Pebble] Applied glass shader to mesh:', child.name || 'unnamed');
             }
         });
 
@@ -55,11 +51,11 @@ export function loadPebbleModel(scene, sharedUniforms) {
         gltf.scene.position.set(-center.x, -center.y, -center.z);
         pebbleGroup.add(gltf.scene);
         
-        // Default transform for pebble
-        // Position will be overridden by scroll trigger setup
-        pebbleGroup.position.set(0, -20, 0); // Start offscreen
+        // Default: keep pebble offscreen and hidden until section 4
+        // Position it well below the viewport; we'll animate it up on section 4
+        pebbleGroup.position.set(0, -20, 0);
         pebbleGroup.scale.setScalar(2.0);
-        pebbleGroup.visible = false; // Hidden until Section 4
+        pebbleGroup.visible = false;
         scene.add(pebbleGroup);
 
         isPebbleReady = true;

@@ -30,6 +30,8 @@ import {
 import { initSection3Dashboard, initSection3Scroll } from './controls/section3Dashboard.js';
 // NEW: Hero button stroke effects
 import { initHeroButtonEffects } from './controls/heroButtonEffects.js';
+// NEW: Scroll Speed Manager
+import scrollSpeedManager from './controls/scrollSpeedManager.js';
 
 // Main initialization function
 async function init() {
@@ -51,6 +53,14 @@ async function init() {
     // NEW: Initialize ScrollSmoother safely (will be paused initially)
     const scrollSmootherStatus = initializeScrollSmoother();
     console.log('ScrollSmoother initialization result:', scrollSmootherStatus ? 'success' : 'skipped');
+    
+    // NEW: Initialize Scroll Speed Manager with ScrollSmoother reference
+    if (scrollSmootherStatus && window.smoother) {
+        scrollSpeedManager.initialize(window.smoother);
+        console.log('Scroll Speed Manager initialized with ScrollSmoother');
+    } else {
+        console.log('Scroll Speed Manager initialized without ScrollSmoother');
+    }
     
     // CRITICAL: Switch loading manager to ScrollSmoother control now that it's initialized
     if (scrollSmootherStatus) {
@@ -212,6 +222,7 @@ async function init() {
     window.forceCompleteLoading = forceCompleteLoading;
     window.forceAllowScrolling = forceAllowScrolling;
     window.switchToScrollSmootherControl = switchToScrollSmootherControl;
+    window.scrollSpeedManager = scrollSpeedManager; // Expose for debugging
     
 
     
