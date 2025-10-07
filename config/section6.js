@@ -13,17 +13,17 @@ import { BREAKPOINT_NAMES } from './breakpoints.js';
 // This allows postTilesDelay to create a long pause without making title disappear slowly.
 export const SECTION6_TIMINGS = {
     // Title animation phases
-    periodA: 0.5,        // Initial delay before title appears
-    titleFadeIn: 0.35,   // Title fade in duration (matches Section 3)
-    titleShow: 2.0,      // How long title stays visible
-    titleFadeOut: 0.35,  // Title fade out duration
+    periodA: 0.01,        // Initial delay before title appears
+    titleFadeIn: 0.15,   // Title fade in duration (matches Section 3)
+    titleShow: 0.25,      // How long title stays visible
+    titleFadeOut: 0.15,  // Title fade out duration
     
     // Tiles animation phases (after title disappears)
-    tilesDelay: 0.3,     // Delay after title disappears before tiles appear
-    tilesFadeIn: 0.8,    // Duration for tiles to fade in
+    tilesDelay: 0.1,     // Delay after title disappears before tiles appear
+    tilesFadeIn: 0.4,    // Duration for tiles to fade in
     tilesStagger: 0.05,  // Stagger between individual tiles
     tilesShow: 3.0,      // How long tiles stay visible
-    tilesHold: 3.0,      // Additional time after tiles appear before unpinning
+    tilesHold: 5.0,      // Additional time after tiles appear before unpinning
     
     // Extra control periods
     postTilesDelay: 8.0, // Extra time period after all logo blocks have fully appeared

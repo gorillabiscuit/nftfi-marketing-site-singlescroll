@@ -2112,4 +2112,51 @@ export function setupSection6TitleAnimation() {
     });
 }
 
+/**
+ * Setup Section 7 simple pin for 2 seconds
+ * Final CTA section with basic pin to hold it in view
+ */
+export function setupSection7Pin() {
+    const section7El = document.querySelector(".section[data-section='7']");
+    if (!section7El) {
+        console.warn('[Section7] Section 7 element not found');
+        return;
+    }
+
+    console.log('[Section7] Setting up 2-second pin');
+
+    // Create a simple timeline (can be empty or have fade-in animation)
+    const tl = gsap.timeline();
+    
+    // Optional: Add a subtle fade-in effect
+    const ctaElements = section7El.querySelectorAll('.section7-content, .section7-circles');
+    if (ctaElements.length > 0) {
+        tl.fromTo(ctaElements, 
+            { opacity: 0.8 },
+            { opacity: 1, duration: 0.5, ease: 'power1.out', stagger: 0.1 }
+        );
+    }
+
+    // 2 seconds = 2000 pixels base (will be adjusted by speed manager)
+    const originalDistance = 2000;
+    
+    // Use Unified Pinning System to create the ScrollTrigger with consistent speed
+    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+        7, // sectionNumber
+        section7El, // triggerElement
+        tl, // animation
+        originalDistance, // originalDistance
+        {
+            onEnter: () => {
+                console.log('[Section7] Pin started - holding for ~2 seconds');
+            },
+            onLeave: () => {
+                console.log('[Section7] Pin released');
+            }
+        }
+    );
+
+    console.log('[Section7] Pin setup complete');
+}
+
  

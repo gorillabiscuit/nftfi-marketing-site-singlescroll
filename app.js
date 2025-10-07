@@ -9,7 +9,7 @@ import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.
 import { loadPebbleModel, pebbleGroup } from './objects/pebbleModel.js';
 import { loadRoundPebbleModel } from './objects/roundPebbleModel.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane, initializeVideoTextures } from './objects/backgroundPlane.js';
-import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned, setupSection5HorizontalScroll, setupSection6TitleAnimation } from './controls/scrollTrigger.js';
+import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned, setupSection5HorizontalScroll, setupSection6TitleAnimation, setupSection7Pin } from './controls/scrollTrigger.js';
 import { initializeTestimonials } from './controls/testimonials.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
 import { initHeaderAnimation } from './controls/headerAnimation.js';
@@ -185,6 +185,13 @@ async function init() {
         setupSection6TitleAnimation();
     } catch (e) {
         console.error('Failed to setup Section 6:', e);
+    }
+    
+    // Setup Section 7 pin
+    try {
+        setupSection7Pin();
+    } catch (e) {
+        console.error('Failed to setup Section 7:', e);
     }
     
     // Start and complete images loading step (most images are loaded via CSS)
