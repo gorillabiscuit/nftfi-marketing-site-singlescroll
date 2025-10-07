@@ -4,6 +4,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
+import unifiedPinningSystem from './unifiedPinningSystem.js';
 import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
 import { BREAKPOINT_NAMES } from '../config/breakpoints.js';
 import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
@@ -621,27 +622,23 @@ export function enableScrollBasedPositioning() {
     console.log('Scroll-based mesh positioning enabled');
 }
 
-// Set up Section 2 with sophisticated 4-phase animation sequence
+// Set up Section 2 with sophisticated 4-phase animation sequence using Unified Pinning System
 function setupSection2Pinning() {
-    console.log('Setting up Section 2 with 4-phase animation sequence');
-    
-    // The pinning is now handled by the master timeline's ScrollTrigger
-    // No need for a separate pinning ScrollTrigger
-    console.log('Section 2 pinning will be handled by master timeline');
+    console.log('Setting up Section 2 with unified pinning system');
     
     // Resolve scope & scroller elements once
     const section2El = document.querySelector("section[data-section='2']");
     const scrollerEl = document.getElementById('smooth-content');
 
-    // Start the sophisticated animation sequence immediately, scoped to Section 2
-    if (section2El) {
-        gsap.context(() => {
-            startAdvancedAnimationSequence(section2El, scrollerEl);
-        }, section2El);
-    } else {
-        // Fallback without context if element not found
-        startAdvancedAnimationSequence(section2El, scrollerEl);
+    if (!section2El) {
+        console.warn('Section 2 element not found');
+        return;
     }
+
+    // Start the sophisticated animation sequence immediately, scoped to Section 2
+    gsap.context(() => {
+        startAdvancedAnimationSequence(section2El, scrollerEl);
+    }, section2El);
 
     // Minimal gsap.matchMedia integration for responsive rebuilds
     let isRebuilding = false;
@@ -653,7 +650,8 @@ function setupSection2Pinning() {
         if (label) lastBpLabel = label;
         try {
             if (section2Timeline) {
-                if (section2Timeline.scrollTrigger) section2Timeline.scrollTrigger.kill();
+                // Use unified pinning system to kill the section
+                unifiedPinningSystem.killSection(2);
                 section2Timeline.kill();
                 section2Timeline = null;
             }
@@ -669,7 +667,10 @@ function setupSection2Pinning() {
             startAdvancedAnimationSequence(el, document.getElementById('smooth-content'));
         }
         requestAnimationFrame(() => {
-            try { ScrollTrigger.refresh(); } catch (_) { void 0; }
+            try { 
+                // Use unified pinning system refresh
+                unifiedPinningSystem.refreshAllSections();
+            } catch (_) { void 0; }
             isRebuilding = false;
         });
     };
@@ -689,18 +690,30 @@ function setupSection2Pinning() {
             try { section2Timeline.kill(); } catch (_) { void 0; }
         }
 
-        section2Timeline = gsap.timeline({
-            scrollTrigger: {
-                trigger: triggerEl || "section[data-section='2']",
-                start: 'top top',
-                // Scale scroll distance in proportion to the timeline's total duration
-                end: () => '+=' + Math.round((section2Timeline ? section2Timeline.totalDuration() : 4) * (SECTION2_SCROLL?.pxPerSecond || 600)),
-                pin: true,
-                anticipatePin: 1,
-                invalidateOnRefresh: true,
-                scrub: true
+        // Create timeline without ScrollTrigger first
+        section2Timeline = gsap.timeline();
+        
+        // Use Unified Pinning System to create the ScrollTrigger
+        const originalDistance = (section2Timeline ? section2Timeline.totalDuration() : 4) * (SECTION2_SCROLL?.pxPerSecond || 600);
+        
+        // Create the pin trigger using unified system
+        const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+            2, // sectionNumber
+            triggerEl || document.querySelector("section[data-section='2']"), // triggerElement
+            section2Timeline, // animation
+            originalDistance, // originalDistance
+            {
+                onUpdate: (self) => {
+                    // Additional custom logic if needed
+                    console.log('Section 2 scroll progress:', self.progress);
+                }
             }
-        });
+        );
+        
+        // Store the ScrollTrigger reference for cleanup
+        if (scrollTrigger) {
+            section2Timeline.scrollTrigger = scrollTrigger;
+        }
 
         // No absolute labels; use relative sequencing only
  
