@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from '../libs/GLTFLoader.js';
 // Import model via Vite asset handling
-import roundPebbleUrl from '../models/pebble-plane.glb?url';
+import roundPebbleUrl from '../models/plane_45.glb?url';
 // Import default video (Art.mp4 for Digital Art category)
 import videoUrl from '../images/Art.mp4?url';
 

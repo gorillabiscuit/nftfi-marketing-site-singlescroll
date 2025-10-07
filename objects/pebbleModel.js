@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from '../libs/GLTFLoader.js';
 // Import model via Vite asset handling
-import pebbleUrl from '../models/round-pebble.glb?url';
-// import pebbleUrl from '../models/pebble.glb?url';
+import pebbleUrl from '../models/pebble_45.glb?url';
+// Previous: round-pebble.glb, pebble.glb
 import vertexShader from '../shaders/glass.vert.js';
 import fragmentShader from '../shaders/glass.frag.js';
 

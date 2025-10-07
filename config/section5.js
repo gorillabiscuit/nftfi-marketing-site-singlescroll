@@ -102,7 +102,7 @@ export const SECTION5_CONFIG = {
     titleTimings: {
         periodA: 0.2,      // Initial delay before title appears
         h2FadeIn: 0.25,     // Title fade in duration  
-        h2Show: 0.5,       // How long title stays visible
+        h2Show: 0.35,       // How long title stays visible
         h2FadeOut: 0.2     // Title fade out duration
     }
 };
