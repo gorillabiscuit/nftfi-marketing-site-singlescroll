@@ -1914,9 +1914,10 @@ export function setupSection5HorizontalScroll() {
     );
 
     // Calculate original scroll distance
-    // Section 5 uses viewport height units (scrollSpeed: 10000vh)
-    // Convert to pixels for consistent speed control
-    const originalDistance = Math.round((config.scrollSpeed / 100) * window.innerHeight);
+    // Section 5 uses viewport height units (scrollSpeed: 10000vh in config)
+    // The old system used this as viewport percentage, which created extremely long distances
+    // Use a fixed large base for proper speed control (like Sections 3 & 4)
+    const originalDistance = 5000; // Large base for proper speed control
     
     // Use Unified Pinning System to create the ScrollTrigger with consistent speed
     const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
