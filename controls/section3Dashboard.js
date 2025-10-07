@@ -487,18 +487,12 @@ export function initSection3Scroll() {
     }
 
     // Calculate original scroll distance
-    // Section 3 uses viewport height percentages (durationVh: 600 = 600% of viewport)
-    // Convert to pixels for consistent speed control
-    let endPercent = 100;
-    try {
-        if (SECTION3_SCROLL && typeof SECTION3_SCROLL.durationVh === 'number') {
-            endPercent = Math.max(1, SECTION3_SCROLL.durationVh);
-        }
-    } catch (_) { void 0; }
-    
-    // Convert viewport percentage to pixels
-    // 600% = 6x viewport height
-    const originalDistance = Math.round((endPercent / 100) * window.innerHeight);
+    // Section 3 uses viewport height units (durationVh: 600 = 600vh)
+    // The old system used this as a percentage in the ScrollTrigger end value ('+=' + 600 + '%')
+    // GSAP interprets percentage in 'end' as viewport height percentage (vh units)
+    // So 600% in GSAP's ScrollTrigger = 6 * viewport height
+    // We need to match this exactly, but use a fixed large base for proper speed control
+    const originalDistance = 5000; // Large base for proper speed control (like Section 4)
 
     // Create timeline without ScrollTrigger (will be added by unified system)
     const tl = gsap.timeline();
