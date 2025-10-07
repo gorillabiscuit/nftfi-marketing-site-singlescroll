@@ -82,13 +82,10 @@ class UnifiedPinningSystem {
             
             // Callbacks
             onUpdate: (self) => {
-                // Apply global speed control
+                // Animation progress should be 1:1 with scroll progress
+                // Speed control is handled by the scroll distance calculation
                 if (animation && typeof animation.progress === 'function') {
-                    const sectionSpeed = scrollSpeedManager.getSectionSpeed(sectionNumber);
-                    const deviceMultiplier = scrollSpeedManager.getDeviceSpeedMultiplier();
-                    const speedMultiplier = sectionSpeed * deviceMultiplier;
-                    
-                    animation.progress(self.progress * speedMultiplier);
+                    animation.progress(self.progress);
                 }
                 
                 // Call custom onUpdate if provided

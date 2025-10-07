@@ -84,8 +84,10 @@ class ScrollSpeedManager {
         // Calculate viewport-based distance
         const viewportDistance = this.calculateViewportDistance(sectionElement, sectionNumber);
         
-        // Apply all multipliers
-        const finalDistance = viewportDistance * sectionSpeed * deviceMultiplier * this.currentSpeed;
+        // Apply all multipliers - smaller speed = longer distance (slower scroll)
+        // Invert the speed multiplier: 0.5 speed = 2x distance, 2.0 speed = 0.5x distance
+        const speedMultiplier = 1 / (sectionSpeed * deviceMultiplier * this.currentSpeed);
+        const finalDistance = viewportDistance * speedMultiplier;
         
         // Clamp between min and max values
         const clampedDistance = Math.max(
@@ -102,6 +104,7 @@ class ScrollSpeedManager {
                 sectionSpeed,
                 deviceMultiplier,
                 currentSpeed: this.currentSpeed,
+                speedMultiplier: 1 / (sectionSpeed * deviceMultiplier * this.currentSpeed),
                 finalDistance: result
             });
         }
