@@ -214,22 +214,18 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         const s = (pcfg.scale ?? 1.75) - 1.0;
         tl.to(pebbleGroup.scale, { x: `+=${s}`, y: `+=${s}`, z: `+=${s}`, ease: 'none', duration: (t.pebbleIn ?? 0.20) }, cursor);
         
-        // Apply 45-degree rotation to pebble based on configuration
+        // Apply multi-axis rotation to pebble based on configuration
         if (SECTION4_PEBBLE_ROTATION.enabled) {
-            const rotationAxis = SECTION4_PEBBLE_ROTATION.axis;
-            const rotationDegrees = SECTION4_PEBBLE_ROTATION.degrees;
-            const rotationRadians = (rotationDegrees * Math.PI) / 180;
+            // Apply rotation to all three axes
+            pebbleGroup.rotation.x = (SECTION4_PEBBLE_ROTATION.x * Math.PI) / 180;
+            pebbleGroup.rotation.y = (SECTION4_PEBBLE_ROTATION.y * Math.PI) / 180;
+            pebbleGroup.rotation.z = (SECTION4_PEBBLE_ROTATION.z * Math.PI) / 180;
             
-            // Apply rotation to the specified axis
-            if (rotationAxis === 'x') {
-                pebbleGroup.rotation.x = rotationRadians;
-            } else if (rotationAxis === 'y') {
-                pebbleGroup.rotation.y = rotationRadians;
-            } else if (rotationAxis === 'z') {
-                pebbleGroup.rotation.z = rotationRadians;
-            }
-            
-            console.log(`[Section 4] Applied ${rotationDegrees}° rotation to pebble on ${rotationAxis.toUpperCase()}-axis`);
+            console.log(`[Section 4] Applied multi-axis rotation to pebble:`, {
+                x: `${SECTION4_PEBBLE_ROTATION.x}°`,
+                y: `${SECTION4_PEBBLE_ROTATION.y}°`,
+                z: `${SECTION4_PEBBLE_ROTATION.z}°`
+            });
         }
         
         // Expose rotation helper function globally for easy testing

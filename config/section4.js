@@ -45,31 +45,57 @@ export const SECTION4_PEBBLE = {
     }
 };
 
-// Pebble rotation for Section 4 - 45 degree rotation on different axes
-// Change the axis (x, y, z) to test which one gives the desired effect
+// Pebble rotation for Section 4 - Multi-axis rotation support
+// Set rotation degrees for each axis independently
 export const SECTION4_PEBBLE_ROTATION = {
     enabled: true,
-    axis: 'x', // Change this to 'x', 'y', or 'z' to test different axes
-    degrees: 0, // 45 degree rotation
-    // You can also test different angles: 30, 60, 90, etc.
+    x: 45,  // X-axis rotation in degrees
+    y: 90,  // Y-axis rotation in degrees  
+    z: 0,   // Z-axis rotation in degrees
+    // You can set any combination of axes: 0 = no rotation, any value = rotation in degrees
 };
 
 // Helper function to easily change rotation for testing
-// Usage: In browser console, run: window.setPebbleRotation('x', 45)
-export function setPebbleRotation(axis, degrees) {
-    if (typeof axis !== 'string' || !['x', 'y', 'z'].includes(axis.toLowerCase())) {
-        console.error('Invalid axis. Use "x", "y", or "z"');
-        return;
-    }
-    if (typeof degrees !== 'number' || degrees < 0 || degrees > 360) {
-        console.error('Invalid degrees. Use a number between 0 and 360');
+// Usage: In browser console, run: window.setPebbleRotation('x', 45) or window.setPebbleRotation({x: 45, y: 90, z: 0})
+export function setPebbleRotation(axisOrObject, degrees) {
+    // Support both single axis: setPebbleRotation('x', 45) and multi-axis: setPebbleRotation({x: 45, y: 90})
+    if (typeof axisOrObject === 'string') {
+        // Single axis mode: setPebbleRotation('x', 45)
+        const axis = axisOrObject.toLowerCase();
+        if (!['x', 'y', 'z'].includes(axis)) {
+            console.error('Invalid axis. Use "x", "y", or "z"');
+            return;
+        }
+        if (typeof degrees !== 'number' || degrees < 0 || degrees > 360) {
+            console.error('Invalid degrees. Use a number between 0 and 360');
+            return;
+        }
+        
+        SECTION4_PEBBLE_ROTATION[axis] = degrees;
+        console.log(`[Section 4] Rotation updated: ${degrees}° on ${axis.toUpperCase()}-axis`);
+        
+    } else if (typeof axisOrObject === 'object' && axisOrObject !== null) {
+        // Multi-axis mode: setPebbleRotation({x: 45, y: 90, z: 0})
+        const updates = [];
+        for (const [axis, value] of Object.entries(axisOrObject)) {
+            if (['x', 'y', 'z'].includes(axis.toLowerCase()) && typeof value === 'number' && value >= 0 && value <= 360) {
+                SECTION4_PEBBLE_ROTATION[axis.toLowerCase()] = value;
+                updates.push(`${value}° on ${axis.toUpperCase()}`);
+            }
+        }
+        
+        if (updates.length > 0) {
+            console.log(`[Section 4] Multi-axis rotation updated: ${updates.join(', ')}`);
+        } else {
+            console.error('No valid rotation values provided. Use {x: 45, y: 90, z: 0} format');
+            return;
+        }
+    } else {
+        console.error('Invalid input. Use setPebbleRotation("x", 45) or setPebbleRotation({x: 45, y: 90, z: 0})');
         return;
     }
     
-    SECTION4_PEBBLE_ROTATION.axis = axis.toLowerCase();
-    SECTION4_PEBBLE_ROTATION.degrees = degrees;
-    
-    console.log(`[Section 4] Rotation updated: ${degrees}° on ${axis.toUpperCase()}-axis`);
+    console.log('Current rotation:', {x: SECTION4_PEBBLE_ROTATION.x, y: SECTION4_PEBBLE_ROTATION.y, z: SECTION4_PEBBLE_ROTATION.z});
     console.log('Refresh the page to see the changes, or scroll to Section 4');
 }
 
