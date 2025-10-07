@@ -351,35 +351,36 @@ export function setupSection4PebbleFadePinned(pebbleGroup) {
         // Note: continuous spin handled per-frame (not scrubbed) in core/loop.js
     } catch (_) { void 0; }
 
-    // Create ScrollTrigger bound to this timeline with end based on timeline totalDuration
-    ScrollTrigger.create({
-        trigger: ".section[data-section='4']",
-        start: 'top top',
-        end: () => '+=' + Math.round(tl.totalDuration() * (SECTION4_SCROLL?.pxPerUnit ?? 1400)),
-        pin: true,
-        scrub: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        animation: tl,
-        onEnter: () => {
-            // Avoid heavy capture onEnter; rely on pre-capture
-            try { if (!window.__s4PreCaptured) { /* fallback disabled */ } } catch (_) { void 0; }
-            gsap.set(pebbleGroup, { visible: true });
-        },
-        onEnterBack: () => {
-            try { /* no capture on enterBack */ } catch (_) { void 0; }
-            gsap.set(pebbleGroup, { visible: true });
-        },
-        onLeaveBack: () => { 
-            gsap.set(pebbleGroup, { visible: false }); 
-            // Switch back to Art.mp4 only when leaving backward (going back to Section 3)
-            switchToHeroTexture();
-        },
-        onLeave: () => {
-            // When leaving forward (going to Section 5), keep the last video playing
-            // Don't call switchToHeroTexture() - maintain current video
+    // Calculate original scroll distance using the old method
+    const originalDistance = Math.round(tl.totalDuration() * (SECTION4_SCROLL?.pxPerUnit ?? 1400));
+    
+    // Use Unified Pinning System to create the ScrollTrigger with consistent speed
+    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+        4, // sectionNumber
+        ".section[data-section='4']", // triggerElement
+        tl, // animation
+        originalDistance, // originalDistance
+        {
+            onEnter: () => {
+                // Avoid heavy capture onEnter; rely on pre-capture
+                try { if (!window.__s4PreCaptured) { /* fallback disabled */ } } catch (_) { void 0; }
+                gsap.set(pebbleGroup, { visible: true });
+            },
+            onEnterBack: () => {
+                try { /* no capture on enterBack */ } catch (_) { void 0; }
+                gsap.set(pebbleGroup, { visible: true });
+            },
+            onLeaveBack: () => { 
+                gsap.set(pebbleGroup, { visible: false }); 
+                // Switch back to Art.mp4 only when leaving backward (going back to Section 3)
+                switchToHeroTexture();
+            },
+            onLeave: () => {
+                // When leaving forward (going to Section 5), keep the last video playing
+                // Don't call switchToHeroTexture() - maintain current video
+            }
         }
-    });
+    );
 
     // Defensive: refresh ScrollTrigger after layout settles to ensure pin engages
     try {
