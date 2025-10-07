@@ -50,7 +50,7 @@ export const SECTION4_PEBBLE_SPIN = {
     enabled: true,
     degPerSecond: 24,
     // Extra spin impulse when middle items appear
-    boostDegPerSecond: 1000,
+    boostDegPerSecond: 50,
     boostDecayPerSecond: 750
 };
 
