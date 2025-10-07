@@ -1991,42 +1991,40 @@ export function setupSection6TitleAnimation() {
     gsap.set(tilesContainer, { opacity: 0 });
     gsap.set(tiles, { opacity: 0, scale: 0.8, y: 20 });
 
-    // PRE-CALCULATE total timeline duration from Section 6 timings
-    // This fixes the circular dependency issue where ScrollTrigger end calculation
-    // tried to use tl.totalDuration() before any animations were added to the timeline
+    // PRE-CALCULATE timeline duration (ONLY active animations, no hold periods)
+    // The hold happens after the timeline completes, as additional scroll distance
     const t = SECTION6_TIMINGS;
-    const calculatedDuration = 
-        (t.periodA ?? 0.5) +                                                    // Initial delay
-        (t.titleFadeIn ?? 0.35) +                                              // Title fade in
-        (t.titleShow ?? 2.0) +                                                 // Title show period  
-        (t.titleFadeOut ?? 0.35) +                                             // Title fade out
-        (t.tilesDelay ?? 0.3) +                                                // Delay before tiles
-        (t.tilesFadeIn ?? 0.8) + (tiles.length * (t.tilesStagger ?? 0.05)) +  // Tiles animation + stagger
-        (t.tilesShow ?? 3.0) +                                                 // Tiles show period
-        (t.tilesHold ?? 3.0) +                                                 // HOLD period after tiles appear
-        (t.postTilesDelay ?? 8.0) +                                            // Extra time after all logos appeared
-        (t.periodB ?? 3.5);                                                    // Final delay
+    const animationDuration = 
+        (t.periodA ?? 0.01) +                                                   // Initial delay
+        (t.titleFadeIn ?? 0.15) +                                              // Title fade in
+        (t.titleShow ?? 0.25) +                                                // Title show period  
+        (t.titleFadeOut ?? 0.15) +                                             // Title fade out
+        (t.tilesDelay ?? 0.1) +                                                // Delay before tiles
+        (t.tilesFadeIn ?? 0.4) + (tiles.length * (t.tilesStagger ?? 0.05)) +  // Tiles animation + stagger
+        (t.tilesShow ?? 3.0);                                                  // Tiles show period
 
-    // Calculate scroll distance using simple approach (like other sections)
-    const scrollDistance = Math.round(calculatedDuration * (SECTION6_SCROLL?.pxPerUnit || 300));
+    // Calculate scroll distance: animation scroll + hold scroll
+    // Animation scroll: timeline duration converted to pixels
+    // Hold scroll: additional pixels to keep section pinned after animation completes
+    const animationScrollDistance = Math.round(animationDuration * (SECTION6_SCROLL?.pxPerUnit || 300));
+    const holdScrollDistance = t.holdAfterAnimation || 3000;
+    const totalScrollDistance = animationScrollDistance + holdScrollDistance;
 
-    console.log('[Section6] Timeline calculation', {
-        totalDuration: calculatedDuration.toFixed(2) + ' timeline units',
-        totalScrollDistance: scrollDistance + 'px',
-        pxPerUnit: (SECTION6_SCROLL?.pxPerUnit || 300) + 'px per unit',
-        postTilesDelay: (t.postTilesDelay ?? 8.0) + ' units ← Extra time after logos appear',
+    console.log('[Section6] NEW Pin + Hold System', {
+        animationDuration: animationDuration.toFixed(2) + ' timeline units',
+        animationScrollDistance: animationScrollDistance + 'px',
+        holdScrollDistance: holdScrollDistance + 'px',
+        totalScrollDistance: totalScrollDistance + 'px',
+        explanation: 'Animation completes at ' + animationScrollDistance + 'px, then holds for ' + holdScrollDistance + 'px more',
         breakdown: {
-            periodA: (t.periodA ?? 0.5),
-            titleFadeIn: (t.titleFadeIn ?? 0.35),
-            titleShow: (t.titleShow ?? 2.0),
-            titleFadeOut: (t.titleFadeOut ?? 0.35),
-            tilesDelay: (t.tilesDelay ?? 0.3),
-            tilesFadeIn: (t.tilesFadeIn ?? 0.8),
+            periodA: (t.periodA ?? 0.01),
+            titleFadeIn: (t.titleFadeIn ?? 0.15),
+            titleShow: (t.titleShow ?? 0.25),
+            titleFadeOut: (t.titleFadeOut ?? 0.15),
+            tilesDelay: (t.tilesDelay ?? 0.1),
+            tilesFadeIn: (t.tilesFadeIn ?? 0.4),
             tilesStagger: tiles.length * (t.tilesStagger ?? 0.05),
-            tilesShow: (t.tilesShow ?? 3.0),
-            tilesHold: (t.tilesHold ?? 3.0),
-            postTilesDelay: (t.postTilesDelay ?? 8.0),
-            periodB: (t.periodB ?? 3.5)
+            tilesShow: (t.tilesShow ?? 3.0)
         }
     });
 
@@ -2034,43 +2032,45 @@ export function setupSection6TitleAnimation() {
     const tl = gsap.timeline();
     
     // Use Unified Pinning System to create the ScrollTrigger with consistent speed
+    // The total scroll distance includes both animation and hold periods
     const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
         6, // sectionNumber
         section6El, // triggerElement
         tl, // animation
-        scrollDistance, // originalDistance
+        totalScrollDistance, // originalDistance (animation + hold)
         {
             // No custom callbacks needed for Section 6
         }
     );
 
     // Build timeline using same timing logic (cursor tracking)
+    // NOTE: Timeline ends when tiles are visible - hold happens AFTER timeline completes
     let cursor = 0;
 
     // Initial delay
-    cursor += (t.periodA ?? 0.5);
+    cursor += (t.periodA ?? 0.01);
 
     // Title fade in
     tl.to(title, { 
         opacity: 1, 
         ease: 'power1.out', 
-        duration: (t.titleFadeIn ?? 0.35) 
+        duration: (t.titleFadeIn ?? 0.15) 
     }, cursor);
-    cursor += (t.titleFadeIn ?? 0.35);
+    cursor += (t.titleFadeIn ?? 0.15);
 
     // Title show period (title stays visible during this time)
-    cursor += (t.titleShow ?? 2.0);
+    cursor += (t.titleShow ?? 0.25);
 
     // Title fade out (starts after show period)
     tl.to(title, { 
         opacity: 0, 
         ease: 'power1.in', 
-        duration: (t.titleFadeOut ?? 0.35) 
+        duration: (t.titleFadeOut ?? 0.15) 
     }, cursor);
-    cursor += (t.titleFadeOut ?? 0.35);
+    cursor += (t.titleFadeOut ?? 0.15);
 
     // Delay before tiles appear
-    cursor += (t.tilesDelay ?? 0.3);
+    cursor += (t.tilesDelay ?? 0.1);
 
     // Tiles container fade in
     tl.to(tilesContainer, { 
@@ -2083,32 +2083,30 @@ export function setupSection6TitleAnimation() {
         opacity: 1, 
         scale: 1, 
         y: 0, 
-        duration: (t.tilesFadeIn ?? 0.8),
+        duration: (t.tilesFadeIn ?? 0.4),
         stagger: (t.tilesStagger ?? 0.05),
         ease: 'back.out(1.2)'
     }, cursor);
-    cursor += (t.tilesFadeIn ?? 0.8) + (tiles.length * (t.tilesStagger ?? 0.05));
+    cursor += (t.tilesFadeIn ?? 0.4) + (tiles.length * (t.tilesStagger ?? 0.05));
 
-    // Tiles show period
+    // Tiles show period (tiles stay visible)
     cursor += (t.tilesShow ?? 3.0);
 
-    // Additional hold period after tiles are fully visible
-    // This is now properly accounted for in the ScrollTrigger end calculation
-    cursor += (t.tilesHold ?? 3.0);
-
-    // Extra time period after all logo blocks have fully appeared
-    cursor += (t.postTilesDelay ?? 8.0);
-
-    // Final delay
-    cursor += (t.periodB ?? 3.5);
+    // Timeline ends here - tiles are now fully visible
+    // The section will continue to be pinned for holdAfterAnimation additional scroll
+    // This creates the "hold" effect without stretching the animation
 
     // Verify that our pre-calculated duration matches the actual timeline duration
     const actualDuration = tl.totalDuration();
-    console.log('[Section6] Duration verification', {
-        preCalculated: calculatedDuration.toFixed(2) + 's',
-        actualTimeline: actualDuration.toFixed(2) + 's',
-        match: Math.abs(calculatedDuration - actualDuration) < 0.01 ? '✅' : '❌',
-        tilesHoldActive: (t.tilesHold ?? 2.0) + 's hold period included'
+    console.log('[Section6] Timeline vs Pin Duration', {
+        timelineUnits: animationDuration.toFixed(2),
+        actualTimelineDuration: actualDuration.toFixed(2),
+        match: Math.abs(animationDuration - actualDuration) < 0.01 ? '✅' : '❌',
+        animationScrollDistance: animationScrollDistance + 'px',
+        holdScrollDistance: holdScrollDistance + 'px (tiles stay visible during this)',
+        totalPinDuration: totalScrollDistance + 'px',
+        explanation: 'Timeline plays from 0-' + animationScrollDistance + 'px, then tiles hold from ' + 
+                     animationScrollDistance + '-' + totalScrollDistance + 'px'
     });
 }
 

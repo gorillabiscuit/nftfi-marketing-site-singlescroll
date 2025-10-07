@@ -4,13 +4,10 @@
 import { BREAKPOINT_NAMES } from './breakpoints.js';
 
 // Section 6 animation timings (title + tiles sequence)
-// NOTE: With scrub:true, these values represent PROPORTIONAL timeline segments, not real time.
-// 
-// WEIGHTED SCROLL SYSTEM:
-// - ACTIVE segments (fades, animations): Use activePxPerUnit (faster scroll)
-// - PASSIVE segments (shows, holds, delays): Use passivePxPerUnit (slower scroll)
-// 
-// This allows postTilesDelay to create a long pause without making title disappear slowly.
+// NEW SYSTEM: Animation duration is separate from pin hold duration
+// - The timeline contains only the active animations (title + tiles fade in)
+// - After animations complete, the section stays pinned for holdAfterAnimation
+// - This creates a true "hold" effect without stretching the animation
 export const SECTION6_TIMINGS = {
     // Title animation phases
     periodA: 0.01,        // Initial delay before title appears
@@ -22,14 +19,11 @@ export const SECTION6_TIMINGS = {
     tilesDelay: 0.1,     // Delay after title disappears before tiles appear
     tilesFadeIn: 0.4,    // Duration for tiles to fade in
     tilesStagger: 0.05,  // Stagger between individual tiles
-    tilesShow: 3.0,      // How long tiles stay visible
-    tilesHold: 5.0,      // Additional time after tiles appear before unpinning
+    tilesShow: 3.0,      // How long tiles stay visible after animation completes
     
-    // Extra control periods
-    postTilesDelay: 8.0, // Extra time period after all logo blocks have fully appeared
-                         // This is a PASSIVE segment - uses passivePxPerUnit for slower scroll
-    
-    periodB: 3.5         // Final delay after all animations complete
+    // Hold after all animations complete (tiles stay visible while pinned)
+    // This is in pixels, not timeline units - it's added to the scroll distance
+    holdAfterAnimation: 3000  // Extra scroll distance to hold tiles visible before unpinning
 };
 
 // Section 6 scroll distance scaling (maps timeline duration to scroll length)
