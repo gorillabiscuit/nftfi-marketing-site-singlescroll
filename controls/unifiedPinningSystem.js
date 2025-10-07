@@ -48,7 +48,8 @@ class UnifiedPinningSystem {
             onEnter,
             onLeave,
             onEnterBack,
-            onLeaveBack
+            onLeaveBack,
+            animationEndProgress  // NEW: Optional - animation completes at this progress, then holds
         } = options;
 
         // Validate required parameters
@@ -82,19 +83,31 @@ class UnifiedPinningSystem {
             
             // Callbacks
             onUpdate: (self) => {
-                // Animation progress should be 1:1 with scroll progress
-                // Speed control is handled by the scroll distance calculation
+                // Animation progress handling
                 if (animation && typeof animation.progress === 'function') {
-                    animation.progress(self.progress);
+                    if (animationEndProgress !== undefined) {
+                        // Animation should complete at animationEndProgress, then hold
+                        // Map scroll progress 0→animationEndProgress to animation 0→1
+                        // After that point, keep animation at 100%
+                        const clampedProgress = Math.min(self.progress / animationEndProgress, 1.0);
+                        animation.progress(clampedProgress);
+                        
+                        if (this.debugMode && Math.random() < 0.05) { // Log occasionally to avoid spam
+                            console.log(`UnifiedPinningSystem: Section ${sectionNumber}`, {
+                                scrollProgress: (self.progress * 100).toFixed(1) + '%',
+                                animationProgress: (clampedProgress * 100).toFixed(1) + '%',
+                                holding: self.progress > animationEndProgress
+                            });
+                        }
+                    } else {
+                        // Default: 1:1 mapping of scroll progress to animation progress
+                        animation.progress(self.progress);
+                    }
                 }
                 
                 // Call custom onUpdate if provided
                 if (onUpdate) {
                     onUpdate(self);
-                }
-                
-                if (this.debugMode) {
-                    console.log(`UnifiedPinningSystem: Section ${sectionNumber} progress:`, self.progress);
                 }
             },
             

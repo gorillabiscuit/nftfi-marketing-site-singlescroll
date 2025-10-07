@@ -2031,15 +2031,26 @@ export function setupSection6TitleAnimation() {
     // Create timeline without ScrollTrigger (will be added by unified system)
     const tl = gsap.timeline();
     
+    // Calculate at what scroll progress the animation should complete
+    // Animation completes at animationScrollDistance, total pin ends at totalScrollDistance
+    // So animation should reach 100% at (animationScrollDistance / totalScrollDistance) of scroll progress
+    const animationEndProgress = animationScrollDistance / totalScrollDistance;
+    
+    console.log('[Section6] Animation End Progress', {
+        animationEndProgress: (animationEndProgress * 100).toFixed(1) + '%',
+        explanation: `Animation reaches 100% at ${(animationEndProgress * 100).toFixed(1)}% of scroll, then holds until 100%`
+    });
+    
     // Use Unified Pinning System to create the ScrollTrigger with consistent speed
     // The total scroll distance includes both animation and hold periods
+    // The animationEndProgress tells the system when to stop progressing the animation
     const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
         6, // sectionNumber
         section6El, // triggerElement
         tl, // animation
         totalScrollDistance, // originalDistance (animation + hold)
         {
-            // No custom callbacks needed for Section 6
+            animationEndProgress: animationEndProgress  // Animation completes here, then holds
         }
     );
 

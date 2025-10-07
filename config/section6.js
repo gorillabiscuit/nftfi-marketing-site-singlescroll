@@ -23,7 +23,7 @@ export const SECTION6_TIMINGS = {
     
     // Hold after all animations complete (tiles stay visible while pinned)
     // This is in pixels, not timeline units - it's added to the scroll distance
-    holdAfterAnimation: 3000  // Extra scroll distance to hold tiles visible before unpinning
+    holdAfterAnimation: 10000  // Extra scroll distance to hold tiles visible before unpinning
 };
 
 // Section 6 scroll distance scaling (maps timeline duration to scroll length)
