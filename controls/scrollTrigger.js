@@ -1991,68 +1991,12 @@ export function setupSection6TitleAnimation() {
     gsap.set(tilesContainer, { opacity: 0 });
     gsap.set(tiles, { opacity: 0, scale: 0.8, y: 20 });
 
-    // PRE-CALCULATE timeline duration (ONLY active animations, no hold periods)
-    // The hold happens after the timeline completes, as additional scroll distance
+    // Get config
     const t = SECTION6_TIMINGS;
-    const animationDuration = 
-        (t.periodA ?? 0.01) +                                                   // Initial delay
-        (t.titleFadeIn ?? 0.15) +                                              // Title fade in
-        (t.titleShow ?? 0.25) +                                                // Title show period  
-        (t.titleFadeOut ?? 0.15) +                                             // Title fade out
-        (t.tilesDelay ?? 0.1) +                                                // Delay before tiles
-        (t.tilesFadeIn ?? 0.4) + (tiles.length * (t.tilesStagger ?? 0.05)) +  // Tiles animation + stagger
-        (t.tilesShow ?? 3.0);                                                  // Tiles show period
-
-    // Calculate scroll distance: animation scroll + hold scroll
-    // Animation scroll: timeline duration converted to pixels
-    // Hold scroll: additional pixels to keep section pinned after animation completes
-    const animationScrollDistance = Math.round(animationDuration * (SECTION6_SCROLL?.pxPerUnit || 300));
     const holdScrollDistance = t.holdAfterAnimation || 3000;
-    const totalScrollDistance = animationScrollDistance + holdScrollDistance;
-
-    console.log('[Section6] NEW Pin + Hold System', {
-        animationDuration: animationDuration.toFixed(2) + ' timeline units',
-        animationScrollDistance: animationScrollDistance + 'px',
-        holdScrollDistance: holdScrollDistance + 'px',
-        totalScrollDistance: totalScrollDistance + 'px',
-        explanation: 'Animation completes at ' + animationScrollDistance + 'px, then holds for ' + holdScrollDistance + 'px more',
-        breakdown: {
-            periodA: (t.periodA ?? 0.01),
-            titleFadeIn: (t.titleFadeIn ?? 0.15),
-            titleShow: (t.titleShow ?? 0.25),
-            titleFadeOut: (t.titleFadeOut ?? 0.15),
-            tilesDelay: (t.tilesDelay ?? 0.1),
-            tilesFadeIn: (t.tilesFadeIn ?? 0.4),
-            tilesStagger: tiles.length * (t.tilesStagger ?? 0.05),
-            tilesShow: (t.tilesShow ?? 3.0)
-        }
-    });
 
     // Create timeline without ScrollTrigger (will be added by unified system)
     const tl = gsap.timeline();
-    
-    // Calculate at what scroll progress the animation should complete
-    // Animation completes at animationScrollDistance, total pin ends at totalScrollDistance
-    // So animation should reach 100% at (animationScrollDistance / totalScrollDistance) of scroll progress
-    const animationEndProgress = animationScrollDistance / totalScrollDistance;
-    
-    console.log('[Section6] Animation End Progress', {
-        animationEndProgress: (animationEndProgress * 100).toFixed(1) + '%',
-        explanation: `Animation reaches 100% at ${(animationEndProgress * 100).toFixed(1)}% of scroll, then holds until 100%`
-    });
-    
-    // Use Unified Pinning System to create the ScrollTrigger with consistent speed
-    // The total scroll distance includes both animation and hold periods
-    // The animationEndProgress tells the system when to stop progressing the animation
-    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
-        6, // sectionNumber
-        section6El, // triggerElement
-        tl, // animation
-        totalScrollDistance, // originalDistance (animation + hold)
-        {
-            animationEndProgress: animationEndProgress  // Animation completes here, then holds
-        }
-    );
 
     // Build timeline using same timing logic (cursor tracking)
     // NOTE: Timeline ends when tiles are visible - hold happens AFTER timeline completes
@@ -2103,22 +2047,44 @@ export function setupSection6TitleAnimation() {
     // Tiles show period (tiles stay visible)
     cursor += (t.tilesShow ?? 3.0);
 
-    // Timeline ends here - tiles are now fully visible
-    // The section will continue to be pinned for holdAfterAnimation additional scroll
-    // This creates the "hold" effect without stretching the animation
-
-    // Verify that our pre-calculated duration matches the actual timeline duration
-    const actualDuration = tl.totalDuration();
-    console.log('[Section6] Timeline vs Pin Duration', {
-        timelineUnits: animationDuration.toFixed(2),
-        actualTimelineDuration: actualDuration.toFixed(2),
-        match: Math.abs(animationDuration - actualDuration) < 0.01 ? '✅' : '❌',
-        animationScrollDistance: animationScrollDistance + 'px',
-        holdScrollDistance: holdScrollDistance + 'px (tiles stay visible during this)',
-        totalPinDuration: totalScrollDistance + 'px',
-        explanation: 'Timeline plays from 0-' + animationScrollDistance + 'px, then tiles hold from ' + 
-                     animationScrollDistance + '-' + totalScrollDistance + 'px'
+    // ADD DUMMY TWEEN FOR HOLD PERIOD
+    // This is the brilliant simple solution: animate a dummy property for the hold duration
+    // This adds real timeline duration that gets scrubbed, creating the hold effect naturally
+    // We convert the holdScrollDistance (pixels) to timeline units using the inverse of pxPerUnit
+    const holdDurationInTimelineUnits = holdScrollDistance / (SECTION6_SCROLL?.pxPerUnit || 300);
+    
+    // Create a dummy object to animate (has no visual effect, just adds timeline duration)
+    const dummyHoldObject = { value: 0 };
+    tl.to(dummyHoldObject, {
+        value: 1,
+        duration: holdDurationInTimelineUnits,
+        ease: 'none'  // Linear, no easing needed for invisible tween
+    }, cursor);
+    
+    // NOW calculate scroll distance based on ACTUAL timeline duration (which includes dummy tween)
+    const totalTimelineDuration = tl.totalDuration();
+    const totalScrollDistance = Math.round(totalTimelineDuration * (SECTION6_SCROLL?.pxPerUnit || 300));
+    
+    console.log('[Section6] SIMPLE HOLD SOLUTION', {
+        holdScrollDistance: holdScrollDistance + 'px',
+        holdDurationInTimelineUnits: holdDurationInTimelineUnits.toFixed(2) + ' units',
+        totalTimelineDuration: totalTimelineDuration.toFixed(2) + ' units',
+        totalScrollDistance: totalScrollDistance + 'px',
+        explanation: 'Dummy tween adds ' + holdDurationInTimelineUnits.toFixed(2) + ' timeline units = ' + 
+                     holdScrollDistance + 'px of scroll hold'
     });
+    
+    // Use Unified Pinning System to create the ScrollTrigger with consistent speed
+    // No need for animationEndProgress - the timeline naturally includes the hold period
+    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+        6, // sectionNumber
+        section6El, // triggerElement
+        tl, // animation (includes dummy hold tween)
+        totalScrollDistance, // originalDistance (calculated from full timeline)
+        {
+            // No special handling needed - timeline duration naturally includes hold
+        }
+    );
 }
 
 /**
