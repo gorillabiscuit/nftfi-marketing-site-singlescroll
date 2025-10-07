@@ -311,6 +311,27 @@ class ScrollSpeedManager {
     }
 
     /**
+     * Update section-specific speed (for real-time testing)
+     * @param {number} sectionNumber - Section number (1-7)
+     * @param {number} speedMultiplier - New speed multiplier
+     */
+    updateSectionSpeed(sectionNumber, speedMultiplier) {
+        const sectionKey = `section${sectionNumber}`;
+        if (SCROLL_CONFIG.sectionSpeeds[sectionKey] !== undefined) {
+            SCROLL_CONFIG.sectionSpeeds[sectionKey] = Math.max(0.1, Math.min(speedMultiplier, 3.0));
+            
+            // Refresh affected sections
+            this.refreshScrollTriggers();
+            
+            if (this.debugMode) {
+                console.log(`ScrollSpeedManager: Updated section ${sectionNumber} speed to ${speedMultiplier}`);
+            }
+        } else {
+            console.warn(`ScrollSpeedManager: Section ${sectionNumber} not found in config`);
+        }
+    }
+
+    /**
      * Get debug information
      * @returns {Object} Debug information
      */
@@ -322,7 +343,8 @@ class ScrollSpeedManager {
             registeredSections: Array.from(this.sectionElements.keys()),
             registeredTriggers: Array.from(this.scrollTriggers.keys()),
             performanceData: this.getPerformanceData(),
-            deviceMultiplier: this.getDeviceSpeedMultiplier()
+            deviceMultiplier: this.getDeviceSpeedMultiplier(),
+            sectionSpeeds: SCROLL_CONFIG.sectionSpeeds
         };
     }
 
