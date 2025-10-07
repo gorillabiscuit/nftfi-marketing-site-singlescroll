@@ -8,8 +8,9 @@ import { initializeNavigation } from './controls/navigation.js';
 import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.js';
 import { loadPebbleModel, pebbleGroup } from './objects/pebbleModel.js';
 import { loadRoundPebbleModel } from './objects/roundPebbleModel.js';
+import { loadMultiplePebbles, pebbleInstances, arePebblesReady } from './objects/multiplePebbles.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane, initializeVideoTextures } from './objects/backgroundPlane.js';
-import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned, setupSection5HorizontalScroll, setupSection6TitleAnimation, setupSection7Pin } from './controls/scrollTrigger.js';
+import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned, setupSection5HorizontalScroll, setupSection6TitleAnimation, setupSection7Pin, setupSection4MultiplePebbles } from './controls/scrollTrigger.js';
 import { initializeTestimonials } from './controls/testimonials.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
 import { initHeaderAnimation } from './controls/headerAnimation.js';
@@ -93,43 +94,22 @@ async function init() {
     updateLoadingProgress('Loading 3D models...', 20);
     loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
 
-    // Load Pebble model (as-is). Uses shared uniforms for same material/lighting
+    // Load Multiple Pebbles for Section 4 (4 instances, one per asset category)
     try {
         updateLoadingProgress('Loading 3D models...', 60);
-        loadPebbleModel(scene, uniforms);
-        // Deferred attach of round pebble once pebbleGroup is available
-        const attachRound = () => {
-            try {
-                if (window.PEBBLE && window.PEBBLE.pebbleGroup) {
-                    loadRoundPebbleModel(window.PEBBLE.pebbleGroup, scene);
-                    updateLoadingProgress('Loading 3D models...', 100);
-                } else if (pebbleGroup) {
-                    loadRoundPebbleModel(pebbleGroup, scene);
-                    updateLoadingProgress('Loading 3D models...', 100);
-                } else {
-                    setTimeout(attachRound, 100);
-                    return;
-                }
-            } catch (err) {
-                console.error('Failed to attach round pebble:', err);
-            }
-        };
-        attachRound();
-        // Hook pebble section 4 entrance once group is ready
-        const hookPebble = () => {
-            try {
-                const grp = (window.PEBBLE && window.PEBBLE.pebbleGroup) ? window.PEBBLE.pebbleGroup : pebbleGroup;
-                if (grp) {
-                    // Use only the pinned fade-in timeline for S4
-                    setupSection4PebbleFadePinned(grp);
-                } else {
-                    setTimeout(hookPebble, 100);
-                }
-            } catch (_) { setTimeout(hookPebble, 100); }
-        };
-        hookPebble();
+        loadMultiplePebbles(scene, uniforms).then((instances) => {
+            updateLoadingProgress('Loading 3D models...', 100);
+            completeLoadingStep('Loading 3D models...');
+            
+            // Setup Section 4 with multiple pebbles
+            console.log('[App] Multiple pebbles loaded, setting up Section 4 animation');
+            setupSection4MultiplePebbles(instances);
+        }).catch(e => {
+            console.error('Failed to load multiple pebbles:', e);
+            completeLoadingStep('Loading 3D models...'); // Complete anyway
+        });
     } catch (e) {
-        console.error('Failed to load Pebble model:', e);
+        console.error('Failed to initialize multiple pebbles:', e);
     }
     
     // Create window resize handler

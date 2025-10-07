@@ -2134,4 +2134,192 @@ export function setupSection7Pin() {
     console.log('[Section7] Pin setup complete');
 }
 
+/**
+ * Setup Section 4 with multiple pebbles (4 instances, one per asset category)
+ * Each pebble shows simultaneously, arranged vertically
+ */
+export function setupSection4MultiplePebbles(pebbleInstances) {
+    if (!pebbleInstances || pebbleInstances.length !== 4) {
+        console.error('[Section4] Expected 4 pebble instances');
+        return;
+    }
+
+    const section4El = document.querySelector(".section[data-section='4']");
+    if (!section4El) {
+        console.warn('[Section4] Section 4 element not found');
+        return;
+    }
+
+    console.log('[Section4] Setting up multiple pebbles animation');
+
+    // Pre-capture Section 4 content before pin
+    setupSectionPreCapture(".section[data-section='4']", '500px');
+
+    // Arrange pebbles vertically (top to bottom)
+    // Using SECTION4_PEBBLE config as base, then offset vertically
+    const bp = getCurrentBreakpoint();
+    const baseConfig = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE[BREAKPOINT_NAMES.DESKTOP];
+    
+    // Vertical spacing between pebbles
+    const verticalSpacing = 3.0; // 3 units between each pebble
+    const startY = baseConfig.position.y + 6; // Start higher than single pebble position
+    
+    pebbleInstances.forEach((instance, index) => {
+        const group = instance.group;
+        const yOffset = index * verticalSpacing;
+        
+        // Set initial position (all hidden offscreen below)
+        gsap.set(group.position, { 
+            x: baseConfig.position.x || -3.5,
+            y: -20,
+            z: baseConfig.position.z || 0
+        });
+        
+        // Set scale (already at 1.0, plus config multiplier)
+        const finalScale = 1.0 * (baseConfig.scale || 0.875);
+        gsap.set(group.scale, { x: finalScale, y: finalScale, z: finalScale });
+        
+        // Start hidden
+        gsap.set(group, { visible: false });
+        
+        // Prepare materials for fading
+        const materials = [];
+        group.traverse((obj) => {
+            if (obj && obj.isMesh && obj.material) {
+                const mat = obj.material;
+                if (Array.isArray(mat)) {
+                    mat.forEach((m) => { if (m && !m.isShaderMaterial) materials.push(m); });
+                } else {
+                    if (!mat.isShaderMaterial) materials.push(mat);
+                }
+            }
+        });
+        materials.forEach((m) => { try { m.transparent = true; m.opacity = 0; } catch (_) { void 0; } });
+    });
+
+    // Build timeline for all 4 pebbles
+    const tl = gsap.timeline();
+    
+    // Title animation (same as before)
+    const titleEl = document.getElementById('section4-title');
+    if (titleEl) {
+        const t = SECTION4_TIMINGS;
+        let cursor = 0;
+        cursor += (t.periodA ?? 0.5);
+        tl.from(titleEl, { blur: 15, alpha: 0.0, scale: 0.95, ease: 'power2.inOut', duration: (t.h2FadeIn ?? 0.5) }, cursor);
+        cursor += (t.h2FadeIn ?? 0.5);
+        tl.to(titleEl, { opacity: 1, duration: 0.001 }, cursor);
+        cursor += (t.h2Show ?? 1);
+        tl.to(titleEl, { opacity: 0, ease: 'power2.in', duration: (t.h2FadeOut ?? 0.5) }, cursor);
+        cursor += (t.h2FadeOut ?? 0.5);
+        cursor += (t.periodB ?? 0.25);
+        
+        titleEl._s4CursorAfterTitle = cursor;
+    }
+
+    // Animate each pebble in sequence
+    let cursor = (titleEl && titleEl._s4CursorAfterTitle) ? titleEl._s4CursorAfterTitle : 0;
+    cursor += (SECTION4_TIMINGS.periodC ?? 4);
+
+    pebbleInstances.forEach((instance, index) => {
+        const group = instance.group;
+        const finalY = startY - (index * verticalSpacing);
+        
+        // Get corresponding text panel
+        const panelEl = document.getElementById(`section4-panel-${index}`);
+        if (panelEl) {
+            // Set initial state for panel
+            gsap.set(panelEl, { opacity: 0, y: 20, filter: 'blur(6px)' });
+        }
+        
+        // Make visible
+        tl.set(group, { visible: true }, cursor);
+        
+        // Fade in materials
+        const materials = [];
+        group.traverse((obj) => {
+            if (obj && obj.isMesh && obj.material) {
+                const mat = obj.material;
+                if (Array.isArray(mat)) {
+                    mat.forEach((m) => { if (m && !m.isShaderMaterial) materials.push(m); });
+                } else {
+                    if (!mat.isShaderMaterial) materials.push(mat);
+                }
+            }
+        });
+        
+        const proxy = { v: 0 };
+        tl.to(proxy, {
+            v: 1,
+            ease: 'power2.out',
+            duration: (SECTION4_TIMINGS.pebbleIn ?? 2),
+            onUpdate: () => {
+                const val = proxy.v;
+                for (let i = 0; i < materials.length; i += 1) {
+                    try { materials[i].opacity = val; } catch (_) { void 0; }
+                }
+            }
+        }, cursor);
+        
+        // Animate position
+        tl.to(group.position, { 
+            y: finalY, 
+            ease: 'power2.out', 
+            duration: (SECTION4_TIMINGS.pebbleIn ?? 2) 
+        }, cursor);
+        
+        // Animate text panel (fade in with pebble)
+        if (panelEl) {
+            tl.to(panelEl, {
+                opacity: 1,
+                y: 0,
+                filter: 'blur(0px)',
+                ease: 'power2.out',
+                duration: (SECTION4_TIMINGS.itemTitleIn ?? 1.0)
+            }, cursor + 0.5); // Start slightly after pebble
+        }
+        
+        cursor += (SECTION4_TIMINGS.pebbleIn ?? 2) + (SECTION4_TIMINGS.periodBetweenItems ?? 0.6);
+    });
+
+    // Add hold time at end using dummy tween
+    const holdDuration = 3.0; // 3 seconds hold at the end
+    const dummyHold = { v: 0 };
+    tl.to(dummyHold, { v: 1, duration: holdDuration, ease: 'none' }, cursor);
+
+    // Calculate original scroll distance
+    const originalDistance = 5000;
+    
+    // Use Unified Pinning System
+    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+        4,
+        section4El,
+        tl,
+        originalDistance,
+        {
+            onEnter: () => {
+                pebbleInstances.forEach(instance => {
+                    gsap.set(instance.group, { visible: true });
+                });
+            },
+            onLeaveBack: () => {
+                pebbleInstances.forEach(instance => {
+                    gsap.set(instance.group, { visible: false });
+                });
+                switchToHeroTexture();
+            },
+            onLeave: () => {
+                // Keep pebbles visible when leaving forward
+            }
+        }
+    );
+
+    // Defensive refresh
+    try {
+        setTimeout(() => { try { ScrollTrigger.refresh(); } catch (_) { void 0; } }, 100);
+    } catch (_) { void 0; }
+    
+    console.log('[Section4] Multiple pebbles animation setup complete');
+}
+
  
