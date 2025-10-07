@@ -49,7 +49,7 @@ export const SECTION4_PEBBLE = {
 // Change the axis (x, y, z) to test which one gives the desired effect
 export const SECTION4_PEBBLE_ROTATION = {
     enabled: true,
-    axis: 'z', // Change this to 'x', 'y', or 'z' to test different axes
+    axis: 'x', // Change this to 'x', 'y', or 'z' to test different axes
     degrees: 45, // 45 degree rotation
     // You can also test different angles: 30, 60, 90, etc.
 };
@@ -75,7 +75,7 @@ export function setPebbleRotation(axis, degrees) {
 
 // Continuous Y spin (degrees per second) independent of scroll
 export const SECTION4_PEBBLE_SPIN = {
-    enabled: true,
+    enabled: true, // Re-enabled Y-axis spin only
     degPerSecond: 24,
     // Extra spin impulse when middle items appear
     boostDegPerSecond: 1000,
@@ -84,7 +84,7 @@ export const SECTION4_PEBBLE_SPIN = {
 
 // Continuous X-axis wobble (sinusoidal) to accompany base Y spin
 export const SECTION4_PEBBLE_WOBBLE = {
-    enabled: true,
+    enabled: false, // Disabled to prevent overriding static X rotation
     xAmplitudeDeg: 12,   // small tilt amplitude in degrees
     xFrequencyHz: 0.2   // cycles per second
 };
