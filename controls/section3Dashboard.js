@@ -516,9 +516,41 @@ export function initSection3Scroll() {
             onRefresh: () => {
                 try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
             },
-            // When leaving Section 3 forward into Section 2, fully reset play-once state
-            onLeave: () => { void 0; },
-            onEnterBack: () => { void 0; }
+            // When leaving Section 3 forward (to Section 4), hide SVG for performance
+            onLeave: () => {
+                console.log('[Section3] Leaving forward - hiding SVG for performance');
+                const svgContainer = document.getElementById('dashboard-svg-container');
+                if (svgContainer) {
+                    gsap.to(svgContainer, {
+                        opacity: 0,
+                        duration: 0.3,
+                        ease: 'power2.out',
+                        onComplete: () => {
+                            // Move offscreen and disable rendering
+                            gsap.set(svgContainer, { 
+                                visibility: 'hidden',
+                                display: 'none'
+                            });
+                        }
+                    });
+                }
+            },
+            // When entering Section 3 from Section 4 (scrolling back), restore SVG
+            onEnterBack: () => {
+                console.log('[Section3] Entering back - restoring SVG');
+                const svgContainer = document.getElementById('dashboard-svg-container');
+                if (svgContainer) {
+                    gsap.set(svgContainer, { 
+                        visibility: 'visible',
+                        display: 'block'
+                    });
+                    gsap.to(svgContainer, {
+                        opacity: 1,
+                        duration: 0.3,
+                        ease: 'power2.in'
+                    });
+                }
+            }
         }
     );
 

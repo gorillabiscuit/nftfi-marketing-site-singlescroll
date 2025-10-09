@@ -18,17 +18,56 @@ import { pebbleMesh4, pebbleGroup4, isPebble4Ready } from '../objects/pebbleMode
 let mesh, wrapper, isModelReady;
 let startTime;
 
+// Performance monitoring
+let lastFrameTime = Date.now();
+let frameCount = 0;
+let fpsHistory = [];
+const FPS_LOG_INTERVAL = 2000; // Log FPS every 2 seconds
+let lastFpsLog = Date.now();
+
 // Initialize animation loop
 export function initializeAnimationLoop(meshInstance, wrapperInstance, isModelReadyFlag) {
     mesh = meshInstance;
     wrapper = wrapperInstance;
     isModelReady = isModelReadyFlag;
     startTime = Date.now();
+    lastFrameTime = Date.now();
+    lastFpsLog = Date.now();
 }
 
 // Main animation loop
 export function animate() {
     requestAnimationFrame(animate);
+
+    // Performance monitoring
+    const now = Date.now();
+    const deltaTime = now - lastFrameTime;
+    lastFrameTime = now;
+    frameCount++;
+    
+    // Calculate FPS
+    const fps = 1000 / deltaTime;
+    fpsHistory.push(fps);
+    if (fpsHistory.length > 60) fpsHistory.shift(); // Keep last 60 frames
+    
+    // Log FPS periodically with mesh count
+    if (now - lastFpsLog > FPS_LOG_INTERVAL) {
+        const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+        const minFps = Math.min(...fpsHistory);
+        const maxFps = Math.max(...fpsHistory);
+        
+        // Count active refractive meshes
+        let activeMeshCount = 0;
+        if (mesh && mesh.visible) activeMeshCount++;
+        if (pebbleMesh && pebbleGroup && pebbleGroup.visible) activeMeshCount++;
+        if (pebbleMesh2 && pebbleGroup2 && pebbleGroup2.visible) activeMeshCount++;
+        if (pebbleMesh3 && pebbleGroup3 && pebbleGroup3.visible) activeMeshCount++;
+        if (pebbleMesh4 && pebbleGroup4 && pebbleGroup4.visible) activeMeshCount++;
+        
+        console.log(`[Performance] FPS: ${avgFps.toFixed(1)} avg | ${minFps.toFixed(1)} min | ${maxFps.toFixed(1)} max | Active refraction meshes: ${activeMeshCount}`);
+        lastFpsLog = now;
+        fpsHistory = []; // Reset for next interval
+    }
 
     // NEW: Start performance monitoring for this frame
     startPerformanceFrame();
@@ -111,12 +150,13 @@ export function animate() {
     // Glass refraction rendering with temporal plane and sphere visibility control
     {
         // Multi-mesh refraction capture: process each refractive mesh
+        // Performance optimization: only include visible meshes
         const refractiveMeshes = [];
-        if (mesh) refractiveMeshes.push(mesh);
-        if (pebbleMesh) refractiveMeshes.push(pebbleMesh);
-        if (pebbleMesh2) refractiveMeshes.push(pebbleMesh2);
-        if (pebbleMesh3) refractiveMeshes.push(pebbleMesh3);
-        if (pebbleMesh4) refractiveMeshes.push(pebbleMesh4);
+        if (mesh && mesh.visible) refractiveMeshes.push(mesh);
+        if (pebbleMesh && pebbleGroup && pebbleGroup.visible) refractiveMeshes.push(pebbleMesh);
+        if (pebbleMesh2 && pebbleGroup2 && pebbleGroup2.visible) refractiveMeshes.push(pebbleMesh2);
+        if (pebbleMesh3 && pebbleGroup3 && pebbleGroup3.visible) refractiveMeshes.push(pebbleMesh3);
+        if (pebbleMesh4 && pebbleGroup4 && pebbleGroup4.visible) refractiveMeshes.push(pebbleMesh4);
         
         if (refractiveMeshes.length > 0) {
             // Temporarily make background plane and sphere visible for render target sampling

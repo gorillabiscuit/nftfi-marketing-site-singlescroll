@@ -24,90 +24,135 @@ export const SECTION4_LAYOUT = {
     }
 };
 
+// Vertical spacing between pebbles (adjustable) - ADJUST THIS ONE NUMBER TO CONTROL ALL SPACING
+export const SECTION4_PEBBLE_VERTICAL_SPACING = 6.0; // World units between pebbles vertically
+
+// Helper function to calculate pebble Y position based on index and spacing
+const getPebbleY = (index) => {
+    return -(index * SECTION4_PEBBLE_VERTICAL_SPACING);
+};
+
 // First pebble positioning for Section 4 (Three.js world-space offsets and scale)
-// Units are world units relative to current baseline position/scale
-// NOTE: Scales reduced by 50% from original values
-// NOTE: Y positions increased by ~2 units (moved up ~20%)
+// Y position auto-calculated: index 0 * spacing = 0
 export const SECTION4_PEBBLE = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: -1.5, y: 3.5, z: 0 },  // Left side
-        scale: 0.7  // 50% of 1.4
+        position: { x: -1.5, y: getPebbleY(0), z: 0 },  // Left side, top
+        scale: 0.7
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: -1.5, y: 3.5, z: 0 },  // Left side
-        scale: 0.8  // 50% of 1.6
+        position: { x: -1.5, y: getPebbleY(0), z: 0 },  // Left side, top
+        scale: 0.8
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: -2.5, y: 2.0, z: 0 },  // Left side
-        scale: 0.875  // 50% of 1.75
+        position: { x: -2.5, y: getPebbleY(0), z: 0 },  // Left side, top
+        scale: 0.875
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: -2.5, y: 2.0, z: 0 },  // Left side
-        scale: 0.875  // 50% of 1.75
+        position: { x: -3, y: getPebbleY(0), z: 0 },  // Left side, top
+        scale: 0.875
     }
 };
 
-// Second pebble positioning for Section 4 (Three.js world-space offsets and scale)
-// Positioned 45 degrees down and to the right from the first pebble
+// Second pebble positioning - auto-calculated: index 1 * spacing
 export const SECTION4_PEBBLE2 = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: 1.5, y: 1.5, z: 0 },  // Right side, down
-        scale: 0.7  // 50% of 1.4
+        position: { x: 1.5, y: getPebbleY(1), z: 0 },  // Right side
+        scale: 0.7
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: 1.5, y: 1.5, z: 0 },  // Right side, down
-        scale: 0.8  // 50% of 1.6
+        position: { x: 1.5, y: getPebbleY(1), z: 0 },  // Right side
+        scale: 0.8
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: 2.5, y: 0.0, z: 0 },  // Right side, down
-        scale: 0.875  // 50% of 1.75
+        position: { x: 2.5, y: getPebbleY(1), z: 0 },  // Right side
+        scale: 0.875
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: 2.5, y: 0.0, z: 0 },  // Right side, down
-        scale: 0.875  // 50% of 1.75
+        position: { x: 3, y: getPebbleY(1), z: 0 },  // Right side
+        scale: 0.875
     }
 };
 
-// Third pebble positioning for Section 4 (Three.js world-space offsets and scale)
-// Positioned on the left, further down
+// Third pebble positioning - auto-calculated: index 2 * spacing
 export const SECTION4_PEBBLE3 = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: -1.5, y: -0.5, z: 0 },  // Left side, down more
-        scale: 0.7  // 50% of 1.4
+        position: { x: -1.5, y: getPebbleY(2), z: 0 },  // Left side
+        scale: 0.7
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: -1.5, y: -0.5, z: 0 },  // Left side, down more
-        scale: 0.8  // 50% of 1.6
+        position: { x: -1.5, y: getPebbleY(2), z: 0 },  // Left side
+        scale: 0.8
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: -2.5, y: -2.0, z: 0 },  // Left side, down more
-        scale: 0.875  // 50% of 1.75
+        position: { x: -2.5, y: getPebbleY(2), z: 0 },  // Left side
+        scale: 0.875
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: -2.5, y: -2.0, z: 0 },  // Left side, down more
-        scale: 0.875  // 50% of 1.75
+        position: { x: -3, y: getPebbleY(2), z: 0 },  // Left side
+        scale: 0.875
     }
 };
 
-// Fourth pebble positioning for Section 4 (Three.js world-space offsets and scale)
-// Positioned on the right, further down
+// Fourth pebble positioning - auto-calculated: index 3 * spacing
 export const SECTION4_PEBBLE4 = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: 1.5, y: -2.0, z: 0 },  // Right side, down more
-        scale: 0.7  // 50% of 1.4
+        position: { x: 1.5, y: getPebbleY(3), z: 0 },  // Right side
+        scale: 0.7
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: 1.5, y: -2.0, z: 0 },  // Right side, down more
-        scale: 0.8  // 50% of 1.6
+        position: { x: 1.5, y: getPebbleY(3), z: 0 },  // Right side
+        scale: 0.8
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: 2.5, y: -4.0, z: 0 },  // Right side, down more
-        scale: 0.875  // 50% of 1.75
+        position: { x: 2.5, y: getPebbleY(3), z: 0 },  // Right side
+        scale: 0.875
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: 2.5, y: -4.0, z: 0 },  // Right side, down more
-        scale: 0.875  // 50% of 1.75
+        position: { x: 3, y: getPebbleY(3), z: 0 },  // Right side
+        scale: 0.875
     }
+};
+
+// Scroll parallax controls for pebbles
+export const SECTION4_PEBBLE_SCROLL_PARAMS = {
+    // Starting Y position (offscreen below viewport)
+    // Lower (more negative) = start further down, appear later
+    // Higher (less negative) = start closer, appear earlier
+    startY: -15,  // Start well below viewport
+    
+    // Total upward travel distance as you scroll through Section 4
+    // Larger value = more movement range, pebbles travel further
+    // Smaller value = less movement, pebbles appear more static
+    totalTravel: 35,  // Increased to bring pebbles all the way up
+    
+    // Scroll speed multiplier
+    // 1.0 = pebbles move with scroll (appear locked to screen)
+    // > 1.0 = pebbles move faster than scroll
+    // < 1.0 = pebbles move slower than scroll (subtle parallax)
+    scrollSpeed: 1.0,
+    
+    // 3D world to 2D screen pixel scale for text panels
+    // This controls the overall scroll speed of text relative to pebbles
+    // Adjust this to make text move at same speed as pebbles
+    // Negative value needed because screen Y is inverted from 3D world Y
+    worldToPixelScale: 0,
+    
+    // Text panel vertical spacing (in pixels)
+    // This controls the distance between each text panel independently of pebble spacing
+    // Adjust this to line up text with their corresponding pebbles
+    textSpacingPixels: 450,  // Distance between each text panel
+    
+    // Text starting offset (in pixels)
+    // This controls where text starts vertically (added to base position)
+    // Positive = text starts higher up (appears earlier)
+    // Negative = text starts lower down (appears later)
+    textStartOffset: 0,  // Starting offset for all text panels
+    
+    // Text scroll speed (viewport height multiplier)
+    // This controls how far text travels as you scroll through Section 4
+    // Higher value = text scrolls faster/further
+    // Lower value = text scrolls slower/less
+    textTravelMultiplier: 1  // Text travels 1.5 viewports upward
 };
 
 // Continuous Y spin (degrees per second) independent of scroll

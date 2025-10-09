@@ -5,7 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import unifiedPinningSystem from './unifiedPinningSystem.js';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_PEBBLE2, SECTION4_PEBBLE3, SECTION4_PEBBLE4, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_LAYOUT, SECTION4_PEBBLE, SECTION4_PEBBLE2, SECTION4_PEBBLE3, SECTION4_PEBBLE4, SECTION4_PEBBLE_SCROLL_PARAMS, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
 import { BREAKPOINT_NAMES } from '../config/breakpoints.js';
 import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
@@ -208,25 +208,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
     // Pre-capture Section 4 content before pin; mark success to skip onEnter capture
     setupSectionPreCapture(".section[data-section='4']", '500px');
 
-    // Tie title blur/opacity/scale into this pinned, scrubbed timeline
-    const title = document.querySelector('.section4-title');
-    if (title) {
-        const t = SECTION4_TIMINGS;
-        let cursor = 0;
-        // period
-        cursor += (t.periodA ?? 0.05);
-        // h2 fade in
-        tl.from(title, { blur: 15, alpha: 0.0, scale: 0.95, ease: 'power2.inOut', duration: (t.h2FadeIn ?? 0.15) }, cursor);
-        cursor += (t.h2FadeIn ?? 0.15);
-        // h2 show period
-        tl.to(title, { opacity: 1, duration: 0.001 }, cursor);
-        cursor += (t.h2Show ?? 0.15);
-        // h2 fade out
-        tl.to(title, { opacity: 0, ease: 'power2.in', duration: (t.h2FadeOut ?? 0.10) }, cursor);
-        cursor += (t.h2FadeOut ?? 0.10);
-        // store the cursor for later phases
-        title._s4CursorAfterTitle = cursor;
-    }
+    // Title animation removed - now handled by new ScrollTrigger in setupSection4PebbleFadePinned
     // Fade in materials via a proxy for reliable onUpdate
     const proxy = { v: 0 };
     tl.to(proxy, {
@@ -435,21 +417,197 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
         // Note: continuous spin handled per-frame (not scrubbed) in core/loop.js
     } catch (_) { void 0; }
 
-    // Calculate original scroll distance
-    // Section 4's timeline is content-based (pebble fade + list items)
-    // Use a fixed large base distance that the speed manager will normalize
-    // This ensures the speed control has proper range and effect
-    const originalDistance = 5000; // Large base for proper speed control (speed manager will adjust)
+    // Section 4 is no longer pinned - use scroll-driven parallax positioning
+    // Get breakpoint-specific configs
+    const bp = getCurrentBreakpoint();
+    const pcfg1 = (SECTION4_PEBBLE && SECTION4_PEBBLE[bp]) ? SECTION4_PEBBLE[bp] : SECTION4_PEBBLE[BREAKPOINT_NAMES.DESKTOP];
+    const pcfg2 = (SECTION4_PEBBLE2 && SECTION4_PEBBLE2[bp]) ? SECTION4_PEBBLE2[bp] : SECTION4_PEBBLE2[BREAKPOINT_NAMES.DESKTOP];
+    const pcfg3 = (SECTION4_PEBBLE3 && SECTION4_PEBBLE3[bp]) ? SECTION4_PEBBLE3[bp] : SECTION4_PEBBLE3[BREAKPOINT_NAMES.DESKTOP];
+    const pcfg4 = (SECTION4_PEBBLE4 && SECTION4_PEBBLE4[bp]) ? SECTION4_PEBBLE4[bp] : SECTION4_PEBBLE4[BREAKPOINT_NAMES.DESKTOP];
     
-    // Use Unified Pinning System to create the ScrollTrigger with consistent speed
-    const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
-        4, // sectionNumber
-        ".section[data-section='4']", // triggerElement
-        tl, // animation
-        originalDistance, // originalDistance
-        {
+    // Get scroll params from config
+    const params = SECTION4_PEBBLE_SCROLL_PARAMS || { startY: -20, totalTravel: 35, scrollSpeed: 1.0 };
+    
+    // Set initial positions - start offscreen (below viewport)
+    // These will be immediately overridden by the ScrollTrigger onUpdate
+    gsap.set(pebbleGroup1, { visible: false });
+    gsap.set(pebbleGroup1.position, { 
+        x: pcfg1.position?.x ?? -2.5,
+        y: params.startY, // Start offscreen (from config)
+        z: pcfg1.position?.z ?? 0
+    });
+    
+    if (pebbleGroup2) {
+        gsap.set(pebbleGroup2, { visible: false });
+        gsap.set(pebbleGroup2.position, { 
+            x: pcfg2.position?.x ?? 2.5,
+            y: params.startY, // Start offscreen (from config)
+            z: pcfg2.position?.z ?? 0
+        });
+    }
+    
+    if (pebbleGroup3) {
+        gsap.set(pebbleGroup3, { visible: false });
+        gsap.set(pebbleGroup3.position, { 
+            x: pcfg3.position?.x ?? -2.5,
+            y: params.startY, // Start offscreen (from config)
+            z: pcfg3.position?.z ?? 0
+        });
+    }
+    
+    if (pebbleGroup4) {
+        gsap.set(pebbleGroup4, { visible: false });
+        gsap.set(pebbleGroup4.position, { 
+            x: pcfg4.position?.x ?? 2.5,
+            y: params.startY, // Start offscreen (from config)
+            z: pcfg4.position?.z ?? 0
+        });
+    }
+    
+    // Use params from above (already defined)
+    const startY = params.startY;
+    const totalTravel = params.totalTravel;
+    const scrollSpeed = params.scrollSpeed;
+    
+    // Get text panels
+    const panel0 = document.getElementById('section4-panel-0');
+    const panel1 = document.getElementById('section4-panel-1');
+    const panel2 = document.getElementById('section4-panel-2');
+    const panel3 = document.getElementById('section4-panel-3');
+    const panels = [panel0, panel1, panel2, panel3];
+    
+    // Calculate pixel positions for text panels and title
+    // Uses independent text spacing control from config
+    const getPanelYPixels = (panelIndex, progress) => {
+        // Start at bottom of screen + offset
+        const startYPixels = window.innerHeight + params.textStartOffset;
+        // Total travel distance in pixels (move up through viewport) - from config
+        const totalTravelPixels = window.innerHeight * params.textTravelMultiplier;
+        // Calculate current position based on scroll progress
+        const baseY = startYPixels - (progress * totalTravelPixels);
+        
+        // Handle title (index -1) - appears first at the top
+        if (panelIndex === -1) {
+            // Title appears at the very top, with extra spacing above the first panel
+            return baseY + (params.textSpacingPixels * 0.5); // Half spacing above first panel
+        }
+        
+        // Add panel-specific offset based on index and text spacing
+        // INVERTED: panel 0 (Digital Art) should be at TOP, so add offset
+        const panelOffset = panelIndex * params.textSpacingPixels;
+        return baseY + panelOffset; // Changed from - to + to invert the order
+    };
+    
+    const scrollTrigger = ScrollTrigger.create({
+        trigger: ".section[data-section='4']",
+        start: "top bottom", // Animation starts when section top enters viewport bottom
+        end: "bottom top",   // Animation ends when section bottom exits viewport top
+        scrub: true,
+        onUpdate: (self) => {
+            const progress = self.progress;
+            
+            // Calculate scroll-driven Y offset
+            // As we scroll down (progress 0 → 1), move pebbles upward (Y increases from -20 to 0+)
+            const scrollOffset = startY + (progress * totalTravel * scrollSpeed);
+            
+            // Apply scroll offset to each pebble while maintaining their relative spacing
+            if (pebbleGroup1) {
+                pebbleGroup1.position.y = scrollOffset + (pcfg1.position?.y ?? 0);
+            }
+            if (pebbleGroup2) {
+                pebbleGroup2.position.y = scrollOffset + (pcfg2.position?.y ?? -4.0);
+            }
+            if (pebbleGroup3) {
+                pebbleGroup3.position.y = scrollOffset + (pcfg3.position?.y ?? -8.0);
+            }
+            if (pebbleGroup4) {
+                pebbleGroup4.position.y = scrollOffset + (pcfg4.position?.y ?? -12.0);
+            }
+            
+            // Synchronize title and text panels with scroll progress (independent from pebbles)
+            // Title - appears first at the top center
+            if (title) {
+                const titleY = getPanelYPixels(-1, progress); // Use index -1 for title (appears first)
+                const titleX = window.innerWidth * 0.5; // Center horizontally
+                
+                gsap.set(title, {
+                    x: titleX,
+                    y: titleY,
+                    xPercent: -50, // Center horizontally
+                    yPercent: -50, // Center vertically
+                    opacity: progress > 0.02 && progress < 0.25 ? 1 : 0, // Show early, fade before panels
+                    scale: progress > 0.02 && progress < 0.25 ? 1 : 0.9,
+                    filter: progress > 0.02 && progress < 0.25 ? 'blur(0px)' : 'blur(5px)',
+                    position: 'absolute', // Use absolute positioning like other panels
+                    top: 'auto',
+                    left: 'auto'
+                });
+            }
+            
+            // Panel 0 (Digital Art) - index 0, pairs with pebble 1 (left), text on right
+            if (panel0) {
+                const yPos = getPanelYPixels(0, progress);
+                const xPos = window.innerWidth * 0.75; // 75% from left
+                gsap.set(panel0, { 
+                    x: xPos,
+                    y: yPos,
+                    xPercent: -50, // Center the panel on its x position
+                    yPercent: -50, // Center the panel on its y position
+                    opacity: progress > 0.05 && progress < 0.95 ? 1 : 0
+                });
+                
+                // Debug log occasionally
+                if (Math.random() < 0.01) {
+                    console.log('[S4] Positions:', {
+                        progress: progress.toFixed(2),
+                        title: { x: titleX, y: getPanelYPixels(-1, progress).toFixed(0) },
+                        panel0: { x: xPos, y: yPos.toFixed(0), text: 'Digital Art (RIGHT)' },
+                        pebble1: { x: pebbleGroup1.position.x.toFixed(1), y: pebbleGroup1.position.y.toFixed(1), side: 'LEFT' }
+                    });
+                }
+            }
+            
+            // Panel 1 (PFPs) - index 1, pairs with pebble 2 (right), text on left
+            if (panel1) {
+                const yPos = getPanelYPixels(1, progress);
+                const xPos = window.innerWidth * 0.25; // 25% from left
+                gsap.set(panel1, { 
+                    x: xPos,
+                    y: yPos,
+                    xPercent: -50,
+                    yPercent: -50,
+                    opacity: progress > 0.05 && progress < 0.95 ? 1 : 0
+                });
+            }
+            
+            // Panel 2 (RWAs) - index 2, pairs with pebble 3 (left), text on right
+            if (panel2) {
+                const yPos = getPanelYPixels(2, progress);
+                const xPos = window.innerWidth * 0.75; // 75% from left
+                gsap.set(panel2, { 
+                    x: xPos,
+                    y: yPos,
+                    xPercent: -50,
+                    yPercent: -50,
+                    opacity: progress > 0.05 && progress < 0.95 ? 1 : 0
+                });
+            }
+            
+            // Panel 3 (DeFi tokens) - index 3, pairs with pebble 4 (right), text on left
+            if (panel3) {
+                const yPos = getPanelYPixels(3, progress);
+                const xPos = window.innerWidth * 0.25; // 25% from left
+                gsap.set(panel3, { 
+                    x: xPos,
+                    y: yPos,
+                    xPercent: -50,
+                    yPercent: -50,
+                    opacity: progress > 0.05 && progress < 0.95 ? 1 : 0
+                });
+            }
+            
+        },
         onEnter: () => {
-            // Avoid heavy capture onEnter; rely on pre-capture
             try { if (!window.__s4PreCaptured) { /* fallback disabled */ } } catch (_) { void 0; }
             gsap.set(pebbleGroup1, { visible: true });
             if (pebbleGroup2) gsap.set(pebbleGroup2, { visible: true });
@@ -457,7 +615,6 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
             if (pebbleGroup4) gsap.set(pebbleGroup4, { visible: true });
         },
         onEnterBack: () => {
-            try { /* no capture on enterBack */ } catch (_) { void 0; }
             gsap.set(pebbleGroup1, { visible: true });
             if (pebbleGroup2) gsap.set(pebbleGroup2, { visible: true });
             if (pebbleGroup3) gsap.set(pebbleGroup3, { visible: true });
@@ -468,26 +625,17 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
             if (pebbleGroup2) gsap.set(pebbleGroup2, { visible: false });
             if (pebbleGroup3) gsap.set(pebbleGroup3, { visible: false });
             if (pebbleGroup4) gsap.set(pebbleGroup4, { visible: false });
-            // Switch back to Art.mp4 only when leaving backward (going back to Section 3)
             switchToHeroTexture();
         },
         onLeave: () => {
-            // When leaving forward (going to Section 5), keep the last video playing
-            // Don't call switchToHeroTexture() - maintain current video
+            // Keep last video playing
         }
-        }
-    );
+    });
 
-    // Defensive: refresh ScrollTrigger after layout settles to ensure pin engages
+    // Defensive: refresh ScrollTrigger after layout settles
     try {
         setTimeout(() => { try { ScrollTrigger.refresh(); } catch (_) { void 0; } }, 100);
     } catch (_) { void 0; }
-    
-    // Add separate ScrollTrigger for pebble exit animation when transitioning to Section 5
-    setupPebbleExitAnimation(pebbleGroup1);
-    if (pebbleGroup2) setupPebbleExitAnimation(pebbleGroup2);
-    if (pebbleGroup3) setupPebbleExitAnimation(pebbleGroup3);
-    if (pebbleGroup4) setupPebbleExitAnimation(pebbleGroup4);
 }
 
 /**
