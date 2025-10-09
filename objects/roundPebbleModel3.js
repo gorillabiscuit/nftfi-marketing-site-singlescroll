@@ -2,17 +2,17 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../libs/GLTFLoader.js';
 // Import model via Vite asset handling
 import roundPebbleUrl from '../models/plane_45.glb?url';
-// Import default video (Art.mp4 for Digital Art category)
-import videoUrl from '../images/Art.mp4?url';
+// Import RWA video for third pebble
+import videoUrl from '../images/RWA.mp4?url';
 
-export let roundPebbleMesh = null;
-export let roundPebbleGroup = null;
+export let roundPebbleMesh3 = null;
+export let roundPebbleGroup3 = null;
 
 /**
- * Load the round pebble GLB, give it a blue material, and attach to the given parent group.
- * If parentGroup is provided (expected: pebbleGroup), the round pebble inherits its transforms.
+ * Load the third round pebble GLB with RWA video, and attach to the given parent group.
+ * If parentGroup is provided (expected: pebbleGroup3), the round pebble inherits its transforms.
  */
-export function loadRoundPebbleModel(parentGroup, scene) {
+export function loadRoundPebbleModel3(parentGroup, scene) {
     const loader = new GLTFLoader();
 
     loader.load(roundPebbleUrl, (gltf) => {
@@ -52,7 +52,7 @@ export function loadRoundPebbleModel(parentGroup, scene) {
 
         gltf.scene.traverse((child) => {
             if (child.isMesh) {
-                roundPebbleMesh = child;
+                roundPebbleMesh3 = child;
                 if (child.geometry) {
                     child.geometry.computeVertexNormals();
                 }
@@ -63,10 +63,10 @@ export function loadRoundPebbleModel(parentGroup, scene) {
         });
 
         // Group wrapper for alignment and future control
-        roundPebbleGroup = new THREE.Group();
+        roundPebbleGroup3 = new THREE.Group();
         
         // Debug: Log the bounding box info
-        console.log('[RoundPebble] Bounding box info:', {
+        console.log('[RoundPebble3] Bounding box info:', {
             center: center,
             size: box.getSize(new THREE.Vector3())
         });
@@ -79,33 +79,33 @@ export function loadRoundPebbleModel(parentGroup, scene) {
         // Rotate the plane to face the camera properly
         gltf.scene.rotation.x = -Math.PI / 2; // Rotate to face camera
         // gltf.scene.rotation.y = Math.PI / 2;  // 90 degrees on Y axis to make it parallel to pebble
-        roundPebbleGroup.add(gltf.scene);
-        roundPebbleGroup.position.set(0, 0, 0);
+        roundPebbleGroup3.add(gltf.scene);
+        roundPebbleGroup3.position.set(0, 0, 0);
         // Remove group rotation since we're rotating the plane directly
-        roundPebbleGroup.scale.setScalar(1);
-        roundPebbleGroup.visible = true;
+        roundPebbleGroup3.scale.setScalar(1);
+        roundPebbleGroup3.visible = true;
         
-        console.log('[RoundPebble] Final plane position within pebble:', {
+        console.log('[RoundPebble3] Final plane position within pebble:', {
             scenePosition: gltf.scene.position,
-            groupPosition: roundPebbleGroup.position
+            groupPosition: roundPebbleGroup3.position
         });
 
         if (parentGroup && parentGroup.add) {
-            parentGroup.add(roundPebbleGroup);
+            parentGroup.add(roundPebbleGroup3);
         } else if (scene && scene.add) {
             // Fallback: add to scene if parentGroup not available
-            scene.add(roundPebbleGroup);
+            scene.add(roundPebbleGroup3);
         }
 
         // Expose for debugging
-        window.ROUND_PEBBLE = { roundPebbleGroup, roundPebbleMesh, gltf: gltf.scene };
+        window.ROUND_PEBBLE3 = { roundPebbleGroup3, roundPebbleMesh3, gltf: gltf.scene };
 
         // Attempt autoplay; if blocked, user interaction will be required
         const tryPlay = () => { try { video.play(); } catch (_) { void 0; } };
         if (video.readyState >= 2) { tryPlay(); }
         else { video.addEventListener('canplay', tryPlay, { once: true }); }
     }, undefined, (error) => {
-        console.error('Error loading round pebble model:', error);
+        console.error('Error loading second round pebble model:', error);
     });
 }
 

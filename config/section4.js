@@ -24,32 +24,95 @@ export const SECTION4_LAYOUT = {
     }
 };
 
-// Pebble positioning for Section 4 (Three.js world-space offsets and scale)
+// First pebble positioning for Section 4 (Three.js world-space offsets and scale)
 // Units are world units relative to current baseline position/scale
 // NOTE: Scales reduced by 50% from original values
 // NOTE: Y positions increased by ~2 units (moved up ~20%)
 export const SECTION4_PEBBLE = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: 0, y: 3.5, z: 0 },  // Moved up from 1.5
+        position: { x: -1.5, y: 3.5, z: 0 },  // Left side
         scale: 0.7  // 50% of 1.4
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: 0.0, y: 3.5, z: 0 },  // Moved up from 1.5
+        position: { x: -1.5, y: 3.5, z: 0 },  // Left side
         scale: 0.8  // 50% of 1.6
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: -3.5, y: 2.0, z: 0 },  // Moved up from 0
+        position: { x: -2.5, y: 2.0, z: 0 },  // Left side
         scale: 0.875  // 50% of 1.75
     },
     [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: -3.5, y: 2.0, z: 0 },  // Moved up from 0
+        position: { x: -2.5, y: 2.0, z: 0 },  // Left side
+        scale: 0.875  // 50% of 1.75
+    }
+};
+
+// Second pebble positioning for Section 4 (Three.js world-space offsets and scale)
+// Positioned 45 degrees down and to the right from the first pebble
+export const SECTION4_PEBBLE2 = {
+    [BREAKPOINT_NAMES.MOBILE]: {
+        position: { x: 1.5, y: 1.5, z: 0 },  // Right side, down
+        scale: 0.7  // 50% of 1.4
+    },
+    [BREAKPOINT_NAMES.TABLET]: {
+        position: { x: 1.5, y: 1.5, z: 0 },  // Right side, down
+        scale: 0.8  // 50% of 1.6
+    },
+    [BREAKPOINT_NAMES.DESKTOP]: {
+        position: { x: 2.5, y: 0.0, z: 0 },  // Right side, down
+        scale: 0.875  // 50% of 1.75
+    },
+    [BREAKPOINT_NAMES.LARGE]: {
+        position: { x: 2.5, y: 0.0, z: 0 },  // Right side, down
+        scale: 0.875  // 50% of 1.75
+    }
+};
+
+// Third pebble positioning for Section 4 (Three.js world-space offsets and scale)
+// Positioned on the left, further down
+export const SECTION4_PEBBLE3 = {
+    [BREAKPOINT_NAMES.MOBILE]: {
+        position: { x: -1.5, y: -0.5, z: 0 },  // Left side, down more
+        scale: 0.7  // 50% of 1.4
+    },
+    [BREAKPOINT_NAMES.TABLET]: {
+        position: { x: -1.5, y: -0.5, z: 0 },  // Left side, down more
+        scale: 0.8  // 50% of 1.6
+    },
+    [BREAKPOINT_NAMES.DESKTOP]: {
+        position: { x: -2.5, y: -2.0, z: 0 },  // Left side, down more
+        scale: 0.875  // 50% of 1.75
+    },
+    [BREAKPOINT_NAMES.LARGE]: {
+        position: { x: -2.5, y: -2.0, z: 0 },  // Left side, down more
+        scale: 0.875  // 50% of 1.75
+    }
+};
+
+// Fourth pebble positioning for Section 4 (Three.js world-space offsets and scale)
+// Positioned on the right, further down
+export const SECTION4_PEBBLE4 = {
+    [BREAKPOINT_NAMES.MOBILE]: {
+        position: { x: 1.5, y: -2.0, z: 0 },  // Right side, down more
+        scale: 0.7  // 50% of 1.4
+    },
+    [BREAKPOINT_NAMES.TABLET]: {
+        position: { x: 1.5, y: -2.0, z: 0 },  // Right side, down more
+        scale: 0.8  // 50% of 1.6
+    },
+    [BREAKPOINT_NAMES.DESKTOP]: {
+        position: { x: 2.5, y: -4.0, z: 0 },  // Right side, down more
+        scale: 0.875  // 50% of 1.75
+    },
+    [BREAKPOINT_NAMES.LARGE]: {
+        position: { x: 2.5, y: -4.0, z: 0 },  // Right side, down more
         scale: 0.875  // 50% of 1.75
     }
 };
 
 // Continuous Y spin (degrees per second) independent of scroll
 export const SECTION4_PEBBLE_SPIN = {
-    enabled: true,
+    enabled: false, // DISABLED for debugging
     degPerSecond: 24,
     // Extra spin impulse when middle items appear
     boostDegPerSecond: 50,
@@ -58,7 +121,7 @@ export const SECTION4_PEBBLE_SPIN = {
 
 // Continuous X-axis wobble (sinusoidal) to accompany base Y spin
 export const SECTION4_PEBBLE_WOBBLE = {
-    enabled: true,
+    enabled: false, // DISABLED for debugging
     xAmplitudeDeg: 12,   // small tilt amplitude in degrees
     xFrequencyHz: 0.2   // cycles per second
 };

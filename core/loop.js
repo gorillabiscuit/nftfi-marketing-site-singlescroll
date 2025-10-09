@@ -10,6 +10,9 @@ import { ANIMATION_CONFIG, MODEL_CONFIG, SECTION4_PEBBLE_SPIN, SECTION4_PEBBLE_W
 // NEW: Import ScrollSmoother performance monitoring
 import { startPerformanceFrame, recordScrollEvent } from '../controls/scrollSynchronizer.js';
 import { pebbleMesh, pebbleGroup, isPebbleReady } from '../objects/pebbleModel.js';
+import { pebbleMesh2, pebbleGroup2, isPebble2Ready } from '../objects/pebbleModel2.js';
+import { pebbleMesh3, pebbleGroup3, isPebble3Ready } from '../objects/pebbleModel3.js';
+import { pebbleMesh4, pebbleGroup4, isPebble4Ready } from '../objects/pebbleModel4.js';
 
 // Global references (will be set by main.js)
 let mesh, wrapper, isModelReady;
@@ -111,6 +114,9 @@ export function animate() {
         const refractiveMeshes = [];
         if (mesh) refractiveMeshes.push(mesh);
         if (pebbleMesh) refractiveMeshes.push(pebbleMesh);
+        if (pebbleMesh2) refractiveMeshes.push(pebbleMesh2);
+        if (pebbleMesh3) refractiveMeshes.push(pebbleMesh3);
+        if (pebbleMesh4) refractiveMeshes.push(pebbleMesh4);
         
         if (refractiveMeshes.length > 0) {
             // Temporarily make background plane and sphere visible for render target sampling

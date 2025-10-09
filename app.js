@@ -8,9 +8,14 @@ import { initializeNavigation } from './controls/navigation.js';
 import { loadLogoModel, mesh, wrapper, isModelReady } from './objects/logoModel.js';
 import { loadPebbleModel, pebbleGroup } from './objects/pebbleModel.js';
 import { loadRoundPebbleModel } from './objects/roundPebbleModel.js';
-import { loadMultiplePebbles, pebbleInstances, arePebblesReady } from './objects/multiplePebbles.js';
+import { loadPebbleModel2, pebbleGroup2 } from './objects/pebbleModel2.js';
+import { loadRoundPebbleModel2 } from './objects/roundPebbleModel2.js';
+import { loadPebbleModel3, pebbleGroup3 } from './objects/pebbleModel3.js';
+import { loadRoundPebbleModel3 } from './objects/roundPebbleModel3.js';
+import { loadPebbleModel4, pebbleGroup4 } from './objects/pebbleModel4.js';
+import { loadRoundPebbleModel4 } from './objects/roundPebbleModel4.js';
 import { createBackgroundPlane, updatePlaneForViewport, updatePlaneTexture, captureHeroAsTexture, updatePlane, initializeVideoTextures } from './objects/backgroundPlane.js';
-import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned, setupSection5HorizontalScroll, setupSection6TitleAnimation, setupSection7Pin, setupSection4MultiplePebbles } from './controls/scrollTrigger.js';
+import { setupScrollAnimation, resetScrollAnimation, setupSection4PebbleFadePinned, setupSection5HorizontalScroll, setupSection6TitleAnimation, setupSection7Pin } from './controls/scrollTrigger.js';
 import { initializeTestimonials } from './controls/testimonials.js';
 import { initStatsScrambleReveal, initHeadingReveal, cleanupTextEffects } from './controls/textEffects.js';
 import { initHeaderAnimation } from './controls/headerAnimation.js';
@@ -94,23 +99,85 @@ async function init() {
     updateLoadingProgress('Loading 3D models...', 20);
     loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
 
-    // Load Multiple Pebbles for Section 4 (4 instances, one per asset category)
-    try {
-        updateLoadingProgress('Loading 3D models...', 60);
-        loadMultiplePebbles(scene, uniforms).then((instances) => {
-            updateLoadingProgress('Loading 3D models...', 100);
-            completeLoadingStep('Loading 3D models...');
-            
-            // Setup Section 4 with multiple pebbles
-            console.log('[App] Multiple pebbles loaded, setting up Section 4 animation');
-            setupSection4MultiplePebbles(instances);
-        }).catch(e => {
-            console.error('Failed to load multiple pebbles:', e);
-            completeLoadingStep('Loading 3D models...'); // Complete anyway
-        });
-    } catch (e) {
-        console.error('Failed to initialize multiple pebbles:', e);
-    }
+        // Load Pebble model (as-is). Uses shared uniforms for same material/lighting
+        try {
+            updateLoadingProgress('Loading 3D models...', 60);
+            loadPebbleModel(scene, uniforms);
+            loadPebbleModel2(scene, uniforms);
+            loadPebbleModel3(scene, uniforms);
+            loadPebbleModel4(scene, uniforms);
+            // Deferred attach of round pebbles once pebbleGroups are available
+            const attachRounds = () => {
+                try {
+                    let attachedCount = 0;
+                    
+                    // Attach first round pebble
+                    if (window.PEBBLE && window.PEBBLE.pebbleGroup) {
+                        loadRoundPebbleModel(window.PEBBLE.pebbleGroup, scene);
+                        attachedCount++;
+                    } else if (pebbleGroup) {
+                        loadRoundPebbleModel(pebbleGroup, scene);
+                        attachedCount++;
+                    }
+                    
+                    // Attach second round pebble
+                    if (window.PEBBLE2 && window.PEBBLE2.pebbleGroup2) {
+                        loadRoundPebbleModel2(window.PEBBLE2.pebbleGroup2, scene);
+                        attachedCount++;
+                    } else if (pebbleGroup2) {
+                        loadRoundPebbleModel2(pebbleGroup2, scene);
+                        attachedCount++;
+                    }
+                    
+                    // Attach third round pebble
+                    if (window.PEBBLE3 && window.PEBBLE3.pebbleGroup3) {
+                        loadRoundPebbleModel3(window.PEBBLE3.pebbleGroup3, scene);
+                        attachedCount++;
+                    } else if (pebbleGroup3) {
+                        loadRoundPebbleModel3(pebbleGroup3, scene);
+                        attachedCount++;
+                    }
+                    
+                    // Attach fourth round pebble
+                    if (window.PEBBLE4 && window.PEBBLE4.pebbleGroup4) {
+                        loadRoundPebbleModel4(window.PEBBLE4.pebbleGroup4, scene);
+                        attachedCount++;
+                    } else if (pebbleGroup4) {
+                        loadRoundPebbleModel4(pebbleGroup4, scene);
+                        attachedCount++;
+                    }
+                    
+                    if (attachedCount === 4) {
+                        updateLoadingProgress('Loading 3D models...', 100);
+                    } else {
+                        setTimeout(attachRounds, 100);
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Failed to attach round pebbles:', err);
+                }
+            };
+            attachRounds();
+            // Hook pebble section 4 entrance once groups are ready
+            const hookPebbles = () => {
+                try {
+                    const grp1 = (window.PEBBLE && window.PEBBLE.pebbleGroup) ? window.PEBBLE.pebbleGroup : pebbleGroup;
+                    const grp2 = (window.PEBBLE2 && window.PEBBLE2.pebbleGroup2) ? window.PEBBLE2.pebbleGroup2 : pebbleGroup2;
+                    const grp3 = (window.PEBBLE3 && window.PEBBLE3.pebbleGroup3) ? window.PEBBLE3.pebbleGroup3 : pebbleGroup3;
+                    const grp4 = (window.PEBBLE4 && window.PEBBLE4.pebbleGroup4) ? window.PEBBLE4.pebbleGroup4 : pebbleGroup4;
+                    
+                    if (grp1 && grp2 && grp3 && grp4) {
+                        // Call once with all 4 pebble groups - creates a single unified ScrollTrigger
+                        setupSection4PebbleFadePinned(grp1, grp2, grp3, grp4);
+                    } else {
+                        setTimeout(hookPebbles, 100);
+                    }
+                } catch (_) { setTimeout(hookPebbles, 100); }
+            };
+            hookPebbles();
+        } catch (e) {
+            console.error('Failed to load Pebble model:', e);
+        }
     
     // Create window resize handler
     const onWindowResize = createWindowResizeHandler(onThreeJSResize, updatePlaneForViewport, updatePlaneTexture);
