@@ -51,7 +51,19 @@ export const SECTION6_CONTAINER = {
         offsetX: 0,
         offsetY: 0
     },
-    [BREAKPOINT_NAMES.LARGE]: {
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        width: 700,
+        height: 260,
+        offsetX: 0,
+        offsetY: 0
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        width: 700,
+        height: 260,
+        offsetX: 0,
+        offsetY: 0
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         width: 700,
         height: 260,
         offsetX: 0,

@@ -436,6 +436,10 @@ a.card:focus {
         margin-top: 80px;
         margin-bottom: 0;
     }
+    .hero-content {
+        min-height: 0 !important;
+        height: auto !important;
+    }
     
     .section:first-child {
         padding-left: calc(var(--container-padding) + 3px);
@@ -443,15 +447,64 @@ a.card:focus {
     }
 }
 
-/* XL Screen Optimization (1200px+) - Match Navigation Container Width */
-@media (min-width: 1201px) {
+/* desktop_hd (1201px–1600px) */
+@media (min-width: 1201px) and (max-width: 1600px) {
     .hero {
         max-width: 1400px; /* Match navigation max-width on large screens */
         margin-top: 110px;
+    }
+    .hero-content {
+        min-height: 0 !important;
+        height: auto !important;
     }
     
     .section:first-child {
         padding-left: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
         padding-right: calc(var(--container-padding) + 3px); /* Match navigation's computed padding */
+    }
+}
+
+/* desktop_xl (1601px–2000px) */
+@media (min-width: 1601px) and (max-width: 2000px) {
+    .hero {
+        max-width: 1400px;
+        margin-top: 110px;
+    }
+    .hero-content {
+        min-height: 0 !important;
+        height: auto !important;
+    }
+    .section:first-child {
+        padding-left: calc(var(--container-padding) + 3px);
+        padding-right: calc(var(--container-padding) + 3px);
+    }
+}
+
+/* desktop_2xl (2001px+) */
+@media (min-width: 2001px) {
+
+    h1 {
+        font-size: 64px !important ; /* Different size for h2 */
+    }
+    .hero-text {
+        max-width: 800px; /* But don't exceed original design width */
+    }
+    
+    .hero {
+        min-height: 55vh !important; 
+        max-width: 1600px; /* Give a little more room on ultra-wide */
+        margin-top: 280px;
+    }
+    /* Allow the hero to shrink: the inner wrapper was enforcing taller heights */
+    .hero-content {
+        /* Fill the hero's content box so buttons can pin to the bottom */
+        min-height: calc(55vh - (var(--hero-padding) * 2)) !important;
+        height: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+    .section:first-child {
+        padding-left: calc(var(--container-padding) + 3px);
+        padding-right: calc(var(--container-padding) + 3px);
     }
 }

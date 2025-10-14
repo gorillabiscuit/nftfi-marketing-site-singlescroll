@@ -297,11 +297,83 @@ export async function initSection3Dashboard() {
                 }
             });
 
-            // Large: ≥1025px - Use config values for positioning
-            mm.add('(min-width: 1201px)', () => {
+            // Desktop HD: 1201px-1600px (HD displays: 1366x768, 1440x900)
+            mm.add('(min-width: 1201px) and (max-width: 1600px)', () => {
                 try {
-                    const dashboardCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.LARGE);
-                    const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.LARGE);
+                    const dashboardCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.DESKTOP_HD);
+                    const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.DESKTOP_HD);
+                    
+                    // Position container using new pixel offset system
+                    gsap.set(container, { 
+                        position: 'absolute',
+                        width: dashboardCfg.width,
+                        height: dashboardCfg.height,
+                        left: dashboardCfg.left,
+                        top: dashboardCfg.top,
+                        x: dashboardCfg.x,
+                        y: dashboardCfg.y,
+                        xPercent: dashboardCfg.xPercent,
+                        yPercent: dashboardCfg.yPercent,
+                        zIndex: 3,
+                        overflow: 'visible',
+                        pointerEvents: 'none',
+                        // Clear any existing transforms
+                        rotation: 0,
+                        scaleX: 1,
+                        scaleY: 1
+                    });
+                    
+                    // Scale the SVG within the positioned container
+                    gsap.set(svgEl, { 
+                        scale: svgCfg.scale,
+                        transformOrigin: '0 0'  // Top-left origin instead of center
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            });
+
+            // Desktop XL: 1601px-2000px (Full HD: 1920x1080)
+            mm.add('(min-width: 1601px) and (max-width: 2000px)', () => {
+                try {
+                    const dashboardCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.DESKTOP_XL);
+                    const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.DESKTOP_XL);
+                    
+                    // Position container using new pixel offset system
+                    gsap.set(container, { 
+                        position: 'absolute',
+                        width: dashboardCfg.width,
+                        height: dashboardCfg.height,
+                        left: dashboardCfg.left,
+                        top: dashboardCfg.top,
+                        x: dashboardCfg.x,
+                        y: dashboardCfg.y,
+                        xPercent: dashboardCfg.xPercent,
+                        yPercent: dashboardCfg.yPercent,
+                        zIndex: 3,
+                        overflow: 'visible',
+                        pointerEvents: 'none',
+                        // Clear any existing transforms
+                        rotation: 0,
+                        scaleX: 1,
+                        scaleY: 1
+                    });
+                    
+                    // Scale the SVG within the positioned container
+                    gsap.set(svgEl, { 
+                        scale: svgCfg.scale,
+                        transformOrigin: '0 0'  // Top-left origin instead of center
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            });
+
+            // Desktop 2XL: ≥2001px (QHD/2K: 2560x1440+, ultra-wide)
+            mm.add('(min-width: 2001px)', () => {
+                try {
+                    const dashboardCfg = getDashboardSvgConfigFor(BREAKPOINT_NAMES.DESKTOP_2XL);
+                    const svgCfg = getSvgConfigFor(BREAKPOINT_NAMES.DESKTOP_2XL);
                     
                     // Position container using new pixel offset system
                     gsap.set(container, { 
@@ -649,7 +721,9 @@ export function initSection3Scroll() {
             mm.add('(max-width: 600px)', applyPositioning(BREAKPOINT_NAMES.MOBILE));
             mm.add('(min-width: 601px) and (max-width: 900px)', applyPositioning(BREAKPOINT_NAMES.TABLET));
             mm.add('(min-width: 901px) and (max-width: 1200px)', applyPositioning(BREAKPOINT_NAMES.DESKTOP));
-            mm.add('(min-width: 1201px)', applyPositioning(BREAKPOINT_NAMES.LARGE));
+            mm.add('(min-width: 1201px) and (max-width: 1600px)', applyPositioning(BREAKPOINT_NAMES.DESKTOP_HD));
+            mm.add('(min-width: 1601px) and (max-width: 2000px)', applyPositioning(BREAKPOINT_NAMES.DESKTOP_XL));
+            mm.add('(min-width: 2001px)', applyPositioning(BREAKPOINT_NAMES.DESKTOP_2XL));
         }
     } catch (e) { 
         console.error('[Section3Dashboard] Error setting up parent container positioning:', e);
@@ -992,27 +1066,31 @@ function addPerIdDetailSequences(tl, targets) {
                 // arrow index matches reveal index
                 const arrowIdx = revealIndex;
                 const arrowSel = '#section3-arrows path[data-arrow-index="' + String(arrowIdx) + '"]';
-                tl.add(() => {
-                    try {
-                        prepareOneArrowDash(arrowIdx);
-                        const p = document.querySelector(arrowSel);
-                        if (p) {
-                            p.setAttribute('data-animating', '1');
-                            try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
-                        }
-                    } catch (_) { void 0; }
-                }, 'intro+=' + startAt.toFixed(3));
-                tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startAt.toFixed(3));
-                tl.to(arrowSel, { strokeDashoffset: 0, duration: 4.2, ease: 'power2.out', onComplete: function () {
-                    try {
-                        const p = document.querySelector(arrowSel);
-                        if (p) {
-                            p.removeAttribute('data-animating');
-                            p.setAttribute('data-drawn', '1');
-                            p.setAttribute('marker-end', 'url(#arrowhead)');
-                        }
-                    } catch (e) { (void e); }
-                } }, 'intro+=' + (startAt + 0.05).toFixed(3));
+                // Only animate arrows if the arrows container exists
+                const arrowsContainer = document.getElementById('section3-arrows');
+                if (arrowsContainer) {
+                    tl.add(() => {
+                        try {
+                            prepareOneArrowDash(arrowIdx);
+                            const p = document.querySelector(arrowSel);
+                            if (p) {
+                                p.setAttribute('data-animating', '1');
+                                try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
+                            }
+                        } catch (_) { void 0; }
+                    }, 'intro+=' + startAt.toFixed(3));
+                    tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startAt.toFixed(3));
+                    tl.to(arrowSel, { strokeDashoffset: 0, duration: 4.2, ease: 'power2.out', onComplete: function () {
+                        try {
+                            const p = document.querySelector(arrowSel);
+                            if (p) {
+                                p.removeAttribute('data-animating');
+                                p.setAttribute('data-drawn', '1');
+                                p.setAttribute('marker-end', 'url(#arrowhead)');
+                            }
+                        } catch (e) { (void e); }
+                    } }, 'intro+=' + (startAt + 0.05).toFixed(3));
+                }
                 revealIndex += 1;
             } catch (_) { void 0; }
         }
@@ -1049,11 +1127,11 @@ function addPerIdDetailSequences(tl, targets) {
         if (gKey === 'boxes') {
             // Schedule chart (bubbles) immediately after boxes group
             const startBubbles = groupEnd + groupGap;
-            try {
-                tl.add(function () {
-                    try { console.log('[Section3Dashboard] Phase start: chart'); } catch (e) { (void e); }
-                }, 'intro+=' + startBubbles.toFixed(3));
-            } catch (e) { (void e); }
+            // try {
+            //     tl.add(function () {
+            //         try { console.log('[Section3Dashboard] Phase start: chart'); } catch (e) { (void e); }
+            //     }, 'intro+=' + startBubbles.toFixed(3));
+            // } catch (e) { (void e); }
 
             // Reveal next feature (feature-2) and corresponding arrow dash
             if (revealIndex < featureSelectors.length) {
@@ -1061,7 +1139,10 @@ function addPerIdDetailSequences(tl, targets) {
                 try {
                     const arrowIdx2 = revealIndex;
                     const arrowSel2 = '#section3-arrows path[data-arrow-index="' + String(arrowIdx2) + '"]';
-                    tl.add(() => {
+                    // Only animate arrows if the arrows container exists
+                    const arrowsContainer2 = document.getElementById('section3-arrows');
+                    if (arrowsContainer2) {
+                        tl.add(() => {
                         try {
                             prepareOneArrowDash(arrowIdx2);
                             const p2 = document.querySelector(arrowSel2);
@@ -1071,18 +1152,22 @@ function addPerIdDetailSequences(tl, targets) {
                             }
                         } catch (_) { void 0; }
                     }, 'intro+=' + startBubbles.toFixed(3));
-                    tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
-                    tl.to(arrowSel2, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startBubbles.toFixed(3));
-                    tl.to(arrowSel2, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.out', onComplete: function () {
-                        try {
-                            const p2 = document.querySelector(arrowSel2);
-                            if (p2) {
-                                p2.removeAttribute('data-animating');
-                                p2.setAttribute('data-drawn', '1');
-                                p2.setAttribute('marker-end', 'url(#arrowhead)');
-                            }
-                        } catch (e) { (void e); }
-                    } }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
+                        tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
+                        tl.to(arrowSel2, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startBubbles.toFixed(3));
+                        tl.to(arrowSel2, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.out', onComplete: function () {
+                            try {
+                                const p2 = document.querySelector(arrowSel2);
+                                if (p2) {
+                                    p2.removeAttribute('data-animating');
+                                    p2.setAttribute('data-drawn', '1');
+                                    p2.setAttribute('marker-end', 'url(#arrowhead)');
+                                }
+                            } catch (e) { (void e); }
+                        } }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
+                    } else {
+                        // Arrows disabled, just reveal the feature
+                        tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
+                    }
                     revealIndex += 1;
                 } catch (_) { void 0; }
             }

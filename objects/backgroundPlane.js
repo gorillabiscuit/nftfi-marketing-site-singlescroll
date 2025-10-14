@@ -23,7 +23,6 @@ function calculateCorrectScaleForScroll() {
         // Get the ScrollTrigger element (section 1)
         const triggerElement = document.querySelector(".section[data-section='1']");
         if (!triggerElement) {
-            console.log('Trigger element not found, using start scale');
             return startPos.scale || MODEL_CONFIG.startScale;
         }
         
@@ -52,15 +51,6 @@ function calculateCorrectScaleForScroll() {
             targetPos.scale,
             progress
         );
-        
-        console.log('Calculated scale for ScrollTrigger position:', {
-            triggerTop: triggerTop,
-            triggerHeight: triggerHeight,
-            progress: progress,
-            startScale: startPos.scale,
-            targetScale: targetPos.scale,
-            currentScale: currentScale
-        });
         
         return currentScale;
     });
@@ -120,7 +110,6 @@ export function initializeVideoTextures() {
                     texture: texture
                 };
                 
-                console.log(`[Video] Loaded texture for ${category}:`, filename);
                 resolve();
             };
             
@@ -136,7 +125,6 @@ export function initializeVideoTextures() {
     
     return Promise.all(loadPromises).then(() => {
         isVideoSystemInitialized = true;
-        console.log('[Video] All video textures initialized:', Object.keys(videoTextures));
     }).catch(error => {
         console.error('[Video] Failed to initialize some video textures:', error);
         isVideoSystemInitialized = true; // Continue anyway
@@ -148,20 +136,17 @@ export function initializeVideoTextures() {
  */
 export function switchToVideoTexture(category) {
     if (!isVideoSystemInitialized) {
-        console.warn('[Video] System not initialized');
         return;
     }
     
     // Target the round pebble mesh (plane inside the glass pebble)
     const roundPebbleMesh = window.ROUND_PEBBLE?.roundPebbleMesh;
     if (!roundPebbleMesh || !roundPebbleMesh.material) {
-        console.warn('[Video] Round pebble mesh not available');
         return;
     }
     
     const videoData = videoTextures[category];
     if (!videoData) {
-        console.warn(`[Video] No video texture found for category: ${category}`);
         return;
     }
     
@@ -182,10 +167,8 @@ export function switchToVideoTexture(category) {
     
     // Start playing the video
     videoData.video.play().catch(error => {
-        console.warn(`[Video] Failed to play video for ${category}:`, error);
+        // Video play failed silently
     });
-    
-    console.log(`[Video] Switched to video texture: ${category}`);
 }
 
 /**
@@ -200,7 +183,6 @@ export function switchToHeroTexture() {
     // Target the round pebble mesh (plane inside the glass pebble)
     const roundPebbleMesh = window.ROUND_PEBBLE?.roundPebbleMesh;
     if (!roundPebbleMesh || !roundPebbleMesh.material) {
-        console.warn('[Video] Round pebble mesh not available for texture switch');
         return;
     }
     
@@ -208,8 +190,6 @@ export function switchToHeroTexture() {
     // We need to get the original video texture from the round pebble
     // For now, let's create a function to get/restore the original video
     restoreOriginalPebbleVideo();
-    
-    console.log('[Video] Switched back to original pebble video');
 }
 
 /**
@@ -292,7 +272,6 @@ export function captureHeroAsTexture() {
                 
                 // Mark texture as ready
                 window.textureReady = true;
-                console.log('Texture applied - mesh should be visible');
                 
                 resolve(texture);
             }).catch(error => {
@@ -318,11 +297,10 @@ export function captureHeroAsTexture() {
                                 if (window.wrapper) window.wrapper.visible = true;
                             },
                             onStart: () => {
-                                console.log('Fallback scale animation started with scroll-adjusted scale:', targetScale);
+                                // Fallback scale animation started
                             },
                             onComplete: () => {
                                 isInitialAnimationComplete = true;
-                                console.log('Fallback scale animation completed');
                             }
                         });
                     });
@@ -508,7 +486,36 @@ export function updatePlaneTexture() {
 }
 
 /**
+ * Create a gradient texture matching Section 4's background
+ * Returns a THREE.CanvasTexture with the gradient
+ */
+function createSection4GradientTexture() {
+    // Create a canvas for the gradient
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;  // Reasonable size for texture
+    canvas.height = 1024;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Create gradient matching Section 4 background: linear-gradient(180deg, #8D694B 0%, #6C3C59 100%)
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#8D694B');    // Top color
+    gradient.addColorStop(1, '#6C3C59');    // Bottom color
+    
+    // Fill canvas with gradient
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Create and return Three.js texture
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    
+    return texture;
+}
+
+/**
  * Capture a specific DOM element into a texture and apply it to the background plane.
+ * For Section 4, uses a static gradient instead of DOM capture.
  * Returns a Promise that resolves to the created THREE.CanvasTexture.
  */
 export function updatePlaneTextureForSection(selector) {
@@ -520,6 +527,28 @@ export function updatePlaneTextureForSection(selector) {
                 return;
             }
             
+            // Check if this is Section 4 - use gradient texture instead of DOM capture
+            const isSection4 = el.closest('.section[data-section="4"]') !== null;
+            
+            if (isSection4) {
+                // Create gradient texture
+                const texture = createSection4GradientTexture();
+                
+                // Apply to background plane
+                if (backgroundPlane && backgroundPlane.material) {
+                    if (backgroundPlane.material.map) {
+                        try { backgroundPlane.material.map.dispose(); } catch (_) { void 0; }
+                    }
+                    backgroundPlane.material.map = texture;
+                    backgroundPlane.material.needsUpdate = true;
+                    backgroundPlane.visible = true;
+                }
+                
+                resolve(texture);
+                return;
+            }
+            
+            // For non-Section 4, use original html2canvas capture
             // Safari-specific configuration
             const safariMode = isSafari();
             const html2canvasOptions = {
@@ -548,8 +577,6 @@ export function updatePlaneTextureForSection(selector) {
             const captureDelay = safariMode ? 100 : 0;
             
             const doCapture = () => {
-                console.log(`[Texture] Capturing Section 4 content (Safari: ${safariMode})`);
-                
                 html2canvas(el, html2canvasOptions).then((canvas) => {
                     const texture = new THREE.CanvasTexture(canvas);
                     texture.needsUpdate = true;
@@ -563,14 +590,12 @@ export function updatePlaneTextureForSection(selector) {
                         backgroundPlane.visible = true;
                     }
                     
-                    console.log(`[Texture] Section 4 capture successful (Safari: ${safariMode})`);
                     resolve(texture);
                 }).catch((err) => {
-                    console.error(`[Texture] Section 4 capture failed (Safari: ${safariMode}):`, err);
+                    console.error(`[Texture] Capture failed (Safari: ${safariMode}):`, err);
                     
                     // Safari fallback: try with even more conservative settings
                     if (safariMode) {
-                        console.log('[Texture] Attempting Safari fallback capture...');
                         const fallbackOptions = {
                             ...html2canvasOptions,
                             scale: 0.5, // Very conservative scale
@@ -597,7 +622,6 @@ export function updatePlaneTextureForSection(selector) {
                                 backgroundPlane.visible = true;
                             }
                             
-                            console.log('[Texture] Safari fallback capture successful');
                             resolve(texture);
                         }).catch((fallbackErr) => {
                             console.error('[Texture] Safari fallback capture also failed:', fallbackErr);
@@ -636,8 +660,6 @@ export function setupSectionPreCapture(selector, rootMargin) {
                 const safariMode = isSafari();
                 const captureDelay = safariMode ? 200 : 0;
                 
-                console.log(`[Texture] Pre-capture triggered for Section 4 (Safari: ${safariMode}, delay: ${captureDelay}ms)`);
-                
                 setTimeout(() => {
                     requestAnimationFrame(() => {
                         try {
@@ -645,11 +667,10 @@ export function setupSectionPreCapture(selector, rootMargin) {
                                 .then(() => { 
                                     try { 
                                         window.__s4PreCaptured = true;
-                                        console.log('[Texture] Section 4 pre-capture completed successfully');
                                     } catch (_) { void 0; } 
                                 })
                                 .catch((err) => { 
-                                    console.warn('[Texture] Section 4 pre-capture failed:', err);
+                                    // Pre-capture failed silently
                                 });
                         } catch (_) { void 0; }
                     });

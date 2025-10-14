@@ -3,156 +3,278 @@
 
 import { BREAKPOINT_NAMES } from './breakpoints.js';
 
-// Center-anchored layout offsets for Section 4 per breakpoint
-// Values are CSS percentages as strings (e.g., '0%', '15%', '-20%')
-export const SECTION4_LAYOUT = {
-    [BREAKPOINT_NAMES.MOBILE]: {
-        title: { x: '0%', y: '0%' },
-        panel: { x: '0%',  y: '150%' }
-    },
-    [BREAKPOINT_NAMES.TABLET]: {
-        title: { x: '0%', y: '0%' },
-        panel: { x: '0%', y: '200%' }
-    },
-    [BREAKPOINT_NAMES.DESKTOP]: {
-        title: { x: '0%', y: '0%' },
-        panel: { x: '60%', y: '0%' }
-    },
-    [BREAKPOINT_NAMES.LARGE]: {
-        title: { x: '0%', y: '0%' },
-        panel: { x: '60%', y: '0%' }  // Keep same as desktop
-    }
+// Vertical spacing between pebbles per breakpoint (adjustable)
+// Smaller screens need tighter spacing, larger screens can spread out more
+export const SECTION4_PEBBLE_VERTICAL_SPACING = {
+    [BREAKPOINT_NAMES.MOBILE]: 5.0,      // Tighter spacing on mobile
+    [BREAKPOINT_NAMES.TABLET]: 4.0,      // Moderate spacing on tablet
+    [BREAKPOINT_NAMES.DESKTOP]: 6.0,     // Standard spacing on desktop
+    [BREAKPOINT_NAMES.DESKTOP_HD]: 6.5,  // Slightly more on HD
+    [BREAKPOINT_NAMES.DESKTOP_XL]: 6.0,  // More spacing on Full HD
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: 8.0  // Maximum spacing on 2K+
 };
 
-// Vertical spacing between pebbles (adjustable) - ADJUST THIS ONE NUMBER TO CONTROL ALL SPACING
-export const SECTION4_PEBBLE_VERTICAL_SPACING = 6.0; // World units between pebbles vertically
-
-// Helper function to calculate pebble Y position based on index and spacing
-const getPebbleY = (index) => {
-    return -(index * SECTION4_PEBBLE_VERTICAL_SPACING);
+// Helper function to calculate pebble Y position based on index, breakpoint, and spacing
+const getPebbleY = (index, breakpoint) => {
+    const spacing = SECTION4_PEBBLE_VERTICAL_SPACING[breakpoint] || SECTION4_PEBBLE_VERTICAL_SPACING[BREAKPOINT_NAMES.DESKTOP];
+    return -(index * spacing);
 };
 
 // First pebble positioning for Section 4 (Three.js world-space offsets and scale)
-// Y position auto-calculated: index 0 * spacing = 0
+// Y position auto-calculated: index 0 * spacing[breakpoint] = 0 (always 0 for first pebble)
 export const SECTION4_PEBBLE = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: -1.5, y: getPebbleY(0), z: 0 },  // Left side, top
-        scale: 0.7
+        position: { x: -2.5, y: getPebbleY(0, BREAKPOINT_NAMES.MOBILE), z: 0 },  // Left side, top
+        scale: 1.5
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: -1.5, y: getPebbleY(0), z: 0 },  // Left side, top
-        scale: 0.8
+        position: { x: -2.5, y: getPebbleY(0, BREAKPOINT_NAMES.TABLET), z: 0 },  // Left side, top
+        scale: 1.2
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: -2.5, y: getPebbleY(0), z: 0 },  // Left side, top
-        scale: 0.875
+        position: { x: -3.5, y: getPebbleY(0, BREAKPOINT_NAMES.DESKTOP), z: 0 },  // Left side, top
+        scale: 1.5
     },
-    [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: -3, y: getPebbleY(0), z: 0 },  // Left side, top
-        scale: 0.875
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        position: { x: -4, y: getPebbleY(0, BREAKPOINT_NAMES.DESKTOP_HD), z: 0 },  // Left side, top (HD: 1366x768)
+        scale: 1.8
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        position: { x: -5, y: getPebbleY(0, BREAKPOINT_NAMES.DESKTOP_XL), z: 0 },  // Left side, top (Full HD: 1920x1080)
+        scale: 1.95
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
+        position: { x: -6, y: getPebbleY(0, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Left side, top (QHD: 2560x1440)
+        scale: 1.5
     }
 };
 
-// Second pebble positioning - auto-calculated: index 1 * spacing
+// Second pebble positioning - auto-calculated: index 1 * spacing[breakpoint]
 export const SECTION4_PEBBLE2 = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: 1.5, y: getPebbleY(1), z: 0 },  // Right side
-        scale: 0.7
+        position: { x: 2.5, y: getPebbleY(1, BREAKPOINT_NAMES.MOBILE), z: 0 },  // Right side
+        scale: 1.5
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: 1.5, y: getPebbleY(1), z: 0 },  // Right side
-        scale: 0.8
+        position: { x: 2.5, y: getPebbleY(1, BREAKPOINT_NAMES.TABLET), z: 0 },  // Right side
+        scale: 1.2
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: 2.5, y: getPebbleY(1), z: 0 },  // Right side
-        scale: 0.875
+        position: { x: 3.5, y: getPebbleY(1, BREAKPOINT_NAMES.DESKTOP), z: 0 },  // Right side
+        scale: 1.5
     },
-    [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: 3, y: getPebbleY(1), z: 0 },  // Right side
-        scale: 0.875
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        position: { x: 4, y: getPebbleY(1, BREAKPOINT_NAMES.DESKTOP_HD), z: 0 },  // Right side (HD: 1366x768)
+        scale: 1.8
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        position: { x: 5, y: getPebbleY(1, BREAKPOINT_NAMES.DESKTOP_XL), z: 0 },  // Right side (Full HD: 1920x1080)
+        scale: 1.95
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
+        position: { x: 6, y: getPebbleY(1, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Right side (QHD: 2560x1440)
+        scale: 1.5
     }
 };
 
-// Third pebble positioning - auto-calculated: index 2 * spacing
+// Third pebble positioning - auto-calculated: index 2 * spacing[breakpoint]
 export const SECTION4_PEBBLE3 = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: -1.5, y: getPebbleY(2), z: 0 },  // Left side
-        scale: 0.7
+        position: { x: -2.5, y: getPebbleY(2, BREAKPOINT_NAMES.MOBILE), z: 0 },  // Left side
+        scale: 1.5
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: -1.5, y: getPebbleY(2), z: 0 },  // Left side
-        scale: 0.8
+        position: { x: -2.5, y: getPebbleY(2, BREAKPOINT_NAMES.TABLET), z: 0 },  // Left side
+        scale: 1.2
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: -2.5, y: getPebbleY(2), z: 0 },  // Left side
-        scale: 0.875
+        position: { x: -3.5, y: getPebbleY(2, BREAKPOINT_NAMES.DESKTOP), z: 0 },  // Left side
+        scale: 1.5
     },
-    [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: -3, y: getPebbleY(2), z: 0 },  // Left side
-        scale: 0.875
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        position: { x: -4, y: getPebbleY(2, BREAKPOINT_NAMES.DESKTOP_HD), z: 0 },  // Left side (HD: 1366x768)
+        scale: 1.8
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        position: { x: -5, y: getPebbleY(2, BREAKPOINT_NAMES.DESKTOP_XL), z: 0 },  // Left side (Full HD: 1920x1080)
+        scale: 1.95
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
+        position: { x: -6, y: getPebbleY(2, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Left side (QHD: 2560x1440)
+        scale: 1.5
     }
 };
 
-// Fourth pebble positioning - auto-calculated: index 3 * spacing
+// Fourth pebble positioning - auto-calculated: index 3 * spacing[breakpoint]
 export const SECTION4_PEBBLE4 = {
     [BREAKPOINT_NAMES.MOBILE]: {
-        position: { x: 1.5, y: getPebbleY(3), z: 0 },  // Right side
-        scale: 0.7
+        position: { x: 2.5, y: getPebbleY(3, BREAKPOINT_NAMES.MOBILE), z: 0 },  // Right side
+        scale: 1.5
     },
     [BREAKPOINT_NAMES.TABLET]: {
-        position: { x: 1.5, y: getPebbleY(3), z: 0 },  // Right side
-        scale: 0.8
+        position: { x: 2.5, y: getPebbleY(3, BREAKPOINT_NAMES.TABLET), z: 0 },  // Right side
+        scale: 1.2
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
-        position: { x: 2.5, y: getPebbleY(3), z: 0 },  // Right side
-        scale: 0.875
+        position: { x: 3.5, y: getPebbleY(3, BREAKPOINT_NAMES.DESKTOP), z: 0 },  // Right side
+        scale: 1.5
     },
-    [BREAKPOINT_NAMES.LARGE]: {
-        position: { x: 3, y: getPebbleY(3), z: 0 },  // Right side
-        scale: 0.875
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        position: { x: 4, y: getPebbleY(3, BREAKPOINT_NAMES.DESKTOP_HD), z: 0 },  // Right side (HD: 1366x768)
+        scale: 1.8
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        position: { x: 5, y: getPebbleY(3, BREAKPOINT_NAMES.DESKTOP_XL), z: 0 },  // Right side (Full HD: 1920x1080)
+        scale: 1.95
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
+        position: { x: 6, y: getPebbleY(3, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Right side (QHD: 2560x1440)
+        scale: 1.5
     }
 };
 
-// Scroll parallax controls for pebbles
+// Section 4 container height (in viewport height units) per breakpoint
+// Controls the visual scroll length of Section 4's content container
+export const SECTION4_CONTAINER_HEIGHT = {
+    [BREAKPOINT_NAMES.MOBILE]: 200,      // Slightly shorter on mobile
+    [BREAKPOINT_NAMES.TABLET]: 130,
+    [BREAKPOINT_NAMES.DESKTOP]: 200,
+    [BREAKPOINT_NAMES.DESKTOP_HD]: 200,
+    [BREAKPOINT_NAMES.DESKTOP_XL]: 200,
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: 200
+};
+
+// Scroll parallax controls for Section 4 (pebbles, text panels, and title)
+// Breakpoint-specific scroll parameters for responsive behavior
 export const SECTION4_PEBBLE_SCROLL_PARAMS = {
-    // Starting Y position (offscreen below viewport)
-    // Lower (more negative) = start further down, appear later
-    // Higher (less negative) = start closer, appear earlier
-    startY: -15,  // Start well below viewport
-    
-    // Total upward travel distance as you scroll through Section 4
-    // Larger value = more movement range, pebbles travel further
-    // Smaller value = less movement, pebbles appear more static
-    totalTravel: 35,  // Increased to bring pebbles all the way up
-    
-    // Scroll speed multiplier
-    // 1.0 = pebbles move with scroll (appear locked to screen)
-    // > 1.0 = pebbles move faster than scroll
-    // < 1.0 = pebbles move slower than scroll (subtle parallax)
-    scrollSpeed: 1.0,
-    
-    // 3D world to 2D screen pixel scale for text panels
-    // This controls the overall scroll speed of text relative to pebbles
-    // Adjust this to make text move at same speed as pebbles
-    // Negative value needed because screen Y is inverted from 3D world Y
-    worldToPixelScale: 0,
-    
-    // Text panel vertical spacing (in pixels)
-    // This controls the distance between each text panel independently of pebble spacing
-    // Adjust this to line up text with their corresponding pebbles
-    textSpacingPixels: 450,  // Distance between each text panel
-    
-    // Text starting offset (in pixels)
-    // This controls where text starts vertically (added to base position)
-    // Positive = text starts higher up (appears earlier)
-    // Negative = text starts lower down (appears later)
-    textStartOffset: 0,  // Starting offset for all text panels
-    
-    // Text scroll speed (viewport height multiplier)
-    // This controls how far text travels as you scroll through Section 4
-    // Higher value = text scrolls faster/further
-    // Lower value = text scrolls slower/less
-    textTravelMultiplier: 1  // Text travels 1.5 viewports upward
+    [BREAKPOINT_NAMES.MOBILE]: {
+        // === PEBBLE (3D MESH) CONTROLS ===
+        pebbleStartY: -13,
+        pebbleTotalTravel: 30,
+        pebbleScrollSpeed: 1.35,
+        
+        // === TEXT PANEL CONTROLS ===
+        textSpacingPixels: 300,
+        textStartOffset: -100,
+        textTravelMultiplier: 0.85,
+        // Horizontal offsets from pebble to text (fractions of available space to container edge)
+        // Higher value = text further from pebble
+        textHorizontalOffsetLeft: 0.9,
+        textHorizontalOffsetRight: 1.2,
+        textPanelMinWidthPx: 200,
+        textPanelMaxWidthPx: 200,
+        textPanelGutterPx: 24,
+        
+        // === TITLE CONTROLS ===
+        titleYOffset: -400,
+        titleTravelMultiplier: 0.9,
+        titleStartOffset: 0
+    },
+    [BREAKPOINT_NAMES.TABLET]: {
+        // === PEBBLE (3D MESH) CONTROLS ===
+        pebbleStartY: -16,
+        pebbleTotalTravel: 33,
+        pebbleScrollSpeed: 1.25,
+        
+        // === TEXT PANEL CONTROLS ===
+        textSpacingPixels: 420,
+        textStartOffset: -100,
+        textTravelMultiplier: 1.4,
+        textHorizontalOffsetLeft: 0.75,
+        textHorizontalOffsetRight: 0.9,
+        textPanelMinWidthPx: 300,
+        textPanelMaxWidthPx: 350,
+        textPanelGutterPx: 24,
+        
+        // === TITLE CONTROLS ===
+        titleYOffset: -600,
+        titleTravelMultiplier: 1.0,
+        titleStartOffset: 0
+    },
+    [BREAKPOINT_NAMES.DESKTOP]: {
+        // === PEBBLE (3D MESH) CONTROLS ===
+        pebbleStartY: -16,
+        pebbleTotalTravel: 35,
+        pebbleScrollSpeed: 1.3,
+        
+        // === TEXT PANEL CONTROLS ===
+        textSpacingPixels: 450,
+        textStartOffset: 0,
+        textTravelMultiplier: 1.5,
+        textHorizontalOffsetLeft: 0.9,
+        textHorizontalOffsetRight: 0.9,
+        textPanelMinWidthPx: 320,
+        textPanelMaxWidthPx: 440,
+        textPanelGutterPx: 24,
+        
+        // === TITLE CONTROLS ===
+        titleYOffset: -450,
+        titleTravelMultiplier: 1.0,
+        titleStartOffset: 0
+    },
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        // === PEBBLE (3D MESH) CONTROLS ===
+        pebbleStartY: -16,
+        pebbleTotalTravel: 35,
+        pebbleScrollSpeed: 1.3,
+        
+        // === TEXT PANEL CONTROLS ===
+        textSpacingPixels: 500,
+        textStartOffset: 0,
+        textTravelMultiplier: 1.5,
+        textHorizontalOffsetLeft: 0.75,  // HD displays (1366x768)
+        textHorizontalOffsetRight: 0.75,
+        textPanelMinWidthPx: 320,
+        textPanelMaxWidthPx: 520,
+        textPanelGutterPx: 24,
+        
+        // === TITLE CONTROLS ===
+        titleYOffset: -400,
+        titleTravelMultiplier: 1.0,
+        titleStartOffset: 0
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        // === PEBBLE (3D MESH) CONTROLS ===
+        pebbleStartY: -16,
+        pebbleTotalTravel: 35,
+        pebbleScrollSpeed: 1.3,
+        
+        // === TEXT PANEL CONTROLS ===
+        textSpacingPixels: 680,
+        textStartOffset: 0,
+        textTravelMultiplier: 1.5,
+        textHorizontalOffsetLeft: 0.75,  // Full HD (1920x1080)
+        textHorizontalOffsetRight: 0.75,
+        textPanelMinWidthPx: 340,
+        textPanelMaxWidthPx: 520,
+        textPanelGutterPx: 24,
+        
+        // === TITLE CONTROLS ===
+        titleYOffset: -500,
+        titleTravelMultiplier: 1.0,
+        titleStartOffset: 0
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
+        // === PEBBLE (3D MESH) CONTROLS ===
+        pebbleStartY: -16,
+        pebbleTotalTravel: 35,
+        pebbleScrollSpeed: 1.3,
+        
+        // === TEXT PANEL CONTROLS ===
+        textSpacingPixels: 900,
+        textStartOffset: 0,
+        textTravelMultiplier: 1.5,
+        textHorizontalOffsetLeft: 0.55,  // QHD/2K (2560x1440+)
+        textHorizontalOffsetRight: 0.55,
+        textPanelMinWidthPx: 360,
+        textPanelMaxWidthPx: 560,
+        textPanelGutterPx: 28,
+        
+        // === TITLE CONTROLS ===
+        titleYOffset: -700,
+        titleTravelMultiplier: 1.0,
+        titleStartOffset: 0
+    }
 };
 
 // Continuous Y spin (degrees per second) independent of scroll

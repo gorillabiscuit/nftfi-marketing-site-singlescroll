@@ -4,9 +4,66 @@
 section[data-section="4"] {
     background-image:  linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
     /* background-image: url('/images/NFTFI-Logo-loopergroup.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%); */
-    background-repeat: no-repeat, no-repeat;
-    background-position: -10%, center;
-    background-size: 100%, 100%;
+    background-repeat: no-repeat;
+    background-position: center; /* Ensure gradient centers without horizontal offset */
+    background-size: 100% 100%; /* Stretch to cover full section */
+    position: relative;
+    overflow: hidden;
+    /* Override global .section padding so content is flush with edges */
+    padding: 0;
+}
+
+/* Section 4 Decorative SVG - Top Right */
+section[data-section="4"]::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    right: -50px;
+    width: 600px;
+    height: 600px;
+    background-image: url('/images/circles.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.3;
+    z-index: 0;
+    pointer-events: none;
+    transform: rotate(15deg);
+}
+
+/* Section 4 Decorative SVG - Middle Left */
+section[data-section="4"]::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -100px;
+    width: 800px;
+    height: 800px;
+    background-image: url('/images/circles.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.65;
+    z-index: 0;
+    pointer-events: none;
+    transform: translateY(-50%) rotate(-30deg);
+}
+
+/* Section 4 Decorative SVG - Bottom Right */
+.section4-decoration-bottom {
+    position: absolute;
+    bottom: 5%;
+    right: -80px;
+    width: 700px;
+    height: 700px;
+    background-image: url('/images/circles.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.8;
+    z-index: 0;
+    pointer-events: none;
+    transform: rotate(60deg);
 }
 
 /* Section 4 layout adjustments */
@@ -109,8 +166,8 @@ section[data-section="4"] {
 @media (min-width: 1201px) {
     .section4-content {
         gap: 3rem; /* More generous spacing on large screens */
-        max-width: 1400px;
-        margin: 0 auto;
+        width: 100%;
+        margin: 0; /* Flush with viewport edges on large screens */
     }
     
     .section4-panel {
@@ -168,7 +225,6 @@ section[data-section="4"] {
     .section4-content {
         grid-template-columns: 1fr; /* Stack vertically on tablet */
         gap: 2rem;
-        text-align: center;
     }
     
     .section4-panel {
@@ -181,43 +237,48 @@ section[data-section="4"] {
     }
     
     .section4-list {
-        text-align: center; /* Center list on tablet */
+        text-align: left; /* Left-align list on tablet to match desktop */
     }
     
     .section4-list li {
         font-size: 22px;
         width: 280px;
-        margin: 0.3rem auto; /* Center list items */
+        margin: 0.3rem 0; /* Left-aligned list items */
     }
     
     .section4-item-title {
         font-size: 26px;
-        text-align: center;
+        text-align: left; /* Left-align to match desktop */
     }
     
     .section4-item-body {
         font-size: 17px;
-        text-align: center;
+        text-align: left; /* Left-align to match desktop */
     }
 }
 
 /* Mobile Breakpoint (≤600px) */
 @media (max-width: 600px) {
     section[data-section="4"] {
-        background-position: -20%, center; /* Adjust background position */
-        background-size: 120%, 100%; /* Adjust background size for mobile */
+        background-position: center; /* No horizontal offset on mobile */
+        background-size: 100% 100%; /* Full coverage on mobile */
+        margin: 0; /* Ensure no section margin on mobile */
     }
     
     .section4-content {
         grid-template-columns: 1fr; /* Single column layout */
         gap: 1.5rem;
-        padding: 1rem;
-        text-align: center;
+        padding: 0; /* Flush with edges on mobile */
+        margin: 0; /* Remove any auto margins */
+        width: 100vw; /* Ensure full viewport width */
+        /* Keep container neutral; panel text will be explicitly left-aligned */
+        text-align: left;
     }
     
     .section4-panel {
         width: min(100%, 90vw);
         gap: 16px; /* Tighter spacing on mobile */
+        text-align: left; /* Left-align text content inside mobile panels */
     }
     
     .section4-title {
@@ -225,7 +286,7 @@ section[data-section="4"] {
     }
     
     .section4-list {
-        text-align: center;
+        text-align: left;
         margin: 1rem 0;
     }
     
@@ -239,13 +300,13 @@ section[data-section="4"] {
     
     .section4-item-title {
         font-size: 22px; /* Smaller item titles */
-        text-align: center;
+        text-align: left;
         line-height: 1.3;
     }
     
     .section4-item-body {
         font-size: 16px; /* Smaller body text */
-        text-align: center;
+        text-align: left;
         line-height: 1.5;
     }
 }

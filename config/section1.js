@@ -32,8 +32,16 @@ export const ANIMATION_STATES = {
         start: { x: 0.55, y: 0.0, z: 0, scale: 2.5 },
         target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
     },
-    [BREAKPOINT_NAMES.LARGE]: {
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
         start: { x: 0.55, y: -0.15, z: 0, scale: 3.0 },
+        target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        start: { x: 0.55, y: -0.15, z: 0, scale: 3.0 },
+        target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
+        start: { x: 0.55, y: -0.15, z: 0, scale: 2.0 },
         target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
     }
 };

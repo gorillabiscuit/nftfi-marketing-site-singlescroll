@@ -47,7 +47,29 @@ export const SECTION3_CONTAINER = {
         xPercent: -50,      // Offset by own width (-50% = move left by half own width)
         yPercent: -50       // Offset by own height (-50% = move up by half own height)
     },
-    [BREAKPOINT_NAMES.LARGE]: {
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        // Container size (percentage of section) - More spacious for large screens
+        width: '85%',       // 85% width of section (leaves 15% margin)
+        height: '75%',      // 75% height of section (leaves 25% margin)
+        // Position from parent edges
+        left: '50%',        // Distance from left edge of parent (50% = center)
+        top: '50%',         // Distance from top edge of parent (50% = center)
+        // Self-offset (to achieve true centering)
+        xPercent: -50,      // Offset by own width (-50% = move left by half own width)
+        yPercent: -50       // Offset by own height (-50% = move up by half own height)
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        // Container size (percentage of section) - More spacious for large screens
+        width: '85%',       // 85% width of section (leaves 15% margin)
+        height: '75%',      // 75% height of section (leaves 25% margin)
+        // Position from parent edges
+        left: '50%',        // Distance from left edge of parent (50% = center)
+        top: '50%',         // Distance from top edge of parent (50% = center)
+        // Self-offset (to achieve true centering)
+        xPercent: -50,      // Offset by own width (-50% = move left by half own width)
+        yPercent: -50       // Offset by own height (-50% = move up by half own height)
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         // Container size (percentage of section) - More spacious for large screens
         width: '85%',       // 85% width of section (leaves 15% margin)
         height: '75%',      // 75% height of section (leaves 25% margin)
@@ -93,7 +115,23 @@ export const HERO_LOOPER = {
         offsetX: 190,      // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 50          // Vertical offset in pixels (+ = down, - = up)
     },
-    [BREAKPOINT_NAMES.LARGE]: {
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        // Panel size (in pixels)
+        width: 780,
+        height: 620,
+        // Pixel offset from center point (0,0 = perfect center)
+        offsetX: 280,      // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: 50         // Vertical offset in pixels (+ = down, - = up) - Slightly higher
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        // Panel size (in pixels)
+        width: 780,
+        height: 620,
+        // Pixel offset from center point (0,0 = perfect center)
+        offsetX: 280,      // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: 50         // Vertical offset in pixels (+ = down, - = up) - Slightly higher
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         // Panel size (in pixels)
         width: 780,
         height: 620,
@@ -143,7 +181,27 @@ export const DASHBOARD_SVG = {
         // SVG content scaling
         scale: 0.32
     },
-    [BREAKPOINT_NAMES.LARGE]: {
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        width: 1000,
+        height: 1000,
+        // Pixel offset from center point (0,0 = perfect center)
+        offsetX: -350,       // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: 140,         // Vertical offset in pixels (+ = down, - = up)
+        // SVG content scaling
+        scale: 0.33,
+        transformOrigin: 'center center'
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        width: 1000,
+        height: 1000,
+        // Pixel offset from center point (0,0 = perfect center)
+        offsetX: -350,       // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: 140,         // Vertical offset in pixels (+ = down, - = up)
+        // SVG content scaling
+        scale: 0.33,
+        transformOrigin: 'center center'
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         width: 1000,
         height: 1000,
         // Pixel offset from center point (0,0 = perfect center)
@@ -164,13 +222,17 @@ export const SECTION3_ARROWS = [
             [BREAKPOINT_NAMES.MOBILE]:  { x: 680, y: 320 },
             [BREAKPOINT_NAMES.TABLET]:  { x: 820, y: 360 },
             [BREAKPOINT_NAMES.DESKTOP]: { x: 760, y: 275 },
-            [BREAKPOINT_NAMES.LARGE]:   { x: 800, y: 260 }
+            [BREAKPOINT_NAMES.DESKTOP_HD]:   { x: 800, y: 260 },
+            [BREAKPOINT_NAMES.DESKTOP_XL]:   { x: 800, y: 260 },
+            [BREAKPOINT_NAMES.DESKTOP_2XL]:   { x: 800, y: 260 }
         },
         to: {
             [BREAKPOINT_NAMES.MOBILE]:  { x: 680, y: 150 },
             [BREAKPOINT_NAMES.TABLET]:  { x: 820, y: 360 },
             [BREAKPOINT_NAMES.DESKTOP]: { x: 500, y: 230 },
-            [BREAKPOINT_NAMES.LARGE]:   { x: 480, y: 210 }
+            [BREAKPOINT_NAMES.DESKTOP_HD]:   { x: 480, y: 210 },
+            [BREAKPOINT_NAMES.DESKTOP_XL]:   { x: 480, y: 210 },
+            [BREAKPOINT_NAMES.DESKTOP_2XL]:   { x: 480, y: 210 }
         }
     },
     {
@@ -179,13 +241,17 @@ export const SECTION3_ARROWS = [
             [BREAKPOINT_NAMES.MOBILE]:  { x: 680, y: 340 },
             [BREAKPOINT_NAMES.TABLET]:  { x: 820, y: 360 },
             [BREAKPOINT_NAMES.DESKTOP]: { x: 810, y: 372 },
-            [BREAKPOINT_NAMES.LARGE]:   { x: 850, y: 360 }
+            [BREAKPOINT_NAMES.DESKTOP_HD]:   { x: 850, y: 360 },
+            [BREAKPOINT_NAMES.DESKTOP_XL]:   { x: 850, y: 360 },
+            [BREAKPOINT_NAMES.DESKTOP_2XL]:   { x: 850, y: 360 }
         },
         to: {
             [BREAKPOINT_NAMES.MOBILE]:  { x: 640, y: 360 },
             [BREAKPOINT_NAMES.TABLET]:  { x: 800, y: 400 },
             [BREAKPOINT_NAMES.DESKTOP]: { x: 450, y: 360 },
-            [BREAKPOINT_NAMES.LARGE]:   { x: 430, y: 340 }
+            [BREAKPOINT_NAMES.DESKTOP_HD]:   { x: 430, y: 340 },
+            [BREAKPOINT_NAMES.DESKTOP_XL]:   { x: 430, y: 340 },
+            [BREAKPOINT_NAMES.DESKTOP_2XL]:   { x: 430, y: 340 }
         }
     },
     {
@@ -194,13 +260,17 @@ export const SECTION3_ARROWS = [
             [BREAKPOINT_NAMES.MOBILE]:  { x: 680, y: 320 },
             [BREAKPOINT_NAMES.TABLET]:  { x: 820, y: 360 },
             [BREAKPOINT_NAMES.DESKTOP]: { x: 862, y: 463 },
-            [BREAKPOINT_NAMES.LARGE]:   { x: 900, y: 450 }
+            [BREAKPOINT_NAMES.DESKTOP_HD]:   { x: 900, y: 450 },
+            [BREAKPOINT_NAMES.DESKTOP_XL]:   { x: 900, y: 450 },
+            [BREAKPOINT_NAMES.DESKTOP_2XL]:   { x: 900, y: 450 }
         },
         to: {
             [BREAKPOINT_NAMES.MOBILE]:  { x: 600, y: 400 },
             [BREAKPOINT_NAMES.TABLET]:  { x: 760, y: 440 },
             [BREAKPOINT_NAMES.DESKTOP]: { x: 773, y: 440 },
-            [BREAKPOINT_NAMES.LARGE]:   { x: 750, y: 420 }
+            [BREAKPOINT_NAMES.DESKTOP_HD]:   { x: 750, y: 420 },
+            [BREAKPOINT_NAMES.DESKTOP_XL]:   { x: 750, y: 420 },
+            [BREAKPOINT_NAMES.DESKTOP_2XL]:   { x: 750, y: 420 }
         }
     },
     {
@@ -209,13 +279,17 @@ export const SECTION3_ARROWS = [
             [BREAKPOINT_NAMES.MOBILE]:  { x: 680, y: 320 },
             [BREAKPOINT_NAMES.TABLET]:  { x: 820, y: 360 },
             [BREAKPOINT_NAMES.DESKTOP]: { x: 917, y: 557 },
-            [BREAKPOINT_NAMES.LARGE]:   { x: 960, y: 540 }
+            [BREAKPOINT_NAMES.DESKTOP_HD]:   { x: 960, y: 540 },
+            [BREAKPOINT_NAMES.DESKTOP_XL]:   { x: 960, y: 540 },
+            [BREAKPOINT_NAMES.DESKTOP_2XL]:   { x: 960, y: 540 }
         },
         to: {
             [BREAKPOINT_NAMES.MOBILE]:  { x: 560, y: 440 },
             [BREAKPOINT_NAMES.TABLET]:  { x: 720, y: 480 },
             [BREAKPOINT_NAMES.DESKTOP]: { x: 630, y: 610 },
-            [BREAKPOINT_NAMES.LARGE]:   { x: 600, y: 590 }
+            [BREAKPOINT_NAMES.DESKTOP_HD]:   { x: 600, y: 590 },
+            [BREAKPOINT_NAMES.DESKTOP_XL]:   { x: 600, y: 590 },
+            [BREAKPOINT_NAMES.DESKTOP_2XL]:   { x: 600, y: 590 }
         }
     }
 ];
@@ -333,7 +407,9 @@ export const WHITE_SPHERE_POSITIONS = {
     [BREAKPOINT_NAMES.MOBILE]: { x: -3.5, y: 5.6, z: -6 },
     [BREAKPOINT_NAMES.TABLET]: { x: -10.0, y: 4.8, z: -6.5 },
     [BREAKPOINT_NAMES.DESKTOP]: { x: -11.15, y: 5.35, z: -7 },
-    [BREAKPOINT_NAMES.LARGE]: { x: -12.5, y: 5.8, z: -7.5 }
+    [BREAKPOINT_NAMES.DESKTOP_HD]: { x: -12.5, y: 5.8, z: -7.5 },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: { x: -12.5, y: 5.8, z: -7.5 },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: { x: -12.5, y: 5.8, z: -7.5 }
 };
 
 // Scroll scaling for Section 3: pixels of scroll per second of timeline duration

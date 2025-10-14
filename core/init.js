@@ -27,6 +27,9 @@ export function init() {
     // Create camera
     camera = createCamera();
     
+    // Make camera globally accessible for viewport calculations
+    window.camera = camera;
+    
     // Create renderer
     renderer = createRenderer(canvas);
     

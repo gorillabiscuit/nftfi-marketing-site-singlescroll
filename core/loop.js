@@ -13,6 +13,8 @@ import { pebbleMesh, pebbleGroup, isPebbleReady } from '../objects/pebbleModel.j
 import { pebbleMesh2, pebbleGroup2, isPebble2Ready } from '../objects/pebbleModel2.js';
 import { pebbleMesh3, pebbleGroup3, isPebble3Ready } from '../objects/pebbleModel3.js';
 import { pebbleMesh4, pebbleGroup4, isPebble4Ready } from '../objects/pebbleModel4.js';
+// NEW: Import pebble interaction update
+import { updatePebbleInteraction } from '../controls/pebbleInteraction.js';
 
 // Global references (will be set by main.js)
 let mesh, wrapper, isModelReady;
@@ -64,13 +66,16 @@ export function animate() {
         if (pebbleMesh3 && pebbleGroup3 && pebbleGroup3.visible) activeMeshCount++;
         if (pebbleMesh4 && pebbleGroup4 && pebbleGroup4.visible) activeMeshCount++;
         
-        console.log(`[Performance] FPS: ${avgFps.toFixed(1)} avg | ${minFps.toFixed(1)} min | ${maxFps.toFixed(1)} max | Active refraction meshes: ${activeMeshCount}`);
+        // FPS logging removed - calculation kept for potential future debugging
         lastFpsLog = now;
         fpsHistory = []; // Reset for next interval
     }
 
     // NEW: Start performance monitoring for this frame
     startPerformanceFrame();
+    
+    // Update pebble interaction (raycasting for hover detection)
+    updatePebbleInteraction();
 
     // ANIMATION LOOP RE-ENABLED
     if (wrapper && isModelReady) {

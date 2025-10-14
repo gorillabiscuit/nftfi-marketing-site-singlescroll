@@ -51,7 +51,27 @@ export const GRID_STATES = {
         lineColor: '#F2F2F2',
         lineOpacity: 0.25
     },
-    [BREAKPOINT_NAMES.LARGE]: {
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        initialSpacing: 80,
+        outwardFactor: 1.9,
+        finalFactor: 3.0,
+        levels: 4,
+        svgSizeMultiplier: 1.6,
+        lineWidth: 0.5,
+        lineColor: '#F2F2F2',
+        lineOpacity: 0.25
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        initialSpacing: 80,
+        outwardFactor: 1.9,
+        finalFactor: 3.0,
+        levels: 4,
+        svgSizeMultiplier: 1.6,
+        lineWidth: 0.5,
+        lineColor: '#F2F2F2',
+        lineOpacity: 0.25
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         initialSpacing: 80,
         outwardFactor: 1.9,
         finalFactor: 3.0,
@@ -241,7 +261,123 @@ export const RECT_STATES = {
         // Blocks array: uses universal blocks configuration
         blocks: UNIVERSAL_BLOCKS
     },
-    [BREAKPOINT_NAMES.LARGE]: {
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        enabled: true,
+        sizeFactor: 1,
+        cornerRadiusFactor: 0.1,
+        pattern: 'checker',
+        cells: [[-2,0],[-1,0],[1,-1],[0,-2]],
+        sizeFactorOutStart: 1,
+        sizeFactorOutEnd: 1.4,
+        sizeFactorFinalStart: 1,
+        sizeFactorFinalEnd: 1,
+        positionOutMultiplierStart: 1,
+        positionOutMultiplierEnd: 1.5265,
+        positionFinalMultiplierStart: 1,
+        positionFinalMultiplierEnd: 1,
+        // Default rect styling for all blocks (can be overridden per block)
+        rectDefaults: {
+            gradientStart: 'rgba(109, 62, 88, 0.0)',
+            gradientEnd: 'rgba(109, 62, 88, 0.8)',
+            gradientAngle: 45,
+            strokeColor: '#FFFFFF',
+            strokeOpacity: 0.38,
+            strokeWidth: 1,
+            rxOverride: 15 // optional override; otherwise computed from cornerRadiusFactor
+        },
+        // Text configurations for the primary cell (global defaults)
+        amount: {
+            text: '$700M+',
+            color: 'rgba(255, 255, 255, 0.75)',
+            fontFamily: 'Roboto Mono, monospace',
+            fontSize: 36,
+            fontWeight: '300',
+            letterSpacing: 1.44,
+            center: true,
+            anchor: 'middle',
+            baseline: 'middle',
+            centerOffsetX: 70,
+            centerOffsetY: 65,
+            rotateDeg: -45
+        },
+        label: {
+            text: 'LOAN VOLUME',
+            color: '#FFFFFF',
+            opacity: 0.5,
+            fontFamily: 'Satoshi Variable, sans-serif',
+            fontSize: 16,
+            fontWeight: '500',
+            // bottom-left by default; you can switch to bottom-right using padRight
+            padLeft: 200,
+            padBottom: undefined,
+            padRight: undefined,
+            padTop: 180,
+            rotateDeg: -90,
+            anchor: 'start',
+            baseline: 'alphabetic'
+        },
+        // Blocks array: uses universal blocks configuration
+        blocks: UNIVERSAL_BLOCKS
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        enabled: true,
+        sizeFactor: 1,
+        cornerRadiusFactor: 0.1,
+        pattern: 'checker',
+        cells: [[-2,0],[-1,0],[1,-1],[0,-2]],
+        sizeFactorOutStart: 1,
+        sizeFactorOutEnd: 1.4,
+        sizeFactorFinalStart: 1,
+        sizeFactorFinalEnd: 1,
+        positionOutMultiplierStart: 1,
+        positionOutMultiplierEnd: 1.5265,
+        positionFinalMultiplierStart: 1,
+        positionFinalMultiplierEnd: 1,
+        // Default rect styling for all blocks (can be overridden per block)
+        rectDefaults: {
+            gradientStart: 'rgba(109, 62, 88, 0.0)',
+            gradientEnd: 'rgba(109, 62, 88, 0.8)',
+            gradientAngle: 45,
+            strokeColor: '#FFFFFF',
+            strokeOpacity: 0.38,
+            strokeWidth: 1,
+            rxOverride: 15 // optional override; otherwise computed from cornerRadiusFactor
+        },
+        // Text configurations for the primary cell (global defaults)
+        amount: {
+            text: '$700M+',
+            color: 'rgba(255, 255, 255, 0.75)',
+            fontFamily: 'Roboto Mono, monospace',
+            fontSize: 36,
+            fontWeight: '300',
+            letterSpacing: 1.44,
+            center: true,
+            anchor: 'middle',
+            baseline: 'middle',
+            centerOffsetX: 70,
+            centerOffsetY: 65,
+            rotateDeg: -45
+        },
+        label: {
+            text: 'LOAN VOLUME',
+            color: '#FFFFFF',
+            opacity: 0.5,
+            fontFamily: 'Satoshi Variable, sans-serif',
+            fontSize: 16,
+            fontWeight: '500',
+            // bottom-left by default; you can switch to bottom-right using padRight
+            padLeft: 200,
+            padBottom: undefined,
+            padRight: undefined,
+            padTop: 180,
+            rotateDeg: -90,
+            anchor: 'start',
+            baseline: 'alphabetic'
+        },
+        // Blocks array: uses universal blocks configuration
+        blocks: UNIVERSAL_BLOCKS
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         enabled: true,
         sizeFactor: 1,
         cornerRadiusFactor: 0.1,

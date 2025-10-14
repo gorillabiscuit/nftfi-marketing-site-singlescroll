@@ -22,7 +22,7 @@ import { initHeaderAnimation } from './controls/headerAnimation.js';
 import { initializeViewport, worldToPosition, calculateTargetPosition, calculateStartPosition } from './utils/viewport.js';
 import { createWindowResizeHandler, addEventListeners } from './utils/domUtils.js';
 import { TARGET_CONFIG, MODEL_CONFIG } from './config/index.js';
-import { initializeBreakpointDetection, getCurrentAnimationState, onStateChange, debugSetState, getAnimationState } from './utils/breakpointManager.js';
+import { initializeBreakpointDetection, getCurrentAnimationState, onStateChange, debugSetState, getAnimationState, toggleDebugMode, enableDebugMode, disableDebugMode } from './utils/breakpointManager.js';
 // NEW: Import ScrollSmoother synchronization layer
 import { 
     initializeScrollSmoother, 
@@ -40,6 +40,8 @@ import { initHeroButtonEffects } from './controls/heroButtonEffects.js';
 import scrollSpeedManager from './controls/scrollSpeedManager.js';
 // NEW: Unified Pinning System
 import unifiedPinningSystem from './controls/unifiedPinningSystem.js';
+// NEW: Pebble Interaction
+import { initPebbleInteraction } from './controls/pebbleInteraction.js';
 
 // Main initialization function
 async function init() {
@@ -169,12 +171,37 @@ async function init() {
                     if (grp1 && grp2 && grp3 && grp4) {
                         // Call once with all 4 pebble groups - creates a single unified ScrollTrigger
                         setupSection4PebbleFadePinned(grp1, grp2, grp3, grp4);
+                        
+                        // Initialize pebble interaction (hover/tap to spin)
+                        // Get camera from Three.js init
+                        import('./core/init.js').then(({ camera }) => {
+                            if (camera) {
+                                initPebbleInteraction(camera, [grp1, grp2, grp3, grp4]);
+                            }
+                        });
                     } else {
                         setTimeout(hookPebbles, 100);
                     }
                 } catch (_) { setTimeout(hookPebbles, 100); }
             };
             hookPebbles();
+            
+            // Listen for breakpoint changes and recreate Section 4 animations
+            onStateChange((newState, oldState) => {
+                try {
+                    const grp1 = (window.PEBBLE && window.PEBBLE.pebbleGroup) ? window.PEBBLE.pebbleGroup : pebbleGroup;
+                    const grp2 = (window.PEBBLE2 && window.PEBBLE2.pebbleGroup2) ? window.PEBBLE2.pebbleGroup2 : pebbleGroup2;
+                    const grp3 = (window.PEBBLE3 && window.PEBBLE3.pebbleGroup3) ? window.PEBBLE3.pebbleGroup3 : pebbleGroup3;
+                    const grp4 = (window.PEBBLE4 && window.PEBBLE4.pebbleGroup4) ? window.PEBBLE4.pebbleGroup4 : pebbleGroup4;
+                    
+                    if (grp1 && grp2 && grp3 && grp4) {
+                        // Recreate Section 4 animations with new breakpoint-specific config
+                        setupSection4PebbleFadePinned(grp1, grp2, grp3, grp4);
+                    }
+                } catch (e) {
+                    console.error('Failed to recreate Section 4 on breakpoint change:', e);
+                }
+            });
         } catch (e) {
             console.error('Failed to load Pebble model:', e);
         }
@@ -345,6 +372,14 @@ document.addEventListener('DOMContentLoaded', () => {
             try { if (e && e.persisted) { window.scrollTo(0, 0); } else { window.scrollTo(0, 0); } } catch (err) { void 0; }
         });
     } catch (e) { void 0; }
-    
+});
 
-}); 
+// Expose debug functions globally for easy console access
+window.debugBreakpoint = toggleDebugMode;
+window.enableBreakpointDebug = enableDebugMode;
+window.disableBreakpointDebug = disableDebugMode;
+
+console.log('💡 Debug commands available:');
+console.log('  - debugBreakpoint()          Toggle breakpoint debug label');
+console.log('  - enableBreakpointDebug()    Enable breakpoint debug label');
+console.log('  - disableBreakpointDebug()   Disable breakpoint debug label'); 

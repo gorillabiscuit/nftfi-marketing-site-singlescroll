@@ -42,7 +42,29 @@ export const SECTION5_LAYOUT = {
         rowGap: '3rem',
         titleYOffset: '10px'
     },
-    [BREAKPOINT_NAMES.LARGE]: {
+    [BREAKPOINT_NAMES.DESKTOP_HD]: {
+        // Explicit tweet count per row
+        topRowCount: 12,          // Exactly 12 tweets in top row
+        bottomRowCount: 12,       // Exactly 12 tweets in bottom row
+        // Card sizing
+        topRowTileSize: 280,      // Base size for CSS calculations
+        bottomRowTileSize: 280,   // Base size for CSS calculations
+        yOffset: '0px',          // More spacing on large screens
+        rowGap: '1.5rem',
+        titleYOffset: '15px'
+    },
+    [BREAKPOINT_NAMES.DESKTOP_XL]: {
+        // Explicit tweet count per row
+        topRowCount: 12,          // Exactly 12 tweets in top row
+        bottomRowCount: 12,       // Exactly 12 tweets in bottom row
+        // Card sizing
+        topRowTileSize: 280,      // Base size for CSS calculations
+        bottomRowTileSize: 280,   // Base size for CSS calculations
+        yOffset: '0px',          // More spacing on large screens
+        rowGap: '1.5rem',
+        titleYOffset: '15px'
+    },
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         // Explicit tweet count per row
         topRowCount: 12,          // Exactly 12 tweets in top row
         bottomRowCount: 12,       // Exactly 12 tweets in bottom row
