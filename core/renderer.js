@@ -17,17 +17,31 @@ export function createRenderer(canvas) {
     renderer = new THREE.WebGLRenderer({ 
         canvas: canvas,
         alpha: true, // Enable transparency
-        antialias: true 
+        antialias: true,
+        powerPreference: 'high-performance'
     });
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0); // Transparent clear color
     
     // Set full viewport dimensions
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    {
+        const dpr = window.devicePixelRatio || 1;
+        const isMobile = window.innerWidth <= 900;
+        const targetPR = Math.min(dpr, isMobile ? 1.5 : 2);
+        renderer.setPixelRatio(targetPR);
+    }
     
     // Set clear color to transparent
     renderer.setClearColor(0x000000, 0);
+    
+    // Color management / tone mapping
+    if (renderer.outputColorSpace !== undefined) {
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+    }
+    if (renderer.toneMapping !== undefined) {
+        renderer.toneMapping = THREE.NoToneMapping;
+    }
     
     return renderer;
 }
@@ -58,7 +72,10 @@ export function onWindowResize() {
         const height = window.innerHeight;
         
         renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const dpr = window.devicePixelRatio || 1;
+        const isMobile = window.innerWidth <= 900;
+        const targetPR = Math.min(dpr, isMobile ? 1.5 : 2);
+        renderer.setPixelRatio(targetPR);
     }
     
     // Update render targets

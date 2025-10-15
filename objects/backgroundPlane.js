@@ -246,8 +246,8 @@ export function captureHeroAsTexture() {
         
         // Wait for fonts and layout to settle before capture to avoid reflow pop
         const doCapture = () => {
-            // Capture the hero div using html2canvas
-            html2canvas(heroElement, { 
+            // Ensure html2canvas is available (lazy-loaded from index.html)
+            const runCapture = () => html2canvas(heroElement, { 
                 backgroundColor: null, // Transparent background
                 scale: 2, // Higher resolution for better quality
                 useCORS: true, // Allow cross-origin images
@@ -308,6 +308,12 @@ export function captureHeroAsTexture() {
                 
                 reject(error);
             });
+            
+            if (window.__loadHtml2Canvas && !window.html2canvas) {
+                try { window.__loadHtml2Canvas(() => runCapture()); } catch (_) { runCapture(); }
+            } else {
+                runCapture();
+            }
         };
         const waitForHeroReady = () => {
             // Prefer global heroReady if available; fallback to fonts.ready

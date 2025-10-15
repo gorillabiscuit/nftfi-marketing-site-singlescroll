@@ -225,10 +225,24 @@ async function init() {
     initStatsScrambleReveal();
     initHeadingReveal();
     
-    // Initialize video textures for Section 4 asset switching (async, non-blocking)
-    initializeVideoTextures().catch(error => {
-        console.warn('Failed to initialize video textures:', error);
-    });
+    // Defer initialization of heavy video textures until Section 4 nears viewport
+    try {
+        const s4 = document.querySelector('.section[data-section="4"]');
+        if ('IntersectionObserver' in window && s4) {
+            let started = false;
+            const obs = new IntersectionObserver((entries) => {
+                const e = entries[0];
+                if (!started && e && e.isIntersecting) {
+                    started = true;
+                    try { initializeVideoTextures().catch(() => {}); } catch (_) { }
+                    try { obs.disconnect(); } catch (_) { }
+                }
+            }, { root: null, rootMargin: '800px', threshold: 0 });
+            obs.observe(s4);
+        } else {
+            initializeVideoTextures().catch(() => {});
+        }
+    } catch (_) { try { initializeVideoTextures().catch(() => {}); } catch (_) { } }
     // Embed Section 3 dashboard SVG, then initialize pin+scrub timeline
     initSection3Dashboard().then((ok) => {
         console.log('Section 3 dashboard embed:', ok ? 'success' : 'skipped');

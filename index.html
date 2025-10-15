@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFTfi Marketing Site - Single Scroll</title>
+    <meta name="description" content="Borrow, lend, and refinance NFTs across major protocols on NFTfi's trusted platform.">
+    <link rel="canonical" href="https://nftfi.com/" />
+    <meta property="og:title" content="NFTfi – NFT Lending Aggregator" />
+    <meta property="og:description" content="Borrow, lend, and refinance NFTs across major protocols on NFTfi's trusted platform." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nftfi.com/" />
+    <meta property="og:image" content="/images/NFTfi-logo-white.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="NFTfi – NFT Lending Aggregator" />
+    <meta name="twitter:description" content="Borrow, lend, and refinance NFTs across major protocols on NFTfi's trusted platform." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
@@ -22,7 +32,17 @@
 
     
     <script>try{if('scrollRestoration'in history){history.scrollRestoration='manual';}}catch(e){}</script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <!-- Defer html2canvas; loaded on-demand by backgroundPlane capture -->
+    <script>
+      window.__loadHtml2Canvas = function(cb){
+        if (window.html2canvas) { cb && cb(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+        s.async = true;
+        s.onload = function(){ cb && cb(); };
+        document.head.appendChild(s);
+      };
+    </script>
 </head>
 <body>
     <!-- Animated Morphing Gradients Background -->
@@ -226,7 +246,7 @@
             </section>
             
             <section class="section half" data-section="2">
-                <h1 class="key-metrics-title">NFTfi by the numbers</h1>
+                <h2 class="key-metrics-title">NFTfi by the numbers</h2>
                                 <div class="svg-lines-container">
                     <svg id="lines-svg" preserveAspectRatio="xMidYMid slice">
                         <!-- Lines will be dynamically positioned and sized via JavaScript -->

@@ -380,6 +380,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
         start: "top bottom", // Animation starts when section top enters viewport bottom
         end: "bottom top",   // Animation ends when section bottom exits viewport top
         scrub: true,
+        invalidateOnRefresh: true,
         onUpdate: (self) => {
             const progress = self.progress;
             
