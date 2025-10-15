@@ -15,7 +15,7 @@ let currentState = 'desktop';
 let stateChangeCallbacks = [];
 
 // Debug mode configuration - SET TO TRUE TO AUTO-ENABLE DEBUG LABEL ON LOAD
-export const DEBUG_BREAKPOINTS_ON_LOAD = true;
+export const DEBUG_BREAKPOINTS_ON_LOAD = false;
 
 // Debug mode state
 let debugMode = false;

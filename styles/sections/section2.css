@@ -19,6 +19,7 @@
 .section[data-section="2"] h1,
 .section[data-section="2"] h2 {
     text-align: center !important;
+    font-size: var(--font-size-3xl);
     padding-bottom: 5vw;
 }
 
