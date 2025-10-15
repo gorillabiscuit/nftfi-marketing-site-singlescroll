@@ -16,7 +16,8 @@
 }
 
 /* Center align the h2 text in section 2 */
-.section[data-section="2"] h1 {
+.section[data-section="2"] h1,
+.section[data-section="2"] h2 {
     text-align: center !important;
     padding-bottom: 5vw;
 }
@@ -24,8 +25,10 @@
 /* Key Metrics Title */
 .key-metrics-title {
     display: inline-block;
-    transform: translate(20px, -100px) rotate(45deg);
+    transform: translate(0px, -40px) rotate(45deg);
     transform-origin: center center;
+    position: relative;
+    z-index: 2;
 }
 
 /* Stats Container */
@@ -177,7 +180,7 @@
 @media (min-width: 601px) and (max-width: 900px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(-10px, -100px) rotate(45deg);
+        transform: translate(-10px, -60px) rotate(45deg);
     }
 
     /* Target amount text */
@@ -195,7 +198,7 @@
 @media (min-width: 901px) and (max-width: 1200px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(0px, -120px) rotate(45deg);
+        transform: translate(0px, -60px) rotate(45deg);
     }
 
     /* Target amount text */
@@ -213,7 +216,7 @@
 @media (min-width: 1201px) and (max-width: 1600px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(0px, -120px) rotate(45deg);
+        transform: translate(0px, -60px) rotate(45deg);
     }
 
     /* Target amount text */
@@ -231,7 +234,7 @@
 @media (min-width: 1601px) and (max-width: 2000px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(0px, -120px) rotate(45deg);
+        transform: translate(0px, -60px) rotate(45deg);
     }
 
     /* Target amount text */
@@ -249,7 +252,7 @@
 @media (min-width: 2001px) {
     /* Key Metrics Title positioning */
     .key-metrics-title {
-        transform: translate(0px, -120px) rotate(45deg);
+        transform: translate(0px, -60px) rotate(45deg);
     }
 
     /* Target amount text */
