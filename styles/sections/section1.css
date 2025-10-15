@@ -1,10 +1,15 @@
 /* Section 1 - Hero Section Styles */
 
 /* Hero Section */
+:root { --hero-height-ratio: 0.75; }
 .hero {
     border-radius: 27px;
     border: 1px solid rgba(217, 213, 214, 0.25);
-    background: linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+    /* Move bottom-left rings into background so buttons refract them */
+    background-image: url('/images/circles.svg'), linear-gradient(180deg, #8D694B 0%, #6C3C59 100%);
+    background-repeat: no-repeat, no-repeat;
+    background-size: 950px 950px, 100% 100%;
+    background-position: left 5px bottom -460px, center;
     padding: var(--hero-padding); /* Only vertical padding - horizontal handled by section wrapper */
     margin-top: 80px; /* Added 20px top spacing */
     margin-left: auto;
@@ -12,12 +17,16 @@
     margin-bottom: var(--spacing-lg);
     max-width: 1200px; /* Match navigation max-width */
     width: 100%; /* Full width up to max-width - like navigation */
-    min-height: 30vh; /* Ensure enough height for flexible button positioning */
+    /* Fill a fraction of the viewport minus header (tunable via --hero-height-ratio) */
+    min-height: calc((var(--app-viewport-height, 100vh) - var(--header-height, 0px)) * var(--hero-height-ratio, 0.75)) !important;
     position: relative;
+    /* Ensure inner content can stretch to bottom for actions pinning */
+    display: flex;
+    flex-direction: column;
     z-index: 4;
     overflow: hidden; /* Clip the SVG backgrounds */
-    /* Create new stacking context for backdrop-filter to work properly */
-    isolation: isolate;
+    /* Avoid isolating stacking context so backdrop can sample beyond hero if needed */
+    isolation: auto;
     box-shadow: 0 39px 54px 0 rgba(12, 9, 10, 0.41);
     
     /* Smooth, non-layout transitions to avoid jank */
@@ -29,8 +38,11 @@
         filter 0.3s ease-out;
 }
 
-/* SVG Background - Top Right Copy */
-.hero::before {
+/* Disable previous ::before art (we'll draw the top-right via ::after to avoid refraction) */
+.hero::before { display: none; }
+
+/* Draw top-right rings above content so they do NOT refract */
+.hero::after {
     content: '';
     position: absolute;
     top: -350px;
@@ -42,24 +54,7 @@
     background-repeat: no-repeat;
     background-position: center;
     opacity: 1.0;
-    z-index: 1; /* Lower z-index so it gets distorted by glass card */
-    pointer-events: none;
-}
-
-/* SVG Background - Bottom Left Copy */
-.hero::after {
-    content: '';
-    position: absolute;
-    bottom: -460px;
-    left: 5px;
-    width: 950px;
-    height: 950px;
-    background-image: url('/images/circles.svg');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 1.0;
-    z-index: 1; /* Lower z-index so it gets distorted by glass card */
+    z-index: 1;
     pointer-events: none;
 }
 
@@ -74,18 +69,18 @@
 }
 
 .hero-content {
-    /* Flexbox layout to push buttons to bottom */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Start content at top */
-    min-height: 50vh; /* Match hero container's min-height to ensure full coverage */
+    /* Grid layout: center main, keep actions pinned at bottom */
+    display: grid;
+    grid-template-rows: 1fr auto; /* main grows, actions sit at bottom */
+    align-items: start; /* place title/subtitle at the top */
+    flex: 1 1 auto; /* fill hero height so actions can reach bottom */
+    /* Make container as tall as the hero's inner box so actions reach the bottom */
+    min-height: calc((var(--app-viewport-height, 100vh) - var(--header-height, 0px)) * var(--hero-height-ratio, 0.75) - (var(--hero-padding) * 2));
+    height: 100%;
     text-align: left;
     padding: 0px;
-    margin: 0; /* Remove auto margin to align left */
-    /* Ensure content is below glass card for proper distortion */
+    margin: 0;
     z-index: 1;
-    
-    /* Smooth transitions for content sizing */
     transition: 
         width 0.3s ease-out,
         height 0.3s ease-out,
@@ -167,12 +162,7 @@ h2 {
     padding: 0px;
     gap: 24px;
     margin: 0;
-    margin-top: auto; /* Push to bottom with flexible gap above */
-    /* Position at bottom of hero-content */
-    flex: 0 0 auto; /* Don't grow, don't shrink, auto height */
-    order: 2; /* Ensure it comes after hero-text */
-    
-    /* Smooth transitions for actions sizing */
+    /* sits in second grid row by default */
     transition: 
         width 0.3s ease-out,
         gap 0.3s ease-out,
@@ -191,11 +181,11 @@ h2 {
 }
 
 .section:first-child {
-    justify-content: flex-start; /* Ensure first section aligns left */
-    align-items: stretch; /* Allow content to fill full height instead of centering */
-    padding: 0; /* Remove padding to allow content to fill full height */
-    padding-left: calc(var(--container-padding) + 3px); /* Match navigation's actual computed padding (35px) */
-    padding-right: calc(var(--container-padding) + 3px); /* Match navigation's actual computed padding (35px) */
+    justify-content: flex-start; /* Keep left alignment */
+    align-items: center; /* Center vertically */
+    padding: 0; /* No extra vertical padding at section level */
+    padding-left: calc(var(--container-padding) + 3px); /* Match navigation */
+    padding-right: calc(var(--container-padding) + 3px);
 }
 
 .content {
@@ -211,11 +201,10 @@ h2 {
 .section:first-child .content {
     max-width: none; /* Allow hero to take full width */
     width: 100%;
-    flex: 1; /* Take up all available space in flex container */
+    flex: 1 1 auto; /* Fill available height so hero can stretch */
     display: flex;
     flex-direction: column;
-    
-    padding: 2rem 0; /* Add back vertical padding, horizontal handled by section */
+    padding: 0; /* Remove extra vertical padding so centering is exact */
 }
 
 /* Hero Action Cards/Buttons */
@@ -350,8 +339,13 @@ a.card:focus {
         padding: 14px 38px; /* Base mobile padding */
     }
     
-    .hero-content {
-        height: 58vh; /* Base mobile height */
+    /* Use grid centering from base; no fixed heights */
+    .hero-content { 
+        /* Place title/subtitle + actions at the bottom on small screens */
+        grid-template-rows: auto auto; /* no 1fr row consuming space */
+        align-content: end; /* pack both rows to the bottom */
+        row-gap: 20px; /* extra space between subtitle and buttons */
+        padding-bottom: 8px; /* small breathing room from card edge */
     }
 
     .hero-text {
@@ -374,8 +368,10 @@ a.card:focus {
         padding: 15px 40px; /* Slightly larger touch targets */
     }
     
-    .hero-content {
-        height: 45vh; /* More content space on larger screens */
+    .hero-content { 
+        grid-template-rows: auto auto;
+        align-content: end; 
+        row-gap: 22px;
     }
 
     .hero-text {
@@ -397,8 +393,10 @@ a.card:focus {
         padding: 12px 36px; /* Compact touch targets */
     }
     
-    .hero-content {
-        height: 56vh; /* Less space for small screens */
+    .hero-content { 
+        grid-template-rows: auto auto;
+        align-content: end; 
+        row-gap: 16px;
     }
 
     .hero-text {
@@ -419,6 +417,11 @@ a.card:focus {
     }
 
     .hero-content {
+        /* Keep rows at the bottom for tablet */
+        grid-template-rows: auto auto;
+        align-content: end;
+        row-gap: 64px; /* more separation from buttons */
+        padding-bottom: 16px; /* prevent overlap into card radius */
         min-height: 30vh;
        } 
 
@@ -450,11 +453,12 @@ a.card:focus {
 /* desktop_hd (1201px–1600px) */
 @media (min-width: 1201px) and (max-width: 1600px) {
     .hero {
+        min-height: calc((var(--app-viewport-height) - var(--header-height)) * var(--hero-height-ratio, 0.75)) !important; 
         max-width: 1400px; /* Match navigation max-width on large screens */
-        margin-top: 110px;
+        margin-top: 40;
     }
     .hero-content {
-        min-height: 0 !important;
+        min-height: auto !important;
         height: auto !important;
     }
     
@@ -467,11 +471,14 @@ a.card:focus {
 /* desktop_xl (1601px–2000px) */
 @media (min-width: 1601px) and (max-width: 2000px) {
     .hero {
+ 
+        --hero-height-ratio: 0.65; /* adjust per 2xl needs */
+        min-height: calc((var(--app-viewport-height) - var(--header-height)) * var(--hero-height-ratio, 0.65)) !important; 
         max-width: 1400px;
-        margin-top: 110px;
+        margin-top: 0;
     }
     .hero-content {
-        min-height: 0 !important;
+        min-height: auto !important;
         height: auto !important;
     }
     .section:first-child {
@@ -491,17 +498,16 @@ a.card:focus {
     }
     
     .hero {
-        min-height: 55vh !important; 
+        --hero-height-ratio: 0.55; /* adjust per 2xl needs */
+        min-height: calc((var(--app-viewport-height) - var(--header-height)) * var(--hero-height-ratio, 0.55)) !important; 
         max-width: 1600px; /* Give a little more room on ultra-wide */
-        margin-top: 280px;
+        margin-top: 0;
     }
     /* Allow the hero to shrink: the inner wrapper was enforcing taller heights */
     .hero-content {
-        /* Fill the hero's content box so buttons can pin to the bottom */
-        min-height: calc(55vh - (var(--hero-padding) * 2)) !important;
+        /* Grid handles centering and buttons; no forced min-height */
+        min-height: auto !important;
         height: auto !important;
-        display: flex;
-        flex-direction: column;
     }
     .section:first-child {
         padding-left: calc(var(--container-padding) + 3px);

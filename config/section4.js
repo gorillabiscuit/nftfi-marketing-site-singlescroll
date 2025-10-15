@@ -11,7 +11,7 @@ export const SECTION4_PEBBLE_VERTICAL_SPACING = {
     [BREAKPOINT_NAMES.DESKTOP]: 6.0,     // Standard spacing on desktop
     [BREAKPOINT_NAMES.DESKTOP_HD]: 6.5,  // Slightly more on HD
     [BREAKPOINT_NAMES.DESKTOP_XL]: 6.0,  // More spacing on Full HD
-    [BREAKPOINT_NAMES.DESKTOP_2XL]: 8.0  // Maximum spacing on 2K+
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: 4.0  // Maximum spacing on 2K+
 };
 
 // Helper function to calculate pebble Y position based on index, breakpoint, and spacing
@@ -44,8 +44,8 @@ export const SECTION4_PEBBLE = {
         scale: 1.95
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
-        position: { x: -6, y: getPebbleY(0, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Left side, top (QHD: 2560x1440)
-        scale: 1.5
+        position: { x: -3, y: getPebbleY(0, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Left side, top (QHD: 2560x1440)
+        scale: 1.25
     }
 };
 
@@ -72,8 +72,8 @@ export const SECTION4_PEBBLE2 = {
         scale: 1.95
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
-        position: { x: 6, y: getPebbleY(1, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Right side (QHD: 2560x1440)
-        scale: 1.5
+        position: { x: 3, y: getPebbleY(1, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Right side (QHD: 2560x1440)
+        scale: 1.25
     }
 };
 
@@ -100,8 +100,8 @@ export const SECTION4_PEBBLE3 = {
         scale: 1.95
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
-        position: { x: -6, y: getPebbleY(2, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Left side (QHD: 2560x1440)
-        scale: 1.5
+        position: { x: -3, y: getPebbleY(2, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Left side (QHD: 2560x1440)
+        scale: 1.25
     }
 };
 
@@ -128,8 +128,8 @@ export const SECTION4_PEBBLE4 = {
         scale: 1.95
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
-        position: { x: 6, y: getPebbleY(3, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Right side (QHD: 2560x1440)
-        scale: 1.5
+        position: { x: 4, y: getPebbleY(3, BREAKPOINT_NAMES.DESKTOP_2XL), z: 0 },  // Right side (QHD: 2560x1440)
+        scale: 1.25
     }
 };
 
@@ -141,7 +141,7 @@ export const SECTION4_CONTAINER_HEIGHT = {
     [BREAKPOINT_NAMES.DESKTOP]: 200,
     [BREAKPOINT_NAMES.DESKTOP_HD]: 200,
     [BREAKPOINT_NAMES.DESKTOP_XL]: 200,
-    [BREAKPOINT_NAMES.DESKTOP_2XL]: 200
+    [BREAKPOINT_NAMES.DESKTOP_2XL]: 140
 };
 
 // Scroll parallax controls for Section 4 (pebbles, text panels, and title)
@@ -215,11 +215,11 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
     [BREAKPOINT_NAMES.DESKTOP_HD]: {
         // === PEBBLE (3D MESH) CONTROLS ===
         pebbleStartY: -16,
-        pebbleTotalTravel: 35,
+        pebbleTotalTravel: 37,
         pebbleScrollSpeed: 1.3,
         
         // === TEXT PANEL CONTROLS ===
-        textSpacingPixels: 500,
+        textSpacingPixels: 530,
         textStartOffset: 0,
         textTravelMultiplier: 1.5,
         textHorizontalOffsetLeft: 0.75,  // HD displays (1366x768)
@@ -240,11 +240,11 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         pebbleScrollSpeed: 1.3,
         
         // === TEXT PANEL CONTROLS ===
-        textSpacingPixels: 680,
+        textSpacingPixels: 620,
         textStartOffset: 0,
         textTravelMultiplier: 1.5,
-        textHorizontalOffsetLeft: 0.75,  // Full HD (1920x1080)
-        textHorizontalOffsetRight: 0.75,
+        textHorizontalOffsetLeft: 0.55,  // Full HD (1920x1080)
+        textHorizontalOffsetRight: 0.55,
         textPanelMinWidthPx: 340,
         textPanelMaxWidthPx: 520,
         textPanelGutterPx: 24,
@@ -256,16 +256,16 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         // === PEBBLE (3D MESH) CONTROLS ===
-        pebbleStartY: -16,
+        pebbleStartY: -18,
         pebbleTotalTravel: 35,
         pebbleScrollSpeed: 1.3,
         
         // === TEXT PANEL CONTROLS ===
-        textSpacingPixels: 900,
+        textSpacingPixels: 520,
         textStartOffset: 0,
         textTravelMultiplier: 1.5,
-        textHorizontalOffsetLeft: 0.55,  // QHD/2K (2560x1440+)
-        textHorizontalOffsetRight: 0.55,
+        textHorizontalOffsetLeft: 0.45,  // QHD/2K (2560x1440+)
+        textHorizontalOffsetRight: 0.45,
         textPanelMinWidthPx: 360,
         textPanelMaxWidthPx: 560,
         textPanelGutterPx: 28,

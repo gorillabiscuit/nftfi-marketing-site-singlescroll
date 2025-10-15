@@ -71,11 +71,11 @@ export const SECTION3_CONTAINER = {
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         // Container size (percentage of section) - More spacious for large screens
-        width: '85%',       // 85% width of section (leaves 15% margin)
-        height: '75%',      // 75% height of section (leaves 25% margin)
+        width: '80%',       // 85% width of section (leaves 15% margin)
+        height: '80%',      // 75% height of section (leaves 25% margin)
         // Position from parent edges
         left: '50%',        // Distance from left edge of parent (50% = center)
-        top: '50%',         // Distance from top edge of parent (50% = center)
+        top: '60%',         // Distance from top edge of parent (50% = center)
         // Self-offset (to achieve true centering)
         xPercent: -50,      // Offset by own width (-50% = move left by half own width)
         yPercent: -50       // Offset by own height (-50% = move up by half own height)
@@ -134,10 +134,10 @@ export const HERO_LOOPER = {
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         // Panel size (in pixels)
         width: 780,
-        height: 620,
+        height: 680,
         // Pixel offset from center point (0,0 = perfect center)
-        offsetX: 280,      // Horizontal offset in pixels (+ = right, - = left)
-        offsetY: 50         // Vertical offset in pixels (+ = down, - = up) - Slightly higher
+        offsetX: 200,      // Horizontal offset in pixels (+ = right, - = left)
+        offsetY: -100         // Vertical offset in pixels (+ = down, - = up) - Slightly higher
     }
 };
 
@@ -202,13 +202,13 @@ export const DASHBOARD_SVG = {
         transformOrigin: 'center center'
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
-        width: 1000,
-        height: 1000,
+        width: 1400,
+        height: 1400,
         // Pixel offset from center point (0,0 = perfect center)
         offsetX: -350,       // Horizontal offset in pixels (+ = right, - = left)
         offsetY: 140,         // Vertical offset in pixels (+ = down, - = up)
         // SVG content scaling
-        scale: 0.33,
+        scale: 0.4,
         transformOrigin: 'center center'
     }
 };

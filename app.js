@@ -372,6 +372,48 @@ document.addEventListener('DOMContentLoaded', () => {
             try { if (e && e.persisted) { window.scrollTo(0, 0); } else { window.scrollTo(0, 0); } } catch (err) { void 0; }
         });
     } catch (e) { void 0; }
+
+    // Bullet-proof viewport and header sizing for hero
+    (function setupDynamicViewportAndHeaderSizing() {
+        const docEl = document.documentElement;
+        const headerEl = document.querySelector('nav.custom-navbar') || document.querySelector('header');
+
+        function setViewportVars() {
+            try {
+                const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                docEl.style.setProperty('--app-viewport-height', vh + 'px');
+            } catch (_) {
+                docEl.style.setProperty('--app-viewport-height', window.innerHeight + 'px');
+            }
+        }
+
+        function setHeaderHeight() {
+            if (!headerEl) { docEl.style.setProperty('--header-height', '0px'); return; }
+            try {
+                const h = headerEl.offsetHeight;
+                docEl.style.setProperty('--header-height', h + 'px');
+            } catch (_) {
+                docEl.style.setProperty('--header-height', '0px');
+            }
+        }
+
+        setViewportVars();
+        setHeaderHeight();
+
+        // Update on viewport changes (mobile browser chrome show/hide)
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', setViewportVars, { passive: true });
+        }
+        window.addEventListener('resize', setViewportVars, { passive: true });
+
+        // Observe header height changes robustly
+        try {
+            const ro = new ResizeObserver(setHeaderHeight);
+            if (headerEl) ro.observe(headerEl);
+        } catch (_) {
+            window.addEventListener('resize', setHeaderHeight, { passive: true });
+        }
+    })();
 });
 
 // Expose debug functions globally for easy console access

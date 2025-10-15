@@ -37,11 +37,11 @@ export const ANIMATION_STATES = {
         target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
     },
     [BREAKPOINT_NAMES.DESKTOP_XL]: {
-        start: { x: 0.55, y: -0.15, z: 0, scale: 3.0 },
+        start: { x: 0.55, y: -0.15, z: 0, scale: 2.5 },
         target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
-        start: { x: 0.55, y: -0.15, z: 0, scale: 2.0 },
+        start: { x: 0.55, y: -0, z: 0, scale: 2.0 },
         target: { x: -0.91, y: 0.81, z: 0, scale: 0.235 }
     }
 };
@@ -80,8 +80,8 @@ export const HERO_BUTTON_STROKE_EFFECTS = {
     glow2OffsetY: -2,          // Vertical offset of second highlight (pixels, + = down, - = up) - symmetric
     
     // Displacement/distortion effects (default + hover)
-    displacementScale: 250,         // Default distortion strength (0-400+, subtle by default)
-    displacementScaleHover: 100,    // Hover distortion strength (stronger on hover)
+    displacementScale: 50,         // Default distortion strength (0-400+, subtle by default)
+    displacementScaleHover: 50,    // Hover distortion strength (stronger on hover)
     displacementBlur: 1.5,          // Default blur with distortion (pixels)
     displacementBlurHover: 2.5,     // Hover blur with distortion (pixels)
     

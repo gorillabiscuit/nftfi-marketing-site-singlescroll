@@ -217,3 +217,35 @@ html.is-prep .hero-text {
     height: 0;
     overflow: hidden;
 }
+
+/* =============================================================
+   Larger gradient scales for big breakpoints
+   Matches JS: desktop_hd (1201–1600), desktop_xl (1601–2000), desktop_2xl (2001+)
+   ============================================================= */
+
+/* desktop_hd (1201–1600px) */
+@media (min-width: 1201px) and (max-width: 1600px) {
+  .gradients-bg::before { width: 840px; height: 840px; }
+  .gradients-bg::after  { width: 700px; height: 700px; }
+  .gradient-layer-3      { width: 980px; height: 980px; }
+  .gradient-layer-4      { width: 630px; height: 630px; }
+  .gradient-layer-5      { width: 770px; height: 770px; }
+}
+
+/* desktop_xl (1601–2000px) */
+@media (min-width: 1601px) and (max-width: 2000px) {
+  .gradients-bg::before { width: 1080px; height: 1080px; }
+  .gradients-bg::after  { width: 900px; height: 900px; }
+  .gradient-layer-3      { width: 1260px; height: 1260px; }
+  .gradient-layer-4      { width: 810px; height: 810px; }
+  .gradient-layer-5      { width: 990px; height: 990px; }
+}
+
+/* desktop_2xl (2001px+) */
+@media (min-width: 2001px) {
+  .gradients-bg::before { width: 1320px; height: 1320px; }
+  .gradients-bg::after  { width: 1100px; height: 1100px; }
+  .gradient-layer-3      { width: 1540px; height: 1540px; }
+  .gradient-layer-4      { width: 990px; height: 990px; }
+  .gradient-layer-5      { width: 1210px; height: 1210px; }
+}

@@ -72,7 +72,7 @@ export const GRID_STATES = {
         lineOpacity: 0.25
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
-        initialSpacing: 80,
+        initialSpacing: 95,
         outwardFactor: 1.9,
         finalFactor: 3.0,
         levels: 4,
@@ -412,8 +412,8 @@ export const RECT_STATES = {
             center: true,
             anchor: 'middle',
             baseline: 'middle',
-            centerOffsetX: 70,
-            centerOffsetY: 65,
+            centerOffsetX: 90,
+            centerOffsetY: 85,
             rotateDeg: -45
         },
         label: {
@@ -424,10 +424,10 @@ export const RECT_STATES = {
             fontSize: 16,
             fontWeight: '500',
             // bottom-left by default; you can switch to bottom-right using padRight
-            padLeft: 200,
+            padLeft: 240,
             padBottom: undefined,
             padRight: undefined,
-            padTop: 180,
+            padTop: 220,
             rotateDeg: -90,
             anchor: 'start',
             baseline: 'alphabetic'

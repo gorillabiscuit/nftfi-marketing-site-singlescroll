@@ -72,6 +72,24 @@ function applyStrokeEffects() {
 export function initHeroButtonEffects() {
     console.log('Initializing hero button stroke effects...');
     
+    // Ensure filter regions cover the viewport; some Chrome builds drop url(#id)
+    // effects when the filter region is too small/objectBoundingBox-based.
+    try {
+        const svgFilter = document.querySelector('#displacementFilter');
+        const svgFilterHover = document.querySelector('#displacementFilterHover');
+        const setRegion = (el) => {
+            if (!el) return;
+            el.setAttribute('filterUnits', 'userSpaceOnUse');
+            el.setAttribute('x', '0');
+            el.setAttribute('y', '0');
+            el.setAttribute('width', String(window.innerWidth));
+            el.setAttribute('height', String(window.innerHeight));
+        };
+        setRegion(svgFilter);
+        setRegion(svgFilterHover);
+        window.addEventListener('resize', () => { setRegion(svgFilter); setRegion(svgFilterHover); }, { passive: true });
+    } catch (_) { /* noop */ }
+
     // Apply initial effects
     applyStrokeEffects();
     
