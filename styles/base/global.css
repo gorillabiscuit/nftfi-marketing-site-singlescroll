@@ -5,6 +5,23 @@ html, body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Mobile scroll hygiene: favor vertical scroll, avoid child elements trapping touches */
+html, body, #smooth-wrapper, #smooth-content {
+    touch-action: pan-y;
+}
+
+/* Prevent decorative overlays from intercepting taps/scrolls */
+.gradients-bg,
+.svg-filters,
+.section .svg-lines-container {
+    pointer-events: none;
+}
+
+/* Allow quick taps while keeping vertical scroll natural on form controls */
+input, textarea, select, [contenteditable] {
+    touch-action: manipulation;
+}
+
 /* Animated Morphing Gradients Background */
 .gradients-bg {
     position: fixed;
