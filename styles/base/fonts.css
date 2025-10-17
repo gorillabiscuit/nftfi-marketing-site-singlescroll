@@ -1,0 +1,97 @@
+/* Self-hosted webfonts: General Sans & Satoshi (variable + italics) */
+
+/* General Sans Variable - normal */
+@font-face {
+  font-family: 'General Sans Variable';
+  src:
+    url('/fonts/General-sans/GeneralSans-Variable.woff2') format('woff2-variations'),
+    url('/fonts/General-sans/GeneralSans-Variable.woff2') format('woff2'),
+    url('/fonts/General-sans/GeneralSans-Variable.woff') format('woff');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* General Sans Variable - italic */
+@font-face {
+  font-family: 'General Sans Variable';
+  src:
+    url('/fonts/General-sans/GeneralSans-VariableItalic.woff2') format('woff2-variations'),
+    url('/fonts/General-sans/GeneralSans-VariableItalic.woff2') format('woff2'),
+    url('/fonts/General-sans/GeneralSans-VariableItalic.woff') format('woff');
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Optional alias: "General Sans" maps to the same files for non-variable family names */
+@font-face {
+  font-family: 'General Sans';
+  src:
+    url('/fonts/General-sans/GeneralSans-Variable.woff2') format('woff2-variations'),
+    url('/fonts/General-sans/GeneralSans-Variable.woff2') format('woff2'),
+    url('/fonts/General-sans/GeneralSans-Variable.woff') format('woff');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'General Sans';
+  src:
+    url('/fonts/General-sans/GeneralSans-VariableItalic.woff2') format('woff2-variations'),
+    url('/fonts/General-sans/GeneralSans-VariableItalic.woff2') format('woff2'),
+    url('/fonts/General-sans/GeneralSans-VariableItalic.woff') format('woff');
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Satoshi Variable - normal */
+@font-face {
+  font-family: 'Satoshi Variable';
+  src:
+    url('/fonts/Satoshi/Satoshi-Variable.woff2') format('woff2-variations'),
+    url('/fonts/Satoshi/Satoshi-Variable.woff2') format('woff2'),
+    url('/fonts/Satoshi/Satoshi-Variable.woff') format('woff');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Satoshi Variable - italic */
+@font-face {
+  font-family: 'Satoshi Variable';
+  src:
+    url('/fonts/Satoshi/Satoshi-VariableItalic.woff2') format('woff2-variations'),
+    url('/fonts/Satoshi/Satoshi-VariableItalic.woff2') format('woff2'),
+    url('/fonts/Satoshi/Satoshi-VariableItalic.woff') format('woff');
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Optional alias: "Satoshi" */
+@font-face {
+  font-family: 'Satoshi';
+  src:
+    url('/fonts/Satoshi/Satoshi-Variable.woff2') format('woff2-variations'),
+    url('/fonts/Satoshi/Satoshi-Variable.woff2') format('woff2'),
+    url('/fonts/Satoshi/Satoshi-Variable.woff') format('woff');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src:
+    url('/fonts/Satoshi/Satoshi-VariableItalic.woff2') format('woff2-variations'),
+    url('/fonts/Satoshi/Satoshi-VariableItalic.woff2') format('woff2'),
+    url('/fonts/Satoshi/Satoshi-VariableItalic.woff') format('woff');
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+

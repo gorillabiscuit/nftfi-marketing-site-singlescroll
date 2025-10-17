@@ -2006,38 +2006,33 @@ export function setupSection5HorizontalScroll() {
     if (title) {
         const t = config.titleTimings;
         let cursor = 0;
-        
-        // Initial period
+
+        // Ensure title is visible immediately (no fade-in)
+        gsap.set(title, { opacity: 1, scale: 1, blur: 0 });
+
+        // Keep initial delay timing consistent
         cursor += (t.periodA ?? 0.5);
-        
-        // Title fade in (same as Section 4)
-        tl.from(title, { 
-            blur: 15, 
-            alpha: 0.0, 
-            scale: 0.95, 
-            ease: 'power2.inOut', 
-            duration: (t.h2FadeIn ?? 0.5) 
-        }, cursor);
+
+        // Preserve original fade-in duration as idle time to keep fade-out schedule
         cursor += (t.h2FadeIn ?? 0.5);
-        
+
         // Title show period
-        tl.to(title, { opacity: 1, duration: 0.001 }, cursor);
+        // (Title already visible; maintain timeline cursor to keep fade-out timing)
         cursor += (t.h2Show ?? 1.0);
-        
+
         // Title fade out
-        tl.to(title, { 
-            opacity: 0, 
-            ease: 'power2.in', 
-            duration: (t.h2FadeOut ?? 0.5) 
+        tl.to(title, {
+            opacity: 0,
+            ease: 'power2.in',
+            duration: (t.h2FadeOut ?? 0.5)
         }, cursor);
         cursor += (t.h2FadeOut ?? 0.5);
-        
+
         // Store cursor position for tile animations to start after title
         title._s5CursorAfterTitle = cursor;
-        
-        console.log('[Section5] Title animation added:', {
-            fadeInAt: (t.periodA ?? 0.5),
-            showDuration: (t.h2Show ?? 1.0),
+
+        console.log('[Section5] Title animation adjusted for immediate visibility:', {
+            initialVisible: true,
             fadeOutAt: cursor - (t.h2FadeOut ?? 0.5),
             tilesStartAt: cursor
         });

@@ -12,18 +12,18 @@ export const SECTION6_TIMINGS = {
     // Title animation phases
     periodA: 0.01,        // Initial delay before title appears
     titleFadeIn: 0.15,   // Title fade in duration (matches Section 3)
-    titleShow: 0.45,      // How long title stays visible
+    titleShow: 3.45,      // How long title stays visible
     titleFadeOut: 0.15,  // Title fade out duration
     
     // Tiles animation phases (after title disappears)
-    tilesDelay: 0.1,     // Delay after title disappears before tiles appear
+    tilesDelay: 0.3,     // Delay after title disappears before tiles appear
     tilesFadeIn: 0.4,    // Duration for tiles to fade in
     tilesStagger: 0.05,  // Stagger between individual tiles
     tilesShow: 3.0,      // How long tiles stay visible after animation completes
     
     // Hold after all animations complete (tiles stay visible while pinned)
     // This is in pixels, not timeline units - it's added to the scroll distance
-    holdAfterAnimation: 1000  // Extra scroll distance to hold tiles visible before unpinning
+    holdAfterAnimation: 2000  // Extra scroll distance to hold tiles visible before unpinning
 };
 
 // Section 6 scroll distance scaling (maps timeline duration to scroll length)

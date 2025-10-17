@@ -31,11 +31,11 @@ export const SCROLL_CONFIG = {
     // Section-specific speed multipliers
     sectionSpeeds: {
         section1: 1.0, // Hero section - normal speed
-        section2: 0.2, // Key metrics - much slower for better readability and timing
+        section2: 0.7, // Key metrics - much slower for better readability and timing
         section3: 1.5, // Dashboard - normal speed
         section4: 1.0, // Pebble animation - slower for dramatic effect
-        section5: 0.7, // Testimonials - slightly slower for reading
-        section6: 1, // Title animation - slower for impact
+        section5: 1, // Testimonials - slightly slower for reading
+        section6: 2, // Title animation - slower for impact
         section7: 1.0  // Final CTA - normal speed
     },
     

@@ -7,4 +7,5 @@
 @import './responsive.css';
 
 /* Global layout and background elements */
+@import './fonts.css';
 @import './global.css';
