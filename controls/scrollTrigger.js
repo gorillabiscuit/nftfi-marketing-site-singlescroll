@@ -1060,7 +1060,40 @@ function setupSection2Pinning() {
         try {
             if (window.innerWidth <= 600) {
                 const finalize = () => {
+                    // Drive the timeline to the end
                     try { section2Timeline.progress(1, false); } catch (_) { /* no-op */ }
+                    
+                    // Force key elements to their final visible state (mirrors end of timeline)
+                    try {
+                        // Title fully visible
+                        const titleEl = document.querySelector('.key-metrics-title');
+                        if (titleEl) gsap.set(titleEl, { opacity: 1, clearProps: 'transform,filter' });
+                    } catch (_) { /* no-op */ }
+                    
+                    try {
+                        // Ensure lines are fully drawn and visible
+                        const svg = document.getElementById('lines-svg');
+                        if (svg) {
+                            const paths = svg.querySelectorAll('path.line');
+                            paths.forEach((p) => {
+                                try {
+                                    const len = (typeof p.getTotalLength === 'function') ? p.getTotalLength() : null;
+                                    if (len) {
+                                        gsap.set(p, { drawSVG: '0% 100%', attr: { 'stroke-opacity': 1 } });
+                                    } else {
+                                        gsap.set(p, { attr: { 'stroke-opacity': 1 } });
+                                    }
+                                } catch (_) { /* no-op */ }
+                            });
+                        }
+                    } catch (_) { /* no-op */ }
+                    
+                    try {
+                        // If there are any block elements revealed later, ensure they are visible
+                        const blocks = document.querySelectorAll('.section2-block, .section2-metric, .section2-rect, .metric-block');
+                        blocks.forEach((el) => gsap.set(el, { opacity: 1, clearProps: 'y,scale,filter' }));
+                    } catch (_) { /* no-op */ }
+                    
                     try { ScrollTrigger.refresh(); } catch (_) { /* no-op */ }
                 };
                 if (document && document.fonts && typeof document.fonts.ready?.then === 'function') {
