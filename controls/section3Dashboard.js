@@ -547,24 +547,6 @@ export function initSection3Scroll() {
         return null;
     }
     
-    // MOBILE-ONLY: Skip animation/pinning and show final state immediately
-    try {
-        const isMobile = window.innerWidth <= 600;
-        if (isMobile) {
-            // Ensure features are visible
-            try { gsap.set('.section3-features .features-title', { opacity: 1 }); } catch (_) { void 0; }
-            try { gsap.set('.section3-features .feature-block', { opacity: 1, clearProps: 'y' }); } catch (_) { void 0; }
-            try { gsap.set('.section3-features .feature-cta', { opacity: 1, y: 0, scale: 1 }); } catch (_) { void 0; }
-            // Ensure SVG container is visible
-            try {
-                const svgContainer = document.getElementById('dashboard-svg-container');
-                if (svgContainer) { gsap.set(svgContainer, { visibility: 'visible', display: 'block', opacity: 1 }); }
-            } catch (_) { void 0; }
-            // No timeline or ScrollTrigger on mobile
-            return null;
-        }
-    } catch (_) { void 0; }
-
     // Get the new parent container and child elements
     const parentContainer = sectionEl.querySelector('.section3-container');
     const looperEl = sectionEl.querySelector('.hero--looper');
@@ -575,6 +557,55 @@ export function initSection3Scroll() {
         console.error('[Section3Dashboard] Parent container .section3-container not found');
         return null;
     }
+
+    // MOBILE-ONLY: Skip animation/pinning but APPLY LAYOUT POSITIONING for final state
+    try {
+        const isMobile = window.innerWidth <= 600;
+        if (isMobile) {
+            // Ensure features and CTA are visible at final state
+            try { gsap.set('.section3-features .features-title', { opacity: 1 }); } catch (_) { void 0; }
+            try { gsap.set('.section3-features .feature-block', { opacity: 1, clearProps: 'y' }); } catch (_) { void 0; }
+            try { gsap.set('.section3-features .feature-cta', { opacity: 1, y: 0, scale: 1 }); } catch (_) { void 0; }
+            // Ensure parent container and looper are positioned using MOBILE config
+            try {
+                const parentCfg = getParentContainerConfigFor(BREAKPOINT_NAMES.MOBILE);
+                gsap.set(parentContainer, {
+                    position: 'absolute',
+                    width: parentCfg.width,
+                    height: parentCfg.height,
+                    left: parentCfg.left,
+                    top: parentCfg.top,
+                    xPercent: parentCfg.xPercent,
+                    yPercent: parentCfg.yPercent,
+                    zIndex: 1
+                });
+                if (looperEl) {
+                    const heroCfg = getHeroLooperConfigFor(BREAKPOINT_NAMES.MOBILE);
+                    const setObj = {
+                        position: 'absolute',
+                        zIndex: 1,
+                        pointerEvents: 'none',
+                        left: heroCfg.left,
+                        top: heroCfg.top,
+                        x: heroCfg.x,
+                        y: heroCfg.y,
+                        xPercent: heroCfg.xPercent,
+                        yPercent: heroCfg.yPercent
+                    };
+                    if (heroCfg.width != null) setObj.width = heroCfg.width;
+                    if (heroCfg.height != null) setObj.height = heroCfg.height;
+                    gsap.set(looperEl, setObj);
+                }
+            } catch (e) { (void e); }
+            // Ensure SVG container is visible
+            try {
+                const svgContainer = document.getElementById('dashboard-svg-container');
+                if (svgContainer) { gsap.set(svgContainer, { visibility: 'visible', display: 'block', opacity: 1 }); }
+            } catch (_) { void 0; }
+            // Skip timeline/ScrollTrigger on mobile
+            return null;
+        }
+    } catch (_) { void 0; }
 
     // Calculate original scroll distance
     // Section 3 uses viewport height units (durationVh: 600 = 600vh)
