@@ -99,7 +99,17 @@ async function init() {
     
     // Load GLTF model with progress tracking
     updateLoadingProgress('Loading 3D models...', 20);
-    loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
+    // Skip heavy logo mesh on mobile (<=600px)
+    try {
+        if (window.innerWidth > 600) {
+            loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
+        } else {
+            console.log('Skipping heavy logo mesh on mobile');
+        }
+    } catch (_) {
+        // Fallback: if window is undefined, load as usual
+        loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
+    }
 
         // Load Pebble model (as-is). Uses shared uniforms for same material/lighting
         try {
