@@ -9,6 +9,7 @@ section[data-section="4"] {
     background-size: 100% 100%; /* Stretch to cover full section */
     position: relative;
     overflow: hidden;
+    touch-action: pan-y; /* allow vertical scroll on mobile */
     /* Override global .section padding so content is flush with edges */
     padding: 0;
 }
@@ -130,7 +131,7 @@ section[data-section="4"]::after {
     left: 0 !important;
     will-change: transform, opacity;
     opacity: 0;
-    pointer-events: auto;
+    pointer-events: none; /* non-interactive text panel */
     z-index: 10;
 }
 

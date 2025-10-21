@@ -69,14 +69,11 @@ h2 {
     display: grid;
     grid-template-rows: auto auto auto auto auto 1fr; /* title + 4 blocks + cta */
     align-content: start;
-    pointer-events: none; /* so dashboard interactions pass through if needed */
+    pointer-events: none; /* disable by default; enable only CTA */
+    touch-action: pan-y; /* allow vertical scroll */
 }
 
-.section3-features .feature-block {
-    pointer-events: auto;
-    
-    text-align: left;
-}
+.section3-features .feature-block { text-align: left; }
 
 .section3-features .features-title {
     font-family: 'Satoshi Variable', sans-serif;
@@ -125,7 +122,8 @@ h2 {
 }
 
 .section3-features .feature-cta .cta-button { 
-    pointer-events: auto; 
+    pointer-events: auto; /* only interactive element */
+    touch-action: manipulation; /* avoid extra gestures */
     min-width: 280px; 
 }
 

@@ -7,6 +7,7 @@
     justify-content: center;
     position: relative;
     overflow: hidden; /* Hide overflow to prevent horizontal scrollbars */
+    touch-action: pan-y; /* ensure vertical scroll on mobile */
 }
 
 /* Section 5 Circles Background - Top Right */
@@ -90,6 +91,7 @@
     gap: var(--section5-row-gap, 3rem); /* Use CSS custom property for responsive gap */
     align-items: center;
     /* Removed fixed margin-top - now uses natural flow */
+    pointer-events: none; /* tiles non-interactive for scrolling hygiene */
 }
 
 .tiles-row {
@@ -136,7 +138,8 @@
     z-index: 5;
     flex-shrink: 0;
     transition: all 0.3s ease;
-    cursor: pointer;
+    cursor: default;
+    pointer-events: none; /* avoid intercepting scroll on mobile */
 }
 
 /* Frame 32663 - Header container (profile + info) */

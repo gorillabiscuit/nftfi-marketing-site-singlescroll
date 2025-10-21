@@ -577,8 +577,7 @@ export function initSection3Scroll() {
         originalDistance, // originalDistance
         {
             onUpdate: (self) => {
-                try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
-                // Store current scroll direction for direction-aware arrow behavior
+                // Store current scroll direction for direction-aware behavior
                 try {
                     if (typeof self.direction === 'number') {
                         section3ScrollDirection = self.direction === 1 ? 1 : -1;
@@ -586,7 +585,7 @@ export function initSection3Scroll() {
                 } catch (e) { (void e); }
             },
             onRefresh: () => {
-                try { updateArrowsGeometry(sectionEl); } catch (e) { (void e); }
+                // no-op
             },
             // When leaving Section 3 forward (to Section 4), hide SVG for performance
             onLeave: () => {
@@ -641,34 +640,9 @@ export function initSection3Scroll() {
     // Fade in title early in the intro phase
     tl.to('.section3-features .features-title', { opacity: 1, duration: 0.35, ease: 'power1.out' }, 'intro+=0.05');
 
-    // Initialize arrows overlay BEFORE building sequences that reference it
-    try {
-        if (SECTION3_ARROWS_ENABLED === false) {
-            const existing = sectionEl.querySelector('#section3-arrows');
-            if (existing && existing.parentNode) { try { existing.parentNode.removeChild(existing); } catch (e) { (void e); } }
-        } else {
-            ensureArrowsOverlay(sectionEl);
-            if (SECTION3_ARROWS_DEBUG === true) {
-                prepareArrowsVisible();
-            } else {
-                prepareArrowsHidden();
-            }
-            updateArrowsGeometry(sectionEl);
-        }
+    // Arrows feature disabled
 
-        // Wire test CTA: draw arrow 0 from 0% to 100%, then reveal arrowhead
-        try {
-            const cta = sectionEl.querySelector('.section3-features .cta-button');
-            if (cta) {
-                cta.addEventListener('click', function (ev) {
-                    if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
-                    try { animateArrowDraw(0, 700); } catch (e) { (void e); }
-                });
-            }
-        } catch (e) { (void e); }
-    } catch (e) { (void e); }
-
-    // Build per-group Y translation sequences (safe: arrows overlay exists)
+    // Build per-group Y translation sequences
     addGroupSequences(tl, targets);
 
     console.log('[Section3Dashboard] Section 3 timeline created with ScrollTrigger pin+scrub');
@@ -1057,40 +1031,12 @@ function addPerIdDetailSequences(tl, targets) {
         } catch (e) { (void e); }
 
         // Reveal next feature block at the start of this group window and draw matching arrow
-        if (revealIndex < featureSelectors.length) {
+            if (revealIndex < featureSelectors.length) {
             const sel = featureSelectors[revealIndex];
             try {
                 const firstFeatureExtraDelay = (revealIndex === 0) ? getSequenceConfigNumberOrDefault('firstFeatureDelay', 0.6) : 0;
                 const startAt = (cursor + firstFeatureExtraDelay);
                 tl.to(sel, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startAt.toFixed(3));
-                // arrow index matches reveal index
-                const arrowIdx = revealIndex;
-                const arrowSel = '#section3-arrows path[data-arrow-index="' + String(arrowIdx) + '"]';
-                // Only animate arrows if the arrows container exists
-                const arrowsContainer = document.getElementById('section3-arrows');
-                if (arrowsContainer) {
-                    tl.add(() => {
-                        try {
-                            prepareOneArrowDash(arrowIdx);
-                            const p = document.querySelector(arrowSel);
-                            if (p) {
-                                p.setAttribute('data-animating', '1');
-                                try { p.removeAttribute('marker-end'); } catch (e) { (void e); }
-                            }
-                        } catch (_) { void 0; }
-                    }, 'intro+=' + startAt.toFixed(3));
-                    tl.to(arrowSel, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startAt.toFixed(3));
-                    tl.to(arrowSel, { strokeDashoffset: 0, duration: 4.2, ease: 'power2.out', onComplete: function () {
-                        try {
-                            const p = document.querySelector(arrowSel);
-                            if (p) {
-                                p.removeAttribute('data-animating');
-                                p.setAttribute('data-drawn', '1');
-                                p.setAttribute('marker-end', 'url(#arrowhead)');
-                            }
-                        } catch (e) { (void e); }
-                    } }, 'intro+=' + (startAt + 0.05).toFixed(3));
-                }
                 revealIndex += 1;
             } catch (_) { void 0; }
         }
@@ -1137,37 +1083,8 @@ function addPerIdDetailSequences(tl, targets) {
             if (revealIndex < featureSelectors.length) {
                 const sel2 = featureSelectors[revealIndex];
                 try {
-                    const arrowIdx2 = revealIndex;
-                    const arrowSel2 = '#section3-arrows path[data-arrow-index="' + String(arrowIdx2) + '"]';
-                    // Only animate arrows if the arrows container exists
-                    const arrowsContainer2 = document.getElementById('section3-arrows');
-                    if (arrowsContainer2) {
-                        tl.add(() => {
-                        try {
-                            prepareOneArrowDash(arrowIdx2);
-                            const p2 = document.querySelector(arrowSel2);
-                            if (p2) {
-                                p2.setAttribute('data-animating', '1');
-                                try { p2.removeAttribute('marker-end'); } catch (e) { (void e); }
-                            }
-                        } catch (_) { void 0; }
-                    }, 'intro+=' + startBubbles.toFixed(3));
-                        tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
-                        tl.to(arrowSel2, { attr: { 'data-visible': '1' }, opacity: 1, duration: 0.01, ease: 'none' }, 'intro+=' + startBubbles.toFixed(3));
-                        tl.to(arrowSel2, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.out', onComplete: function () {
-                            try {
-                                const p2 = document.querySelector(arrowSel2);
-                                if (p2) {
-                                    p2.removeAttribute('data-animating');
-                                    p2.setAttribute('data-drawn', '1');
-                                    p2.setAttribute('marker-end', 'url(#arrowhead)');
-                                }
-                            } catch (e) { (void e); }
-                        } }, 'intro+=' + (startBubbles + 0.05).toFixed(3));
-                    } else {
-                        // Arrows disabled, just reveal the feature
-                        tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
-                    }
+                    // Reveal the feature (arrows removed)
+                    tl.to(sel2, { opacity: 1, duration: 0.3, ease: 'power1.out' }, 'intro+=' + startBubbles.toFixed(3));
                     revealIndex += 1;
                 } catch (_) { void 0; }
             }
