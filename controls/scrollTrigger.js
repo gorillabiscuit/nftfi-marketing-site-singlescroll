@@ -341,6 +341,18 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
     // Get title element for new scroll-driven positioning
     const title = document.getElementById('section4-title');
     
+    // On mobile, skip animation and force final visible state so content is present without scrolling
+    if (isMobileBp) {
+        try {
+            updatePlaneTextureForSection(".section[data-section='4']");
+        } catch (_) { /* no-op */ }
+        try {
+            if (title) gsap.set(title, { opacity: 1, clearProps: 'filter,transform' });
+            panels.forEach((p) => { if (p) gsap.set(p, { opacity: 1, clearProps: 'y,filter,transform' }); });
+        } catch (_) { /* no-op */ }
+        return; // Do not create ScrollTrigger on mobile
+    }
+    
     // Set up title element to override .center-anchored CSS positioning
     if (title) {
         // Remove the center-anchored class to prevent CSS conflicts
