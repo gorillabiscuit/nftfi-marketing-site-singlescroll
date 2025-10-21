@@ -1085,6 +1085,24 @@ function setupSection2Pinning() {
                                     }
                                 } catch (_) { /* no-op */ }
                             });
+                            // If grid group exists, set final rotation/spacing by replaying phases to end
+                            try {
+                                const phase2 = createOutwardExpansionPhase();
+                                if (phase2 && typeof phase2.totalProgress === 'function') phase2.totalProgress(1);
+                            } catch (_) { /* no-op */ }
+                            try {
+                                const phase3 = createRotationPhase();
+                                if (phase3 && typeof phase3.totalProgress === 'function') phase3.totalProgress(1);
+                            } catch (_) { /* no-op */ }
+                            try {
+                                const phase4 = createExpansionPhase();
+                                if (phase4 && typeof phase4.totalProgress === 'function') phase4.totalProgress(1);
+                            } catch (_) { /* no-op */ }
+                            // Reveal blocks to their end state
+                            try {
+                                const blocksTL = createBlocksRevealPhase();
+                                if (blocksTL && typeof blocksTL.totalProgress === 'function') blocksTL.totalProgress(1);
+                            } catch (_) { /* no-op */ }
                         }
                     } catch (_) { /* no-op */ }
                     
