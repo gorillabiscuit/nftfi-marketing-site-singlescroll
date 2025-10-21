@@ -264,6 +264,8 @@ section[data-section="4"]::after {
         background-position: center; /* No horizontal offset on mobile */
         background-size: 100% 100%; /* Full coverage on mobile */
         margin: 0; /* Ensure no section margin on mobile */
+        pointer-events: none; /* disable hit events on entire section */
+        touch-action: pan-y;
     }
     
     .section4-content {
@@ -274,16 +276,19 @@ section[data-section="4"]::after {
         width: 100vw; /* Ensure full viewport width */
         /* Keep container neutral; panel text will be explicitly left-aligned */
         text-align: left;
+        pointer-events: none; /* ensure children don't capture touches */
     }
     
     .section4-panel {
         width: min(100%, 90vw);
         gap: 16px; /* Tighter spacing on mobile */
         text-align: left; /* Left-align text content inside mobile panels */
+        pointer-events: none; /* reinforce non-interactive */
     }
     
     .section4-title {
         font-size: 2rem; /* Match Section 5 mobile title size */
+        pointer-events: none;
     }
     
     .section4-list {
