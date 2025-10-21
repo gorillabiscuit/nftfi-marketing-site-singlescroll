@@ -419,10 +419,18 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                 SECTION4_MOBILE_VIDEOS.forEach((cfg) => {
                     try {
                         const v = document.createElement('video');
+                        // Set properties BEFORE setting src for iOS autoplay behavior
+                        v.muted = true;
+                        v.autoplay = true;
+                        v.loop = true;
+                        v.playsInline = true; // camelCase property
+                        // Mirror as attributes for broader compatibility
                         v.setAttribute('playsinline', '');
+                        v.setAttribute('webkit-playsinline', '');
                         v.setAttribute('muted', '');
                         v.setAttribute('autoplay', '');
                         v.setAttribute('loop', '');
+                        v.preload = 'auto';
                         v.setAttribute('data-s4-mobile', '');
                         v.src = cfg.src;
                         v.style.position = 'absolute';
@@ -434,6 +442,25 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                         if (cfg.blendMode) v.style.mixBlendMode = cfg.blendMode;
                         if (typeof cfg.opacity === 'number') v.style.opacity = String(cfg.opacity);
                         container.appendChild(v);
+
+                        // Attempt autoplay once appended (required by some browsers)
+                        const tryPlay = () => {
+                            try {
+                                const p = v.play();
+                                if (p && typeof p.then === 'function') {
+                                    p.catch(() => {
+                                        // If blocked, show controls to allow tap-to-play
+                                        v.controls = true;
+                                    });
+                                }
+                            } catch (_) {
+                                v.controls = true;
+                            }
+                        };
+                        v.addEventListener('canplay', tryPlay, { once: true });
+                        v.addEventListener('loadeddata', tryPlay, { once: true });
+                        // Fallback attempt
+                        setTimeout(tryPlay, 0);
                     } catch (_) { /* no-op */ }
                 });
             }
