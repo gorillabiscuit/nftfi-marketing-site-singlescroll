@@ -351,11 +351,14 @@
 
 /* Mobile Breakpoint (≤600px) */
 @media (max-width: 600px) {
-    /* On touch/mobile, disable tile hit events to avoid scroll interference */
-    .section5-tiles { pointer-events: none; }
-    .testimonial-card {
+    /* On mobile, disable all hit/selection to avoid scroll interference */
+    .section[data-section="5"],
+    .section[data-section="5"] * {
         pointer-events: none;
-        cursor: default;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
         touch-action: pan-y;
     }
     .section[data-section="5"] h2,
@@ -402,11 +405,14 @@
 
 /* Tablet Breakpoint (601px-900px) */
 @media (min-width: 601px) and (max-width: 900px) {
-    /* On tablet, also disable tile hit events to favor smooth scrolling */
-    .section5-tiles { pointer-events: none; }
-    .testimonial-card {
+    /* On tablet, disable all hit/selection to favor smooth scrolling */
+    .section[data-section="5"],
+    .section[data-section="5"] * {
         pointer-events: none;
-        cursor: default;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
         touch-action: pan-y;
     }
     .section[data-section="5"] h2,
@@ -435,7 +441,7 @@
 
 /* Desktop Breakpoint (901px-1200px) */
 @media (min-width: 901px) and (max-width: 1200px) {
-    /* Restore interactivity on desktop */
+    /* Interactivity allowed on desktop */
     .section5-tiles { pointer-events: auto; }
     .testimonial-card { pointer-events: auto; cursor: pointer; }
     .section[data-section="5"] h2,

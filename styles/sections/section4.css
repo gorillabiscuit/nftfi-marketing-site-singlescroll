@@ -223,6 +223,16 @@ section[data-section="4"]::after {
 
 /* Tablet Breakpoint (601px-900px) */
 @media (min-width: 601px) and (max-width: 900px) {
+    /* Disable all hit/selection on tablet to preserve scroll */
+    section[data-section="4"],
+    section[data-section="4"] * {
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: pan-y;
+    }
     .section4-content {
         grid-template-columns: 1fr; /* Stack vertically on tablet */
         gap: 2rem;
