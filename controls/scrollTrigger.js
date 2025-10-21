@@ -347,9 +347,31 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
             updatePlaneTextureForSection(".section[data-section='4']");
         } catch (_) { /* no-op */ }
         try {
-            // Make title and panels visible; allow CSS to handle layout
-            if (title) gsap.set(title, { opacity: 1, clearProps: 'filter,transform' });
-            panels.forEach((p) => { if (p) gsap.set(p, { opacity: 1, clearProps: 'y,filter,transform' }); });
+            // Make title and panels visible; also set explicit Y offsets so they don't bunch at the top
+            const container = document.querySelector('.section4-content');
+            if (container) {
+                const containerRect = container.getBoundingClientRect();
+                const containerLeft = containerRect.left;
+                const containerWidth = containerRect.width;
+                const centerX = containerLeft + containerWidth * 0.5;
+                const toContainerX = (viewportX) => Math.round(viewportX - containerLeft);
+
+                const titleYOffset = (typeof params.titleYOffset === 'number') ? params.titleYOffset : -400;
+                const spacing = (typeof params.textSpacingPixels === 'number') ? params.textSpacingPixels : 300;
+                const titleY = Math.round(window.innerHeight * 0.25 + titleYOffset);
+                const panelY = (index) => Math.round(window.innerHeight * 0.25 + titleYOffset + spacing * (index + 1));
+
+                if (title) {
+                    gsap.set(title, { opacity: 1, x: toContainerX(centerX), y: titleY, xPercent: -50, yPercent: -50, clearProps: 'filter' });
+                }
+                [panel0, panel1, panel2, panel3].forEach((panelEl, idx) => {
+                    if (!panelEl) return;
+                    gsap.set(panelEl, { opacity: 1, x: toContainerX(centerX), y: panelY(idx), xPercent: -50, yPercent: -50, clearProps: 'filter' });
+                });
+            } else {
+                if (title) gsap.set(title, { opacity: 1, clearProps: 'filter,transform' });
+                panels.forEach((p) => { if (p) gsap.set(p, { opacity: 1, clearProps: 'y,filter,transform' }); });
+            }
         } catch (_) { /* no-op */ }
         return; // Do not create ScrollTrigger on mobile
     }
