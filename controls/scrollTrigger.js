@@ -341,28 +341,6 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
     // Get title element for new scroll-driven positioning
     const title = document.getElementById('section4-title');
     
-    // On mobile, skip animation and force final visible state so content is present without scrolling
-    if (isMobileBp) {
-        try {
-            updatePlaneTextureForSection(".section[data-section='4']");
-        } catch (_) { /* no-op */ }
-        try {
-            if (title) gsap.set(title, { opacity: 1, clearProps: 'filter,transform' });
-            panels.forEach((p) => {
-                if (p) {
-                    // Reset visibility and positioning so CSS grid lays them out correctly on mobile
-                    gsap.set(p, { opacity: 1, clearProps: 'y,filter,transform' });
-                    p.style.position = 'static';
-                    p.style.left = 'auto';
-                    p.style.top = 'auto';
-                    p.style.right = 'auto';
-                    p.style.bottom = 'auto';
-                }
-            });
-        } catch (_) { /* no-op */ }
-        return; // Do not create ScrollTrigger on mobile
-    }
-    
     // Set up title element to override .center-anchored CSS positioning
     if (title) {
         // Remove the center-anchored class to prevent CSS conflicts
@@ -403,16 +381,126 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
         return baseY + panelOffset; // Changed from - to + to invert the order
     };
     
+    // Mobile-only: render a static final layout (no pinning, no scrub) to avoid layout regressions
+    const isMobileBp = bp === BREAKPOINT_NAMES.MOBILE;
+    if (isMobileBp) {
+        // Reveal pebbles and set final positions/scales from config
+        const revealMat = () => materials.forEach((m) => { try { m.opacity = 1; m.transparent = false; } catch (_) { /* no-op */ } });
+        try { revealMat(); } catch (_) { /* no-op */ }
+        try {
+            if (pebbleGroup1) {
+                gsap.set(pebbleGroup1, { visible: true });
+                gsap.set(pebbleGroup1.position, { x: calculatePebbleX(pcfg1.position?.x ?? -2.5), y: (pcfg1.position?.y ?? 0), z: pcfg1.position?.z ?? 0 });
+                gsap.set(pebbleGroup1.scale, { x: pcfg1.scale ?? 1.0, y: pcfg1.scale ?? 1.0, z: pcfg1.scale ?? 1.0 });
+            }
+            if (pebbleGroup2) {
+                gsap.set(pebbleGroup2, { visible: true });
+                gsap.set(pebbleGroup2.position, { x: calculatePebbleX(pcfg2.position?.x ?? 2.5), y: (pcfg2.position?.y ?? -4.0), z: pcfg2.position?.z ?? 0 });
+                gsap.set(pebbleGroup2.scale, { x: pcfg2.scale ?? 1.0, y: pcfg2.scale ?? 1.0, z: pcfg2.scale ?? 1.0 });
+            }
+            if (pebbleGroup3) {
+                gsap.set(pebbleGroup3, { visible: true });
+                gsap.set(pebbleGroup3.position, { x: calculatePebbleX(pcfg3.position?.x ?? -2.5), y: (pcfg3.position?.y ?? -8.0), z: pcfg3.position?.z ?? 0 });
+                gsap.set(pebbleGroup3.scale, { x: pcfg3.scale ?? 1.0, y: pcfg3.scale ?? 1.0, z: pcfg3.scale ?? 1.0 });
+            }
+            if (pebbleGroup4) {
+                gsap.set(pebbleGroup4, { visible: true });
+                gsap.set(pebbleGroup4.position, { x: calculatePebbleX(pcfg4.position?.x ?? 2.5), y: (pcfg4.position?.y ?? -12.0), z: pcfg4.position?.z ?? 0 });
+                gsap.set(pebbleGroup4.scale, { x: pcfg4.scale ?? 1.0, y: pcfg4.scale ?? 1.0, z: pcfg4.scale ?? 1.0 });
+            }
+        } catch (_) { /* no-op */ }
+
+        // Position title and text panels relative to projected pebble positions
+        try {
+            const container = document.querySelector('.section4-content');
+            if (container) {
+                const containerRect = container.getBoundingClientRect();
+                const containerWidth = containerRect.width;
+                const containerLeft = containerRect.left;
+
+                const projectPebbleToScreen = (pebbleGroup) => {
+                    if (!pebbleGroup || !window.camera) return null;
+                    const worldPosition = new THREE.Vector3();
+                    pebbleGroup.getWorldPosition(worldPosition);
+                    const projected = worldPosition.clone().project(window.camera);
+                    const screenX = (projected.x * 0.5 + 0.5) * window.innerWidth;
+                    const screenY = (-(projected.y * 0.5) + 0.5) * window.innerHeight;
+                    return { x: screenX, y: screenY };
+                };
+
+                const legacy = params.textHorizontalOffset;
+                const offsetLeft = (typeof params.textHorizontalOffsetLeft === 'number') ? params.textHorizontalOffsetLeft : (typeof legacy === 'number' ? legacy : 0.8);
+                const offsetRight = (typeof params.textHorizontalOffsetRight === 'number') ? params.textHorizontalOffsetRight : (typeof legacy === 'number' ? legacy : 0.8);
+                const panelDims = (panelEl) => {
+                    const rect = panelEl.getBoundingClientRect();
+                    const minW = typeof params.textPanelMinWidthPx === 'number' ? params.textPanelMinWidthPx : rect.width;
+                    const maxW = typeof params.textPanelMaxWidthPx === 'number' ? params.textPanelMaxWidthPx : rect.width;
+                    const gutter = typeof params.textPanelGutterPx === 'number' ? params.textPanelGutterPx : 24;
+                    return { minW, maxW, gutter };
+                };
+                const clampToContainer = (xViewport, panelEl, forcedWidthPx) => {
+                    const halfForced = forcedWidthPx * 0.5;
+                    const rightEdge = containerLeft + containerWidth;
+                    const clampedViewportX = Math.min(Math.max(xViewport, containerLeft + halfForced), rightEdge - halfForced);
+                    const x = clampedViewportX - containerLeft;
+                    return { x };
+                };
+
+                // Title near top-center of visible area
+                if (title) {
+                    gsap.set(title, {
+                        x: (window.innerWidth * 0.5) - containerLeft,
+                        y: 120,
+                        xPercent: -50,
+                        yPercent: 0,
+                    });
+                }
+
+                const applyPanel = (panelEl, pebbleGroup, side) => {
+                    if (!panelEl || !pebbleGroup) return;
+                    const dims = panelDims(panelEl);
+                    const pebbleScreen = projectPebbleToScreen(pebbleGroup);
+                    if (!pebbleScreen) return;
+                    const half = dims.minW * 0.5;
+                    const rightEdge = containerLeft + containerWidth;
+                    const leftEdge = containerLeft;
+                    if (side === 'right') {
+                        const availableRight = Math.max(0, rightEdge - pebbleScreen.x - half - dims.gutter);
+                        const desiredWidth = Math.min(Math.max(availableRight * 2, dims.minW), dims.maxW);
+                        const offset = availableRight * offsetRight;
+                        const xViewport = pebbleScreen.x + half + dims.gutter + offset;
+                        const { x } = clampToContainer(xViewport, panelEl, desiredWidth);
+                        gsap.set(panelEl, { width: desiredWidth, x, y: pebbleScreen.y, xPercent: -50, yPercent: -50, opacity: 1 });
+                    } else {
+                        const availableLeft = Math.max(0, pebbleScreen.x - leftEdge - half - dims.gutter);
+                        const desiredWidth = Math.min(Math.max(availableLeft * 2, dims.minW), dims.maxW);
+                        const offset = availableLeft * offsetLeft;
+                        const xViewport = pebbleScreen.x - half - dims.gutter - offset;
+                        const { x } = clampToContainer(xViewport, panelEl, desiredWidth);
+                        gsap.set(panelEl, { width: desiredWidth, x, y: pebbleScreen.y, xPercent: -50, yPercent: -50, opacity: 1 });
+                    }
+                };
+
+                applyPanel(panel0, pebbleGroup1, 'right');
+                applyPanel(panel1, pebbleGroup2, 'left');
+                applyPanel(panel2, pebbleGroup3, 'right');
+                applyPanel(panel3, pebbleGroup4, 'left');
+            }
+        } catch (_) { /* no-op */ }
+
+        // Nothing else to do on mobile; no ScrollTrigger created
+        return;
+    }
+
     // Create and store ScrollTrigger for cleanup on breakpoint changes
     // Explicitly ensure no pinning on mobile
-    const isMobileBp = bp === BREAKPOINT_NAMES.MOBILE;
     section4ScrollTrigger = ScrollTrigger.create({
         trigger: ".section[data-section='4']",
         start: "top bottom", // Animation starts when section top enters viewport bottom
         end: "bottom top",   // Animation ends when section bottom exits viewport top
         scrub: true,
-        pin: isMobileBp ? false : undefined,
-        pinSpacing: isMobileBp ? false : undefined,
+        pin: undefined,
+        pinSpacing: undefined,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
             const progress = self.progress;
