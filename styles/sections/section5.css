@@ -91,7 +91,6 @@
     gap: var(--section5-row-gap, 3rem); /* Use CSS custom property for responsive gap */
     align-items: center;
     /* Removed fixed margin-top - now uses natural flow */
-    pointer-events: none; /* tiles non-interactive for scrolling hygiene */
 }
 
 .tiles-row {
@@ -138,8 +137,8 @@
     z-index: 5;
     flex-shrink: 0;
     transition: all 0.3s ease;
-    cursor: default;
-    pointer-events: none; /* avoid intercepting scroll on mobile */
+    cursor: pointer;
+    pointer-events: auto;
 }
 
 /* Frame 32663 - Header container (profile + info) */
@@ -352,6 +351,13 @@
 
 /* Mobile Breakpoint (≤600px) */
 @media (max-width: 600px) {
+    /* On touch/mobile, disable tile hit events to avoid scroll interference */
+    .section5-tiles { pointer-events: none; }
+    .testimonial-card {
+        pointer-events: none;
+        cursor: default;
+        touch-action: pan-y;
+    }
     .section[data-section="5"] h2,
     .section5-title {
         font-size: 2rem; /* Smaller title on mobile */
@@ -396,6 +402,13 @@
 
 /* Tablet Breakpoint (601px-900px) */
 @media (min-width: 601px) and (max-width: 900px) {
+    /* On tablet, also disable tile hit events to favor smooth scrolling */
+    .section5-tiles { pointer-events: none; }
+    .testimonial-card {
+        pointer-events: none;
+        cursor: default;
+        touch-action: pan-y;
+    }
     .section[data-section="5"] h2,
     .section5-title {
         font-size: 2.5rem; /* Medium title size */
@@ -422,6 +435,9 @@
 
 /* Desktop Breakpoint (901px-1200px) */
 @media (min-width: 901px) and (max-width: 1200px) {
+    /* Restore interactivity on desktop */
+    .section5-tiles { pointer-events: auto; }
+    .testimonial-card { pointer-events: auto; cursor: pointer; }
     .section[data-section="5"] h2,
     .section5-title {
         font-size: 3.5rem; /* Standard title size */
@@ -442,6 +458,9 @@
 
 /* Large Breakpoint (≥1201px) */
 @media (min-width: 1201px) {
+    /* Interactivity remains enabled on large screens */
+    .section5-tiles { pointer-events: auto; }
+    .testimonial-card { pointer-events: auto; cursor: pointer; }
     .section[data-section="5"] h2,
     .section5-title {
         font-size: 4rem; /* Larger title on large screens */
