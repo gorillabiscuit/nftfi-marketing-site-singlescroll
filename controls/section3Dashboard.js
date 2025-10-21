@@ -602,7 +602,22 @@ export function initSection3Scroll() {
                 const svgContainer = document.getElementById('dashboard-svg-container');
                 if (svgContainer) { gsap.set(svgContainer, { visibility: 'visible', display: 'block', opacity: 1 }); }
             } catch (_) { void 0; }
-            // Skip timeline/ScrollTrigger on mobile
+            // Add a lightweight visibility controller (no pin, no scrub) so Section 3 doesn't overlay Section 4 when out of view
+            try {
+                const svgContainer = document.getElementById('dashboard-svg-container');
+                if (svgContainer && typeof ScrollTrigger !== 'undefined' && ScrollTrigger) {
+                    ScrollTrigger.create({
+                        trigger: sectionEl,
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        onEnter: () => { try { gsap.set(svgContainer, { visibility: 'visible', display: 'block', opacity: 1 }); } catch (_) { /* no-op */ } },
+                        onEnterBack: () => { try { gsap.set(svgContainer, { visibility: 'visible', display: 'block', opacity: 1 }); } catch (_) { /* no-op */ } },
+                        onLeave: () => { try { gsap.set(svgContainer, { visibility: 'hidden', display: 'none' }); } catch (_) { /* no-op */ } },
+                        onLeaveBack: () => { try { gsap.set(svgContainer, { visibility: 'hidden', display: 'none' }); } catch (_) { /* no-op */ } }
+                    });
+                }
+            } catch (_) { /* no-op */ }
+            // Skip animated timeline/ScrollTrigger on mobile/tablet
             return null;
         }
     } catch (_) { void 0; }
