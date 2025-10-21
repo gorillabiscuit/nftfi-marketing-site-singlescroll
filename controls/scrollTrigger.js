@@ -342,7 +342,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
     const title = document.getElementById('section4-title');
     
     // On mobile, skip animation and force final visible state so content is present without scrolling
-    if (isMobileBp) {
+    if (bp === BREAKPOINT_NAMES.MOBILE) {
         try {
             updatePlaneTextureForSection(".section[data-section='4']");
         } catch (_) { /* no-op */ }
