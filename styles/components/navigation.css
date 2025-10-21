@@ -431,6 +431,11 @@
         opacity: 1 !important;
         transition: none;
     }
+
+    /* Bring down hamburger menu icon by 15px on mobile */
+    .mobile-menu-toggle {
+        top: calc(var(--spacing-lg) + 15px);
+    }
 }
 
 /* Mobile Responsive Design - Consolidated (601px - 900px) */
