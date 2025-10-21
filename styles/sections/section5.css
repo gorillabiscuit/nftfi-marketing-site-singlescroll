@@ -351,6 +351,9 @@
 
 /* Mobile Breakpoint (≤600px) */
 @media (max-width: 600px) {
+    /* Let section height be defined by content on mobile */
+    .section[data-section="5"] { min-height: auto; }
+    
     /* On mobile, disable all hit/selection to avoid scroll interference */
     .section[data-section="5"],
     .section[data-section="5"] * {
@@ -364,11 +367,23 @@
     .section[data-section="5"] h2,
     .section5-title {
         font-size: 2rem; /* Smaller title on mobile */
+        position: static; /* Place near top in normal flow */
+        transform: none;
+        width: 100%;
+        margin: 0.75rem 0 1rem;
+        text-align: center;
     }
     
-    .tiles-row {
-        gap: 1.2rem; /* Tighter spacing between tiles */
-    }
+    /* Hide horizontal rows on mobile in favor of a single vertical list */
+    .tiles-row { display: none; }
+    
+    /* Vertical list container for testimonials on mobile */
+    .section5-tiles { flex-direction: column; align-items: stretch; }
+    .section5-vertical-list { display: flex; flex-direction: column; gap: 1rem; width: 100%; }
+    .section5-vertical-list .testimonial-card { width: 100%; height: auto; }
+
+    /* Preserve spacing rules for cards within vertical list */
+    .tiles-row { gap: 1.2rem; }
 
     .tiles-row-1 .testimonial-content {
 

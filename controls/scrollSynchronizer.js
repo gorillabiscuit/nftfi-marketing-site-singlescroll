@@ -89,6 +89,14 @@ export function initializeScrollSmoother() {
     }
 
     try {
+        // Skip ScrollSmoother on mobile for native scrolling behavior
+        if (typeof window !== 'undefined' && window.innerWidth <= 600) {
+            console.log('ScrollSmoother: Skipping initialization on mobile');
+            isInitialized = true;
+            isEnabled = false;
+            smoother = null;
+            return null;
+        }
         // Check if the smooth-content element exists
         const smoothContent = document.querySelector("#smooth-content");
         if (!smoothContent) {

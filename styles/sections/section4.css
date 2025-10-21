@@ -95,7 +95,8 @@ section[data-section="4"]::after {
 .section4-title {
     text-align: center;
     font-family: 'Satoshi Variable', sans-serif;
-    will-change: transform, filter, opacity;
+    font-weight: 300; /* explicit weight to avoid UA defaults */
+    will-change: transform, opacity; /* avoid will-change: filter to prevent Safari thickening */
 }
 
 .section4-list {
@@ -104,7 +105,7 @@ section[data-section="4"]::after {
     padding: 0;
     text-align: left;
     font-family: inherit;
-    will-change: transform, filter, opacity;
+    will-change: transform, opacity; /* remove filter from will-change */
 }
 
 .section4-list li {

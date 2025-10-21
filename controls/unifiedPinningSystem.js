@@ -67,6 +67,16 @@ class UnifiedPinningSystem {
             originalDistance || 1000
         );
 
+        // Mobile: disable pinning entirely (return null to skip creating triggers)
+        try {
+            if (typeof window !== 'undefined' && window.innerWidth <= 600) {
+                if (this.debugMode) {
+                    console.log('UnifiedPinningSystem: Skipping pin on mobile for section', sectionNumber);
+                }
+                return null;
+            }
+        } catch (_) { /* no-op */ }
+
         // Create ScrollTrigger configuration
         const triggerConfig = {
             trigger: triggerElement,

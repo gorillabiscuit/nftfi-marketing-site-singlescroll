@@ -201,6 +201,17 @@ export async function initializeTestimonials() {
     const topRowContainer = document.querySelector('.tiles-row-1');
     const bottomRowContainer = document.querySelector('.tiles-row-2');
     
+    // Create/ensure vertical list container for mobile
+    let verticalListContainer = document.querySelector('.section5-vertical-list');
+    if (!verticalListContainer) {
+        const tilesRoot = document.querySelector('.section5-tiles');
+        if (tilesRoot) {
+            verticalListContainer = document.createElement('div');
+            verticalListContainer.className = 'section5-vertical-list';
+            tilesRoot.appendChild(verticalListContainer);
+        }
+    }
+    
     if (!topRowContainer || !bottomRowContainer) {
         console.error('[Testimonials] Testimonial containers not found');
         return false;
@@ -217,12 +228,18 @@ export async function initializeTestimonials() {
         
         console.log(`[Testimonials] Loaded ${testimonials.length} testimonials`);
         
-        // Distribute testimonials across rows
-        const distribution = distributeTestimonials(testimonials);
-        
-        // Render testimonials
-        renderTestimonials(distribution.topRow, topRowContainer);
-        renderTestimonials(distribution.bottomRow, bottomRowContainer);
+        // Determine mobile vs non-mobile layout
+        const isMobile = window.innerWidth <= 600;
+        if (isMobile && verticalListContainer) {
+            // Show 10 testimonials in a vertical list
+            const firstTen = testimonials.slice(0, 10);
+            renderTestimonials(firstTen, verticalListContainer);
+        } else {
+            // Distribute testimonials across rows
+            const distribution = distributeTestimonials(testimonials);
+            renderTestimonials(distribution.topRow, topRowContainer);
+            renderTestimonials(distribution.bottomRow, bottomRowContainer);
+        }
         
         console.log('[Testimonials] Testimonials rendered successfully');
         
@@ -250,8 +267,13 @@ function setupResponsiveTestimonials(testimonials) {
             
             const topRowContainer = document.querySelector('.tiles-row-1');
             const bottomRowContainer = document.querySelector('.tiles-row-2');
+            const verticalListContainer = document.querySelector('.section5-vertical-list');
+            const isMobile = window.innerWidth <= 600;
             
-            if (topRowContainer && bottomRowContainer) {
+            if (isMobile && verticalListContainer) {
+                const firstTen = testimonials.slice(0, 10);
+                renderTestimonials(firstTen, verticalListContainer);
+            } else if (topRowContainer && bottomRowContainer) {
                 const distribution = distributeTestimonials(testimonials);
                 renderTestimonials(distribution.topRow, topRowContainer);
                 renderTestimonials(distribution.bottomRow, bottomRowContainer);

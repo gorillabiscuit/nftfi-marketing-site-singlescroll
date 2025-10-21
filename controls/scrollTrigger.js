@@ -375,11 +375,15 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
     };
     
     // Create and store ScrollTrigger for cleanup on breakpoint changes
+    // Explicitly ensure no pinning on mobile
+    const isMobileBp = bp === BREAKPOINT_NAMES.MOBILE;
     section4ScrollTrigger = ScrollTrigger.create({
         trigger: ".section[data-section='4']",
         start: "top bottom", // Animation starts when section top enters viewport bottom
         end: "bottom top",   // Animation ends when section bottom exits viewport top
         scrub: true,
+        pin: isMobileBp ? false : undefined,
+        pinSpacing: isMobileBp ? false : undefined,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
             const progress = self.progress;
@@ -449,7 +453,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                     maxWidth: '90vw', // Ensure it doesn't exceed viewport
                     opacity: progress > 0.01 && progress < 0.8 ? 1 : 0, // Show early, fade before panels
                     scale: progress > 0.01 && progress < 0.8 ? 1 : 0.9,
-                    filter: progress > 0.01 && progress < 0.8 ? 'blur(0px)' : 'blur(5px)'
+                    filter: progress > 0.8 || progress <= 0.01 ? 'blur(5px)' : 'none'
                 });
             }
             
@@ -489,7 +493,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                     const minW = typeof params.textPanelMinWidthPx === 'number' ? params.textPanelMinWidthPx : panelRect.width;
                     const maxW = typeof params.textPanelMaxWidthPx === 'number' ? params.textPanelMaxWidthPx : panelRect.width;
                     const gutter = typeof params.textPanelGutterPx === 'number' ? params.textPanelGutterPx : 24;
-                    // Stable baseline to avoid feedback oscillation (don’t use current width)
+                    // Stable baseline to avoid feedback oscillation (don't use current width)
                     const half = (minW) * 0.5;
                     const rightEdge = containerLeft + containerWidth;
                     const availableRight = Math.max(0, rightEdge - pebbleScreen.x - half - (typeof gutter === 'number' ? gutter : 0));
@@ -879,28 +883,6 @@ function setupSection2Pinning() {
 
         // Create timeline without ScrollTrigger first
         section2Timeline = gsap.timeline();
-        
-        // Use Unified Pinning System to create the ScrollTrigger
-        const originalDistance = (section2Timeline ? section2Timeline.totalDuration() : 4) * (SECTION2_SCROLL?.pxPerSecond || 600);
-        
-        // Create the pin trigger using unified system
-        const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
-            2, // sectionNumber
-            triggerEl || document.querySelector("section[data-section='2']"), // triggerElement
-            section2Timeline, // animation
-            originalDistance, // originalDistance
-            {
-                onUpdate: (self) => {
-                    // Additional custom logic if needed
-                    console.log('Section 2 scroll progress:', self.progress);
-                }
-            }
-        );
-        
-        // Store the ScrollTrigger reference for cleanup
-        if (scrollTrigger) {
-            section2Timeline.scrollTrigger = scrollTrigger;
-        }
 
         // No absolute labels; use relative sequencing only
  
@@ -1049,9 +1031,6 @@ function setupSection2Pinning() {
 
         // Blocks: add each visible block as its own TL sequentially after title using blockGap
         const blocksTL = createBlocksRevealPhase();
-        // Instead of adding the entire phase at once, we reuse its internal per-node logic by
-        // constructing a per-node TL chain using the same timings and stagger parameters.
-        // For minimal code change, keep existing function but add as a group right after title delay.
         section2Timeline.add(blocksTL, `>+=${SECTION2_TIMINGS.delayBeforeFirstBlock}`);
 
         // Fade out only the grid lines (not rectangles or title) as we transition toward Section 3
@@ -1076,6 +1055,34 @@ function setupSection2Pinning() {
         } catch (e) { (void e); }
         // Add an explicit tail gap before unpinning
         section2Timeline.add(gsap.timeline().to({}, { duration: SECTION2_TIMINGS.delayBeforeUnpin }), ">");
+
+        // MOBILE: immediately set final state and skip creating a pin
+        try {
+            if (window.innerWidth <= 600) {
+                section2Timeline.progress(1, false);
+                return;
+            }
+        } catch (_) { /* no-op */ }
+
+        // NON-MOBILE: create the pin trigger using unified system
+        const originalDistance = (section2Timeline ? section2Timeline.totalDuration() : 4) * (SECTION2_SCROLL?.pxPerSecond || 600);
+        const scrollTrigger = unifiedPinningSystem.createAnimatedPin(
+            2, // sectionNumber
+            triggerEl || document.querySelector("section[data-section='2']"), // triggerElement
+            section2Timeline, // animation
+            originalDistance, // originalDistance
+            {
+                onUpdate: (self) => {
+                    // Additional custom logic if needed
+                    console.log('Section 2 scroll progress:', self.progress);
+                }
+            }
+        );
+        
+        // Store the ScrollTrigger reference for cleanup
+        if (scrollTrigger) {
+            section2Timeline.scrollTrigger = scrollTrigger;
+        }
 
         console.log('Master timeline with 4-phase animation created successfully');
         try { ScrollTrigger.refresh(); } catch (_) { void 0; }
@@ -2008,31 +2015,31 @@ export function setupSection5HorizontalScroll() {
     if (title) {
         const t = config.titleTimings;
         let cursor = 0;
-
+        
         // Ensure title is visible immediately (no fade-in)
         gsap.set(title, { opacity: 1, scale: 1, blur: 0 });
 
         // Keep initial delay timing consistent
         cursor += (t.periodA ?? 0.5);
-
+        
         // Preserve original fade-in duration as idle time to keep fade-out schedule
         cursor += (t.h2FadeIn ?? 0.5);
-
+        
         // Title show period
         // (Title already visible; maintain timeline cursor to keep fade-out timing)
         cursor += (t.h2Show ?? 1.0);
-
+        
         // Title fade out
-        tl.to(title, {
-            opacity: 0,
-            ease: 'power2.in',
-            duration: (t.h2FadeOut ?? 0.5)
+        tl.to(title, { 
+            opacity: 0, 
+            ease: 'power2.in', 
+            duration: (t.h2FadeOut ?? 0.5) 
         }, cursor);
         cursor += (t.h2FadeOut ?? 0.5);
-
+        
         // Store cursor position for tile animations to start after title
         title._s5CursorAfterTitle = cursor;
-
+        
         console.log('[Section5] Title animation adjusted for immediate visibility:', {
             initialVisible: true,
             fadeOutAt: cursor - (t.h2FadeOut ?? 0.5),
