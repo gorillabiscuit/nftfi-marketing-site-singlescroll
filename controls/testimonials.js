@@ -169,6 +169,26 @@ function renderTestimonials(testimonials, container) {
         const card = createTestimonialCard(testimonial);
         container.appendChild(card);
     });
+
+    // Enforce touch-disable on mobile/tablet to prevent scroll interference
+    try {
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        const width = window.innerWidth;
+        const isMobileOrTablet = width <= 900;
+        if (isTouch && isMobileOrTablet) {
+            const tilesRoot = container.closest('.section5-tiles');
+            if (tilesRoot) {
+                tilesRoot.style.pointerEvents = 'none';
+            }
+            const cards = document.querySelectorAll('.testimonial-card');
+            cards.forEach(card => {
+                card.style.pointerEvents = 'none';
+                card.style.cursor = 'default';
+            });
+        }
+    } catch (e) {
+        console.warn('[Testimonials] touch-disable failed:', e);
+    }
 }
 
 /**

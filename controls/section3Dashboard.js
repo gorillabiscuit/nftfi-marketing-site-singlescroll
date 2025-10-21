@@ -547,6 +547,24 @@ export function initSection3Scroll() {
         return null;
     }
     
+    // MOBILE-ONLY: Skip animation/pinning and show final state immediately
+    try {
+        const isMobile = window.innerWidth <= 600;
+        if (isMobile) {
+            // Ensure features are visible
+            try { gsap.set('.section3-features .features-title', { opacity: 1 }); } catch (_) { void 0; }
+            try { gsap.set('.section3-features .feature-block', { opacity: 1, clearProps: 'y' }); } catch (_) { void 0; }
+            try { gsap.set('.section3-features .feature-cta', { opacity: 1, y: 0, scale: 1 }); } catch (_) { void 0; }
+            // Ensure SVG container is visible
+            try {
+                const svgContainer = document.getElementById('dashboard-svg-container');
+                if (svgContainer) { gsap.set(svgContainer, { visibility: 'visible', display: 'block', opacity: 1 }); }
+            } catch (_) { void 0; }
+            // No timeline or ScrollTrigger on mobile
+            return null;
+        }
+    } catch (_) { void 0; }
+
     // Get the new parent container and child elements
     const parentContainer = sectionEl.querySelector('.section3-container');
     const looperEl = sectionEl.querySelector('.hero--looper');
