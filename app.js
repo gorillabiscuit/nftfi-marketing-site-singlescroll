@@ -107,6 +107,28 @@ async function init() {
             console.log('Skipping heavy logo mesh on mobile');
             // Ensure Section 2 initializes/finalizes on mobile (no pin, no mesh)
             try { setupScrollAnimation(null, calculateStartPosition, calculateTargetPosition); } catch (_) { /* no-op */ }
+            // Force Section 4 panels visible on mobile (independent of animation/pinning)
+            try {
+                const finalizeS4 = () => {
+                    try {
+                        const titleEl = document.getElementById('section4-title');
+                        if (titleEl) { titleEl.style.opacity = '1'; titleEl.style.filter = 'none'; titleEl.style.transform = 'none'; }
+                        for (let i = 0; i < 4; i++) {
+                            const p = document.getElementById(`section4-panel-${i}`);
+                            if (p) {
+                                p.style.opacity = '1';
+                                p.style.filter = 'none';
+                                p.style.transform = 'none';
+                            }
+                        }
+                    } catch (_) { /* no-op */ }
+                };
+                if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+                    document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(finalizeS4)));
+                } else {
+                    requestAnimationFrame(finalizeS4);
+                }
+            } catch (_) { /* no-op */ }
         }
     } catch (_) {
         // Fallback: if window is undefined, load as usual
