@@ -69,6 +69,13 @@ export function setupScrollAnimation(wrapperInstance, startPositionFn, targetPos
     calculateStartPosition = startPositionFn;
     calculateTargetPosition = targetPositionFn;
     
+    // Ensure Section 2 initializes on mobile even if the logo mesh is skipped
+    try {
+        if (typeof window !== 'undefined' && window.innerWidth <= 600) {
+            setupSection2Pinning();
+        }
+    } catch (_) { /* no-op */ }
+
     if (!wrapper) return;
     
     // Store original position and scale
