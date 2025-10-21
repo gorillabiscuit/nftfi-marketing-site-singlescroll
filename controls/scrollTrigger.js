@@ -1056,10 +1056,20 @@ function setupSection2Pinning() {
         // Add an explicit tail gap before unpinning
         section2Timeline.add(gsap.timeline().to({}, { duration: SECTION2_TIMINGS.delayBeforeUnpin }), ">");
 
-        // MOBILE: immediately set final state and skip creating a pin
+        // MOBILE: set final state and skip creating a pin (defer until fonts/layout are ready)
         try {
             if (window.innerWidth <= 600) {
-                section2Timeline.progress(1, false);
+                const finalize = () => {
+                    try { section2Timeline.progress(1, false); } catch (_) { /* no-op */ }
+                    try { ScrollTrigger.refresh(); } catch (_) { /* no-op */ }
+                };
+                if (document && document.fonts && typeof document.fonts.ready?.then === 'function') {
+                    document.fonts.ready.then(() => {
+                        requestAnimationFrame(() => requestAnimationFrame(finalize));
+                    }).catch(() => finalize());
+                } else {
+                    requestAnimationFrame(finalize);
+                }
                 return;
             }
         } catch (_) { /* no-op */ }
