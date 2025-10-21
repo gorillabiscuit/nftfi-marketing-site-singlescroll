@@ -316,3 +316,36 @@ export const SECTION4_TIMINGS = {
 export const SECTION4_SCROLL = {
     pxPerUnit: 700 // increase to slow down overall scrub speed
 };
+
+// Mobile inline videos configuration (container-relative positioning)
+// One entry per asset type; adjust x/y/width to position in Section 4 on mobile
+export const SECTION4_MOBILE_VIDEOS = [
+    {
+        id: 's4-vid-0',               // Digital Art
+        src: '/images/Art.mp4',
+        width: 200,                   // px
+        x: 40,                        // px from container left
+        y: 220                        // px from container top
+    },
+    {
+        id: 's4-vid-1',               // PFPs
+        src: '/images/PFP.mp4',
+        width: 200,
+        x: 220,
+        y: 480
+    },
+    {
+        id: 's4-vid-2',               // RWAs
+        src: '/images/RWA.mp4',
+        width: 200,
+        x: 40,
+        y: 760
+    },
+    {
+        id: 's4-vid-3',               // Tokens
+        src: '/images/token.mp4',
+        width: 200,
+        x: 220,
+        y: 1040
+    }
+];

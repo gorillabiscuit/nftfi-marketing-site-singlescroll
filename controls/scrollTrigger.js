@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import unifiedPinningSystem from './unifiedPinningSystem.js';
-import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_PEBBLE, SECTION4_PEBBLE2, SECTION4_PEBBLE3, SECTION4_PEBBLE4, SECTION4_PEBBLE_SCROLL_PARAMS, SECTION4_CONTAINER_HEIGHT, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
+import { MODEL_CONFIG, TARGET_CONFIG, GRID_STATES, RECT_STATES, SECTION2_TIMINGS, SECTION2_SCROLL, SECTION4_PEBBLE, SECTION4_PEBBLE2, SECTION4_PEBBLE3, SECTION4_PEBBLE4, SECTION4_PEBBLE_SCROLL_PARAMS, SECTION4_CONTAINER_HEIGHT, SECTION4_TIMINGS, SECTION4_SCROLL, SECTION4_PEBBLE_SPIN, SECTION4_MOBILE_VIDEOS, SECTION5_CONFIG, SECTION5_LAYOUT, SECTION6_TIMINGS, SECTION6_SCROLL } from '../config/index.js';
 import { BREAKPOINT_NAMES } from '../config/breakpoints.js';
 import { onStateChange, getCurrentAnimationState, getCurrentBreakpoint } from '../utils/breakpointManager.js';
 import { updatePlaneTextureForSection, setupSectionPreCapture, switchToVideoTexture, switchToHeroTexture } from '../objects/backgroundPlane.js';
@@ -407,6 +407,33 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                 gsap.set(pebbleGroup4, { visible: true });
                 gsap.set(pebbleGroup4.position, { x: calculatePebbleX(pcfg4.position?.x ?? 2.5), y: (pcfg4.position?.y ?? -12.0), z: pcfg4.position?.z ?? 0 });
                 gsap.set(pebbleGroup4.scale, { x: pcfg4.scale ?? 1.0, y: pcfg4.scale ?? 1.0, z: pcfg4.scale ?? 1.0 });
+            }
+        } catch (_) { /* no-op */ }
+
+        // Inject inline videos for mobile (absolute within section4-content)
+        try {
+            const container = document.querySelector('.section4-content');
+            if (container && Array.isArray(SECTION4_MOBILE_VIDEOS)) {
+                // Remove existing injected videos to avoid duplicates
+                Array.from(container.querySelectorAll('video[data-s4-mobile]')).forEach((v) => v.remove());
+                SECTION4_MOBILE_VIDEOS.forEach((cfg) => {
+                    try {
+                        const v = document.createElement('video');
+                        v.setAttribute('playsinline', '');
+                        v.setAttribute('muted', '');
+                        v.setAttribute('autoplay', '');
+                        v.setAttribute('loop', '');
+                        v.setAttribute('data-s4-mobile', '');
+                        v.src = cfg.src;
+                        v.style.position = 'absolute';
+                        v.style.left = (cfg.x || 0) + 'px';
+                        v.style.top = (cfg.y || 0) + 'px';
+                        v.style.width = (cfg.width || 200) + 'px';
+                        v.style.borderRadius = '12px';
+                        v.style.zIndex = '5';
+                        container.appendChild(v);
+                    } catch (_) { /* no-op */ }
+                });
             }
         } catch (_) { /* no-op */ }
 
