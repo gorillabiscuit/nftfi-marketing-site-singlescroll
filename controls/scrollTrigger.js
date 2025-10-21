@@ -351,7 +351,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
             top: 0,
             left: 0,
             transform: 'none',
-            maxWidth: (typeof params.titleMaxWidthPx === 'number') ? `${params.titleMaxWidthPx}px` : undefined
+            width: (typeof params.titleMaxWidthPx === 'number') ? `${params.titleMaxWidthPx}px` : undefined
         });
     }
     
@@ -644,8 +644,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                     y: titleY,
                     xPercent: -50, // Center horizontally
                     yPercent: -50, // Center vertically
-                    width: 'auto', // Override inherited width to prevent 1400px issue
-                    maxWidth: (typeof params.titleMaxWidthPx === 'number') ? `${params.titleMaxWidthPx}px` : '90vw',
+                    width: (typeof params.titleMaxWidthPx === 'number') ? `${params.titleMaxWidthPx}px` : '90vw',
                     opacity: progress > 0.01 && progress < 0.8 ? 1 : 0, // Show early, fade before panels
                     scale: progress > 0.01 && progress < 0.8 ? 1 : 0.9,
                     filter: progress > 0.8 || progress <= 0.01 ? 'blur(5px)' : 'none'
