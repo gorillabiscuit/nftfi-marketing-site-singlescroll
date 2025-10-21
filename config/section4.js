@@ -168,7 +168,8 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         // === TITLE CONTROLS ===
         titleYOffset: -400,
         titleTravelMultiplier: 0.9,
-        titleStartOffset: 0
+        titleStartOffset: 0,
+        titleMaxWidthPx: 320
     },
     [BREAKPOINT_NAMES.TABLET]: {
         // === PEBBLE (3D MESH) CONTROLS ===
@@ -189,7 +190,8 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         // === TITLE CONTROLS ===
         titleYOffset: -600,
         titleTravelMultiplier: 1.0,
-        titleStartOffset: 0
+        titleStartOffset: 0,
+        titleMaxWidthPx: 420
     },
     [BREAKPOINT_NAMES.DESKTOP]: {
         // === PEBBLE (3D MESH) CONTROLS ===
@@ -210,7 +212,8 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         // === TITLE CONTROLS ===
         titleYOffset: -450,
         titleTravelMultiplier: 1.0,
-        titleStartOffset: 0
+        titleStartOffset: 0,
+        titleMaxWidthPx: 520
     },
     [BREAKPOINT_NAMES.DESKTOP_HD]: {
         // === PEBBLE (3D MESH) CONTROLS ===
@@ -231,7 +234,8 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         // === TITLE CONTROLS ===
         titleYOffset: -400,
         titleTravelMultiplier: 1.0,
-        titleStartOffset: 0
+        titleStartOffset: 0,
+        titleMaxWidthPx: 560
     },
     [BREAKPOINT_NAMES.DESKTOP_XL]: {
         // === PEBBLE (3D MESH) CONTROLS ===
@@ -252,7 +256,8 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         // === TITLE CONTROLS ===
         titleYOffset: -500,
         titleTravelMultiplier: 1.0,
-        titleStartOffset: 0
+        titleStartOffset: 0,
+        titleMaxWidthPx: 600
     },
     [BREAKPOINT_NAMES.DESKTOP_2XL]: {
         // === PEBBLE (3D MESH) CONTROLS ===
@@ -273,7 +278,8 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         // === TITLE CONTROLS ===
         titleYOffset: -700,
         titleTravelMultiplier: 1.0,
-        titleStartOffset: 0
+        titleStartOffset: 0,
+        titleMaxWidthPx: 640
     }
 };
 
@@ -326,8 +332,8 @@ export const SECTION4_MOBILE_VIDEOS = [
         width: 200,                   // px
         x: 40,                        // px from container left
         y: 220,                       // px from container top
-        blendMode: 'overlay',         // CSS mix-blend-mode (e.g., 'overlay', 'screen')
-        opacity: 0.7                  // Semi-transparency
+        blendMode: 'multiply',         // CSS mix-blend-mode (e.g., 'overlay', 'screen')
+        opacity: 0.5                  // Semi-transparency
     },
     {
         id: 's4-vid-1',               // PFPs
@@ -335,8 +341,8 @@ export const SECTION4_MOBILE_VIDEOS = [
         width: 200,
         x: 220,
         y: 480,
-        blendMode: 'overlay',
-        opacity: 0.7
+        blendMode: 'multiply',
+        opacity: 0.5
     },
     {
         id: 's4-vid-2',               // RWAs
@@ -344,8 +350,8 @@ export const SECTION4_MOBILE_VIDEOS = [
         width: 200,
         x: 40,
         y: 760,
-        blendMode: 'overlay',
-        opacity: 0.7
+        blendMode: 'multiply',
+        opacity: 0.5
     },
     {
         id: 's4-vid-3',               // Tokens
@@ -353,7 +359,7 @@ export const SECTION4_MOBILE_VIDEOS = [
         width: 200,
         x: 220,
         y: 1040,
-        blendMode: 'overlay',
-        opacity: 0.7
+        blendMode: 'multiply',
+        opacity: 0.5
     }
 ];
