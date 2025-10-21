@@ -558,17 +558,17 @@ export function initSection3Scroll() {
         return null;
     }
 
-    // MOBILE-ONLY: Skip animation/pinning but APPLY LAYOUT POSITIONING for final state
+    // MOBILE/TABLET: Skip animation/pinning but APPLY LAYOUT POSITIONING for final state
     try {
-        const isMobile = window.innerWidth <= 600;
-        if (isMobile) {
+        const isMobileOrTablet = window.innerWidth <= 900;
+        if (isMobileOrTablet) {
             // Ensure features and CTA are visible at final state
             try { gsap.set('.section3-features .features-title', { opacity: 1 }); } catch (_) { void 0; }
             try { gsap.set('.section3-features .feature-block', { opacity: 1, clearProps: 'y' }); } catch (_) { void 0; }
             try { gsap.set('.section3-features .feature-cta', { opacity: 1, y: 0, scale: 1 }); } catch (_) { void 0; }
             // Ensure parent container and looper are positioned using MOBILE config
             try {
-                const parentCfg = getParentContainerConfigFor(BREAKPOINT_NAMES.MOBILE);
+                const parentCfg = getParentContainerConfigFor(window.innerWidth <= 600 ? BREAKPOINT_NAMES.MOBILE : BREAKPOINT_NAMES.TABLET);
                 gsap.set(parentContainer, {
                     position: 'absolute',
                     width: parentCfg.width,
@@ -580,7 +580,7 @@ export function initSection3Scroll() {
                     zIndex: 1
                 });
                 if (looperEl) {
-                    const heroCfg = getHeroLooperConfigFor(BREAKPOINT_NAMES.MOBILE);
+                    const heroCfg = getHeroLooperConfigFor(window.innerWidth <= 600 ? BREAKPOINT_NAMES.MOBILE : BREAKPOINT_NAMES.TABLET);
                     const setObj = {
                         position: 'absolute',
                         zIndex: 1,
