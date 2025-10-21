@@ -105,6 +105,8 @@ async function init() {
             loadLogoModel(scene, uniforms, calculateStartPosition, updatePlaneForViewport, setupScrollAnimation, resetScrollAnimation, updatePlaneTexture, captureHeroAsTexture, worldToPosition, calculateTargetPosition);
         } else {
             console.log('Skipping heavy logo mesh on mobile');
+            // Ensure Section 2 initializes/finalizes on mobile (no pin, no mesh)
+            try { setupScrollAnimation(null, calculateStartPosition, calculateTargetPosition); } catch (_) { /* no-op */ }
         }
     } catch (_) {
         // Fallback: if window is undefined, load as usual
