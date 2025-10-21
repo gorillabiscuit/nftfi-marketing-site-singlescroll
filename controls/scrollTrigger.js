@@ -717,6 +717,7 @@ function createScrollTimeline() {
                     // Hide mesh just before reaching final position and show logo accent paths
                     if (progress > 0.99) {
                         wrapper.visible = false;
+                        try { if (window.mesh) window.mesh.visible = false; } catch (_) { }
                         // Show the accent paths in the logo when mesh disappears
                         const accentPath1 = document.getElementById('logo-accent-1');
                         const accentPath2 = document.getElementById('logo-accent-2');
@@ -724,6 +725,7 @@ function createScrollTimeline() {
                         if (accentPath2) accentPath2.style.opacity = '1';
                     } else {
                         wrapper.visible = true;
+                        try { if (window.mesh) window.mesh.visible = true; } catch (_) { }
                         // Hide the accent paths when mesh is visible
                         const accentPath1 = document.getElementById('logo-accent-1');
                         const accentPath2 = document.getElementById('logo-accent-2');

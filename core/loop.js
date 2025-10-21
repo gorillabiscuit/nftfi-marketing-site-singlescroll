@@ -77,8 +77,8 @@ export function animate() {
     // Update pebble interaction (raycasting for hover detection)
     updatePebbleInteraction();
 
-    // ANIMATION LOOP RE-ENABLED
-    if (wrapper && isModelReady) {
+    // Skip object transforms when the wrapper is hidden
+    if (wrapper && isModelReady && wrapper.visible) {
         const time = (Date.now() - startTime) * 0.001; // Convert to seconds from start
         
         // Decay mouse influence over time (slower decay like working example)
@@ -157,7 +157,8 @@ export function animate() {
         // Multi-mesh refraction capture: process each refractive mesh
         // Performance optimization: only include visible meshes
         const refractiveMeshes = [];
-        if (mesh && mesh.visible) refractiveMeshes.push(mesh);
+        // Only capture refraction for the logo when the parent wrapper is visible
+        if (wrapper && wrapper.visible && mesh && mesh.visible) refractiveMeshes.push(mesh);
         if (pebbleMesh && pebbleGroup && pebbleGroup.visible) refractiveMeshes.push(pebbleMesh);
         if (pebbleMesh2 && pebbleGroup2 && pebbleGroup2.visible) refractiveMeshes.push(pebbleMesh2);
         if (pebbleMesh3 && pebbleGroup3 && pebbleGroup3.visible) refractiveMeshes.push(pebbleMesh3);
