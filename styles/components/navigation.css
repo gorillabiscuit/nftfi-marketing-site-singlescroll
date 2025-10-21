@@ -424,6 +424,13 @@
         width: calc(var(--logo-size) ); /* Slightly smaller logo */
         height: calc(var(--logo-height) );
     }
+
+    /* Ensure all logo accent paths are visible on mobile */
+    .nav-logo #logo-accent-1,
+    .nav-logo #logo-accent-2 {
+        opacity: 1 !important;
+        transition: none;
+    }
 }
 
 /* Mobile Responsive Design - Consolidated (601px - 900px) */
