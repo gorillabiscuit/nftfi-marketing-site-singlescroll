@@ -414,10 +414,26 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
         try {
             const container = document.querySelector('.section4-content');
             if (container && Array.isArray(SECTION4_MOBILE_VIDEOS)) {
-                // Remove existing injected videos to avoid duplicates
-                Array.from(container.querySelectorAll('video[data-s4-mobile]')).forEach((v) => v.remove());
+                // Remove existing injected videos/frames to avoid duplicates
+                Array.from(container.querySelectorAll('video[data-s4-mobile], div[data-s4-mobile-frame]')).forEach((el) => el.remove());
                 SECTION4_MOBILE_VIDEOS.forEach((cfg) => {
                     try {
+                        // Frame (diamond) wrapper
+                        const frame = document.createElement('div');
+                        frame.setAttribute('data-s4-mobile-frame', '');
+                        frame.style.position = 'absolute';
+                        frame.style.left = (cfg.x || 0) + 'px';
+                        frame.style.top = (cfg.y || 0) + 'px';
+                        const frameSize = (cfg.width || 200);
+                        frame.style.width = frameSize + 'px';
+                        frame.style.height = frameSize + 'px';
+                        frame.style.overflow = 'hidden';
+                        frame.style.transform = 'rotate(45deg)';
+                        frame.style.transformOrigin = '50% 50%';
+                        frame.style.borderRadius = '12px';
+                        frame.style.zIndex = '5';
+                        container.appendChild(frame);
+
                         const v = document.createElement('video');
                         // Set properties BEFORE setting src for iOS autoplay behavior
                         v.muted = true;
@@ -434,14 +450,19 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                         v.setAttribute('data-s4-mobile', '');
                         v.src = cfg.src;
                         v.style.position = 'absolute';
-                        v.style.left = (cfg.x || 0) + 'px';
-                        v.style.top = (cfg.y || 0) + 'px';
-                        v.style.width = (cfg.width || 200) + 'px';
-                        v.style.borderRadius = '12px';
-                        v.style.zIndex = '5';
+                        v.style.left = '50%';
+                        v.style.top = '50%';
+                        // Scale ~sqrt(2) to fully cover the diamond mask
+                        const scale = 1.42;
+                        v.style.transform = `translate(-50%, -50%) rotate(-45deg) scale(${scale})`;
+                        v.style.transformOrigin = '50% 50%';
+                        v.style.width = '100%';
+                        v.style.height = '100%';
+                        v.style.objectFit = 'cover';
+                        v.style.borderRadius = '0px';
                         if (cfg.blendMode) v.style.mixBlendMode = cfg.blendMode;
                         if (typeof cfg.opacity === 'number') v.style.opacity = String(cfg.opacity);
-                        container.appendChild(v);
+                        frame.appendChild(v);
 
                         // Attempt autoplay once appended (required by some browsers)
                         const tryPlay = () => {
