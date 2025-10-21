@@ -431,6 +431,8 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                         v.style.width = (cfg.width || 200) + 'px';
                         v.style.borderRadius = '12px';
                         v.style.zIndex = '5';
+                        if (cfg.blendMode) v.style.mixBlendMode = cfg.blendMode;
+                        if (typeof cfg.opacity === 'number') v.style.opacity = String(cfg.opacity);
                         container.appendChild(v);
                     } catch (_) { /* no-op */ }
                 });

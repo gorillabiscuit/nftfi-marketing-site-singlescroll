@@ -325,27 +325,35 @@ export const SECTION4_MOBILE_VIDEOS = [
         src: '/images/Art.mp4',
         width: 200,                   // px
         x: 40,                        // px from container left
-        y: 220                        // px from container top
+        y: 220,                       // px from container top
+        blendMode: 'overlay',         // CSS mix-blend-mode (e.g., 'overlay', 'screen')
+        opacity: 0.7                  // Semi-transparency
     },
     {
         id: 's4-vid-1',               // PFPs
         src: '/images/PFP.mp4',
         width: 200,
         x: 220,
-        y: 480
+        y: 480,
+        blendMode: 'overlay',
+        opacity: 0.7
     },
     {
         id: 's4-vid-2',               // RWAs
         src: '/images/RWA.mp4',
         width: 200,
         x: 40,
-        y: 760
+        y: 760,
+        blendMode: 'overlay',
+        opacity: 0.7
     },
     {
         id: 's4-vid-3',               // Tokens
         src: '/images/token.mp4',
         width: 200,
         x: 220,
-        y: 1040
+        y: 1040,
+        blendMode: 'overlay',
+        opacity: 0.7
     }
 ];
