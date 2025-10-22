@@ -167,13 +167,16 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         // Mobile-only text row Y positioning (independent of pebbles)
         // If an array is provided, it is used as absolute container-relative Y for each row index (0..3)
         // Otherwise, offset and spacing are applied relative to the pebble projection Y
-        textRowYPositionsPxMobile: [400, 620, 820, 1100], // e.g., [300, 620, 820, 1100]
+        textRowYPositionsPxMobile: [400, 850, 1820, 1100], // e.g., [300, 620, 820, 1100]
         textRowOffsetYPxMobile: 0,
         textRowSpacingPxMobile: 0,
         // Mobile-only text row X positioning (independent of pebbles)
         // If an array is provided, it is used as absolute container-relative X CENTER for each row
         // Otherwise, horizontal position comes from side-aware offsets relative to the pebble
-        textRowXPositionsPxMobile: [200, 300, 200, 300],
+        textRowXPositionsPxMobile: [300, 140, 200, 300],
+        // Mobile-only text row WIDTH overrides (absolute px per row 0..3)
+        // When provided, each value sets the panel width directly; if omitted uses computed width
+        textRowWidthsPxMobile: undefined,
         
         // === TITLE CONTROLS ===
         titleYOffset: -400,
@@ -341,16 +344,16 @@ export const SECTION4_MOBILE_VIDEOS = [
         src: '/images/Art.mp4',
         width: 290,                   // px
         x: -100,                        // px from container left
-        y: 290,                       // px from container top
+        y: 390,                       // px from container top
         blendMode: 'multiply',         // CSS mix-blend-mode (e.g., 'overlay', 'screen')
         opacity: 0.5                  // Semi-transparency
     },
     {
         id: 's4-vid-1',               // PFPs
         src: '/images/PFP.mp4',
-        width: 230,
-        x: 220,
-        y: 590,
+        width: 280,
+        x: 270,
+        y: 660,
         blendMode: 'multiply',
         opacity: 0.5
     },
@@ -359,7 +362,7 @@ export const SECTION4_MOBILE_VIDEOS = [
         src: '/images/RWA.mp4',
         width: 230,
         x: 40,
-        y: 760,
+        y: 960,
         blendMode: 'multiply',
         opacity: 0.5
     },

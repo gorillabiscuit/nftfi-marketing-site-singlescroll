@@ -554,9 +554,14 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                     const half = dims.minW * 0.5;
                     const rightEdge = containerLeft + containerWidth;
                     const leftEdge = containerLeft;
+                    // Optional per-row width override
+                    const wArray = params.textRowWidthsPxMobile;
                     if (side === 'right') {
                         const availableRight = Math.max(0, rightEdge - pebbleScreen.x - half - dims.gutter);
-                        const desiredWidth = Math.min(Math.max(availableRight * 2, dims.minW), dims.maxW);
+                        let desiredWidth = Math.min(Math.max(availableRight * 2, dims.minW), dims.maxW);
+                        if (Array.isArray(wArray) && typeof wArray[idx] === 'number') {
+                            desiredWidth = Math.max(1, Math.min(wArray[idx], containerWidth));
+                        }
                         let x;
                         if (Array.isArray(xArray) && typeof xArray[idx] === 'number') {
                             // Absolute container-relative center X provided
@@ -569,7 +574,10 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                         gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1 });
                     } else {
                         const availableLeft = Math.max(0, pebbleScreen.x - leftEdge - half - dims.gutter);
-                        const desiredWidth = Math.min(Math.max(availableLeft * 2, dims.minW), dims.maxW);
+                        let desiredWidth = Math.min(Math.max(availableLeft * 2, dims.minW), dims.maxW);
+                        if (Array.isArray(wArray) && typeof wArray[idx] === 'number') {
+                            desiredWidth = Math.max(1, Math.min(wArray[idx], containerWidth));
+                        }
                         let x;
                         if (Array.isArray(xArray) && typeof xArray[idx] === 'number') {
                             x = Math.min(Math.max(xArray[idx], half), containerWidth - half);
