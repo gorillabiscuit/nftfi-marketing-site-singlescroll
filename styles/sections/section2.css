@@ -149,6 +149,13 @@
         width: 100%;
         text-align: center;
     }
+
+    /* Hide unused lines on mobile to prevent horizontal overflow */
+    .section[data-section="2"] .svg-lines-container,
+    .section[data-section="2"] #lines-svg,
+    .section[data-section="2"] #grid-lines {
+        display: none !important;
+    }
 }
 
 /* ==========================================================================
