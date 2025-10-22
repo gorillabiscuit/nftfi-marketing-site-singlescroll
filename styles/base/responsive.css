@@ -134,3 +134,27 @@
         transform: none;
     }
 }
+
+/* Mobile-only: prevent horizontal overflow and hide unused oversized layers */
+@media (max-width: 600px) {
+    /* Belt-and-braces overflow protection */
+    html, body, #smooth-wrapper, #smooth-content, .section {
+        overflow-x: hidden !important;
+    }
+
+    /* Hide Section 3 lines/containers on mobile */
+    .svg-lines-container,
+    #lines-svg,
+    #grid-lines,
+    #grid-cells,
+    #dashboard-svg-container {
+        display: none !important;
+    }
+
+    /* Hide decorative gradient/layer elements that extend beyond viewport */
+    .gradient-layer-3,
+    .gradient-layer-5,
+    .section4-decoration-bottom {
+        display: none !important;
+    }
+}
