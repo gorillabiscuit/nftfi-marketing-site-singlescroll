@@ -7,11 +7,13 @@ html, body {
     font-synthesis: none; /* Prevent Safari from faking bold/italic */
     font-optical-sizing: auto; /* Respect variable font optical sizing */
     -webkit-text-size-adjust: 100%; /* Avoid unexpected size/weight changes */
+    overflow-x: hidden; /* Prevent global horizontal scroll */
 }
 
 /* Mobile scroll hygiene: favor vertical scroll, avoid child elements trapping touches */
 html, body, #smooth-wrapper, #smooth-content {
     touch-action: pan-y;
+    overflow-x: hidden; /* Clamp smoother wrappers from creating horizontal scroll */
 }
 
 /* Prevent decorative overlays from intercepting taps/scrolls */
