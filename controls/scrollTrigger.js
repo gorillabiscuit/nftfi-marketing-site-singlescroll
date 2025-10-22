@@ -415,6 +415,8 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
         try {
             const container = document.querySelector('.section4-content');
             if (container && Array.isArray(SECTION4_MOBILE_VIDEOS)) {
+                // Safety net to avoid accidental horizontal scroll
+                try { container.style.overflowX = 'hidden'; document.documentElement.style.overflowX = 'hidden'; document.body.style.overflowX = 'hidden'; } catch (_) { /* no-op */ }
                 // Remove existing injected videos/frames to avoid duplicates
                 Array.from(container.querySelectorAll('video[data-s4-mobile], div[data-s4-mobile-frame]')).forEach((el) => el.remove());
                 SECTION4_MOBILE_VIDEOS.forEach((cfg) => {
@@ -423,9 +425,13 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                         const frame = document.createElement('div');
                         frame.setAttribute('data-s4-mobile-frame', '');
                         frame.style.position = 'absolute';
-                        frame.style.left = (cfg.x || 0) + 'px';
-                        frame.style.top = (cfg.y || 0) + 'px';
+                        // Clamp left to container bounds to avoid horizontal overflow
+                        const cRect = container.getBoundingClientRect();
                         const frameSize = (cfg.width || 200);
+                        const rawX = (cfg.x || 0);
+                        const clampedX = Math.min(Math.max(rawX, 0), Math.max(0, cRect.width - frameSize));
+                        frame.style.left = clampedX + 'px';
+                        frame.style.top = (cfg.y || 0) + 'px';
                         frame.style.width = frameSize + 'px';
                         frame.style.height = frameSize + 'px';
                         frame.style.overflow = 'hidden';
@@ -571,7 +577,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                             const xViewport = pebbleScreen.x + half + dims.gutter + offset;
                             x = clampToContainer(xViewport, panelEl, desiredWidth).x;
                         }
-                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1, backgroundColor: 'rgba(33,22,22,0.8)', padding: '30px', boxSizing: 'border-box' });
+                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1, backgroundColor: 'rgba(33,22,22,0.2)', padding: '10px', boxSizing: 'border-box' });
                     } else {
                         const availableLeft = Math.max(0, pebbleScreen.x - leftEdge - half - dims.gutter);
                         let desiredWidth = Math.min(Math.max(availableLeft * 2, dims.minW), dims.maxW);
@@ -586,7 +592,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                             const xViewport = pebbleScreen.x - half - dims.gutter - offset;
                             x = clampToContainer(xViewport, panelEl, desiredWidth).x;
                         }
-                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1, backgroundColor: 'rgba(33,22,22,0.8)', padding: '30px', boxSizing: 'border-box' });
+                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1, backgroundColor: 'rgba(33,22,22,0.2)', padding: '30px', boxSizing: 'border-box' });
                     }
                 };
 
