@@ -534,11 +534,21 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                     });
                 }
 
-                const applyPanel = (panelEl, pebbleGroup, side) => {
+                const applyPanel = (panelEl, pebbleGroup, side, idx) => {
                     if (!panelEl || !pebbleGroup) return;
                     const dims = panelDims(panelEl);
                     const pebbleScreen = projectPebbleToScreen(pebbleGroup);
                     if (!pebbleScreen) return;
+                    // Determine Y: allow independent control via config
+                    let yTarget = pebbleScreen.y;
+                    const yArray = params.textRowYPositionsPxMobile;
+                    if (Array.isArray(yArray) && typeof yArray[idx] === 'number') {
+                        yTarget = yArray[idx];
+                    } else {
+                        const baseOffset = typeof params.textRowOffsetYPxMobile === 'number' ? params.textRowOffsetYPxMobile : 0;
+                        const spacing = typeof params.textRowSpacingPxMobile === 'number' ? params.textRowSpacingPxMobile : 0;
+                        yTarget = pebbleScreen.y + baseOffset + idx * spacing;
+                    }
                     const half = dims.minW * 0.5;
                     const rightEdge = containerLeft + containerWidth;
                     const leftEdge = containerLeft;
@@ -548,21 +558,21 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                         const offset = availableRight * offsetRight;
                         const xViewport = pebbleScreen.x + half + dims.gutter + offset;
                         const { x } = clampToContainer(xViewport, panelEl, desiredWidth);
-                        gsap.set(panelEl, { width: desiredWidth, x, y: pebbleScreen.y, xPercent: -50, yPercent: -50, opacity: 1 });
+                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1 });
                     } else {
                         const availableLeft = Math.max(0, pebbleScreen.x - leftEdge - half - dims.gutter);
                         const desiredWidth = Math.min(Math.max(availableLeft * 2, dims.minW), dims.maxW);
                         const offset = availableLeft * offsetLeft;
                         const xViewport = pebbleScreen.x - half - dims.gutter - offset;
                         const { x } = clampToContainer(xViewport, panelEl, desiredWidth);
-                        gsap.set(panelEl, { width: desiredWidth, x, y: pebbleScreen.y, xPercent: -50, yPercent: -50, opacity: 1 });
+                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1 });
                     }
                 };
 
-                applyPanel(panel0, pebbleGroup1, 'right');
-                applyPanel(panel1, pebbleGroup2, 'left');
-                applyPanel(panel2, pebbleGroup3, 'right');
-                applyPanel(panel3, pebbleGroup4, 'left');
+                applyPanel(panel0, pebbleGroup1, 'right', 0);
+                applyPanel(panel1, pebbleGroup2, 'left', 1);
+                applyPanel(panel2, pebbleGroup3, 'right', 2);
+                applyPanel(panel3, pebbleGroup4, 'left', 3);
             }
         } catch (_) { /* no-op */ }
 

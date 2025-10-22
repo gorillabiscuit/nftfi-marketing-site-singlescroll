@@ -154,22 +154,28 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         pebbleScrollSpeed: 1.35,
         
         // === TEXT PANEL CONTROLS ===
-        textSpacingPixels: 300,
-        textStartOffset: -100,
+        textSpacingPixels: 0,
+        textStartOffset: 0,
         textTravelMultiplier: 0.85,
         // Horizontal offsets from pebble to text (fractions of available space to container edge)
         // Higher value = text further from pebble
-        textHorizontalOffsetLeft: 0.9,
-        textHorizontalOffsetRight: 1.2,
+        textHorizontalOffsetLeft: 0.1,
+        textHorizontalOffsetRight: 0.9,
         textPanelMinWidthPx: 200,
         textPanelMaxWidthPx: 200,
         textPanelGutterPx: 24,
+        // Mobile-only text row Y positioning (independent of pebbles)
+        // If an array is provided, it is used as absolute container-relative Y for each row index (0..3)
+        // Otherwise, offset and spacing are applied relative to the pebble projection Y
+        textRowYPositionsPxMobile: undefined, // e.g., [300, 620, 820, 1100]
+        textRowOffsetYPxMobile: 0,
+        textRowSpacingPxMobile: 0,
         
         // === TITLE CONTROLS ===
         titleYOffset: -400,
         titleTravelMultiplier: 0.9,
         titleStartOffset: 0,
-        titleMaxWidthPx: 320
+        titleMaxWidthPx: 360
     },
     [BREAKPOINT_NAMES.TABLET]: {
         // === PEBBLE (3D MESH) CONTROLS ===
@@ -329,25 +335,25 @@ export const SECTION4_MOBILE_VIDEOS = [
     {
         id: 's4-vid-0',               // Digital Art
         src: '/images/Art.mp4',
-        width: 200,                   // px
-        x: 40,                        // px from container left
-        y: 220,                       // px from container top
+        width: 290,                   // px
+        x: -100,                        // px from container left
+        y: 290,                       // px from container top
         blendMode: 'multiply',         // CSS mix-blend-mode (e.g., 'overlay', 'screen')
         opacity: 0.5                  // Semi-transparency
     },
     {
         id: 's4-vid-1',               // PFPs
         src: '/images/PFP.mp4',
-        width: 200,
+        width: 230,
         x: 220,
-        y: 480,
+        y: 590,
         blendMode: 'multiply',
         opacity: 0.5
     },
     {
         id: 's4-vid-2',               // RWAs
         src: '/images/RWA.mp4',
-        width: 200,
+        width: 230,
         x: 40,
         y: 760,
         blendMode: 'multiply',
@@ -356,7 +362,7 @@ export const SECTION4_MOBILE_VIDEOS = [
     {
         id: 's4-vid-3',               // Tokens
         src: '/images/token.mp4',
-        width: 200,
+        width: 230,
         x: 220,
         y: 1040,
         blendMode: 'multiply',
