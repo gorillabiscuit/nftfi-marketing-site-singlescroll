@@ -167,9 +167,13 @@ export const SECTION4_PEBBLE_SCROLL_PARAMS = {
         // Mobile-only text row Y positioning (independent of pebbles)
         // If an array is provided, it is used as absolute container-relative Y for each row index (0..3)
         // Otherwise, offset and spacing are applied relative to the pebble projection Y
-        textRowYPositionsPxMobile: undefined, // e.g., [300, 620, 820, 1100]
+        textRowYPositionsPxMobile: [400, 620, 820, 1100], // e.g., [300, 620, 820, 1100]
         textRowOffsetYPxMobile: 0,
         textRowSpacingPxMobile: 0,
+        // Mobile-only text row X positioning (independent of pebbles)
+        // If an array is provided, it is used as absolute container-relative X CENTER for each row
+        // Otherwise, horizontal position comes from side-aware offsets relative to the pebble
+        textRowXPositionsPxMobile: [200, 300, 200, 300],
         
         // === TITLE CONTROLS ===
         titleYOffset: -400,

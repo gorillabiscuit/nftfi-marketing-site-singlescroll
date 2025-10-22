@@ -549,22 +549,35 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                         const spacing = typeof params.textRowSpacingPxMobile === 'number' ? params.textRowSpacingPxMobile : 0;
                         yTarget = pebbleScreen.y + baseOffset + idx * spacing;
                     }
+                    // Determine X: optional per-row absolute override (container-relative center)
+                    const xArray = params.textRowXPositionsPxMobile;
                     const half = dims.minW * 0.5;
                     const rightEdge = containerLeft + containerWidth;
                     const leftEdge = containerLeft;
                     if (side === 'right') {
                         const availableRight = Math.max(0, rightEdge - pebbleScreen.x - half - dims.gutter);
                         const desiredWidth = Math.min(Math.max(availableRight * 2, dims.minW), dims.maxW);
-                        const offset = availableRight * offsetRight;
-                        const xViewport = pebbleScreen.x + half + dims.gutter + offset;
-                        const { x } = clampToContainer(xViewport, panelEl, desiredWidth);
+                        let x;
+                        if (Array.isArray(xArray) && typeof xArray[idx] === 'number') {
+                            // Absolute container-relative center X provided
+                            x = Math.min(Math.max(xArray[idx], half), containerWidth - half);
+                        } else {
+                            const offset = availableRight * offsetRight;
+                            const xViewport = pebbleScreen.x + half + dims.gutter + offset;
+                            x = clampToContainer(xViewport, panelEl, desiredWidth).x;
+                        }
                         gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1 });
                     } else {
                         const availableLeft = Math.max(0, pebbleScreen.x - leftEdge - half - dims.gutter);
                         const desiredWidth = Math.min(Math.max(availableLeft * 2, dims.minW), dims.maxW);
-                        const offset = availableLeft * offsetLeft;
-                        const xViewport = pebbleScreen.x - half - dims.gutter - offset;
-                        const { x } = clampToContainer(xViewport, panelEl, desiredWidth);
+                        let x;
+                        if (Array.isArray(xArray) && typeof xArray[idx] === 'number') {
+                            x = Math.min(Math.max(xArray[idx], half), containerWidth - half);
+                        } else {
+                            const offset = availableLeft * offsetLeft;
+                            const xViewport = pebbleScreen.x - half - dims.gutter - offset;
+                            x = clampToContainer(xViewport, panelEl, desiredWidth).x;
+                        }
                         gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1 });
                     }
                 };
