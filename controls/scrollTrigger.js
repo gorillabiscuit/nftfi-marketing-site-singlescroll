@@ -571,7 +571,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                             const xViewport = pebbleScreen.x + half + dims.gutter + offset;
                             x = clampToContainer(xViewport, panelEl, desiredWidth).x;
                         }
-                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1, backgroundColor: 'rgba(33,22,22,0.8)' });
+                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1, backgroundColor: 'rgba(33,22,22,0.8)', padding: '30px', boxSizing: 'border-box' });
                     } else {
                         const availableLeft = Math.max(0, pebbleScreen.x - leftEdge - half - dims.gutter);
                         let desiredWidth = Math.min(Math.max(availableLeft * 2, dims.minW), dims.maxW);
@@ -586,7 +586,7 @@ export function setupSection4PebbleFadePinned(pebbleGroup1, pebbleGroup2, pebble
                             const xViewport = pebbleScreen.x - half - dims.gutter - offset;
                             x = clampToContainer(xViewport, panelEl, desiredWidth).x;
                         }
-                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1, backgroundColor: 'rgba(33,22,22,0.8)' });
+                        gsap.set(panelEl, { width: desiredWidth, x, y: yTarget, xPercent: -50, yPercent: -50, opacity: 1, backgroundColor: 'rgba(33,22,22,0.8)', padding: '30px', boxSizing: 'border-box' });
                     }
                 };
 
