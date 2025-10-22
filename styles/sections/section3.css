@@ -9,6 +9,7 @@ h2 {
     height: 100vh;
     min-height: 100vh;
     position: relative; /* Ensure proper positioning context for children */
+    overflow-x: hidden; /* Prevent horizontal overflow from large/rotated children */
 }
 
 /* Section 3 Parent Container - Centralized positioning system */
