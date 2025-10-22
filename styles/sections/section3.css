@@ -289,15 +289,21 @@ h2 {
         padding-right: 0px; 
     }
 
-    /* Make Section 3 height content-based on mobile */
+    /* Make Section 3 height content-based on mobile and prevent inner scroll */
     .section[data-section="3"] {
         height: auto;
         min-height: 0;
         padding-top: 80px;
         padding-bottom: 80px;
+        overflow-y: visible;
     }
     /* Place container in normal flow so section wraps it */
     .section3-container {
         position: static;
+    }
+    /* Keep features in normal flow so section height includes them */
+    .section3-features {
+        position: static;
+        inset: auto;
     }
 }
