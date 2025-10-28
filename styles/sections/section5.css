@@ -368,9 +368,11 @@
     .section5-title {
         font-size: 2rem; /* Smaller title on mobile */
         position: relative; /* Keep in flow, allow z-index */
+        top: auto; left: auto; right: auto; /* reset absolute centering from base */
         transform: none;
         width: 100%;
-        margin: 0.75rem 0 1rem;
+        margin: 0; /* use padding for spacing */
+        padding: 30px 0; /* 30px above and below */
         text-align: center;
         z-index: 6; /* Above testimonial cards (z-index: 5) */
         opacity: 1 !important; /* Override GSAP inline opacity */
