@@ -141,6 +141,26 @@
 .section2m-number { font: 300 28px/1.2 'Roboto Mono', monospace; color: #fff; }
 .section2m-label { font: 500 13px/1.6 'Satoshi Variable', sans-serif; color: rgba(255,255,255,0.85); }
 
+/* Positioning controls for Section 2 mobile/tablet heading */
+.section2-mobile {
+    /* Tweak these variables to reposition/resize the heading */
+    --s2m-title-top: 10vh;
+    --s2m-title-left: 50%;
+    --s2m-title-rotate: 45deg;
+    --s2m-title-width: auto;
+    --s2m-title-z: 2;
+}
+.section2-mobile .key-metrics-title {
+    position: absolute;
+    top: var(--s2m-title-top);
+    left: var(--s2m-title-left);
+    transform: translate(-50%, 0) rotate(var(--s2m-title-rotate));
+    width: var(--s2m-title-width);
+    z-index: var(--s2m-title-z);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
 /* 45° square grid background */
 .section2m-grid {
     position: absolute;
@@ -166,7 +186,7 @@
 /* Children will opt-in to counter-rotate */
 
 /* Make the diamond look square/centered */
-.section2m-stat { width: 72px; height: 72px; margin: 0 auto; }
+.section2m-stat { width: 180px; height: 180px; margin: 0 auto; }
 .section2m-number {
     position: absolute;
     top: 50%; left: 50%;
@@ -179,14 +199,17 @@
 }
 .section2m-label {
     position: absolute;
-    left: 50%; bottom: 12px;
-    /* Parent is rotated 45deg; to get net -45deg on viewport, rotate child -90deg */
-    transform: translateX(-50%) rotate(-90deg);
+    left: 170px; bottom: 10px;
+    /* Anchor from left edge: rotate around left-bottom and don't translate */
+    transform: rotate(-90deg);
+    transform-origin: left bottom;
     font-family: 'Satoshi Variable', sans-serif;
+    text-align: left;
     font-weight: 500;
     font-size: 16px; /* match Section 2 .stats .label */
     line-height: 1.6;
     color: rgba(255,255,255,0.85);
+    white-space: nowrap;
 }
 
 /* Gradient palettes to match animated section */
@@ -201,6 +224,20 @@
 
 @media (min-width: 601px) and (max-width: 900px) {
     .section2m-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Horizontal staggering similar to Section 4 video tiles */
+@media (max-width: 600px) {
+    .section2m-stat.stat-0 { left: -80px; }
+    .section2m-stat.stat-1 { left:  80px; top: -40px; }
+    .section2m-stat.stat-2 { left: -80px; top: -70px; }
+    .section2m-stat.stat-3 { left:  80px;  top: -100px; }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+    .section2m-stat.stat-0 { left: -28px; }
+    .section2m-stat.stat-1 { left:  28px; }
+    .section2m-stat.stat-2 { left: -28px; }
+    .section2m-stat.stat-3 { left:  28px; }
 }
 
 @media (max-width: 900px) {
