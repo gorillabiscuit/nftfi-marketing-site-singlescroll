@@ -367,11 +367,13 @@
     .section[data-section="5"] h2,
     .section5-title {
         font-size: 2rem; /* Smaller title on mobile */
-        position: static; /* Place near top in normal flow */
+        position: relative; /* Keep in flow, allow z-index */
         transform: none;
         width: 100%;
         margin: 0.75rem 0 1rem;
         text-align: center;
+        z-index: 6; /* Above testimonial cards (z-index: 5) */
+        opacity: 1 !important; /* Override GSAP inline opacity */
     }
     
     /* Hide horizontal rows on mobile in favor of a single vertical list */
