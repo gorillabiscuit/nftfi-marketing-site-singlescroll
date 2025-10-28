@@ -141,6 +141,40 @@
 .section2m-number { font: 300 28px/1.2 'Roboto Mono', monospace; color: #fff; }
 .section2m-label { font: 500 13px/1.6 'Satoshi Variable', sans-serif; color: rgba(255,255,255,0.85); }
 
+/* 45° square grid background */
+.section2m-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+        linear-gradient(0deg, rgba(255,255,255,0.08) 1px, transparent 1px) 0 0/40px 40px,
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px) 0 0/40px 40px;
+    transform: rotate(45deg);
+    transform-origin: center center;
+    pointer-events: none;
+}
+
+/* Diamond cards with counter-rotated text */
+.section2m-stat {
+    position: relative;
+    z-index: 1;
+    transform: rotate(45deg);
+    display: grid;
+    place-items: center;
+}
+.section2m-stat > * {
+    transform: rotate(-45deg);
+}
+
+/* Make the diamond look square/centered */
+.section2m-stat { width: 240px; height: 240px; margin: 0 auto; }
+.section2m-number { font-size: 24px; }
+.section2m-label { font-size: 12px; }
+
+@media (min-width: 601px) and (max-width: 900px) {
+    .section2m-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 900px) {
     /* Hide legacy animated Section 2 on tablet/mobile */
     .section[data-section="2"] { display: none !important; }
