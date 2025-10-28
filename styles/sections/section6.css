@@ -140,7 +140,7 @@
         text-align: center;
         z-index: 6; /* above tiles (z-index: 5) */
         opacity: 1 !important; /* override GSAP fade */
-        padding: 30px 0; /* vertical spacing */
+        padding: 30px 0; /* align with Section 4 title spacing */
     }
     
     .section6-tiles {

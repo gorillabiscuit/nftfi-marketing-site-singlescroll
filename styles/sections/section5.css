@@ -372,7 +372,7 @@
         transform: none;
         width: 100%;
         margin: 0; /* use padding for spacing */
-        padding: 30px 0; /* 30px above and below */
+        padding: 30px 0; /* align with Section 4 title spacing */
         text-align: center;
         z-index: 6; /* Above testimonial cards (z-index: 5) */
         opacity: 1 !important; /* Override GSAP inline opacity */
