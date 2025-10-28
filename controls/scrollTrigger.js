@@ -1351,6 +1351,13 @@ function setupSection2Pinning() {
                                     const rect = node.querySelector('.cell-rect');
                                     if (rect) gsap.set(rect, { attr: { width: size, height: size, rx, ry: rx } });
                                 });
+                                // Center the cells group within the centered SVG (viewBox origin at 0,0)
+                                try {
+                                    const bbox = cellsGroup.getBBox();
+                                    const centerX = bbox.x + bbox.width / 2;
+                                    const centerY = bbox.y + bbox.height / 2;
+                                    cellsGroup.setAttribute('transform', `translate(${-centerX} ${-centerY})`);
+                                } catch (_) { /* no-op */ }
                             } catch (_) { /* no-op */ }
 
                             // Force-visible final state for cells/text regardless of tween side-effects
