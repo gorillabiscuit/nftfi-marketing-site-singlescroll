@@ -180,7 +180,8 @@
 .section2m-label {
     position: absolute;
     left: 50%; bottom: 12px;
-    transform: translateX(-50%) rotate(-45deg);
+    /* Parent is rotated 45deg; to get net -45deg on viewport, rotate child -90deg */
+    transform: translateX(-50%) rotate(-90deg);
     font-family: 'Satoshi Variable', sans-serif;
     font-weight: 500;
     font-size: 16px; /* match Section 2 .stats .label */
