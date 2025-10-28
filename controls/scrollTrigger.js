@@ -1351,12 +1351,16 @@ function setupSection2Pinning() {
                                     const rect = node.querySelector('.cell-rect');
                                     if (rect) gsap.set(rect, { attr: { width: size, height: size, rx, ry: rx } });
                                 });
-                                // Center the cells group within the centered SVG (viewBox origin at 0,0)
+                                // Center and rotate on the parent group so translation isn't affected by rotation
                                 try {
                                     const bbox = cellsGroup.getBBox();
                                     const centerX = bbox.x + bbox.width / 2;
                                     const centerY = bbox.y + bbox.height / 2;
-                                    cellsGroup.setAttribute('transform', `translate(${-centerX} ${-centerY})`);
+                                    if (gridGroup) {
+                                        // Clear any existing transform, then translate center to origin and rotate around origin
+                                        gridGroup.removeAttribute('transform');
+                                        gridGroup.setAttribute('transform', `translate(${-centerX} ${-centerY}) rotate(45)`);
+                                    }
                                 } catch (_) { /* no-op */ }
                             } catch (_) { /* no-op */ }
 
