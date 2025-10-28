@@ -144,11 +144,14 @@
 /* Positioning controls for Section 2 mobile/tablet heading */
 .section2-mobile {
     /* Tweak these variables to reposition/resize the heading */
-    --s2m-title-top: 10vh;
+    --s2m-title-top: 40vh;
     --s2m-title-left: 50%;
     --s2m-title-rotate: 45deg;
     --s2m-title-width: auto;
     --s2m-title-z: 2;
+    /* Size controls */
+    --s2m-title-font-size: 40px;
+    --s2m-title-line-height: 1.1;
 }
 .section2-mobile .key-metrics-title {
     position: absolute;
@@ -157,6 +160,8 @@
     transform: translate(-50%, 0) rotate(var(--s2m-title-rotate));
     width: var(--s2m-title-width);
     z-index: var(--s2m-title-z);
+    font-size: var(--s2m-title-font-size);
+    line-height: var(--s2m-title-line-height);
     white-space: nowrap;
     pointer-events: none;
 }
