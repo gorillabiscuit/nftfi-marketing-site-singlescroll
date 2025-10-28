@@ -351,6 +351,13 @@
 
 /* Mobile Breakpoint (≤600px) */
 @media (max-width: 600px) {
+    /* Title controls (mobile) */
+    .section[data-section="5"] {
+        --s5-title-font-size: 2rem;
+        --s5-title-paddingY: 30px;
+        --s5-title-align: center;
+        --s5-title-z: 6;
+    }
     /* Let section height be defined by content on mobile */
     .section[data-section="5"] { min-height: auto; }
     
@@ -366,15 +373,15 @@
     }
     .section[data-section="5"] h2,
     .section5-title {
-        font-size: 2rem; /* Smaller title on mobile */
+        font-size: var(--s5-title-font-size, 2rem); /* Smaller title on mobile */
         position: relative; /* Keep in flow, allow z-index */
         top: auto; left: auto; right: auto; /* reset absolute centering from base */
         transform: none;
         width: 100%;
         margin: 0; /* use padding for spacing */
-        padding: 30px 0; /* align with Section 4 title spacing */
-        text-align: center;
-        z-index: 6; /* Above testimonial cards (z-index: 5) */
+        padding: var(--s5-title-paddingY, 30px) 0; /* align with Section 4 spacing */
+        text-align: var(--s5-title-align, center);
+        z-index: var(--s5-title-z, 6); /* Above testimonial cards (z-index: 5) */
         opacity: 1 !important; /* Override GSAP inline opacity */
     }
     
