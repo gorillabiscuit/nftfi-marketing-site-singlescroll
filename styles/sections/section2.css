@@ -156,12 +156,18 @@
         width: 100vw;
         left: 0;
     }
-    .section[data-section="2"] #lines-svg,
+    /* Keep the SVG visible so cells/text can render; hide only the grid lines */
+    .section[data-section="2"] #lines-svg {
+        visibility: visible;
+        opacity: 1;
+        max-width: 100vw;
+    }
     .section[data-section="2"] #grid-lines {
         visibility: hidden;
         opacity: 0;
-        max-width: 100vw;
     }
+    /* Ensure cells group is visible */
+    .section[data-section="2"] #grid-cells { visibility: visible; opacity: 1; }
 }
 
 /* ==========================================================================
