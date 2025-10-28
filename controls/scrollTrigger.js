@@ -1323,11 +1323,35 @@ function setupSection2Pinning() {
                                 });
                             } catch (_) { /* no-op */ }
 
-                            // Ensure phase builders have applied their end state (idempotent)
-                            try { const p2 = createOutwardExpansionPhase(); p2 && p2.totalProgress && p2.totalProgress(1); } catch (_) { /* no-op */ }
-                            try { const p3 = createRotationPhase(); p3 && p3.totalProgress && p3.totalProgress(1); } catch (_) { /* no-op */ }
-                            try { const p4 = createExpansionPhase(); p4 && p4.totalProgress && p4.totalProgress(1); } catch (_) { /* no-op */ }
-                            try { const pb = createBlocksRevealPhase(); pb && pb.totalProgress && pb.totalProgress(1); } catch (_) { /* no-op */ }
+                            // Apply final geometry directly without timelines (robust on mobile/tablet)
+                            try {
+                                const gridGroup = window.gridGroup;
+                                if (gridGroup) {
+                                    gsap.set(gridGroup, { transformOrigin: '50% 50%', rotation: 45 });
+                                }
+                                const baseSpacing = typeof window.gridInitialSpacing === 'number' ? window.gridInitialSpacing : 50;
+                                const rectStateKey = getCurrentAnimationState();
+                                const rectStateCfg = RECT_STATES[rectStateKey] || {};
+                                const posMult = (typeof rectStateCfg.positionFinalMultiplierEnd === 'number') ? rectStateCfg.positionFinalMultiplierEnd : 1;
+                                const sizeF = (typeof rectStateCfg.sizeFactorFinalEnd === 'number') ? rectStateCfg.sizeFactorFinalEnd : (rectStateCfg.sizeFactor ?? 0.5);
+                                const finalFactor = (window.gridState && typeof window.gridState.finalFactor === 'number') ? window.gridState.finalFactor : 2.5;
+                                const spacingBase = baseSpacing * finalFactor;
+                                const size = Math.max(2, spacingBase * sizeF);
+                                const rx = size * (rectStateCfg.cornerRadiusFactor ?? 0.15);
+
+                                const cellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
+                                cellNodes.forEach((node) => {
+                                    const i = Number(node.dataset.i);
+                                    const j = Number(node.dataset.j);
+                                    const cx = i * (spacingBase * posMult) + (spacingBase * posMult) / 2;
+                                    const cy = j * (spacingBase * posMult) + (spacingBase * posMult) / 2;
+                                    const x = cx - size / 2;
+                                    const y = cy - size / 2;
+                                    node.setAttribute('transform', `translate(${x} ${y})`);
+                                    const rect = node.querySelector('.cell-rect');
+                                    if (rect) gsap.set(rect, { attr: { width: size, height: size, rx, ry: rx } });
+                                });
+                            } catch (_) { /* no-op */ }
 
                             // Force-visible final state for cells/text regardless of tween side-effects
                             try {
