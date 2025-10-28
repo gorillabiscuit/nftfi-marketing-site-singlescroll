@@ -1287,9 +1287,9 @@ function setupSection2Pinning() {
         // Add an explicit tail gap before unpinning
         section2Timeline.add(gsap.timeline().to({}, { duration: SECTION2_TIMINGS.delayBeforeUnpin }), ">");
 
-        // MOBILE: set final state and skip creating a pin (defer until fonts/layout are ready)
+        // MOBILE/TABLET: set final state and skip creating a pin (defer until fonts/layout are ready)
         try {
-            if (window.innerWidth <= 600) {
+            if (window.innerWidth <= 900) {
                 const finalize = () => {
                     // Prevent duplicate work
                     if (window.__s2MobileFinalizing) return;
