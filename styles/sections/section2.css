@@ -163,14 +163,30 @@
     place-items: center;
     overflow: hidden;
 }
-.section2m-stat > * {
-    transform: rotate(-45deg);
-}
+/* Children will opt-in to counter-rotate */
 
 /* Make the diamond look square/centered */
 .section2m-stat { width: 240px; height: 240px; margin: 0 auto; }
-.section2m-number { font-size: 24px; }
-.section2m-label { font-size: 12px; }
+.section2m-number {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 300;
+    font-size: 32px; /* match Section 2 .stats .number */
+    line-height: 1.2;
+    color: #FFFFFF;
+}
+.section2m-label {
+    position: absolute;
+    left: 50%; bottom: 12px;
+    transform: translateX(-50%) rotate(-45deg);
+    font-family: 'Satoshi Variable', sans-serif;
+    font-weight: 500;
+    font-size: 16px; /* match Section 2 .stats .label */
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+}
 
 /* Gradient palettes to match animated section */
 .section2m-stat.stat-0 { background: linear-gradient(135deg, rgba(109,62,88,0.10), rgba(109,62,88,0.80)); }
