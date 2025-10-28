@@ -12,6 +12,7 @@
     justify-content: center;
     overflow: hidden;
     padding: 0; /* Override global section padding */
+    
 }
 
 /* Container styling - matches Section 3 pattern */
@@ -131,13 +132,20 @@
 
 /* Mobile Breakpoint (≤600px) */
 @media (max-width: 600px) {
-    /* Title controls (mobile) */
+    /* Title/spacing controls (mobile) */
     .section[data-section="6"] {
         --s6-title-font-size: 2rem;
-        --s6-title-paddingY: 30px;
+        --s6-title-paddingY: 30px; /* legacy */
+        --s6-title-padding-top: 0px; /* reduce overall title block height */
+        --s6-title-padding-bottom: 30px; /* space below title */
         --s6-title-align: center;
         --s6-title-z: 6;
+        --s6-tiles-marginTop: 30px; /* gap between title and tiles */
     }
+
+    /* Avoid 100vh flex-centering on mobile; let content flow top-down */
+    .section[data-section="6"] { min-height: auto; }
+    .section6-content { min-height: auto; justify-content: flex-start; }
     .section6-title {
         font-size: var(--s6-title-font-size, 2rem);
         line-height: 1.3;
@@ -147,8 +155,11 @@
         text-align: var(--s6-title-align, center);
         z-index: var(--s6-title-z, 6); /* above tiles (z-index: 5) */
         opacity: 1 !important; /* override GSAP fade */
-        padding: var(--s6-title-paddingY, 30px) 0; /* align with Section 4 title spacing */
+        padding: var(--s6-title-padding-top, 0px) 0 var(--s6-title-padding-bottom, 30px);
     }
+
+    /* Controlled gap below title */
+    .section6-tiles { margin-top: var(--s6-tiles-marginTop, 30px); }
     
     .section6-tiles {
         width: 100%;
@@ -176,7 +187,8 @@
 @media (min-width: 601px) and (max-width: 900px) {
     .section6-title {
         font-size: 2.8rem;
-        line-height: 1.25;
+        line-height: 1.95;
+        padding-bottom: 30px;
     }
     
     .section6-tiles {
