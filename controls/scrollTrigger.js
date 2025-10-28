@@ -1291,51 +1291,65 @@ function setupSection2Pinning() {
         try {
             if (window.innerWidth <= 600) {
                 const finalize = () => {
-                    // Drive the timeline to the end
-                    try { section2Timeline.progress(1, false); } catch (_) { /* no-op */ }
-                    
-                    // Force key elements to their final visible state (mirrors end of timeline)
-                    try {
-                        // Title fully visible
-                        const titleEl = document.querySelector('.key-metrics-title');
-                        if (titleEl) gsap.set(titleEl, { opacity: 1, clearProps: 'transform,filter' });
-                    } catch (_) { /* no-op */ }
-                    
-                    try {
-                        const svg = document.getElementById('lines-svg');
-                        if (svg) {
-                            const paths = svg.querySelectorAll('path.line');
-                            paths.forEach((p) => {
-                                try {
-                                    gsap.set(p, { drawSVG: '0% 0%', attr: { 'stroke-opacity': 0 }, opacity: 0, visibility: 'hidden' });
-                                } catch (_) { /* no-op */ }
-                            });
+                    // Prevent duplicate work
+                    if (window.__s2MobileFinalizing) return;
+                    window.__s2MobileFinalizing = true;
+
+                    const attempt = () => {
+                        try {
+                            // Ensure DOM is built (lines and cells exist)
+                            const svg = document.getElementById('lines-svg');
+                            const cellsGroup = document.getElementById('grid-cells');
+                            if (!svg || !cellsGroup) {
+                                // Wait a frame for createDrawingPhase/createStaticCellsPhase
+                                requestAnimationFrame(attempt);
+                                return;
+                            }
+
+                            // Drive the master timeline to its end
+                            try { section2Timeline && section2Timeline.progress && section2Timeline.progress(1, false); } catch (_) { /* no-op */ }
+
+                            // Title fully visible
                             try {
-                                const phase2 = createOutwardExpansionPhase();
-                                if (phase2 && typeof phase2.totalProgress === 'function') phase2.totalProgress(1);
+                                const titleEl = document.querySelector('.key-metrics-title');
+                                if (titleEl) gsap.set(titleEl, { opacity: 1, clearProps: 'transform,filter' });
                             } catch (_) { /* no-op */ }
+
+                            // Hide lines to avoid overflow on mobile, but keep SVG measurable
                             try {
-                                const phase3 = createRotationPhase();
-                                if (phase3 && typeof phase3.totalProgress === 'function') phase3.totalProgress(1);
+                                const paths = svg.querySelectorAll('path.line');
+                                paths.forEach((p) => {
+                                    try { gsap.set(p, { drawSVG: '0% 0%', attr: { 'stroke-opacity': 0 }, opacity: 0, visibility: 'hidden' }); } catch (_) { /* no-op */ }
+                                });
                             } catch (_) { /* no-op */ }
+
+                            // Ensure phase builders have applied their end state (idempotent)
+                            try { const p2 = createOutwardExpansionPhase(); p2 && p2.totalProgress && p2.totalProgress(1); } catch (_) { /* no-op */ }
+                            try { const p3 = createRotationPhase(); p3 && p3.totalProgress && p3.totalProgress(1); } catch (_) { /* no-op */ }
+                            try { const p4 = createExpansionPhase(); p4 && p4.totalProgress && p4.totalProgress(1); } catch (_) { /* no-op */ }
+                            try { const pb = createBlocksRevealPhase(); pb && pb.totalProgress && pb.totalProgress(1); } catch (_) { /* no-op */ }
+
+                            // Force-visible final state for cells/text regardless of tween side-effects
                             try {
-                                const phase4 = createExpansionPhase();
-                                if (phase4 && typeof phase4.totalProgress === 'function') phase4.totalProgress(1);
+                                const cellNodes = Array.from(cellsGroup.querySelectorAll('.cell-node'));
+                                const rects = Array.from(cellsGroup.querySelectorAll('rect.cell-rect'));
+                                const labels = Array.from(cellsGroup.querySelectorAll('text[data-role="label"]'));
+                                const amounts = Array.from(cellsGroup.querySelectorAll('text[data-role="amount"]'));
+                                const highlights = Array.from(cellsGroup.querySelectorAll('rect.label-highlight'));
+                                if (cellNodes.length) gsap.set(cellNodes, { opacity: 1 });
+                                if (rects.length) gsap.set(rects, { attr: { 'fill-opacity': 1 } });
+                                if (labels.length) gsap.set(labels, { opacity: 0.5 });
+                                if (amounts.length) gsap.set(amounts, { opacity: 1 });
+                                if (highlights.length) gsap.set(highlights, { attr: { width: 0 } });
                             } catch (_) { /* no-op */ }
-                            try {
-                                const blocksTL = createBlocksRevealPhase();
-                                if (blocksTL && typeof blocksTL.totalProgress === 'function') blocksTL.totalProgress(1);
-                            } catch (_) { /* no-op */ }
+
+                            try { ScrollTrigger.refresh(); } catch (_) { /* no-op */ }
+                        } finally {
+                            window.__s2MobileFinalizing = false;
                         }
-                    } catch (_) { /* no-op */ }
-                    
-                    try {
-                        // If there are any block elements revealed later, ensure they are visible
-                        const blocks = document.querySelectorAll('.section2-block, .section2-metric, .section2-rect, .metric-block');
-                        blocks.forEach((el) => gsap.set(el, { opacity: 1, clearProps: 'y,scale,filter' }));
-                    } catch (_) { /* no-op */ }
-                    
-                    try { ScrollTrigger.refresh(); } catch (_) { /* no-op */ }
+                    };
+
+                    attempt();
                 };
                 if (document && document.fonts && typeof document.fonts.ready?.then === 'function') {
                     document.fonts.ready.then(() => {
