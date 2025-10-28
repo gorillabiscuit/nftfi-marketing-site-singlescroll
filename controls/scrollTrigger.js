@@ -1351,6 +1351,9 @@ function setupSection2Pinning() {
 
                     attempt();
                 };
+                // Expose a manual hook for debugging from DevTools
+                try { window.section2Finalize = finalize; } catch (_) { /* no-op */ }
+
                 if (document && document.fonts && typeof document.fonts.ready?.then === 'function') {
                     document.fonts.ready.then(() => {
                         requestAnimationFrame(() => requestAnimationFrame(finalize));
